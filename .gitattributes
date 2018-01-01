@@ -1,0 +1,6 @@
+* text=auto
+*.java text
+*.properties text
+*.gradle text
+grablew text
+grablew.bat text
