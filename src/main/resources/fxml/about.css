@@ -1,0 +1,80 @@
+.root {
+    -fx-base: #443823;
+    -fx-accent: #f6d35b;
+    -fx-focus-color: #f6d35b;
+    -fx-pressed-base: #f6d35b;
+    -fx-text-box-border: #ffd993;
+    -fx-control-inner-background: #443823;
+    -fx-shadow-highlight-color: #ffd993;
+    -fx-body-color: #443823;
+    -fx-text-fill: white;
+    -fx-mark-highlight-color: #ffd993;
+    -fx-mark-color: #ffd993;
+    /* will be overriden to 1em on runtime */
+    -fx-font-size: 1em;
+}
+
+.bg-container {
+	-fx-background-image: url('about_bg.png');
+	-fx-background-size: contain;
+	-fx-background-repeat: no-repeat;
+	-fx-background-color: transparent;
+}
+.tq-title-label {
+	-fx-text-fill: #000000;
+	// px, do not scale
+	-fx-font-size: 12px;
+	-fx-font-family: 'Albertus MT Light';
+	-fx-background-image: url('topbar_center.png');
+	-fx-background-repeat: no-repeat;
+
+}
+.tq-bigtitle {
+	-fx-font-size: 30px;
+	-fx-font-family: 'Albertus MT';
+	-fx-font-weight: bold;
+	-fx-font-style: italic;
+    -fx-text-fill: #ffd993;
+    -fx-effect: dropshadow( one-pass-box , #443823 , 5, 5.0 , 5 , 5 );
+
+}
+
+.tq-splitpane,
+.tq-splitpane-left {
+    -fx-background-color: transparent;
+}
+
+.tq-text-area:focused,
+.tq-textarea > .scroll-pane,
+.tq-textarea .content,
+.tq-textarea {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-prompt-text-fill: transparent;
+    -fx-base: transparent;
+    -fx-text-fill: #ffd993;
+   	-fx-font-family: 'Albertus MT Light';
+}
+
+.tq-aboutversion {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 26px;
+   	-fx-font-family: 'Albertus MT Light';
+}
+.tq-winclose {
+	-fx-background-image: url('close.png');
+	-fx-background-size: stretch;
+	-fx-background-color:transparent;
+}
+
+.tq-winclose:pressed {
+	-fx-background-image: url('close_pressed.png');
+	-fx-background-size: stretch;
+	-fx-background-color:transparent;
+}
+
+.tq-versioncheck {
+    -fx-text-fill: green;
+    -fx-font-size:17px;
+   	-fx-font-family: 'Albertus MT Light';
+}

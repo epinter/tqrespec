@@ -3,11 +3,10 @@
  */
 
 group 'br.com.pinter.tqrespec'
-version '0.1'
 
 apply plugin: 'java'
 
-sourceCompatibility = 1.8
+sourceCompatibility = 1.9
 
 repositories {
     mavenCentral()
@@ -15,10 +14,13 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    // https://mvnrepository.com/artifact/net.java.dev.jna/platform
     compile group: 'net.java.dev.jna', name: 'platform', version: '3.5.0'
-    // https://mvnrepository.com/artifact/net.java.dev.jna/platform
-    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
-
 }
+
+jar {
+    manifest {
+        attributes 'Class-Path': configurations.compile.collect { it.getName() }.join(' ')
+    }
+}
+

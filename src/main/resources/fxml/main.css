@@ -1,0 +1,236 @@
+.root {
+    -fx-base: #443823;
+    -fx-accent: #f6d35b;
+    -fx-focus-color: #f6d35b;
+    -fx-pressed-base: #f6d35b;
+    -fx-text-box-border: #ffd993;
+    -fx-control-inner-background: #443823;
+    -fx-shadow-highlight-color: #ffd993;
+    -fx-body-color: #443823;
+    -fx-text-fill: white;
+    -fx-mark-highlight-color: #ffd993;
+    -fx-mark-color: #ffd993;
+    /* will be overriden to 1em on runtime */
+    -fx-font-size: 1em;
+}
+
+.scroll-bar:vertical > .increment-button > .increment-arrow {
+    -fx-background-color: #ffd993;
+}
+
+.scroll-bar:horizontal > .decrement-button > .decrement-arrow {
+    -fx-background-color: #ffd993;
+}
+
+/* button */
+.tq-button .text {
+    -fx-effect: dropshadow( one-pass-box , black , 0, 0.0 , 0 , 2 );
+	-fx-font-family: 'Albertus MT';
+}
+
+.tq-button {
+	-fx-background-image: url('bg-button.png');
+	-fx-background-size: stretch;
+	-fx-background-color:transparent;
+	-fx-font-weight: bold;
+	-fx-font-family: 'Albertus MT';
+	-fx-font-size: 1.5em;
+	-fx-text-fill: #ffffff;}
+
+.tq-button:pressed {
+	-fx-background-image: url('bg-button_pressed.png');
+	-fx-background-size: stretch;
+	-fx-background-color:transparent;
+}
+
+/* window decoration */
+.tq-title-label {
+	-fx-text-fill: #000000;
+	// px, do not scale
+	-fx-font-size: 12px;
+	-fx-font-family: 'Albertus MT Light';
+	-fx-background-image: url('topbar_center.png');
+	-fx-background-repeat: no-repeat;
+
+}
+
+.tq-bigtitle {
+	-fx-font-size: 40px;
+	-fx-font-family: 'Albertus MT';
+	-fx-font-weight: bold;
+	-fx-font-style: italic;
+    -fx-text-fill: #ffd993;
+    -fx-effect: dropshadow( one-pass-box , black , 5, 5.0 , 5 , 5 );
+
+}
+
+.tq-winclose {
+	-fx-background-image: url('close.png');
+	-fx-background-size: stretch;
+	-fx-background-color:transparent;
+}
+
+.tq-winclose:pressed {
+	-fx-background-image: url('close_pressed.png');
+	-fx-background-size: stretch;
+	-fx-background-color:transparent;
+}
+
+.bg-container {
+	-fx-background-image: url('window_bg.png');
+	-fx-background-size: contain;
+	-fx-background-repeat: no-repeat;
+}
+
+.tq-topdeco {
+    -fx-background-image: url('topdeco.png');
+}
+
+
+.decoleft {
+    -fx-background-image: url('decoleft.png');
+}
+
+.decoright {
+    -fx-background-image: url('decoright.png');
+}
+
+.topregionleft {
+    -fx-background-image: url('topbar_region.png');
+    -fx-background-repeat: repeat-x;
+}
+
+.topregionright {
+    -fx-background-image: url('topbar_region.png');
+    -fx-background-repeat: repeat-x;
+}
+
+.borderpane {
+    -fx-border-image-source: url('border.png');
+    -fx-border-image-insets: 0;
+    -fx-border-image-repeat: stretch;
+    -fx-border-image-width: 4 4 4 4;
+    -fx-border-image-slice: 4 4 4 4;
+}
+/* ******* */
+
+
+/* character combobox */
+.tq-charactercombo:hover {
+        -fx-background: -fx-accent;
+        -fx-background-color: -fx-selection-bar;
+        -fx-text-fill: -fx-selection-bar-text;
+}
+
+.tq-charactercombo {
+	-fx-font-family: 'Albertus MT Light';
+	-fx-font-size: 1.4em;
+}
+
+.tq-charactercombo .arrow {
+    -fx-background-color: #ffd993 ;
+}
+.tq-charactercombo .arrow-button{
+    -fx-background-color: #443823;
+}
+
+.tq-charactercombo:showing > .arrow-button {
+    -fx-color: #ffd993;
+}
+
+/* ------- ARROW* ------- */
+.tq-charactercombo:hover > .arrow-button > .arrow{
+    -fx-background-insets: 1 0 -1 0, 0;
+    -fx-background-color: #f6f0d0;
+}
+
+.tq-charactercombo .list-cell{
+    -fx-background-color: #443823;
+    -fx-text-fill: #ffffff;
+	-fx-font-size: 1.2em;
+    -fx-font-family: 'Albertus MT';
+}
+
+.tq-charactercombo .combo-box-popup .list-view{
+    -fx-background-color: #443823;
+    -fx-text-fill: #ffffff;
+	-fx-font-size: 1.2em;
+    -fx-font-family: 'Albertus MT';
+}
+
+.tq-charactercombo .combo-box-popup .list-view .list-cell {
+    -fx-background-color: #f6f0d0;
+    -fx-text-fill: #000000;
+	-fx-font-size: 1.2em;
+    -fx-font-family: 'Albertus MT';
+}
+
+.tq-charactercombo:hover .combo-box-popup .list-view .list-cell {
+    -fx-background-color: #443823;
+    -fx-text-fill: #ffffff;
+	-fx-font-size: 1.2em;
+    -fx-font-family: 'Albertus MT';
+}
+/************/
+
+.tq-label {
+	-fx-text-fill: #ffffff;
+	-fx-font-size: 1.4em;
+	-fx-font-family: 'Albertus MT Light';
+    -fx-effect: dropshadow( one-pass-box , black , 0, 0.0 , 0 , 2 );
+    -fx-text-alignment: right;
+}
+
+
+.tq-textfield {
+    -fx-background-color: #443823;
+    -fx-font-family: 'Albertus MT';
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 1.4em
+}
+
+.tq-labelbox {
+    -fx-background-color: #443823;
+    -fx-font-family: 'Albertus MT';
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 1.4em;
+    -fx-background-radius: 4;
+}
+
+
+/*****spinner********/
+.spinner {
+    -fx-font-family: 'Albertus MT';
+  	-fx-font-size: 1.4em;
+}
+.spinner .increment-arrow-button .increment-arrow {
+    -fx-background-color: #ffd993;
+}
+.spinner .decrement-arrow-button .decrement-arrow {
+    -fx-background-color: #ffd993;
+}
+
+.spinner .increment-arrow-button {
+    -fx-background-color: #443823;
+}
+.spinner .decrement-arrow-button {
+    -fx-background-color: #443823;
+}
+
+.spinner:focused,
+.spinner:contains-focus,
+.spinner > .text-field {
+    -fx-text-fill: #f6d35b;
+}
+
+.spinner > .text-field {
+    -fx-background-color: #443823;
+}
+
+.spinner:focused,
+.spinner:contains-focus {
+    -fx-border-color: #f6d35b;
+
+}
+
+/*****/

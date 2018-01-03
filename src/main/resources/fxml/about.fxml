@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+
+<!--
+  ~ Copyright (C) 2018 Emerson Pinter - All Rights Reserved
+  -->
+
+<AnchorPane fx:id="rootelement" prefHeight="300.0" prefWidth="370.0" stylesheets="@about.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.pinter.tqrespec.gui.ControllerAboutForm">
+   <children>
+      <SplitPane dividerPositions="0.43" layoutX="23.0" layoutY="28.0" prefHeight="272.0" prefWidth="370.0" styleClass="bg-container" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <items>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="281.0" prefWidth="134.0" styleClass="tq-splitpane-left">
+               <children>
+                  <Label alignment="CENTER" layoutY="14.0" maxHeight="60.0" maxWidth="1.7976931348623157E308" prefHeight="60.0" styleClass="tq-bigtitle" text="TQ Respec" textAlignment="CENTER" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="14.0" />
+                  <ImageView fitHeight="180.0" fitWidth="135.0" layoutX="14.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+                     <image>
+                        <Image url="@about_character.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </AnchorPane>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" styleClass="tq-splitpane">
+               <children>
+                  <TextArea editable="false" layoutX="4.0" layoutY="87.0" prefHeight="194.0" prefWidth="206.0" styleClass="tq-textarea" text="%about.text" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="87.0">
+                     <padding>
+                        <Insets bottom="3.0" right="3.0" />
+                     </padding>
+                  </TextArea>
+                  <Label fx:id="aboutVersion" alignment="CENTER" layoutY="14.0" maxHeight="30.0" prefHeight="30.0" styleClass="tq-aboutversion" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0" />
+                  <Hyperlink fx:id="versionCheck" alignment="CENTER" layoutX="-15.0" layoutY="44.0" maxHeight="26.0" maxWidth="1.7976931348623157E308" prefHeight="26.0" styleClass="tq-versioncheck" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="55.0" />
+               </children>
+            </AnchorPane>
+        </items>
+         <padding>
+            <Insets bottom="3.0" left="3.0" top="16.0" />
+         </padding>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+      </SplitPane>
+      <Pane layoutX="161.0" onMouseClicked="#closeAboutWindow" prefHeight="26.0" prefWidth="24.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+      <Label fx:id="aboutFormTitle" alignment="TOP_CENTER" layoutX="123.0" layoutY="1.0" prefHeight="13.0" prefWidth="126.0" styleClass="tq-title-label" text="title" textAlignment="CENTER" />
+   </children>
+</AnchorPane>

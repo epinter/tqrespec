@@ -1,4 +1,0 @@
-Manifest-Version: 1.0
-Class-Path: commons-lang3-3.7.jar platform-3.5.0.jar jna-3.5.0.jar
-Main-Class: br.com.pinter.tqrespec.Main
-
