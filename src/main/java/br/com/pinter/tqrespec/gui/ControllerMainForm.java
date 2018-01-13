@@ -26,6 +26,7 @@ import br.com.pinter.tqrespec.save.PlayerWriter;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -33,10 +34,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.*;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -51,7 +53,9 @@ import javafx.stage.Window;
 import javafx.util.converter.NumberStringConverter;
 import org.apache.commons.lang3.StringUtils;
 
+import java.awt.*;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.util.ResourceBundle;
@@ -103,6 +107,9 @@ public class ControllerMainForm implements Initializable {
     @FXML
     private Label difficultyText;
 
+    @FXML
+    private Hyperlink versionCheck;
+
     private SimpleIntegerProperty currentStr = null;
     private SimpleIntegerProperty currentInt = null;
     private SimpleIntegerProperty currentDex = null;
@@ -131,6 +138,41 @@ public class ControllerMainForm implements Initializable {
             };
             new WorkerThread(windowShownTask).start();
         }));
+
+        Task<Version> taskCheckVersion = new Task<Version>() {
+            @Override
+            protected Version call() throws Exception {
+                Version version = new Version(Util.getBuildVersion());
+                int check = version.checkNewerVersion(Constants.VERSION_CHECK_URL);
+                //new version available (-1 our version is less than remote, 0 equal, 1 greater, -2 error checking
+                return version;
+            }
+        };
+
+        taskCheckVersion.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, (WorkerStateEvent e) -> {
+            Version version = taskCheckVersion.getValue();
+            if (version != null && version.getLastCheck() == -1) {
+                versionCheck.setOnAction(event -> {
+                    if (Desktop.isDesktopSupported()) {
+                        Desktop.getDesktop().isSupported(Desktop.Action.BROWSE);
+                        final Task<Void> openUrl = new Task<Void>() {
+                            @Override
+                            public Void call() throws Exception {
+                                if (StringUtils.isNotEmpty(version.getUrlPage()))
+                                    Desktop.getDesktop().browse(new URI(version.getUrlPage()));
+                                return null;
+                            }
+                        };
+                        new Thread(openUrl).start();
+                    }
+                });
+                versionCheck.setText(Util.getUIMessage("about.newversion"));
+            } else {
+                versionCheck.setDisable(true);
+            }
+        });
+
+        new Thread(taskCheckVersion).start();
 
     }
 
@@ -173,9 +215,9 @@ public class ControllerMainForm implements Initializable {
 
         //disable maximize
         stage.resizableProperty().setValue(Boolean.FALSE);
-        stage.getIcons().addAll(new Image("icon/icon64.png"),new Image("icon/icon32.png"),new Image("icon/icon16.png"));
+        stage.getIcons().addAll(new Image("icon/icon64.png"), new Image("icon/icon32.png"), new Image("icon/icon16.png"));
         stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setTitle(Util.getUIMessage("about.title",Util.getBuildTitle()));
+        stage.setTitle(Util.getUIMessage("about.title", Util.getBuildTitle()));
         Scene scene = new Scene(root);
         scene.setFill(Color.TRANSPARENT);
         stage.setScene(scene);
@@ -195,6 +237,7 @@ public class ControllerMainForm implements Initializable {
 
         stage.show();
     }
+
     @FXML
     public void saveChar(ActionEvent evt) {
         Button b = ((Button) evt.getSource());
@@ -206,16 +249,16 @@ public class ControllerMainForm implements Initializable {
         TaskWithException<Integer> backupSaveGameTask = new TaskWithException<Integer>() {
             @Override
             protected Integer call() throws Exception {
-                if(DBG) System.out.println("starting backup task");
+                if (DBG) System.out.println("starting backup task");
                 saveButton.setDisable(true);
-                if(DBG) System.out.println("returning backup task");
+                if (DBG) System.out.println("returning backup task");
                 return new PlayerWriter().backupCurrent() ? 2 : 0;
             }
         };
         TaskWithException<Integer> saveGameTask = new TaskWithException<Integer>() {
             @Override
             protected Integer call() throws Exception {
-                if(DBG) System.out.println("starting savegame task");
+                if (DBG) System.out.println("starting savegame task");
 
                 int strOld = Math.round(PlayerData.getInstance().getFloat("str"));
                 int intOld = Math.round(PlayerData.getInstance().getFloat("int"));
@@ -242,19 +285,19 @@ public class ControllerMainForm implements Initializable {
                 if (modifierOld != currentAvail.get() && currentAvail.get() > 0) {
                     PlayerData.getInstance().setInt("modifierPoints", currentAvail.get());
                 }
-                if(DBG) System.out.println("returning savegame task");
+                if (DBG) System.out.println("returning savegame task");
                 return new PlayerWriter().saveCurrent() ? 2 : 0;
             }
         };
 
         backupSaveGameTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, (e) -> {
-            if(DBG) System.out.println("starting backup listener");
+            if (DBG) System.out.println("starting backup listener");
 
             if ((int) backupSaveGameTask.getValue() == 2) {
-                if(DBG) System.out.println("backupcreated==" + backupCreated.get());
+                if (DBG) System.out.println("backupcreated==" + backupCreated.get());
                 new WorkerThread(saveGameTask).start();
             } else {
-                if(DBG) System.out.println("backupcreated==+=" + backupCreated.get());
+                if (DBG) System.out.println("backupcreated==+=" + backupCreated.get());
                 Util.showError(Util.getUIMessage("alert.errorbackup_header"),
                         Util.getUIMessage("alert.errorbackup_content", Constants.BACKUP_DIRECTORY));
                 saveButton.setDisable(false);
@@ -266,7 +309,7 @@ public class ControllerMainForm implements Initializable {
                 Util.showError(Util.getUIMessage("alert.errorsaving_header"),
                         Util.getUIMessage("alert.errorsaving_content", Constants.BACKUP_DIRECTORY));
             } else {
-                if(DBG) System.out.println("character saved==" + saveGameTask.getValue());
+                if (DBG) System.out.println("character saved==" + saveGameTask.getValue());
             }
             saveButton.setDisable(false);
         });
@@ -321,7 +364,7 @@ public class ControllerMainForm implements Initializable {
                     charClassText.setText(Util.getUIMessage("classtags." + charClass));
                 }
                 int difficulty = PlayerData.getInstance().getInt("difficulty");
-                difficultyText.setText(Util.getUIMessage(String.format("difficulty.%d",difficulty)));
+                difficultyText.setText(Util.getUIMessage(String.format("difficulty.%d", difficulty)));
                 experienceText.setText(NumberFormat.getInstance().format(xp));
                 charLevelText.setText(String.valueOf(level));
                 goldText.setText(NumberFormat.getInstance().format(gold));

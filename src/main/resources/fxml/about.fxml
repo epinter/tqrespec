@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextArea?>
@@ -36,7 +35,6 @@
                      </padding>
                   </TextArea>
                   <Label fx:id="aboutVersion" alignment="CENTER" layoutY="14.0" maxHeight="30.0" prefHeight="30.0" styleClass="tq-aboutversion" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0" />
-                  <Hyperlink fx:id="versionCheck" alignment="CENTER" layoutX="-15.0" layoutY="44.0" maxHeight="26.0" maxWidth="1.7976931348623157E308" prefHeight="26.0" styleClass="tq-versioncheck" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="55.0" />
                </children>
             </AnchorPane>
         </items>

@@ -232,5 +232,20 @@
     -fx-border-color: #f6d35b;
 
 }
-
 /*****/
+
+.tq-versioncheck {
+    -fx-font-family: 'Albertus MT Light';
+    -fx-font-weight: bold;
+    -fx-border-width: 0;
+    -fx-underline: false;
+    -fx-text-fill: #f6d35b;
+}
+
+.tq-versioncheck:visited {
+    -fx-font-family: 'Albertus MT Light';
+    -fx-font-weight: bold;
+    -fx-border-width: 0;
+    -fx-underline: false;
+    -fx-text-fill: #f6d35b;
+}

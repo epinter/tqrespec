@@ -72,9 +72,3 @@
 	-fx-background-size: stretch;
 	-fx-background-color:transparent;
 }
-
-.tq-versioncheck {
-    -fx-text-fill: green;
-    -fx-font-size:17px;
-   	-fx-font-family: 'Albertus MT Light';
-}
