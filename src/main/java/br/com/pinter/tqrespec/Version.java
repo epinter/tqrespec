@@ -21,6 +21,7 @@ public class Version implements Comparable<Version> {
     private String url1;
     private String url2;
     private String url3;
+    private int lastCheck = -2;
 
     public String getVersion() {
         return version;
@@ -46,11 +47,15 @@ public class Version implements Comparable<Version> {
         this.version = version;
     }
 
-    public int checkNewerVersion() {
+    public int getLastCheck() {
+        return lastCheck;
+    }
+
+    public int checkNewerVersion(String urlPropFile) {
         URL url = null;
         Reader reader = null;
         try {
-            url = new URL(Constants.VERSION_CHECK_URL);
+            url = new URL(urlPropFile);
             InputStream in = url.openStream();
             reader = new InputStreamReader(in, "UTF-8"); // for example
             Properties prop = new Properties();
@@ -70,7 +75,8 @@ public class Version implements Comparable<Version> {
                         System.out.println(k + "=" + v);
                     }
                 }
-                return this.compareTo(new Version(currentVersion));
+                lastCheck = this.compareTo(new Version(currentVersion));
+                return lastCheck;
             }
         } catch (Exception e) {
         }
