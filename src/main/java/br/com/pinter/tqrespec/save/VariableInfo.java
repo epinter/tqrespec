@@ -20,7 +20,7 @@
 
 package br.com.pinter.tqrespec.save;
 
-class VariableInfo {
+public class VariableInfo {
     private String name = null;
     private int keyOffset = -1;
     private int valOffset = -1;
