@@ -149,7 +149,7 @@ public class PlayerParser {
 
             if (blockInfo.getSize() < 4) continue;
 
-            if((blockInfo.getStart() >= inventoryStart && Constants.SKIP_INVENTORY_BLOCKS && inventoryStart > 0 && inventoryStart!=-1)) {
+            if((blockInfo.getStart() >= inventoryStart && Constants.SKIP_INVENTORY_BLOCKS && inventoryStart > 0)) {
                 break;
             }
             Hashtable<String, VariableInfo> variables = parseBlock(blockInfo);
@@ -177,9 +177,6 @@ public class PlayerParser {
             int keyOffset = getBuffer().position();
             String name = readString(getBuffer());
             keyread++;
-//            if (getBuffer().position() >= blockInfo.size) {
-//                continue;
-//            }
 
             if (StringUtils.isEmpty(name)) {
                 continue;

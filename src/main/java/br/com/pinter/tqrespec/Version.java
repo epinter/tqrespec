@@ -73,7 +73,7 @@ public class Version implements Comparable<Version> {
         try {
             url = new URL(urlPropFile);
             InputStream in = url.openStream();
-            reader = new InputStreamReader(in, "UTF-8"); // for example
+            reader = new InputStreamReader(in, "UTF-8");
             Properties prop = new Properties();
             if (reader != null)
                 prop.load(reader);
