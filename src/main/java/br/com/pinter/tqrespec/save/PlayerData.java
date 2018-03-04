@@ -39,6 +39,7 @@ public class PlayerData {
     private Hashtable<Integer, byte[]> changes = null;
     private Hashtable<Integer, Integer> valuesLengthIndex = null;
     private Boolean saveInProgress = null;
+    private boolean isCustomQuest = false;
 
     public static PlayerData getInstance() {
         if (instance == null) {
@@ -120,6 +121,14 @@ public class PlayerData {
 
     public void setSaveInProgress(Boolean saveInProgress) {
         this.saveInProgress = saveInProgress;
+    }
+
+    public boolean isCustomQuest() {
+        return isCustomQuest;
+    }
+
+    public void setCustomQuest(boolean customQuest) {
+        isCustomQuest = customQuest;
     }
 
     public boolean loadPlayerData(String playerName) throws Exception {
