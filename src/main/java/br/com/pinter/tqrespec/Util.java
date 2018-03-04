@@ -26,8 +26,15 @@ import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 import javafx.stage.Modality;
 
+import java.io.IOException;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
+
+import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class Util {
     public static void log(String message) {
@@ -85,10 +92,10 @@ public class Util {
         return message;
     }
 
-    public static String getUIMessage(String message,Object... parameters) {
+    public static String getUIMessage(String message, Object... parameters) {
         ResourceBundle ui = ResourceBundle.getBundle("i18n.UI");
         if (ui.containsKey(message)) {
-            return MessageFormat.format(ui.getString(message),parameters);
+            return MessageFormat.format(ui.getString(message), parameters);
         }
         return message;
     }
@@ -101,9 +108,79 @@ public class Util {
         }
         return false;
     }
+
+    public static void copyDirectoryRecurse(Path source, Path target, boolean replace) throws FileAlreadyExistsException {
+        boolean DBG = false;
+        if (!replace && Files.exists(target)) {
+            throw new FileAlreadyExistsException(target.toString() + " already exists");
+        }
+        FileVisitor fileVisitor = new FileVisitor() {
+            @Override
+            public FileVisitResult preVisitDirectory(Object dir, BasicFileAttributes attrs) {
+                Path targetDir = target.resolve(source.relativize((Path) dir));
+
+                if (DBG) System.err.println(String.format("PREDIR: src:'%s' dst:'%s'", dir, targetDir));
+
+                try {
+                    Files.copy((Path) dir, targetDir, COPY_ATTRIBUTES);
+                } catch (DirectoryNotEmptyException ignored) {
+                } catch (IOException e) {
+                    if (DBG) System.err.println(String.format("Unable to create directory '%s'", targetDir));
+                    return FileVisitResult.TERMINATE;
+                }
+
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(Object file, BasicFileAttributes attrs) {
+                Path targetFile = target.resolve(source.relativize((Path) file));
+                try {
+                    Files.copy((Path) file, targetFile, replace ? new CopyOption[]{COPY_ATTRIBUTES, REPLACE_EXISTING}
+                            : new CopyOption[]{COPY_ATTRIBUTES});
+                } catch (IOException e) {
+                    if (DBG) System.err.println(String.format("Unable to create file '%s'", targetFile));
+                    return FileVisitResult.TERMINATE;
+                }
+                if (DBG) System.err.println(String.format("FILE: src:'%s' dst:'%s'", file, targetFile));
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFileFailed(Object file, IOException exc) {
+                if (DBG) System.err.println(String.format("VISITFAIL: %s %s", file, exc));
+                return FileVisitResult.TERMINATE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Object dir, IOException exc) {
+                Path targetDir = target.resolve(source.relativize((Path) dir));
+
+                if (DBG) System.err.println(String.format("POSTDIR: src:'%s' dst:'%s'", dir, targetDir));
+
+                if (exc == null) {
+                    try {
+                        FileTime fileTime = Files.getLastModifiedTime((Path) dir);
+                        Files.setLastModifiedTime(targetDir, fileTime);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return FileVisitResult.TERMINATE;
+                    }
+                }
+                return FileVisitResult.CONTINUE;
+            }
+        };
+
+        try {
+            Files.walkFileTree(source, fileVisitor);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void closeApplication() {
         if (!Util.tryToCloseApplication()) {
-            Util.showWarning(Util.getUIMessage("alert.saveinprogress_header"),Util.getUIMessage("alert.saveinprogress_content"));
+            Util.showWarning(Util.getUIMessage("alert.saveinprogress_header"), Util.getUIMessage("alert.saveinprogress_content"));
             Task tryAgain = new Task() {
                 @Override
                 protected Object call() throws Exception {
