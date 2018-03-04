@@ -23,8 +23,6 @@ package br.com.pinter.tqrespec.save;
 import br.com.pinter.tqrespec.Constants;
 import br.com.pinter.tqrespec.GameInfo;
 import br.com.pinter.tqrespec.Settings;
-import br.com.pinter.tqrespec.Util;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -36,23 +34,20 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
 
 public class PlayerWriter {
     public PlayerWriter() {
     }
 
-    private boolean backupSaveGame(String fileName, String playerName,boolean fullBackup) {
+    private boolean backupSaveGame(String fileName, String playerName, boolean fullBackup) {
         File backupDirectory = new File(String.format("%s\\%s", GameInfo.getInstance().getSavePath(), Constants.BACKUP_DIRECTORY));
         Path player = Paths.get(fileName);
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HH");
         String ts = df.format(new Date());
-        File destPlayerZip = new File(String.format("%s\\%s%s_%s.zip", backupDirectory.toPath().toString(), playerName, fullBackup?"-fullbackup":"",ts));
+        File destPlayerZip = new File(String.format("%s\\%s%s_%s.zip", backupDirectory.toPath().toString(), playerName, fullBackup ? "-fullbackup" : "", ts));
 
         //doesn't overwrite previous backup
-        if(destPlayerZip.exists() && destPlayerZip.length()> 1) {
+        if (destPlayerZip.exists() && destPlayerZip.length() > 1) {
             return true;
         }
         if (!backupDirectory.exists()) {
@@ -68,7 +63,7 @@ public class PlayerWriter {
                     Files.walkFileTree(player.getParent(), new SimpleFileVisitor<Path>() {
                         @Override
                         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                            Path subPath = file.subpath(player.getParent().getNameCount()-1, file.getNameCount());
+                            Path subPath = file.subpath(player.getParent().getNameCount() - 1, file.getNameCount());
                             final Path dest = zipFs.getPath(root.toString(), subPath.toString());
                             Files.copy(file, dest, StandardCopyOption.REPLACE_EXISTING);
                             return FileVisitResult.CONTINUE;
@@ -79,7 +74,7 @@ public class PlayerWriter {
                             if (player.getParent().getNameCount() == dir.getNameCount()) {
                                 return FileVisitResult.CONTINUE;
                             }
-                            Path subPath = dir.subpath(player.getParent().getNameCount()-1, dir.getNameCount());
+                            Path subPath = dir.subpath(player.getParent().getNameCount() - 1, dir.getNameCount());
 
                             final Path createDir = zipFs.getPath(root.toString(), subPath.toString());
                             if (Files.notExists(createDir)) {
@@ -89,9 +84,9 @@ public class PlayerWriter {
                         }
                     });
                 } else {
-                    Files.createDirectories(zipFs.getPath(root.toString(),"/"+player.getName(player.getNameCount()-2)));
+                    Files.createDirectories(zipFs.getPath(root.toString(), "/" + player.getName(player.getNameCount() - 2)));
 
-                    Path destPlayer = zipFs.getPath("/" + player.getName(player.getNameCount()-2)+ "/" + player.getFileName());
+                    Path destPlayer = zipFs.getPath("/" + player.getName(player.getNameCount() - 2) + "/" + player.getFileName());
                     Path createdBackup = Files.copy(player, destPlayer, StandardCopyOption.REPLACE_EXISTING);
                 }
                 return true;
@@ -107,14 +102,14 @@ public class PlayerWriter {
     public boolean backupCurrent() {
         String playerChr = PlayerData.getInstance().getPlayerChr().toString();
         String playerName = PlayerData.getInstance().getPlayerName();
-        if(this.backupSaveGame(playerChr,playerName,false)) {
+        if (this.backupSaveGame(playerChr, playerName, false)) {
             return true;
         }
         return false;
     }
 
     public boolean saveCurrent() throws IOException {
-        if(PlayerData.getInstance().getSaveInProgress()!=null && PlayerData.getInstance().getSaveInProgress()) {
+        if (PlayerData.getInstance().getSaveInProgress() != null && PlayerData.getInstance().getSaveInProgress()) {
             return false;
         }
         PlayerData.getInstance().setSaveInProgress(true);
@@ -126,7 +121,7 @@ public class PlayerWriter {
         } catch (IOException e) {
             PlayerData.getInstance().setSaveInProgress(false);
             e.printStackTrace();
-            throw  e;
+            throw e;
         }
     }
 
