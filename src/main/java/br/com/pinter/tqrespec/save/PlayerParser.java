@@ -61,7 +61,6 @@ public class PlayerParser {
         HeaderInfo headerInfo = parseHeader();
 
         PlayerData.getInstance().setHeaderInfo(headerInfo);
-        PlayerData.getInstance().setVariableLocation(new Hashtable<String, ArrayList<Integer>>());
 
         if (headerInfo.getHeaderVersion() != 2) {
             throw new IncompatibleSavegameException(
@@ -78,8 +77,6 @@ public class PlayerParser {
         }
         this.prepareBufferForRead();
         PlayerData.getInstance().setPlayerName(playerName);
-        PlayerData.getInstance().setChanges(new Hashtable<Integer, byte[]>());
-        PlayerData.getInstance().setValuesLengthIndex(new Hashtable<Integer, Integer>());
     }
 
     private void prepareBufferForRead() {

@@ -260,30 +260,30 @@ public class ControllerMainForm implements Initializable {
             protected Integer call() throws Exception {
                 if (DBG) System.out.println("starting savegame task");
 
-                int strOld = Math.round(PlayerData.getInstance().getFloat("str"));
-                int intOld = Math.round(PlayerData.getInstance().getFloat("int"));
-                int dexOld = Math.round(PlayerData.getInstance().getFloat("dex"));
-                int lifeOld = Math.round(PlayerData.getInstance().getFloat("life"));
-                int manaOld = Math.round(PlayerData.getInstance().getFloat("mana"));
-                int modifierOld = PlayerData.getInstance().getInt("modifierPoints");
+                int strOld = Math.round(PlayerData.getInstance().getChanges().getFloat("str"));
+                int intOld = Math.round(PlayerData.getInstance().getChanges().getFloat("int"));
+                int dexOld = Math.round(PlayerData.getInstance().getChanges().getFloat("dex"));
+                int lifeOld = Math.round(PlayerData.getInstance().getChanges().getFloat("life"));
+                int manaOld = Math.round(PlayerData.getInstance().getChanges().getFloat("mana"));
+                int modifierOld = PlayerData.getInstance().getChanges().getInt("modifierPoints");
 
                 if (strOld != currentStr.get() && currentStr.get() > 0) {
-                    PlayerData.getInstance().setFloat("str", currentStr.get());
+                    PlayerData.getInstance().getChanges().setFloat("str", currentStr.get());
                 }
                 if (intOld != currentInt.get() && currentInt.get() > 0) {
-                    PlayerData.getInstance().setFloat("int", currentInt.get());
+                    PlayerData.getInstance().getChanges().setFloat("int", currentInt.get());
                 }
                 if (dexOld != currentDex.get() && currentDex.get() > 0) {
-                    PlayerData.getInstance().setFloat("dex", currentDex.get());
+                    PlayerData.getInstance().getChanges().setFloat("dex", currentDex.get());
                 }
                 if (lifeOld != currentLife.get() && currentLife.get() > 0) {
-                    PlayerData.getInstance().setFloat("life", currentLife.get());
+                    PlayerData.getInstance().getChanges().setFloat("life", currentLife.get());
                 }
                 if (manaOld != currentMana.get() && currentMana.get() > 0) {
-                    PlayerData.getInstance().setFloat("mana", currentMana.get());
+                    PlayerData.getInstance().getChanges().setFloat("mana", currentMana.get());
                 }
                 if (modifierOld != currentAvail.get() && currentAvail.get() > 0) {
-                    PlayerData.getInstance().setInt("modifierPoints", currentAvail.get());
+                    PlayerData.getInstance().getChanges().setInt("modifierPoints", currentAvail.get());
                 }
                 if (DBG) System.out.println("returning savegame task");
                 return new PlayerWriter().saveCurrent() ? 2 : 0;
@@ -337,12 +337,12 @@ public class ControllerMainForm implements Initializable {
         characterLoaded.addListener((observable, oldValue, newValue) -> {
             if (characterLoaded.get()) {
                 clearProperties();
-                int str = Math.round(PlayerData.getInstance().getFloat("str"));
-                int inl = Math.round(PlayerData.getInstance().getFloat("int"));
-                int dex = Math.round(PlayerData.getInstance().getFloat("dex"));
-                int life = Math.round(PlayerData.getInstance().getFloat("life"));
-                int mana = Math.round(PlayerData.getInstance().getFloat("mana"));
-                int modifier = PlayerData.getInstance().getInt("modifierPoints");
+                int str = Math.round(PlayerData.getInstance().getChanges().getFloat("str"));
+                int inl = Math.round(PlayerData.getInstance().getChanges().getFloat("int"));
+                int dex = Math.round(PlayerData.getInstance().getChanges().getFloat("dex"));
+                int life = Math.round(PlayerData.getInstance().getChanges().getFloat("life"));
+                int mana = Math.round(PlayerData.getInstance().getChanges().getFloat("mana"));
+                int modifier = PlayerData.getInstance().getChanges().getInt("modifierPoints");
                 if (modifier < 0 || str < 0 || dex < 0 || inl < 0 || life < 0 || mana < 0) {
                     Util.showError(Util.getUIMessage("alert.errorloadingchar_header"),
                             Util.getUIMessage("alert.errorloadingchar_content", life, mana, str, inl, dex));
@@ -355,15 +355,15 @@ public class ControllerMainForm implements Initializable {
                 this.setDexField(dex);
                 this.setLifeField(life);
                 this.setManaField(mana);
-                int xp = PlayerData.getInstance().getInt("currentStats.experiencePoints");
-                int level = PlayerData.getInstance().getInt("currentStats.charLevel");
-                int gold = PlayerData.getInstance().getInt("money");
+                int xp = PlayerData.getInstance().getChanges().getInt("currentStats.experiencePoints");
+                int level = PlayerData.getInstance().getChanges().getInt("currentStats.charLevel");
+                int gold = PlayerData.getInstance().getChanges().getInt("money");
                 String charClass = PlayerData.getInstance().getHeaderInfo().getPlayerClassTag();
 
                 if (StringUtils.isNotEmpty(charClass)) {
                     charClassText.setText(Util.getUIMessage("classtags." + charClass));
                 }
-                int difficulty = PlayerData.getInstance().getInt("difficulty");
+                int difficulty = PlayerData.getInstance().getChanges().getInt("difficulty");
                 difficultyText.setText(Util.getUIMessage(String.format("difficulty.%d", difficulty)));
                 experienceText.setText(NumberFormat.getInstance().format(xp));
                 charLevelText.setText(String.valueOf(level));

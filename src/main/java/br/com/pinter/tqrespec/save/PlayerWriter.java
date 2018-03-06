@@ -23,6 +23,7 @@ package br.com.pinter.tqrespec.save;
 import br.com.pinter.tqrespec.Constants;
 import br.com.pinter.tqrespec.GameInfo;
 import br.com.pinter.tqrespec.Settings;
+import br.com.pinter.tqrespec.Util;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -126,8 +127,12 @@ public class PlayerWriter {
     }
 
     private void writeBuffer(String filename) throws IOException {
+        this.writeBuffer(filename,PlayerData.getInstance().getChanges());
+    }
+
+    private void writeBuffer(String filename, ChangesTable changesTable) throws IOException {
         PlayerData.getInstance().getBuffer().rewind();
-        List<Integer> changedOffsets = new ArrayList<>(PlayerData.getInstance().getChanges().keySet());
+        List<Integer> changedOffsets = new ArrayList<>(changesTable.keySet());
         Collections.sort(changedOffsets);
 
         File out = new File(filename);
@@ -140,9 +145,9 @@ public class PlayerWriter {
             );
             outChannel.write(PlayerData.getInstance().getBuffer());
             PlayerData.getInstance().getBuffer().limit(PlayerData.getInstance().getBuffer().capacity());
-            byte c[] = PlayerData.getInstance().getChanges().get(offset);
+            byte c[] = changesTable.get(offset);
             outChannel.write(ByteBuffer.wrap(c));
-            int previousValueLength = PlayerData.getInstance().getValuesLengthIndex().get(offset);
+            int previousValueLength = changesTable.getValuesLengthIndex().get(offset);
             PlayerData.getInstance().getBuffer().position(
                     PlayerData.getInstance().getBuffer().position() + previousValueLength);
         }
