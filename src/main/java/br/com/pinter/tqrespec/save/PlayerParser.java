@@ -25,7 +25,9 @@ import br.com.pinter.tqrespec.GameInfo;
 import br.com.pinter.tqrespec.Util;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
@@ -170,7 +172,6 @@ public class PlayerParser {
 
         while (this.getBuffer().position() <= (blockInfo.getEnd() - getBlockTagSize("end_block"))) {
             int dataOffset = 0;
-            int valSize = -1;
             int keyOffset = getBuffer().position();
             String name = readString(getBuffer());
             keyread++;
@@ -179,16 +180,16 @@ public class PlayerParser {
                 continue;
             }
 
-            String value = null;
-
             if (StringUtils.isEmpty(name)) {
                 if (DBG)
                     Util.log(String.format("empty name at block %d pos %d", blockInfo.getStart(), getBuffer().position()));
             }
 
-            int valOffset = getBuffer().position();
-
-            VariableInfo.VariableType valType = VariableInfo.VariableType.Unknown;
+            VariableInfo variableInfo = new VariableInfo();
+            variableInfo.setValOffset(getBuffer().position());
+            variableInfo.setVariableType(VariableInfo.VariableType.Unknown);
+            variableInfo.setKeyOffset(keyOffset);
+            variableInfo.setName(name);
 
             if (name.equalsIgnoreCase("begin_block")) {
                 dataOffset -= getBlockTagSize("begin_block");
@@ -197,76 +198,28 @@ public class PlayerParser {
                 dataOffset -= getBlockTagSize("end_block");
                 valread++;
                 if(temp.size() == 1) {
-                    VariableInfo variableInfo = temp.get(temp.size() - 1);
-                    variableInfo.setName("difficulty");
-                    ret.put(variableInfo.getName(), variableInfo);
-                    putVarIndex(variableInfo.getName(), blockInfo.getStart());
-                    int diffInt = this.getBuffer().getInt(variableInfo.getValOffset());
-                    variableInfo.setValue(diffInt);
-                    variableInfo.setVariableType(VariableInfo.VariableType.Integer);
-                    if (DBG) Util.log(String.format("blockStart: %d; variableInfo: %s; data_offset=%d", blockInfo.getStart(), variableInfo.toString(), dataOffset));
+                    VariableInfo endBlockVar = temp.get(temp.size() - 1);
+                    endBlockVar.setName("difficulty");
+                    ret.put(endBlockVar.getName(), endBlockVar);
+                    putVarIndex(endBlockVar.getName(), blockInfo.getStart());
+                    int diffInt = this.getBuffer().getInt(endBlockVar.getValOffset());
+                    endBlockVar.setValue(diffInt);
+                    endBlockVar.setVariableType(VariableInfo.VariableType.Integer);
+                    if (DBG) Util.log(String.format("blockStart: %d; variableInfo: %s; data_offset=%d", blockInfo.getStart(), endBlockVar.toString(), dataOffset));
                 }
-            } else if (name.equalsIgnoreCase("myPlayerName")) {
-                valType = VariableInfo.VariableType.String;
-                value = this.readString(this.getBuffer(), true);
-                if (StringUtils.isNotEmpty(value)) {
-                    try {
-                        value = new String(value.getBytes(), "UTF-16LE");
-                        valSize = value.getBytes().length * 2;
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-
-                } else {
-                    valSize = 0;
+            } else if (name.equalsIgnoreCase("myPlayerName")
+                    || name.equalsIgnoreCase("defaultText")
+                    || name.equalsIgnoreCase("(*greatestMonsterKilledName)[i]")) {
+                this.readString(variableInfo, this.getBuffer(), true);
+                if (variableInfo.getValSize() >= 0) {
+                    valread++;
                 }
-                valread++;
-            } else if (name.equalsIgnoreCase("defaultText")) {
-                valType = VariableInfo.VariableType.String;
-                value = this.readString(this.getBuffer(), true);
-                if (StringUtils.isNotEmpty(value)) {
-                    try {
-                        value = new String(value.getBytes(), "UTF-16LE");
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                    valSize = value.getBytes().length;
-                } else {
-                    valSize = 0;
+            } else if (name.equalsIgnoreCase("playerTexture")
+                    || name.equalsIgnoreCase("skillName")) {
+                this.readString(variableInfo, this.getBuffer());
+                if (variableInfo.getValSize() >= 0) {
+                    valread++;
                 }
-                valread++;
-            } else if (name.equalsIgnoreCase("(*greatestMonsterKilledName)[i]")) {
-                valType = VariableInfo.VariableType.String;
-                value = this.readString(this.getBuffer(), true);
-                if (StringUtils.isNotEmpty(value)) {
-                    try {
-                        value = new String(value.getBytes(), "UTF-16LE");
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                    valSize = value.getBytes().length;
-                } else {
-                    valSize = 0;
-                }
-                valread++;
-            } else if (name.equalsIgnoreCase("playerTexture")) {
-                valType = VariableInfo.VariableType.String;
-                value = this.readString(this.getBuffer());
-                if (StringUtils.isNotEmpty(value)) {
-                    valSize = value.getBytes().length;
-                } else {
-                    valSize = 0;
-                }
-                valread++;
-            } else if (name.equalsIgnoreCase("skillName")) {
-                valType = VariableInfo.VariableType.String;
-                value = this.readString(this.getBuffer());
-                if (StringUtils.isNotEmpty(value)) {
-                    valSize = value.getBytes().length;
-                } else {
-                    valSize = 0;
-                }
-                valread++;
             } else if (name.equalsIgnoreCase("isInMainQuest")
                     || name.equalsIgnoreCase("disableAutoPopV2")
                     || name.equalsIgnoreCase("numTutorialPagesV2")
@@ -319,56 +272,45 @@ public class PlayerParser {
                     || name.equalsIgnoreCase("equipmentSelection")
                     || name.equalsIgnoreCase("equipmentSelection")
                     || name.equalsIgnoreCase("seed")
-                    || name.equalsIgnoreCase("var1")) {
-                valType = VariableInfo.VariableType.Integer;
+                    || name.equalsIgnoreCase("var1")
+                    || name.equalsIgnoreCase("storedType")) {
+                variableInfo.setVariableType(VariableInfo.VariableType.Integer);
+                variableInfo.setValSize(4);
                 dataOffset = 4;
-                valSize = dataOffset;
                 valread++;
             } else if (name.equalsIgnoreCase("teleportUID")
                     || name.equalsIgnoreCase("respawnUID")
                     || name.equalsIgnoreCase("markerUID")
                     || name.equalsIgnoreCase("strategicMovementRespawnPoint[i]")
                     ) {
-                valType = VariableInfo.VariableType.UID;
+                variableInfo.setVariableType(VariableInfo.VariableType.UID);
                 dataOffset = 16;
-                valSize = dataOffset;
+                variableInfo.setValSize(16);
                 valread++;
-            } else if (name.equalsIgnoreCase("currentStats.experiencePoints")) {
-                valType = VariableInfo.VariableType.Integer;
-                value = String.valueOf(getBuffer().getInt());
-                valSize = 4;
-                valread++;
-            } else if (name.equalsIgnoreCase("currentStats.charLevel")) {
-                valType = VariableInfo.VariableType.Integer;
-                value = String.valueOf(getBuffer().getInt());
-                valSize = 4;
-                valread++;
-            } else if (name.equalsIgnoreCase("modifierPoints")
+            } else if (name.equalsIgnoreCase("currentStats.experiencePoints")
+                    || name.equalsIgnoreCase("currentStats.charLevel")
+                    || name.equalsIgnoreCase("modifierPoints")
                     || name.equalsIgnoreCase("versionRespawnPoint")
                     || name.equalsIgnoreCase("money")) {
-                valType = VariableInfo.VariableType.Integer;
-                value = String.valueOf(getBuffer().getInt());
-                valSize = 4;
-                valread++;
-            } else if (name.equalsIgnoreCase("storedType")) {
-                valType = VariableInfo.VariableType.Integer;
-                dataOffset = 4;
-                valSize = dataOffset;
-                valread++;
+                this.readInt(variableInfo);
+                if(variableInfo.getValSize() >= 0) {
+                    valread++;
+                }
             } else if (name.equalsIgnoreCase("itemPositionsSavedAsGridCoords")) {
                 //inventory
                 if(Constants.SKIP_INVENTORY_BLOCKS) {
-                    inventoryStart = valOffset;
+                    inventoryStart = variableInfo.getValOffset();
                 }
                 break;
             } else if (name.equalsIgnoreCase("temp")) {
-                valType = VariableInfo.VariableType.Float;
-                value = String.valueOf(getBuffer().getFloat());
-                valSize = 4;
-                valread++;
+                this.readFloat(variableInfo);
+                if(variableInfo.getValSize() >= 0) {
+                    valread++;
+                }
             } else {
-                valType = VariableInfo.VariableType.Integer;
+                variableInfo.setVariableType(VariableInfo.VariableType.Integer);
                 dataOffset = this.getBuffer().getInt();
+                variableInfo.setValSize(dataOffset);
                 valread++;
             }
             if (keyread > 0) {
@@ -380,21 +322,7 @@ public class PlayerParser {
                 }
             }
 
-            VariableInfo variableInfo = new VariableInfo();
-            variableInfo.setName(name);
-            variableInfo.setKeyOffset(keyOffset);
-            variableInfo.setValOffset(valOffset);
-            variableInfo.setVariableType(valType);
-
-            if (StringUtils.isNotEmpty(value)) {
-                variableInfo.setValSize(valSize);
-                if(variableInfo.getVariableType() == VariableInfo.VariableType.Float) {
-                    variableInfo.setValue(Float.parseFloat(value));
-                } else if(variableInfo.getVariableType() == VariableInfo.VariableType.Integer) {
-                    variableInfo.setValue(Integer.parseInt(value));
-                } else if(variableInfo.getVariableType() == VariableInfo.VariableType.String) {
-                    variableInfo.setValue(value);
-                }
+            if (variableInfo.getValSize() >= 0) {
                 if (name.equalsIgnoreCase("temp")) {
                     if (temp.size() == 4) {
                         VariableInfo str = temp.get(0);
@@ -432,7 +360,7 @@ public class PlayerParser {
                 }
             } else {
                 if (DBG)
-                    Util.log(String.format("IGNORED name=%s; value=%s; key_offset=%d, val_offset=%d; val_size=%d", name, value, keyOffset, valOffset, valSize));
+                    Util.log(String.format("IGNORED %s", variableInfo));
             }
             if (dataOffset > 0) {
                 this.getBuffer().position(this.getBuffer().position() + dataOffset);
@@ -500,31 +428,6 @@ public class PlayerParser {
         return headerInfo;
     }
 
-    private String readString(ByteBuffer byteBuffer) {
-        return this.readString(byteBuffer, false);
-    }
-
-    private String readString(ByteBuffer byteBuffer, boolean utf16le) {
-
-        try {
-            int len = byteBuffer.getInt();
-            if (len <= 0) {
-                return null;
-            }
-            if (utf16le) {
-                len *= 2;
-            }
-            byte buf[] = new byte[len];
-
-            byteBuffer.get(buf, 0, len);
-            String value = new String(buf, "UTF-8");
-            return new String(value.getBytes(), "Windows-1252");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     private int searchBlockTag(String tag, int offset) {
         int count = 0;
         for (int i = offset; i >= 0 && i < this.getBuffer().capacity(); i++) {
@@ -562,4 +465,79 @@ public class PlayerParser {
         return null;
     }
 
+    private void readString(VariableInfo variableInfo, ByteBuffer byteBuffer) {
+        this.readString(variableInfo, byteBuffer, false);
+    }
+
+    private void readString(VariableInfo variableInfo, ByteBuffer byteBuffer, boolean utf16le) {
+        if (variableInfo.getValSize() != -1) {
+            System.err.println("BUG: variable size != 0");
+            return;
+        }
+        try {
+            int len = byteBuffer.getInt();
+            variableInfo.setVariableType(VariableInfo.VariableType.String);
+            variableInfo.setValSize(len);
+            if (len <= 0) {
+                return;
+            }
+            if (utf16le) {
+                len *= 2;
+            }
+
+            byte buf[] = new byte[len];
+
+            byteBuffer.get(buf, 0, len);
+
+            variableInfo.setValue(new String(buf, utf16le ? "UTF-16LE" : "UTF-8"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void readInt(VariableInfo variableInfo) {
+        if (variableInfo.getValSize() != -1) {
+            System.err.println("BUG: variable size != 0");
+            return;
+        }
+
+        variableInfo.setValue(getBuffer().getInt());
+        variableInfo.setVariableType(VariableInfo.VariableType.Integer);
+        variableInfo.setValSize(4);
+    }
+
+    private void readFloat(VariableInfo variableInfo) {
+        if (variableInfo.getValSize() != -1) {
+            System.err.println("BUG: variable size != 0");
+            return;
+        }
+
+        variableInfo.setValue(getBuffer().getFloat());
+        variableInfo.setVariableType(VariableInfo.VariableType.Float);
+        variableInfo.setValSize(4);
+    }
+
+    private String readString(ByteBuffer byteBuffer) {
+        return this.readString(byteBuffer, false);
+    }
+
+    private String readString(ByteBuffer byteBuffer, boolean utf16le) {
+
+        try {
+            int len = byteBuffer.getInt();
+            if (len <= 0) {
+                return null;
+            }
+            if (utf16le) {
+                len *= 2;
+            }
+            byte buf[] = new byte[len];
+
+            byteBuffer.get(buf, 0, len);
+            return new String(buf, utf16le ? "UTF-16LE" : "UTF-8");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
