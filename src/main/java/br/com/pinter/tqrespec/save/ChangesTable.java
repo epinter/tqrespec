@@ -125,7 +125,9 @@ public class ChangesTable extends Hashtable<Integer, byte[]>  implements DeepClo
                         == VariableInfo.VariableType.Float) {
                     VariableInfo variableInfo = PlayerData.getInstance().getBlockInfo().get(block).getVariables().get(variable);
                     if (variableInfo.getValSize() == 4) {
-                        PlayerData.getInstance().getBuffer().putFloat(variableInfo.getValOffset(), value);
+                        byte data[] = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putFloat(value).array();
+                        this.put(variableInfo.getValOffset(), data);
+                        this.valuesLengthIndex.put(variableInfo.getValOffset(), variableInfo.getValSize());
                     }
                 } else {
                     throw new Exception(String.format("Variable '%s' is not a float", variable));
@@ -174,7 +176,9 @@ public class ChangesTable extends Hashtable<Integer, byte[]>  implements DeepClo
                         == VariableInfo.VariableType.Integer) {
                     VariableInfo variableInfo = PlayerData.getInstance().getBlockInfo().get(block).getVariables().get(variable);
                     if (variableInfo.getValSize() == 4) {
-                        PlayerData.getInstance().getBuffer().putInt(variableInfo.getValOffset(), value);
+                        byte data[] = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(value).array();
+                        this.put(variableInfo.getValOffset(), data);
+                        this.valuesLengthIndex.put(variableInfo.getValOffset(), variableInfo.getValSize());
                     }
                 } else {
                     throw new Exception(String.format("Variable '%s' is not an int", variable));
