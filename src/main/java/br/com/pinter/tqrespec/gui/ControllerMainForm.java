@@ -419,6 +419,7 @@ public class ControllerMainForm implements Initializable {
     public void characterSelected(ActionEvent evt) throws Exception {
         saveButton.setDisable(true);
         copyButton.setDisable(true);
+        characterCombo.setDisable(true);
         copyCharInput.clear();
         ComboBox character = (ComboBox) evt.getSource();
         String playerName = (String) character.getSelectionModel().getSelectedItem();
@@ -474,6 +475,7 @@ public class ControllerMainForm implements Initializable {
                 if (currentAvail.get() >= 0) {
                     saveButton.setDisable(false);
                 }
+                characterCombo.setDisable(false);
             }
         });
 
