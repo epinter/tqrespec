@@ -26,6 +26,7 @@ import br.com.pinter.tqrespec.save.PlayerWriter;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
@@ -39,6 +40,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.*;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -57,6 +59,8 @@ import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.file.FileAlreadyExistsException;
 import java.text.NumberFormat;
 import java.util.ResourceBundle;
 
@@ -109,6 +113,12 @@ public class ControllerMainForm implements Initializable {
 
     @FXML
     private Hyperlink versionCheck;
+
+    @FXML
+    private Button copyButton;
+
+    @FXML
+    private TextField copyCharInput;
 
     private SimpleIntegerProperty currentStr = null;
     private SimpleIntegerProperty currentInt = null;
@@ -176,16 +186,21 @@ public class ControllerMainForm implements Initializable {
 
     }
 
-    public void windowShownHandler() throws Exception {
-        assert characterCombo == null : "fx:id=\"characterCombo\" not found in FXML.";
-
+    public void addCharactersToCombo() {
         try {
+            characterCombo.getSelectionModel().clearSelection();
+            characterCombo.getItems().clear();
             for (String playerName : GameInfo.getInstance().getPlayerListMain()) {
                 characterCombo.getItems().add(playerName);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void windowShownHandler() throws Exception {
+        assert characterCombo == null : "fx:id=\"characterCombo\" not found in FXML.";
+        addCharactersToCombo();
     }
 
     public void close(MouseEvent evt) {
@@ -236,6 +251,72 @@ public class ControllerMainForm implements Initializable {
         }));
 
         stage.show();
+    }
+
+    @FXML
+    public void copyCharInputChanged(KeyEvent event) {
+        String str = copyCharInput.getText();
+        int caret = copyCharInput.getCaretPosition();
+        StringBuilder newStr = new StringBuilder();
+
+        for (char c : str.toCharArray()) {
+            //all characters above 0xFF needs to have accents stripped
+            if (c > 0xFF) {
+                newStr.append(StringUtils.stripAccents(Character.toString(c)).toCharArray()[0]);
+            } else {
+                newStr.append(c);
+            }
+        }
+        if(copyCharInput.getText().length() > 0) {
+            copyButton.setDisable(false);
+        } else {
+            copyButton.setDisable(true);
+        }
+        copyCharInput.setText(newStr.toString());
+        copyCharInput.positionCaret(caret);
+    }
+
+    @FXML
+    public void copyChar(ActionEvent evt) {
+        String targetPlayerName = copyCharInput.getText();
+        copyButton.setDisable(true);
+        saveButton.setDisable(true);
+        TaskWithException<Integer> copyCharTask = new TaskWithException<Integer>() {
+            @Override
+            protected Integer call() {
+                try {
+                    new PlayerWriter().copyCurrentSave(targetPlayerName);
+                    return 2;
+                } catch (FileAlreadyExistsException e) {
+                    return 3;
+                } catch (IOException e) {
+                    return 0;
+                }
+            }
+        };
+
+        copyCharTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, (e) -> {
+            if ((int) copyCharTask.getValue() == 2) {
+                PlayerData.getInstance().reset();
+                copyButton.setDisable(false);
+                saveButton.setDisable(false);
+                addCharactersToCombo();
+                if (characterCombo.getItems().contains(targetPlayerName)) {
+                    characterCombo.setValue(targetPlayerName);
+                }
+            } else if((int) copyCharTask.getValue() == 3) {
+                Util.showError("Target Directory already exists!",
+                        String.format("The specified target directory already exists. Aborting the copy to character '%s'",
+                                targetPlayerName));
+            } else {
+                Util.showError(Util.getUIMessage("alert.errorcopying_header"),
+                        Util.getUIMessage("alert.errorcopying_content", targetPlayerName));
+            }
+            copyButton.setDisable(false);
+        });
+
+        new WorkerThread(copyCharTask).start();
+
     }
 
     @FXML
@@ -321,8 +402,13 @@ public class ControllerMainForm implements Initializable {
     @FXML
     public void characterSelected(ActionEvent evt) throws Exception {
         saveButton.setDisable(true);
+        copyButton.setDisable(true);
+        copyCharInput.clear();
         ComboBox character = (ComboBox) evt.getSource();
         String playerName = (String) character.getSelectionModel().getSelectedItem();
+        if(StringUtils.isEmpty((playerName))) {
+            return;
+        }
 
         SimpleBooleanProperty characterLoaded = new SimpleBooleanProperty();
 

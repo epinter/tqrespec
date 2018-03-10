@@ -186,6 +186,7 @@
     -fx-background-color: #443823;
     -fx-font-family: 'Albertus MT';
     -fx-text-fill: #ffffff;
+    -fx-prompt-text-fill: #9e8760;
     -fx-font-size: 1.4em
 }
 
@@ -236,6 +237,7 @@
 
 .tq-versioncheck {
     -fx-font-family: 'Albertus MT Light';
+    -fx-font-size: 12px;
     -fx-font-weight: bold;
     -fx-border-width: 0;
     -fx-underline: false;
@@ -244,6 +246,7 @@
 
 .tq-versioncheck:visited {
     -fx-font-family: 'Albertus MT Light';
+    -fx-font-size: 12px;
     -fx-font-weight: bold;
     -fx-border-width: 0;
     -fx-underline: false;
