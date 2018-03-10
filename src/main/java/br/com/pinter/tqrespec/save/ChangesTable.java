@@ -20,6 +20,8 @@
 
 package br.com.pinter.tqrespec.save;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
@@ -43,7 +45,6 @@ public class ChangesTable extends Hashtable<Integer, byte[]> {
         this.valuesLengthIndex = valuesLengthIndex;
     }
 
-
     public String getString(String variable) {
         if (PlayerData.getInstance().getVariableLocation().get(variable) != null) {
             int block = PlayerData.getInstance().getVariableLocation().get(variable).get(0);
@@ -61,10 +62,10 @@ public class ChangesTable extends Hashtable<Integer, byte[]> {
         this.setString(variable, value, false);
     }
 
-    public void setString(String variable, String value, boolean utf16le) throws Exception {
+    public void setString(String variable, String value, boolean utf16le) {
         if (PlayerData.getInstance().getVariableLocation().get(variable) != null) {
             if (PlayerData.getInstance().getVariableLocation().get(variable).size() > 1) {
-                throw new Exception("Variable is defined on multiple blocks, aborting");
+                throw new IllegalStateException("Variable is defined on multiple blocks, aborting");
             }
             int block = PlayerData.getInstance().getVariableLocation().get(variable).get(0);
             if (PlayerData.getInstance().getBlockInfo().get(block) != null) {
@@ -73,9 +74,10 @@ public class ChangesTable extends Hashtable<Integer, byte[]> {
                     VariableInfo variableInfo = PlayerData.getInstance().getBlockInfo().get(block).getVariables().get(variable);
                     byte str[];
                     if (utf16le) {
-                        str = value.getBytes(Charset.forName("UTF-16LE"));
+                        //encode string to the format the game uses, a wide character with second byte always 0
+                        str = encodeString(value,true);
                     } else {
-                        str = value.getBytes();
+                        str = encodeString(value,false);
                     }
                     byte len[] = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(value.length()).array();
                     byte[] data = new byte[4 + str.length];
@@ -83,11 +85,32 @@ public class ChangesTable extends Hashtable<Integer, byte[]> {
                     System.arraycopy(str, 0, data, len.length, str.length);
 
                     this.put(variableInfo.getValOffset(), data);
-                    this.valuesLengthIndex.put(variableInfo.getValOffset(), 4 + variableInfo.getValSize());
-                    System.err.println(Arrays.toString(str) + " --- v" + variableInfo.toString());
+                    this.valuesLengthIndex.put(variableInfo.getValOffset(), 4 + (variableInfo.getValSize() * (utf16le ? 2 : 1)));
                 }
             }
         }
+    }
+
+    private byte[] encodeString(String str, boolean wide) {
+        //allocate the number of characters * 2 so the buffer can hold the '0'
+        ByteBuffer buffer = ByteBuffer.allocate(str.length() * (wide?2:1));
+
+        for (char c : str.toCharArray()) {
+            byte n;
+
+            //all characters above 0xFF needs to have accents stripped
+            if (c > 0xFF) {
+                n = (byte) StringUtils.stripAccents(Character.toString(c)).toCharArray()[0];
+            } else {
+                n = (byte) c;
+            }
+            if(wide) {
+                buffer.put(new byte[]{n, 0});
+            }else {
+                buffer.put(new byte[]{n});
+            }
+        }
+        return buffer.array();
     }
 
     public void setFloat(String variable, float value) throws Exception {
