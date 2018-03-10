@@ -20,6 +20,7 @@
 
 package br.com.pinter.tqrespec;
 
+import br.com.pinter.tqrespec.save.PlayerData;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -35,6 +36,7 @@ import java.util.Optional;
 public class ExceptionHandler {
     public static void unhandled(Thread t, Throwable e) {
         e.printStackTrace();
+        PlayerData.getInstance().reset();
         if(Platform.isFxApplicationThread()) {
             ExceptionHandler.showAlert(t,e);
         }
