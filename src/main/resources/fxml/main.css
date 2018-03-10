@@ -54,14 +54,18 @@
 
 }
 
+.tq-bigtitle:hover {
+    -fx-cursor: hand;
+    -fx-text-fill: #ffffff;
+}
+
 .tq-bigtitle {
-	-fx-font-size: 40px;
-	-fx-font-family: 'Albertus MT';
-	-fx-font-weight: bold;
-	-fx-font-style: italic;
+    -fx-font-size: 34px;
+    -fx-text-alignment: left;
+    -fx-font-family: 'Albertus MT';
+    -fx-font-weight: bold;
     -fx-text-fill: #ffd993;
     -fx-effect: dropshadow( one-pass-box , black , 5, 5.0 , 5 , 5 );
-
 }
 
 .tq-winclose {
@@ -235,6 +239,9 @@
 }
 /*****/
 
+.tq-versioncheck:hover {
+    -fx-text-fill: #ffffff;
+}
 .tq-versioncheck {
     -fx-font-family: 'Albertus MT Light';
     -fx-font-size: 12px;
