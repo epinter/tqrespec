@@ -12,6 +12,7 @@
     -fx-mark-color: #ffd993;
     /* will be overriden to 1em on runtime */
     -fx-font-size: 1em;
+    -fx-font-family: 'Albertus MT';
 }
 
 .scroll-bar:vertical > .increment-button > .increment-arrow {
@@ -60,7 +61,7 @@
 }
 
 .tq-bigtitle {
-    -fx-font-size: 34px;
+    -fx-font-size: 3.4em;
     -fx-text-alignment: left;
     -fx-font-family: 'Albertus MT';
     -fx-font-weight: bold;
@@ -86,8 +87,8 @@
 	-fx-background-repeat: no-repeat;
 }
 
-.tq-topdeco {
-    -fx-background-image: url('topdeco.png');
+.tq-topdecoration {
+    -fx-background-image: url('topdecoration.png');
 }
 
 
@@ -258,4 +259,54 @@
     -fx-border-width: 0;
     -fx-underline: false;
     -fx-text-fill: #f6d35b;
+}
+
+.tq-tabpane {
+    -fx-cursor: default;
+}
+
+.tq-tabpane .tab-header-area .headers-region {
+    visibility: hidden ;
+}
+.tq-tabpane .tab-header-area .headers-region {
+}
+.tq-tabpane .tab-header-area .tab-header-background {
+    -fx-background-color: transparent;
+}
+
+.tq-tabpane .tab-content-area {
+    -fx-border-image-source: url('border.png');
+    -fx-border-image-insets: 0;
+    -fx-border-image-repeat: stretch;
+    -fx-border-image-width: 2 2 2 2;
+    -fx-border-image-slice: 2 2 2 2;
+}
+
+.tq-tabpane .control-buttons-tab {
+}
+.tq-tabpane .tab-header-area .tab-label {
+    -fx-pref-height: 30px;
+    -fx-min-height: 30px;
+    -fx-max-height: 30px;
+}
+.tq-tabpane .tab-header-area {
+    -fx-font-size: 22px;
+}
+
+.tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
+    -fx-border-color: transparent;
+}
+
+.tq-tabbutton {
+	-fx-font-family: 'Albertus MT';
+    -fx-border-image-source: url('border.png');
+    -fx-border-image-insets: 0;
+    -fx-border-image-repeat: stretch;
+    -fx-border-image-width: 3 3 0 3;
+    -fx-border-image-slice: 3 3 0 3;
+    display:none;
+}
+
+.tab-pane {
+    -fx-tab-max-height: 48px ;
 }

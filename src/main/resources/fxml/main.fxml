@@ -8,6 +8,8 @@
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -20,7 +22,7 @@
 
 <VBox fx:id="rootelement" alignment="TOP_CENTER" maxHeight="940.0" maxWidth="1320.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="470.0" prefWidth="660.0" stylesheets="@main.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.pinter.tqrespec.gui.ControllerMainForm">
    <children>
-      <HBox fx:id="tophbox" fillHeight="false" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" onMouseDragged="#moveWindow" onMousePressed="#startMoveWindow" onMouseReleased="#endMoveWindow" prefHeight="23.0" VBox.vgrow="ALWAYS">
+      <HBox fx:id="tophbox" fillHeight="false" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" onMouseDragged="#moveWindow" onMousePressed="#startMoveWindow" onMouseReleased="#endMoveWindow" prefHeight="47.0" styleClass="tq-topdecoration" VBox.vgrow="ALWAYS">
          <children>
             <Region prefHeight="13.0" prefWidth="264.0" styleClass="topregionleft" stylesheets="@main.css" HBox.hgrow="ALWAYS">
                <HBox.margin>
@@ -45,123 +47,168 @@
                </cursor>
             </Button>
          </children>
+         <VBox.margin>
+            <Insets bottom="10.0" />
+         </VBox.margin>
       </HBox>
       <VBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="470.0" prefWidth="660.0" stylesheets="@main.css" VBox.vgrow="ALWAYS">
         <children>
-            <GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+            <GridPane prefHeight="75.0" prefWidth="637.0">
               <columnConstraints>
-                  <ColumnConstraints />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="26.0" minWidth="26.0" prefWidth="26.0" />
-                <ColumnConstraints hgrow="SOMETIMES" percentWidth="20.0" />
-                <ColumnConstraints hgrow="SOMETIMES" percentWidth="20.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" percentWidth="25.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="209.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="26.0" minWidth="26.0" prefWidth="26.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="59.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="41.0" />
               </columnConstraints>
               <rowConstraints>
-                  <RowConstraints percentHeight="10.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints percentHeight="10.0" vgrow="SOMETIMES" />
-                  <RowConstraints percentHeight="10.0" vgrow="SOMETIMES" />
-                <RowConstraints percentHeight="10.0" vgrow="SOMETIMES" />
-                  <RowConstraints percentHeight="10.0" vgrow="SOMETIMES" />
-                  <RowConstraints percentHeight="10.0" vgrow="SOMETIMES" />
-                  <RowConstraints percentHeight="10.0" vgrow="SOMETIMES" />
-                <RowConstraints percentHeight="10.0" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="26.0" minHeight="26.0" prefHeight="26.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="68.0" minHeight="10.0" prefHeight="48.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="27.0" minHeight="10.0" prefHeight="27.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Button fx:id="saveButton" alignment="CENTER" disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#saveChar" styleClass="tq-button" text="%main.savechar" textAlignment="CENTER" GridPane.columnIndex="5" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="9" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
-                  <ComboBox fx:id="characterCombo" maxWidth="1.7976931348623157E308" onAction="#characterSelected" prefHeight="32.0" promptText="%main.labelselectchar" styleClass="tq-charactercombo" stylesheets="@main.css" GridPane.columnIndex="4" GridPane.columnSpan="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
-                     <GridPane.margin>
-                        <Insets left="40.0" right="10.0" />
-                     </GridPane.margin></ComboBox>
-                  <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="26.0" snapToPixel="false" styleClass="decoright" stylesheets="@main.css" GridPane.columnIndex="6" GridPane.halignment="RIGHT" GridPane.rowIndex="10" GridPane.valignment="BOTTOM">
-                     <GridPane.margin>
-                        <Insets bottom="-2.0" right="-2.0" />
-                     </GridPane.margin>
-                  </Pane>
-                  <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="26.0" styleClass="decoleft" stylesheets="@main.css" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="10" GridPane.valignment="BOTTOM">
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
-                     <GridPane.margin>
-                        <Insets bottom="-2.0" left="-2.0" />
-                     </GridPane.margin>
-                  </Pane>
-                  <Spinner fx:id="lifeSpinner" disable="true" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="110.0" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER" />
-                  <Spinner fx:id="manaSpinner" disable="true" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="110.0" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="5" GridPane.valignment="CENTER" />
-                  <Spinner fx:id="strSpinner" disable="true" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="110.0" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="6" GridPane.valignment="CENTER" />
-                  <Spinner fx:id="intSpinner" disable="true" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="110.0" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="7" GridPane.valignment="CENTER" />
-                  <Spinner fx:id="dexSpinner" disable="true" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="110.0" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="8" GridPane.valignment="CENTER" />
-                  <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" styleClass="tq-label" stylesheets="@main.css" text="%main.strength" textAlignment="RIGHT" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6" GridPane.vgrow="ALWAYS" />
-                  <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" styleClass="tq-label" stylesheets="@main.css" text="%main.intelligence" textAlignment="RIGHT" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="7" />
-                  <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" styleClass="tq-label" stylesheets="@main.css" text="%main.dexterity" textAlignment="RIGHT" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="8" />
-                  <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" styleClass="tq-label" stylesheets="@main.css" text="%main.energy" textAlignment="RIGHT" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="5" />
-                  <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" styleClass="tq-label" stylesheets="@main.css" text="%main.health" textAlignment="RIGHT" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
-                  <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" styleClass="tq-label" stylesheets="@main.css" text="%main.available" textAlignment="RIGHT" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-                  <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="tq-label" text="%main.experience" GridPane.columnIndex="4" GridPane.rowIndex="6" />
-                  <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="tq-label" text="%main.charlevel" GridPane.columnIndex="4" GridPane.rowIndex="7" />
-                  <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="tq-label" text="%main.gold" GridPane.columnIndex="4" GridPane.rowIndex="8" />
-                  <Label fx:id="experienceText" maxWidth="1.7976931348623157E308" prefHeight="32.0" styleClass="tq-labelbox" GridPane.columnIndex="5" GridPane.rowIndex="6">
-                     <GridPane.margin>
-                        <Insets left="10.0" right="10.0" />
-                     </GridPane.margin>
-                     <padding>
-                        <Insets bottom="2.0" left="10.0" right="10.0" top="2.0" />
-                     </padding>
-                  </Label>
-                  <Label fx:id="charLevelText" maxWidth="1.7976931348623157E308" prefHeight="32.0" styleClass="tq-labelbox" GridPane.columnIndex="5" GridPane.rowIndex="7">
-                     <GridPane.margin>
-                        <Insets left="10.0" right="10.0" />
-                     </GridPane.margin>
-                     <padding>
-                        <Insets bottom="2.0" left="10.0" right="10.0" top="2.0" />
-                     </padding>
-                  </Label>
-                  <Label fx:id="goldText" maxWidth="1.7976931348623157E308" prefHeight="32.0" styleClass="tq-labelbox" GridPane.columnIndex="5" GridPane.rowIndex="8">
-                     <GridPane.margin>
-                        <Insets left="10.0" right="10.0" />
-                     </GridPane.margin>
-                     <padding>
-                        <Insets bottom="2.0" left="10.0" right="10.0" top="2.0" />
-                     </padding>
-                  </Label>
-                  <Label fx:id="availPointsText" prefHeight="30.0" prefWidth="110.0" styleClass="tq-labelbox" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER">
-                     <GridPane.margin>
-                        <Insets left="10.0" right="10.0" />
-                     </GridPane.margin>
-                     <padding>
-                        <Insets bottom="2.0" left="10.0" right="10.0" top="2.0" />
-                     </padding>
-                  </Label>
-                  <Label fx:id="charClassText" maxWidth="1.7976931348623157E308" prefHeight="32.0" styleClass="tq-labelbox" GridPane.columnIndex="5" GridPane.rowIndex="4">
-                     <padding>
-                        <Insets bottom="2.0" left="10.0" right="10.0" top="2.0" />
-                     </padding>
-                     <GridPane.margin>
-                        <Insets left="10.0" right="10.0" />
-                     </GridPane.margin>
-                  </Label>
-                  <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="tq-label" text="%main.charclass" GridPane.columnIndex="4" GridPane.rowIndex="4" />
-                  <Label fx:id="difficultyText" maxWidth="1.7976931348623157E308" prefHeight="32.0" styleClass="tq-labelbox" GridPane.columnIndex="5" GridPane.rowIndex="5">
-                     <padding>
-                        <Insets bottom="2.0" left="10.0" right="10.0" top="2.0" />
-                     </padding>
-                     <GridPane.margin>
-                        <Insets left="10.0" right="10.0" />
-                     </GridPane.margin>
-                  </Label>
-                  <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="tq-label" text="%main.difficulty" GridPane.columnIndex="4" GridPane.rowIndex="5" />
-                  <Label alignment="BOTTOM_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#openAboutWindow" prefHeight="74.0" prefWidth="198.0" styleClass="tq-bigtitle" text="TQ Respec" textAlignment="RIGHT" GridPane.columnIndex="5" GridPane.rowSpan="2" GridPane.valignment="BOTTOM" />
-                  <Hyperlink fx:id="versionCheck" alignment="CENTER_RIGHT" maxHeight="26.0" maxWidth="1.7976931348623157E308" prefHeight="26.0" styleClass="tq-versioncheck" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="TOP" />
-                  <Button fx:id="copyButton" alignment="CENTER" disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#copyChar" styleClass="tq-button" text="%main.copychar" textAlignment="CENTER" GridPane.columnIndex="2" GridPane.rowIndex="9">
+                  <Label alignment="BOTTOM_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#openAboutWindow" styleClass="tq-bigtitle" text="TQ Respec" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.valignment="BOTTOM">
                      <GridPane.margin>
                         <Insets />
+                     </GridPane.margin>
+                  </Label>
+                  <Hyperlink fx:id="versionCheck" alignment="CENTER_RIGHT" maxHeight="26.0" maxWidth="1.7976931348623157E308" prefHeight="26.0" styleClass="tq-versioncheck" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="TOP" />
+                  <ComboBox fx:id="characterCombo" maxWidth="1.7976931348623157E308" onAction="#characterSelected" prefHeight="32.0" promptText="%main.labelselectchar" styleClass="tq-charactercombo" stylesheets="@main.css" GridPane.hgrow="ALWAYS" GridPane.rowSpan="2" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
+                     <GridPane.margin>
+                        <Insets bottom="5.0" left="15.0" right="15.0" />
+                     </GridPane.margin>
+                  </ComboBox>
+               </children>
+               <padding>
+                  <Insets left="48.0" right="48.0" />
+               </padding>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </GridPane>
+            <TabPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" side="LEFT" styleClass="tq-tabpane" tabMaxHeight="100.0" tabMaxWidth="100.0" VBox.vgrow="ALWAYS">
+               <tabs>
+                  <Tab closable="false" styleClass="tq-tabbutton" text="Points">
+                     <content>
+                        <GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                          <columnConstraints>
+                              <ColumnConstraints />
+                            <ColumnConstraints hgrow="SOMETIMES" percentWidth="25.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" percentWidth="25.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" percentWidth="25.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" />
+                          </columnConstraints>
+                          <rowConstraints>
+                              <RowConstraints maxHeight="-Infinity" percentHeight="20.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="-Infinity" percentHeight="20.0" vgrow="SOMETIMES" />
+                            <RowConstraints maxHeight="-Infinity" percentHeight="20.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="-Infinity" percentHeight="20.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="-Infinity" percentHeight="20.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="-Infinity" percentHeight="20.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <Spinner fx:id="lifeSpinner" disable="true" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="110.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+                              <Spinner fx:id="manaSpinner" disable="true" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="110.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+                              <Spinner fx:id="strSpinner" disable="true" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="110.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
+                              <Spinner fx:id="intSpinner" disable="true" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="110.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER" />
+                              <Spinner fx:id="dexSpinner" disable="true" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="110.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="5" GridPane.valignment="CENTER" />
+                              <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" styleClass="tq-label" stylesheets="@main.css" text="%main.strength" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.vgrow="ALWAYS" />
+                              <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" styleClass="tq-label" stylesheets="@main.css" text="%main.intelligence" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
+                              <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" styleClass="tq-label" stylesheets="@main.css" text="%main.dexterity" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="5" />
+                              <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" styleClass="tq-label" stylesheets="@main.css" text="%main.energy" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+                              <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" styleClass="tq-label" stylesheets="@main.css" text="%main.health" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+                                 <GridPane.margin>
+                                    <Insets />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" styleClass="tq-label" stylesheets="@main.css" text="%main.available" textAlignment="RIGHT" GridPane.columnIndex="1">
+                                 <GridPane.margin>
+                                    <Insets />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="tq-label" text="%main.experience" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                              <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="tq-label" text="%main.charlevel" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+                              <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="tq-label" text="%main.gold" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+                              <Label fx:id="experienceText" maxWidth="1.7976931348623157E308" styleClass="tq-labelbox" GridPane.columnIndex="4" GridPane.rowIndex="2">
+                                 <GridPane.margin>
+                                    <Insets left="10.0" />
+                                 </GridPane.margin>
+                                 <padding>
+                                    <Insets bottom="2.0" left="10.0" right="10.0" top="2.0" />
+                                 </padding>
+                              </Label>
+                              <Label fx:id="charLevelText" maxWidth="1.7976931348623157E308" styleClass="tq-labelbox" GridPane.columnIndex="4" GridPane.rowIndex="3">
+                                 <GridPane.margin>
+                                    <Insets left="10.0" />
+                                 </GridPane.margin>
+                                 <padding>
+                                    <Insets bottom="2.0" left="10.0" right="10.0" top="2.0" />
+                                 </padding>
+                              </Label>
+                              <Label fx:id="goldText" maxWidth="1.7976931348623157E308" styleClass="tq-labelbox" GridPane.columnIndex="4" GridPane.rowIndex="4">
+                                 <GridPane.margin>
+                                    <Insets left="10.0" />
+                                 </GridPane.margin>
+                                 <padding>
+                                    <Insets bottom="2.0" left="10.0" right="10.0" top="2.0" />
+                                 </padding>
+                              </Label>
+                              <Label fx:id="availPointsText" prefHeight="30.0" prefWidth="110.0" styleClass="tq-labelbox" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="10.0" right="10.0" />
+                                 </GridPane.margin>
+                                 <padding>
+                                    <Insets bottom="2.0" left="10.0" right="10.0" top="2.0" />
+                                 </padding>
+                              </Label>
+                              <Label fx:id="charClassText" maxWidth="1.7976931348623157E308" styleClass="tq-labelbox" GridPane.columnIndex="4" GridPane.valignment="CENTER">
+                                 <padding>
+                                    <Insets bottom="2.0" left="10.0" right="10.0" top="2.0" />
+                                 </padding>
+                                 <GridPane.margin>
+                                    <Insets left="10.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="tq-label" text="%main.charclass" GridPane.columnIndex="3" />
+                              <Label fx:id="difficultyText" maxWidth="1.7976931348623157E308" styleClass="tq-labelbox" GridPane.columnIndex="4" GridPane.rowIndex="1">
+                                 <padding>
+                                    <Insets bottom="2.0" left="10.0" right="10.0" top="2.0" />
+                                 </padding>
+                                 <GridPane.margin>
+                                    <Insets left="10.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="tq-label" text="%main.difficulty" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                           </children>
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </padding>
+                        </GridPane>
+                     </content>
+                  </Tab>
+               </tabs>
+               <padding>
+                  <Insets right="48.0" />
+               </padding>
+            </TabPane>
+            <GridPane>
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="25.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="30.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="30.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="42.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <Button fx:id="saveButton" alignment="CENTER" disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#saveChar" styleClass="tq-button" text="%main.savechar" textAlignment="CENTER" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
+                     <GridPane.margin>
+                        <Insets bottom="2.0" left="10.0" right="10.0" top="2.0" />
                      </GridPane.margin>
                   </Button>
-                  <TextField fx:id="copyCharInput" onKeyTyped="#copyCharInputChanged" promptText="%main.copycharname" styleClass="tq-textfield" GridPane.columnIndex="3" GridPane.rowIndex="9">
+                  <Button fx:id="copyButton" alignment="CENTER" disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#copyChar" styleClass="tq-button" text="%main.copychar" textAlignment="CENTER">
+                     <GridPane.margin>
+                        <Insets left="10.0" right="10.0" />
+                     </GridPane.margin>
+                  </Button>
+                  <TextField fx:id="copyCharInput" onKeyTyped="#copyCharInputChanged" promptText="%main.copycharname" styleClass="tq-textfield" GridPane.columnIndex="1">
                      <padding>
                         <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
                      </padding>
@@ -170,7 +217,21 @@
                      </GridPane.margin>
                   </TextField>
                </children>
+               <padding>
+                  <Insets left="48.0" right="35.0" top="10.0" />
+               </padding>
             </GridPane>
+            <HBox prefHeight="26.0" prefWidth="200.0">
+               <children>
+                  <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="26.0" styleClass="decoleft" stylesheets="@main.css">
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </Pane>
+                  <Region maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                  <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="26.0" snapToPixel="false" styleClass="decoright" stylesheets="@main.css" />
+               </children>
+            </HBox>
         </children>
       </VBox>
    </children>
