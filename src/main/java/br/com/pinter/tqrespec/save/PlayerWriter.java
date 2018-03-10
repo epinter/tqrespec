@@ -160,4 +160,32 @@ public class PlayerWriter {
         outChannel.force(false);
         outChannel.close();
     }
+
+    public void copyCurrentSave(String toPlayerName) throws IOException {
+        PlayerData.getInstance().setSaveInProgress(true);
+        String path;
+        if (PlayerData.getInstance().isCustomQuest()) {
+            path = GameInfo.getInstance().getSaveDataUserPath();
+        } else {
+            path = GameInfo.getInstance().getSaveDataMainPath();
+        }
+
+        String fromPlayerName = PlayerData.getInstance().getPlayerName();
+
+        Path playerSaveDirSource = Paths.get(path, "_" + fromPlayerName);
+        Path playerSaveDirTarget = Paths.get(path, "_" + toPlayerName);
+
+        if(Files.exists(playerSaveDirTarget)) {
+            PlayerData.getInstance().setSaveInProgress(false);
+            throw new FileAlreadyExistsException("Target Directory already exists");
+        }
+        Util.copyDirectoryRecurse(playerSaveDirSource, playerSaveDirTarget, false);
+
+        ChangesTable changesTable = (ChangesTable) PlayerData.getInstance().getChanges().deepClone();
+
+        changesTable.setString("myPlayerName",toPlayerName,true);
+
+        this.writeBuffer(Paths.get(playerSaveDirTarget.toString(),"Player.chr").toString(),changesTable);
+        PlayerData.getInstance().setSaveInProgress(false);
+    }
 }
