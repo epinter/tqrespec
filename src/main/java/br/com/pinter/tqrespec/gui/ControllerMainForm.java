@@ -262,16 +262,16 @@ public class ControllerMainForm implements Initializable {
             if (c > 0xFF) {
                 newStr.append(StringUtils.stripAccents(Character.toString(c)).toCharArray()[0]);
             } else {
-                newStr.append(c);
+                newStr.append(Character.toString(c).replaceAll("\\\\|/|:|\\*|\\?|\"|<|>|\\||;",""));
             }
         }
+        copyCharInput.setText(newStr.toString());
+        copyCharInput.positionCaret(caret);
         if (copyCharInput.getText().length() > 0) {
             copyButton.setDisable(false);
         } else {
             copyButton.setDisable(true);
         }
-        copyCharInput.setText(newStr.toString());
-        copyCharInput.positionCaret(caret);
     }
 
     @FXML
