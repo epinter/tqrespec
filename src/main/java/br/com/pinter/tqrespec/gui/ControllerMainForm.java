@@ -26,7 +26,6 @@ import br.com.pinter.tqrespec.save.PlayerWriter;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
@@ -59,7 +58,6 @@ import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
-import java.nio.ByteBuffer;
 import java.nio.file.FileAlreadyExistsException;
 import java.text.NumberFormat;
 import java.util.ResourceBundle;
@@ -267,7 +265,7 @@ public class ControllerMainForm implements Initializable {
                 newStr.append(c);
             }
         }
-        if(copyCharInput.getText().length() > 0) {
+        if (copyCharInput.getText().length() > 0) {
             copyButton.setDisable(false);
         } else {
             copyButton.setDisable(true);
@@ -279,8 +277,8 @@ public class ControllerMainForm implements Initializable {
     @FXML
     public void copyChar(ActionEvent evt) {
         String targetPlayerName = copyCharInput.getText();
-        copyButton.setDisable(true);
-        saveButton.setDisable(true);
+        setAllControlsDisable(true);
+
         TaskWithException<Integer> copyCharTask = new TaskWithException<Integer>() {
             @Override
             protected Integer call() {
@@ -298,13 +296,12 @@ public class ControllerMainForm implements Initializable {
         copyCharTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, (e) -> {
             if ((int) copyCharTask.getValue() == 2) {
                 PlayerData.getInstance().reset();
-                copyButton.setDisable(false);
-                saveButton.setDisable(false);
+                setAllControlsDisable(false);
                 addCharactersToCombo();
                 if (characterCombo.getItems().contains(targetPlayerName)) {
                     characterCombo.setValue(targetPlayerName);
                 }
-            } else if((int) copyCharTask.getValue() == 3) {
+            } else if ((int) copyCharTask.getValue() == 3) {
                 Util.showError("Target Directory already exists!",
                         String.format("The specified target directory already exists. Aborting the copy to character '%s'",
                                 targetPlayerName));
@@ -312,7 +309,7 @@ public class ControllerMainForm implements Initializable {
                 Util.showError(Util.getUIMessage("alert.errorcopying_header"),
                         Util.getUIMessage("alert.errorcopying_content", targetPlayerName));
             }
-            copyButton.setDisable(false);
+            setAllControlsDisable(false);
         });
 
         new WorkerThread(copyCharTask).start();
@@ -331,7 +328,7 @@ public class ControllerMainForm implements Initializable {
             @Override
             protected Integer call() throws Exception {
                 if (DBG) System.out.println("starting backup task");
-                saveButton.setDisable(true);
+                setAllControlsDisable(true);
                 if (DBG) System.out.println("returning backup task");
                 return new PlayerWriter().backupCurrent() ? 2 : 0;
             }
@@ -381,7 +378,8 @@ public class ControllerMainForm implements Initializable {
                 if (DBG) System.out.println("backupcreated==+=" + backupCreated.get());
                 Util.showError(Util.getUIMessage("alert.errorbackup_header"),
                         Util.getUIMessage("alert.errorbackup_content", Constants.BACKUP_DIRECTORY));
-                saveButton.setDisable(false);
+                setAllControlsDisable(false);
+
             }
         });
 
@@ -392,11 +390,29 @@ public class ControllerMainForm implements Initializable {
             } else {
                 if (DBG) System.out.println("character saved==" + saveGameTask.getValue());
             }
-            saveButton.setDisable(false);
+            setAllControlsDisable(false);
+
         });
 
         new WorkerThread(backupSaveGameTask).start();
 
+    }
+
+    private void setAllControlsDisable(boolean disable) {
+        saveButton.setDisable(disable);
+        if ((copyCharInput.getText().length() > 0 && !disable) || disable) {
+            copyButton.setDisable(disable);
+        }
+
+        setSpinnersDisable(disable);
+    }
+
+    private void setSpinnersDisable(boolean disable) {
+        lifeSpinner.setDisable(disable);
+        manaSpinner.setDisable(disable);
+        strSpinner.setDisable(disable);
+        intSpinner.setDisable(disable);
+        dexSpinner.setDisable(disable);
     }
 
     @FXML
@@ -406,10 +422,11 @@ public class ControllerMainForm implements Initializable {
         copyCharInput.clear();
         ComboBox character = (ComboBox) evt.getSource();
         String playerName = (String) character.getSelectionModel().getSelectedItem();
-        if(StringUtils.isEmpty((playerName))) {
+        if (StringUtils.isEmpty((playerName))) {
             return;
         }
 
+        setSpinnersDisable(false);
         SimpleBooleanProperty characterLoaded = new SimpleBooleanProperty();
 
         TaskWithException<Boolean> loadTask = new TaskWithException<Boolean>() {

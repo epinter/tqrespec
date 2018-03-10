@@ -90,11 +90,11 @@
                         <Insets bottom="-2.0" left="-2.0" />
                      </GridPane.margin>
                   </Pane>
-                  <Spinner fx:id="lifeSpinner" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="110.0" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER" />
-                  <Spinner fx:id="manaSpinner" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="110.0" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="5" GridPane.valignment="CENTER" />
-                  <Spinner fx:id="strSpinner" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="110.0" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="6" GridPane.valignment="CENTER" />
-                  <Spinner fx:id="intSpinner" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="110.0" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="7" GridPane.valignment="CENTER" />
-                  <Spinner fx:id="dexSpinner" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="110.0" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="8" GridPane.valignment="CENTER" />
+                  <Spinner fx:id="lifeSpinner" disable="true" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="110.0" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER" />
+                  <Spinner fx:id="manaSpinner" disable="true" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="110.0" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="5" GridPane.valignment="CENTER" />
+                  <Spinner fx:id="strSpinner" disable="true" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="110.0" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="6" GridPane.valignment="CENTER" />
+                  <Spinner fx:id="intSpinner" disable="true" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="110.0" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="7" GridPane.valignment="CENTER" />
+                  <Spinner fx:id="dexSpinner" disable="true" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="110.0" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="8" GridPane.valignment="CENTER" />
                   <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" styleClass="tq-label" stylesheets="@main.css" text="%main.strength" textAlignment="RIGHT" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6" GridPane.vgrow="ALWAYS" />
                   <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" styleClass="tq-label" stylesheets="@main.css" text="%main.intelligence" textAlignment="RIGHT" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="7" />
                   <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" styleClass="tq-label" stylesheets="@main.css" text="%main.dexterity" textAlignment="RIGHT" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="8" />
@@ -154,7 +154,7 @@
                      </GridPane.margin>
                   </Label>
                   <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="tq-label" text="%main.difficulty" GridPane.columnIndex="4" GridPane.rowIndex="5" />
-                  <Label alignment="BOTTOM_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#openAboutWindow" styleClass="tq-bigtitle" text="TQ Respec" textAlignment="RIGHT" GridPane.columnIndex="4" GridPane.columnSpan="2" GridPane.rowSpan="2" GridPane.valignment="BOTTOM" />
+                  <Label alignment="BOTTOM_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#openAboutWindow" prefWidth="173.0" styleClass="tq-bigtitle" text="TQ Respec" textAlignment="RIGHT" GridPane.columnIndex="4" GridPane.columnSpan="2" GridPane.rowSpan="2" GridPane.valignment="BOTTOM" />
                   <Hyperlink fx:id="versionCheck" alignment="CENTER_RIGHT" maxHeight="26.0" maxWidth="1.7976931348623157E308" prefHeight="26.0" styleClass="tq-versioncheck" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="TOP" />
                   <Button fx:id="copyButton" alignment="CENTER" disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#copyChar" styleClass="tq-button" text="%main.copychar" textAlignment="CENTER" GridPane.columnIndex="2" GridPane.rowIndex="9">
                      <GridPane.margin>
