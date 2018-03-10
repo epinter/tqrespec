@@ -20,6 +20,7 @@
 
 package br.com.pinter.tqrespec.save;
 
+import br.com.pinter.tqrespec.DeepCloneable;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.ByteBuffer;
@@ -29,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 
-public class ChangesTable extends Hashtable<Integer, byte[]> {
+public class ChangesTable extends Hashtable<Integer, byte[]>  implements DeepCloneable {
     private Hashtable<Integer, Integer> valuesLengthIndex = null;
 
     public ChangesTable() {
