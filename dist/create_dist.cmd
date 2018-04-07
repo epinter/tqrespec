@@ -40,4 +40,4 @@ powershell.exe Compress-Archive -Path "%SCRIPT_DIR%\..\out\dist\withjre\*" -Dest
 echo CREATING ZIP tqrespec.zip
 powershell.exe Compress-Archive -Path "%SCRIPT_DIR%\..\out\dist\tqrespec\*" -DestinationPath "%SCRIPT_DIR%\..\out\dist\tqrespec.zip -force 
 echo CREATING ZIP tqrespec_jar.zip
-powershell.exe Compress-Archive -Path "%SCRIPT_DIR%\..\out\dist\tqrespec\*" -DestinationPath "%SCRIPT_DIR%\..\out\dist\tqrespec_jar.zip -force 
+powershell.exe Compress-Archive -Path "%SCRIPT_DIR%\..\out\dist\jar\*" -DestinationPath "%SCRIPT_DIR%\..\out\dist\tqrespec_jar.zip -force 
