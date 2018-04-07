@@ -3,9 +3,10 @@
 setlocal
 
 set SCRIPT_DIR=%~dp0
+set JDKVERSION=9
 
-echo ------ CREATING CUSTOM JRE
-call "%SCRIPT_DIR%\jlink.cmd"
+echo ------ CREATING CUSTOM JRE, USING JDK %JDKVERSION%
+call "%SCRIPT_DIR%\jlink.cmd" %JDKVERSION%
 
 echo ------ DELETING DIRECTORY "%SCRIPT_DIR%\..\out\dist"
 rd /s "%SCRIPT_DIR%\..\out\dist"

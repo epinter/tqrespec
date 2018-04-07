@@ -1,46 +1,66 @@
 @echo off
 
-setlocal
+SETLOCAL
 
 set SCRIPT_DIR=%~dp0
 
-::- Get the Java Version
-set KEY="HKLM\SOFTWARE\JavaSoft\JDK"
-set VALUE=CurrentVersion
-reg query %KEY% /v %VALUE% 2>nul || (
-    echo JRE not installed 
-    exit /b 1
-)
-set JRE_VERSION=
-for /f "tokens=2,*" %%a in ('reg query %KEY% /v %VALUE% ^| findstr %VALUE%') do (
-    set JRE_VERSION=%%b
+set BASEKEY=HKLM\SOFTWARE\JavaSoft\JDK
+set BASEKEYLEGACY="HKLM\SOFTWARE\JavaSoft\Java Development Kit"
+
+if "%~1" == "" (
+    set SELECTED_VERSION=newer
+) else (
+    set SELECTED_VERSION=%~1
 )
 
-echo JRE VERSION: %JRE_VERSION%
+if "%SELECTED_VERSION%" == "newer" (
+    :: get the java version (newer)
+    reg query "%BASEKEY%" /v CurrentVersion >nul || (
+        echo JRE not installed 
+        exit /b 1
+    )
 
-::- Get the JavaHome
-set KEY="HKLM\SOFTWARE\JavaSoft\JDK\%JRE_VERSION%"
-set VALUE=JavaHome
-reg query %KEY% /v %VALUE% 2>nul || (
+    for /f "tokens=2,*" %%a in ('reg query %BASEKEY% /v CurrentVersion ^| findstr CurrentVersion') do (
+        set JDKKEY="HKLM\SOFTWARE\JavaSoft\JDK\%%b"
+    )
+) else (
+    :: get the registry key for specified jdk major version, jdk <= 1.8
+    for /f "tokens=*" %%a in ('reg query %BASEKEYLEGACY% /k /f * ^| findstr /r "HKEY_LOCAL_MACHINE.*\\%SELECTED_VERSION%\..*"') do (
+        set JDKKEY="%%a"
+    )
+    for /f "tokens=*" %%a in ('reg query %BASEKEYLEGACY% /k /f * ^| findstr /r /c:"HKEY_LOCAL_MACHINE.*\\%SELECTED_VERSION%"') do (
+        set JDKKEY="%%a"
+    )
+
+    :: get the registry key for specified jdk major version, > 9    
+    for /f "tokens=*" %%a in ('reg query %BASEKEY% /k /f * ^| findstr /r "HKEY_LOCAL_MACHINE.*\\%SELECTED_VERSION%$"') do (
+        set JDKKEY="%%a"
+    )
+
+    for /f "tokens=*" %%a in ('reg query %BASEKEY% /k /f * ^| findstr /r "HKEY_LOCAL_MACHINE.*\\%SELECTED_VERSION%\..*"') do (
+        set JDKKEY="%%a"
+    )
+)
+
+:: get the java home
+reg query %JDKKEY% /v JavaHome >nul || (
     echo JavaHome not installed
     exit /b 1
 )
 
 set JAVAHOME=
-for /f "tokens=2,*" %%a in ('reg query %KEY% /v %VALUE% ^| findstr %VALUE%') do (
+for /f "tokens=2,*" %%a in ('reg query %JDKKEY% /v JavaHome ^| findstr JavaHome') do (
     set JAVAHOME=%%b
 )
 
-
-
-
-
+:: clean destination directory
 echo DELETING DIRECTORY "%SCRIPT_DIR%\..\out\jre-image"
 rd /s "%SCRIPT_DIR%\..\out\jre-image"
 echo JavaHome: %JAVAHOME%
-"%JAVAHOME%\bin\jlink" --compress=2 --output "%SCRIPT_DIR%\..\out\jre-image" --module-path "%JAVAHOME%\jmods" --add-modules javafx.base,javafx.fxml,javafx.graphics,javafx.controls,java.prefs,java.base,jdk.zipfs
-endlocal
 
+:: build runtime
+"%JAVAHOME%\bin\jlink" --compress=2 --output "%SCRIPT_DIR%\..\out\jre-image" --module-path "%JAVAHOME%\jmods" --add-modules javafx.base,javafx.fxml,javafx.graphics,javafx.controls,java.prefs,java.base,jdk.zipfs
+ENDLOCAL
 
 rem jdeps --print-module-deps tqrespec.jar
 
