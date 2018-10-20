@@ -262,7 +262,7 @@ public class ControllerMainForm implements Initializable {
             if (c > 0xFF) {
                 newStr.append(StringUtils.stripAccents(Character.toString(c)).toCharArray()[0]);
             } else {
-                newStr.append(Character.toString(c).replaceAll("\\\\|/|:|\\*|\\?|\"|<|>|\\||;",""));
+                newStr.append(Character.toString(c).replaceAll("\\\\|/|:|\\*|\\?|\"|<|>|\\||;", ""));
             }
         }
         copyCharInput.setText(newStr.toString());
@@ -428,7 +428,6 @@ public class ControllerMainForm implements Initializable {
         }
 
         setSpinnersDisable(false);
-        SimpleBooleanProperty characterLoaded = new SimpleBooleanProperty();
 
         TaskWithException<Boolean> loadTask = new TaskWithException<Boolean>() {
             @Override
@@ -437,50 +436,46 @@ public class ControllerMainForm implements Initializable {
             }
         };
 
-        characterLoaded.bind(loadTask.valueProperty());
-        characterLoaded.addListener((observable, oldValue, newValue) -> {
-            if (characterLoaded.get()) {
+        loadTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, (e) -> {
+            clearProperties();
+            int str = Math.round(PlayerData.getInstance().getChanges().getFloat("str"));
+            int inl = Math.round(PlayerData.getInstance().getChanges().getFloat("int"));
+            int dex = Math.round(PlayerData.getInstance().getChanges().getFloat("dex"));
+            int life = Math.round(PlayerData.getInstance().getChanges().getFloat("life"));
+            int mana = Math.round(PlayerData.getInstance().getChanges().getFloat("mana"));
+            int modifier = PlayerData.getInstance().getChanges().getInt("modifierPoints");
+            if (modifier < 0 || str < 0 || dex < 0 || inl < 0 || life < 0 || mana < 0) {
+                Util.showError(Util.getUIMessage("alert.errorloadingchar_header"),
+                        Util.getUIMessage("alert.errorloadingchar_content", life, mana, str, inl, dex));
                 clearProperties();
-                int str = Math.round(PlayerData.getInstance().getChanges().getFloat("str"));
-                int inl = Math.round(PlayerData.getInstance().getChanges().getFloat("int"));
-                int dex = Math.round(PlayerData.getInstance().getChanges().getFloat("dex"));
-                int life = Math.round(PlayerData.getInstance().getChanges().getFloat("life"));
-                int mana = Math.round(PlayerData.getInstance().getChanges().getFloat("mana"));
-                int modifier = PlayerData.getInstance().getChanges().getInt("modifierPoints");
-                if (modifier < 0 || str < 0 || dex < 0 || inl < 0 || life < 0 || mana < 0) {
-                    Util.showError(Util.getUIMessage("alert.errorloadingchar_header"),
-                            Util.getUIMessage("alert.errorloadingchar_content", life, mana, str, inl, dex));
-                    clearProperties();
-                    return;
-                }
-                this.setAvailablePointsField(modifier);
-                this.setStrField(str);
-                this.setIntField(inl);
-                this.setDexField(dex);
-                this.setLifeField(life);
-                this.setManaField(mana);
-                int xp = PlayerData.getInstance().getChanges().getInt("currentStats.experiencePoints");
-                int level = PlayerData.getInstance().getChanges().getInt("currentStats.charLevel");
-                int gold = PlayerData.getInstance().getChanges().getInt("money");
-                String charClass = PlayerData.getInstance().getHeaderInfo().getPlayerClassTag();
-
-                if (StringUtils.isNotEmpty(charClass)) {
-                    charClassText.setText(Util.getUIMessage("classtags." + charClass));
-                }
-                int difficulty = PlayerData.getInstance().getChanges().getInt("difficulty");
-                difficultyText.setText(Util.getUIMessage(String.format("difficulty.%d", difficulty)));
-                experienceText.setText(NumberFormat.getInstance().format(xp));
-                charLevelText.setText(String.valueOf(level));
-                goldText.setText(NumberFormat.getInstance().format(gold));
-                if (currentAvail.get() >= 0) {
-                    saveButton.setDisable(false);
-                }
-                characterCombo.setDisable(false);
+                return;
             }
+            this.setAvailablePointsField(modifier);
+            this.setStrField(str);
+            this.setIntField(inl);
+            this.setDexField(dex);
+            this.setLifeField(life);
+            this.setManaField(mana);
+            int xp = PlayerData.getInstance().getChanges().getInt("currentStats.experiencePoints");
+            int level = PlayerData.getInstance().getChanges().getInt("currentStats.charLevel");
+            int gold = PlayerData.getInstance().getChanges().getInt("money");
+            String charClass = PlayerData.getInstance().getHeaderInfo().getPlayerClassTag();
+
+            if (StringUtils.isNotEmpty(charClass)) {
+                charClassText.setText(Util.getUIMessage("classtags." + charClass));
+            }
+            int difficulty = PlayerData.getInstance().getChanges().getInt("difficulty");
+            difficultyText.setText(Util.getUIMessage(String.format("difficulty.%d", difficulty)));
+            experienceText.setText(NumberFormat.getInstance().format(xp));
+            charLevelText.setText(String.valueOf(level));
+            goldText.setText(NumberFormat.getInstance().format(gold));
+            if (currentAvail.get() >= 0) {
+                saveButton.setDisable(false);
+            }
+            characterCombo.setDisable(false);
         });
 
         new WorkerThread(loadTask).start();
-
     }
 
     @FXML
