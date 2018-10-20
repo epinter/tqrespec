@@ -178,6 +178,13 @@ public class Util {
         }
     }
 
+    public static String normalizeRecordPath(String recordId) {
+        if (recordId == null || recordId.isEmpty()) {
+            return null;
+        }
+        return recordId.toUpperCase().replace("/", "\\");
+    }
+
     public static void closeApplication() {
         if (!Util.tryToCloseApplication()) {
             Util.showWarning(Util.getUIMessage("alert.saveinprogress_header"), Util.getUIMessage("alert.saveinprogress_content"));
