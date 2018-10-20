@@ -68,4 +68,15 @@ public class BlockInfo {
     public void setVariables(Hashtable<String, VariableInfo> variables) {
         this.variables = variables;
     }
+
+    @Override
+    public String toString() {
+        return "BlockInfo{" +
+                "tag='" + tag + '\'' +
+                ", start=" + start +
+                ", end=" + end +
+                ", size=" + size +
+                ", variables=" + variables +
+                '}';
+    }
 }
