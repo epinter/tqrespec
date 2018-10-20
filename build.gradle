@@ -13,6 +13,7 @@ repositories {
 }
 
 dependencies {
+    compile fileTree(dir: 'libs', include: '*.jar')
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile group: 'net.java.dev.jna', name: 'platform', version: '3.5.0'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'

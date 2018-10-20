@@ -6,25 +6,26 @@
     <exclude-output />
     <content url="file://$MODULE_DIR$/../..">
       <sourceFolder url="file://$MODULE_DIR$/../../src/main/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../../src/test/java" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/../../src/main/resources" type="java-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/../../src/test/resources" type="java-test-resource" />
       <excludeFolder url="file://$MODULE_DIR$/../../.gradle" />
       <excludeFolder url="file://$MODULE_DIR$/../../build" />
       <excludeFolder url="file://$MODULE_DIR$/../../out" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: net.java.dev.jna:platform:3.5.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.apache.commons:commons-lang3:3.7" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: net.java.dev.jna:jna:3.5.0" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Gradle: net.java.dev.jna:platform:3.5.0" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.apache.commons:commons-lang3:3.7" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Gradle: net.java.dev.jna:jna:3.5.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: net.java.dev.jna:platform:3.5.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: org.apache.commons:commons-lang3:3.7" level="project" />
+    <orderEntry type="library" name="Gradle: net.java.dev.jna:platform:3.5.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.commons:commons-lang3:3.7" level="project" />
+    <orderEntry type="library" name="Gradle: net.java.dev.jna:jna:3.5.0" level="project" />
+    <orderEntry type="module-library">
+      <library name="Gradle: tqdatabase-1.0">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../libs/tqdatabase-1.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
     <orderEntry type="library" scope="TEST" name="Gradle: junit:junit:4.12" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: net.java.dev.jna:jna:3.5.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.hamcrest:hamcrest-core:1.3" level="project" />
   </component>
 </module>
