@@ -74,7 +74,7 @@ public class PlayerParser {
         }
         Hashtable<Integer, BlockInfo> blocks = this.parseAllBlocks();
         PlayerData.getInstance().setBlockInfo(blocks);
-        if(inventoryStart==-1) {
+        if (inventoryStart == -1) {
             this.parseFooter();
         }
         this.prepareBufferForRead();
@@ -124,7 +124,7 @@ public class PlayerParser {
 
             this.prepareBufferForRead();
 
-            if(DBG) Util.log("File read to buffer: " + this.getBuffer());
+            if (DBG) Util.log("File read to buffer: " + this.getBuffer());
 
             PlayerData.getInstance().setPlayerChr(playerChr.toPath());
         } catch (Exception e) {
@@ -148,7 +148,7 @@ public class PlayerParser {
 
             if (blockInfo.getSize() < 4) continue;
 
-            if((blockInfo.getStart() >= inventoryStart && Constants.SKIP_INVENTORY_BLOCKS && inventoryStart > 0)) {
+            if ((blockInfo.getStart() >= inventoryStart && Constants.SKIP_INVENTORY_BLOCKS && inventoryStart > 0)) {
                 break;
             }
             Hashtable<String, VariableInfo> variables = parseBlock(blockInfo);
@@ -197,7 +197,7 @@ public class PlayerParser {
             } else if (name.equalsIgnoreCase("end_block")) {
                 dataOffset -= getBlockTagSize("end_block");
                 valread++;
-                if(temp.size() == 1) {
+                if (temp.size() == 1) {
                     VariableInfo endBlockVar = temp.get(temp.size() - 1);
                     endBlockVar.setName("difficulty");
                     ret.put(endBlockVar.getName(), endBlockVar);
@@ -205,7 +205,8 @@ public class PlayerParser {
                     int diffInt = this.getBuffer().getInt(endBlockVar.getValOffset());
                     endBlockVar.setValue(diffInt);
                     endBlockVar.setVariableType(VariableInfo.VariableType.Integer);
-                    if (DBG) Util.log(String.format("blockStart: %d; variableInfo: %s; data_offset=%d", blockInfo.getStart(), endBlockVar.toString(), dataOffset));
+                    if (DBG)
+                        Util.log(String.format("blockStart: %d; variableInfo: %s; data_offset=%d", blockInfo.getStart(), endBlockVar.toString(), dataOffset));
                 }
             } else if (name.equalsIgnoreCase("myPlayerName")
                     || name.equalsIgnoreCase("defaultText")
@@ -282,7 +283,7 @@ public class PlayerParser {
                     || name.equalsIgnoreCase("respawnUID")
                     || name.equalsIgnoreCase("markerUID")
                     || name.equalsIgnoreCase("strategicMovementRespawnPoint[i]")
-                    ) {
+            ) {
                 variableInfo.setVariableType(VariableInfo.VariableType.UID);
                 dataOffset = 16;
                 variableInfo.setValSize(16);
@@ -293,18 +294,18 @@ public class PlayerParser {
                     || name.equalsIgnoreCase("versionRespawnPoint")
                     || name.equalsIgnoreCase("money")) {
                 this.readInt(variableInfo);
-                if(variableInfo.getValSize() >= 0) {
+                if (variableInfo.getValSize() >= 0) {
                     valread++;
                 }
             } else if (name.equalsIgnoreCase("itemPositionsSavedAsGridCoords")) {
                 //inventory
-                if(Constants.SKIP_INVENTORY_BLOCKS) {
+                if (Constants.SKIP_INVENTORY_BLOCKS) {
                     inventoryStart = variableInfo.getValOffset();
                 }
                 break;
             } else if (name.equalsIgnoreCase("temp")) {
                 this.readFloat(variableInfo);
-                if(variableInfo.getValSize() >= 0) {
+                if (variableInfo.getValSize() >= 0) {
                     valread++;
                 }
             } else {
@@ -343,10 +344,14 @@ public class PlayerParser {
                         putVarIndex(inl.getName(), blockInfo.getStart());
                         ret.put(life.getName(), life);
                         putVarIndex(life.getName(), blockInfo.getStart());
-                        if (DBG) Util.log(String.format("blockStart: %d; variableInfo: %s;", blockInfo.getStart(), ret.get("str").toString()));
-                        if (DBG) Util.log(String.format("blockStart: %d; variableInfo: %s;", blockInfo.getStart(), ret.get("dex").toString()));
-                        if (DBG) Util.log(String.format("blockStart: %d; variableInfo: %s;", blockInfo.getStart(), ret.get("int").toString()));
-                        if (DBG) Util.log(String.format("blockStart: %d; variableInfo: %s;", blockInfo.getStart(), ret.get("life").toString()));
+                        if (DBG)
+                            Util.log(String.format("blockStart: %d; variableInfo: %s;", blockInfo.getStart(), ret.get("str").toString()));
+                        if (DBG)
+                            Util.log(String.format("blockStart: %d; variableInfo: %s;", blockInfo.getStart(), ret.get("dex").toString()));
+                        if (DBG)
+                            Util.log(String.format("blockStart: %d; variableInfo: %s;", blockInfo.getStart(), ret.get("int").toString()));
+                        if (DBG)
+                            Util.log(String.format("blockStart: %d; variableInfo: %s;", blockInfo.getStart(), ret.get("life").toString()));
                     } else {
                         temp.add(variableInfo);
                     }
@@ -356,7 +361,8 @@ public class PlayerParser {
                 if (!variableInfo.getName().equals("temp")) {
                     ret.put(variableInfo.getName(), variableInfo);
                     putVarIndex(variableInfo.getName(), blockInfo.getStart());
-                    if (DBG) Util.log(String.format("blockStart: %d; variableInfo: %s; data_offset=%d", blockInfo.getStart(), variableInfo.toString(), dataOffset));
+                    if (DBG)
+                        Util.log(String.format("blockStart: %d; variableInfo: %s; data_offset=%d", blockInfo.getStart(), variableInfo.toString(), dataOffset));
                 }
             } else {
                 if (DBG)
@@ -386,11 +392,12 @@ public class PlayerParser {
     }
 
     private void putVarIndex(String varName, int blockStart) {
-        if(PlayerData.getInstance().getVariableLocation().get(varName)==null) {
+        if (PlayerData.getInstance().getVariableLocation().get(varName) == null) {
             PlayerData.getInstance().getVariableLocation().put(varName, new ArrayList<Integer>());
         }
         PlayerData.getInstance().getVariableLocation().get(varName).add(blockStart);
     }
+
     private HeaderInfo parseHeader() {
         int headerEnd = searchBlockTag("begin_block", 0) - 1;
         HeaderInfo headerInfo = new HeaderInfo();
