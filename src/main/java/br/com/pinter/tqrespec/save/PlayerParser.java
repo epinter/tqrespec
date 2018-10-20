@@ -276,9 +276,10 @@ public class PlayerParser {
                     || name.equalsIgnoreCase("var1")
                     || name.equalsIgnoreCase("storedType")) {
                 variableInfo.setVariableType(VariableInfo.VariableType.Integer);
-                variableInfo.setValSize(4);
-                dataOffset = 4;
-                valread++;
+                this.readInt(variableInfo);
+                if (variableInfo.getValSize() >= 0) {
+                    valread++;
+                }
             } else if (name.equalsIgnoreCase("teleportUID")
                     || name.equalsIgnoreCase("respawnUID")
                     || name.equalsIgnoreCase("markerUID")
