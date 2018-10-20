@@ -22,12 +22,13 @@ package br.com.pinter.tqrespec;
 
 import br.com.pinter.tqrespec.gui.ControllerMainForm;
 import br.com.pinter.tqrespec.gui.ResizeListener;
-import br.com.pinter.tqrespec.save.PlayerData;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.application.Preloader;
 import javafx.beans.binding.Bindings;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -43,14 +44,32 @@ import java.util.ResourceBundle;
 
 public class Main extends Application {
     public static void main(String[] args) {
-
+        System.setProperty("javafx.preloader","br.com.pinter.tqrespec.gui.AppPreloader");
         launch(args);
     }
 
     private static double scale = 0;
 
+    private void load(Stage stage) {
+        TaskWithException<Void> task = new TaskWithException<Void>() {
+            @Override
+            public Void call()
+            {
+                notifyPreloader(new Preloader.ProgressNotification(0.5));
+                return null;
+            }
+        };
+        task.setOnSucceeded(e -> {
+            notifyPreloader(new Preloader.StateChangeNotification(
+                    Preloader.StateChangeNotification.Type.BEFORE_START));
+            stage.show();
+        });
+        new WorkerThread(task).start();
+    }
+
     @Override
     public void start(Stage primaryStage) {
+        notifyPreloader(new Preloader.ProgressNotification(0.3));
         Font.loadFont(getClass().getResourceAsStream("/fxml/albertus-mt.ttf"),16);
         Font.loadFont(getClass().getResourceAsStream("/fxml/albertus-mt-light.ttf"),16);
         Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler::unhandled);
@@ -119,6 +138,6 @@ public class Main extends Application {
             }
         });
 
-        primaryStage.show();
+        load(primaryStage);
     }
 }

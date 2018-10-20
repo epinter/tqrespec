@@ -1,0 +1,45 @@
+.root {
+    -fx-base: #443823;
+    -fx-accent: #f6d35b;
+    -fx-focus-color: #f6d35b;
+    -fx-pressed-base: #f6d35b;
+    -fx-text-box-border: #ffd993;
+    -fx-control-inner-background: #443823;
+    -fx-shadow-highlight-color: #ffd993;
+    -fx-body-color: #443823;
+    -fx-text-fill: white;
+    -fx-mark-highlight-color: #ffd993;
+    -fx-mark-color: #ffd993;
+    /* will be overriden to 1em on runtime */
+    -fx-font-size: 1em;
+}
+
+.bg-container {
+	-fx-background-color: #000000;
+    -fx-padding: 20px 0 20px 0;
+
+    -fx-border-image-source: url('border.png');
+    -fx-border-image-insets: 0;
+    -fx-border-image-repeat: stretch;
+    -fx-border-image-width: 2 2 2 2;
+    -fx-border-image-slice: 2 2 2 2;
+
+}
+.bar {
+    -fx-min-width: 340px;
+    -fx-min-height: 70px;
+}
+
+.indicator {
+    -fx-max-height: 30px;
+}
+
+.tq-bigtitle {
+	-fx-font-size: 30px;
+	-fx-font-family: 'Albertus MT';
+	-fx-font-weight: bold;
+	-fx-font-style: italic;
+    -fx-text-fill: #ffd993;
+    -fx-effect: dropshadow( one-pass-box , #443823 , 5, 5.0 , 5 , 5 );
+
+}
