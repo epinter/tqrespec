@@ -29,7 +29,6 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -62,6 +61,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.text.NumberFormat;
 import java.util.ResourceBundle;
 
+@SuppressWarnings({"RedundantThrows", "unused"})
 public class ControllerMainForm implements Initializable {
     private static final boolean DBG = false;
     @FXML
@@ -128,8 +128,6 @@ public class ControllerMainForm implements Initializable {
     private double dragX;
     private double dragY;
     private boolean isMoving = false;
-    private String prev;
-
 
     public static BooleanProperty mainFormInitialized = new SimpleBooleanProperty();
 
@@ -147,11 +145,11 @@ public class ControllerMainForm implements Initializable {
             new WorkerThread(windowShownTask).start();
         }));
 
-        Task<Version> taskCheckVersion = new Task<Version>() {
+        Task<Version> taskCheckVersion = new Task<>() {
             @Override
             protected Version call() throws Exception {
                 Version version = new Version(Util.getBuildVersion());
-                int check = version.checkNewerVersion(Constants.VERSION_CHECK_URL);
+                version.checkNewerVersion(Constants.VERSION_CHECK_URL);
                 //new version available (-1 our version is less than remote, 0 equal, 1 greater, -2 error checking
                 return version;
             }
@@ -163,7 +161,7 @@ public class ControllerMainForm implements Initializable {
                 versionCheck.setOnAction(event -> {
                     if (Desktop.isDesktopSupported()) {
                         Desktop.getDesktop().isSupported(Desktop.Action.BROWSE);
-                        final Task<Void> openUrl = new Task<Void>() {
+                        final Task<Void> openUrl = new Task<>() {
                             @Override
                             public Void call() throws Exception {
                                 if (StringUtils.isNotEmpty(version.getUrlPage()))
@@ -184,11 +182,12 @@ public class ControllerMainForm implements Initializable {
 
     }
 
-    public void addCharactersToCombo() {
+    private void addCharactersToCombo() {
         try {
             characterCombo.getSelectionModel().clearSelection();
             characterCombo.getItems().clear();
             for (String playerName : GameInfo.getInstance().getPlayerListMain()) {
+                //noinspection unchecked
                 characterCombo.getItems().add(playerName);
             }
         } catch (Exception e) {
@@ -196,7 +195,7 @@ public class ControllerMainForm implements Initializable {
         }
     }
 
-    public void windowShownHandler() throws Exception {
+    private void windowShownHandler() throws Exception {
         assert characterCombo == null : "fx:id=\"characterCombo\" not found in FXML.";
         addCharactersToCombo();
     }
@@ -206,7 +205,7 @@ public class ControllerMainForm implements Initializable {
     }
 
     public void openAboutWindow(MouseEvent evt) {
-        Parent root = null;
+        Parent root;
         ResourceBundle bundle = ResourceBundle.getBundle("i18n.UI");
         try {
             root = FXMLLoader.load(getClass().getResource("/fxml/about.fxml"), bundle);
@@ -239,12 +238,9 @@ public class ControllerMainForm implements Initializable {
         stage.setMaxHeight(root.maxHeight(-1));
         stage.setMaxWidth(root.maxWidth(-1));
 
-        stage.addEventHandler(KeyEvent.KEY_PRESSED, (new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent event) {
-                if (event.getCode() == KeyCode.ESCAPE) {
-                    stage.close();
-                }
+        stage.addEventHandler(KeyEvent.KEY_PRESSED, (event -> {
+            if (event.getCode() == KeyCode.ESCAPE) {
+                stage.close();
             }
         }));
 
@@ -262,6 +258,7 @@ public class ControllerMainForm implements Initializable {
             if (c > 0xFF) {
                 newStr.append(StringUtils.stripAccents(Character.toString(c)).toCharArray()[0]);
             } else {
+                //noinspection RegExpSingleCharAlternation
                 newStr.append(Character.toString(c).replaceAll("\\\\|/|:|\\*|\\?|\"|<|>|\\||;", ""));
             }
         }
@@ -279,7 +276,7 @@ public class ControllerMainForm implements Initializable {
         String targetPlayerName = copyCharInput.getText();
         setAllControlsDisable(true);
 
-        TaskWithException<Integer> copyCharTask = new TaskWithException<Integer>() {
+        TaskWithException<Integer> copyCharTask = new TaskWithException<>() {
             @Override
             protected Integer call() {
                 try {
@@ -299,6 +296,7 @@ public class ControllerMainForm implements Initializable {
                 setAllControlsDisable(false);
                 addCharactersToCombo();
                 if (characterCombo.getItems().contains(targetPlayerName)) {
+                    //noinspection unchecked
                     characterCombo.setValue(targetPlayerName);
                 }
             } else if ((int) copyCharTask.getValue() == 3) {
@@ -318,13 +316,11 @@ public class ControllerMainForm implements Initializable {
 
     @FXML
     public void saveChar(ActionEvent evt) {
-        Button b = ((Button) evt.getSource());
-
         SimpleIntegerProperty backupCreated = new SimpleIntegerProperty();
         SimpleIntegerProperty characterSaved = new SimpleIntegerProperty();
 
 
-        TaskWithException<Integer> backupSaveGameTask = new TaskWithException<Integer>() {
+        TaskWithException<Integer> backupSaveGameTask = new TaskWithException<>() {
             @Override
             protected Integer call() throws Exception {
                 if (DBG) System.out.println("starting backup task");
@@ -333,7 +329,7 @@ public class ControllerMainForm implements Initializable {
                 return new PlayerWriter().backupCurrent() ? 2 : 0;
             }
         };
-        TaskWithException<Integer> saveGameTask = new TaskWithException<Integer>() {
+        TaskWithException<Integer> saveGameTask = new TaskWithException<>() {
             @Override
             protected Integer call() throws Exception {
                 if (DBG) System.out.println("starting savegame task");
@@ -400,7 +396,7 @@ public class ControllerMainForm implements Initializable {
 
     private void setAllControlsDisable(boolean disable) {
         saveButton.setDisable(disable);
-        if ((copyCharInput.getText().length() > 0 && !disable) || disable) {
+        if (copyCharInput.getText().length() > 0 || disable) {
             copyButton.setDisable(disable);
         }
 
@@ -429,7 +425,7 @@ public class ControllerMainForm implements Initializable {
 
         setSpinnersDisable(false);
 
-        TaskWithException<Boolean> loadTask = new TaskWithException<Boolean>() {
+        TaskWithException<Boolean> loadTask = new TaskWithException<>() {
             @Override
             protected Boolean call() throws Exception {
                 return PlayerData.getInstance().loadPlayerData(playerName);
@@ -513,7 +509,9 @@ public class ControllerMainForm implements Initializable {
         }
         currentStr = new SimpleIntegerProperty(value);
         AttrIntegerSpinnerValueFactory strFactory = new AttrIntegerSpinnerValueFactory(50, currentStr.get(), currentStr.get(), Constants.STR_ATTR_STEP, currentAvail);
+        //noinspection unchecked
         strSpinner.setValueFactory(strFactory);
+        //noinspection unchecked
         strSpinner.getValueFactory().valueProperty().bindBidirectional(currentStr);
         currentStr.addListener(((observable, oldValue, newValue) -> attributesChanged("str", (int) oldValue, (int) newValue)));
 
@@ -527,7 +525,9 @@ public class ControllerMainForm implements Initializable {
         }
         currentInt = new SimpleIntegerProperty(value);
         AttrIntegerSpinnerValueFactory intFactory = new AttrIntegerSpinnerValueFactory(50, currentInt.get(), currentInt.get(), Constants.INT_ATTR_STEP, currentAvail);
+        //noinspection unchecked
         intSpinner.setValueFactory(intFactory);
+        //noinspection unchecked
         intSpinner.getValueFactory().valueProperty().bindBidirectional(currentInt);
         currentInt.addListener(((observable, oldValue, newValue) -> attributesChanged("int", (int) oldValue, (int) newValue)));
     }
@@ -539,7 +539,9 @@ public class ControllerMainForm implements Initializable {
         }
         currentDex = new SimpleIntegerProperty(value);
         AttrIntegerSpinnerValueFactory dexFactory = new AttrIntegerSpinnerValueFactory(50, currentDex.get(), currentDex.get(), Constants.DEX_ATTR_STEP, currentAvail);
+        //noinspection unchecked
         dexSpinner.setValueFactory(dexFactory);
+        //noinspection unchecked
         dexSpinner.getValueFactory().valueProperty().bindBidirectional(currentDex);
         currentDex.addListener(((observable, oldValue, newValue) -> attributesChanged("dex", (int) oldValue, (int) newValue)));
     }
@@ -551,7 +553,9 @@ public class ControllerMainForm implements Initializable {
         }
         currentLife = new SimpleIntegerProperty(value);
         AttrIntegerSpinnerValueFactory lifeFactory = new AttrIntegerSpinnerValueFactory(Constants.LIFE_ATTR_MIN, currentLife.get(), currentLife.get(), Constants.LIFE_ATTR_STEP, currentAvail);
+        //noinspection unchecked
         lifeSpinner.setValueFactory(lifeFactory);
+        //noinspection unchecked
         lifeSpinner.getValueFactory().valueProperty().bindBidirectional(currentLife);
         currentLife.addListener(((observable, oldValue, newValue) -> attributesChanged("life", (int) oldValue, (int) newValue)));
     }
@@ -563,7 +567,9 @@ public class ControllerMainForm implements Initializable {
         }
         currentMana = new SimpleIntegerProperty(value);
         AttrIntegerSpinnerValueFactory manaFactory = new AttrIntegerSpinnerValueFactory(Constants.MANA_ATTR_MIN, currentMana.get(), currentMana.get(), Constants.MANA_ATTR_STEP, currentAvail);
+        //noinspection unchecked
         manaSpinner.setValueFactory(manaFactory);
+        //noinspection unchecked
         manaSpinner.getValueFactory().valueProperty().bindBidirectional(currentMana);
         currentMana.addListener(((observable, oldValue, newValue) -> attributesChanged("mana", (int) oldValue, (int) newValue)));
     }
@@ -600,7 +606,6 @@ public class ControllerMainForm implements Initializable {
         }
         if (newValue < oldValue) {
             int diff = oldValue - newValue;
-            if (diff < 4) return;
             if (attr.equals("str")) {
                 if (diff < Constants.STR_ATTR_STEP) return;
                 currentStr.set(newValue);
@@ -642,19 +647,29 @@ public class ControllerMainForm implements Initializable {
         if (availPointsText.textProperty().isBound())
             availPointsText.textProperty().unbindBidirectional(currentAvail);
         if (strSpinner.getValueFactory() != null && strSpinner.getValueFactory().valueProperty().isBound())
+            //noinspection unchecked
             strSpinner.getValueFactory().valueProperty().unbindBidirectional(currentStr);
         if (intSpinner.getValueFactory() != null && intSpinner.getValueFactory().valueProperty().isBound())
+            //noinspection unchecked
             intSpinner.getValueFactory().valueProperty().unbindBidirectional(currentInt);
         if (dexSpinner.getValueFactory() != null && dexSpinner.getValueFactory().valueProperty().isBound())
+            //noinspection unchecked
             dexSpinner.getValueFactory().valueProperty().unbindBidirectional(currentDex);
         if (lifeSpinner.getValueFactory() != null && lifeSpinner.getValueFactory().valueProperty().isBound())
+            //noinspection unchecked
             lifeSpinner.getValueFactory().valueProperty().unbindBidirectional(currentLife);
         if (manaSpinner.getValueFactory() != null && manaSpinner.getValueFactory().valueProperty().isBound())
+            //noinspection unchecked
             manaSpinner.getValueFactory().valueProperty().unbindBidirectional(currentMana);
+        //noinspection unchecked
         strSpinner.setValueFactory(null);
+        //noinspection unchecked
         intSpinner.setValueFactory(null);
+        //noinspection unchecked
         dexSpinner.setValueFactory(null);
+        //noinspection unchecked
         lifeSpinner.setValueFactory(null);
+        //noinspection unchecked
         manaSpinner.setValueFactory(null);
         currentAvail = null;
         currentStr = null;
@@ -689,7 +704,7 @@ class AttrIntegerSpinnerValueFactory extends SpinnerValueFactory.IntegerSpinnerV
         if (this.originalMax == -1) {
             this.originalMax = this.getMax();
         }
-        int oldValue = (int) this.getValue();
+        int oldValue = this.getValue();
         int step = v * this.getAmountToStepBy();
         int newValue = oldValue - step;
         if (oldValue - step >= this.getMin())
@@ -701,7 +716,7 @@ class AttrIntegerSpinnerValueFactory extends SpinnerValueFactory.IntegerSpinnerV
         if (this.originalMax == -1) {
             this.originalMax = this.getMax();
         }
-        int oldValue = (int) this.getValue();
+        int oldValue = this.getValue();
         int step = v * this.getAmountToStepBy();
         int newValue = oldValue + step;
         int pointsAvail = available.get() * step;
