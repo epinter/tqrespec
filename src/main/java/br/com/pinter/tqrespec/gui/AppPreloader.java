@@ -5,23 +5,17 @@
 package br.com.pinter.tqrespec.gui;
 
 import javafx.application.Preloader;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.Image;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.IOException;
-import java.util.ResourceBundle;
 
 public class AppPreloader extends Preloader {
     private ProgressBar bar;
@@ -30,7 +24,7 @@ public class AppPreloader extends Preloader {
 
     private Scene createPreloaderScene() throws IOException {
         BorderPane pane = new BorderPane();
-        Scene scene = new Scene(pane,370,210);
+        Scene scene = new Scene(pane, 370, 210);
         pane.getStylesheets().add("/fxml/preloader.css");
         pane.getStyleClass().add("bg-container");
 
@@ -42,7 +36,7 @@ public class AppPreloader extends Preloader {
         title.setText("TQRespec");
         title.getStyleClass().add("tq-bigtitle");
         pane.setTop(title);
-        BorderPane.setAlignment(title,Pos.CENTER);
+        BorderPane.setAlignment(title, Pos.CENTER);
 
         ProgressIndicator indicator = new ProgressIndicator();
         indicator.getStyleClass().add("indicator");
@@ -55,7 +49,7 @@ public class AppPreloader extends Preloader {
     @Override
     public void start(Stage stage) throws Exception {
         this.stage = stage;
-        this.stage.getIcons().addAll(new Image("icon/icon64.png"),new Image("icon/icon32.png"),new Image("icon/icon16.png"));
+        this.stage.getIcons().addAll(new Image("icon/icon64.png"), new Image("icon/icon32.png"), new Image("icon/icon16.png"));
         this.stage.setScene(createPreloaderScene());
 
         String osName = System.getProperty("os.name");
@@ -74,7 +68,7 @@ public class AppPreloader extends Preloader {
         //Even if there is nothing to load 0% and 100% events can be
         // delivered
         if (pn.getProgress() != 1.0 || !noLoadingProgress) {
-            bar.setProgress(pn.getProgress()/2);
+            bar.setProgress(pn.getProgress() / 2);
             if (pn.getProgress() > 0) {
                 noLoadingProgress = false;
             }
@@ -96,7 +90,7 @@ public class AppPreloader extends Preloader {
                 //if we were receiving loading progress notifications
                 //then progress is already at 50%.
                 //Rescale application progress to start from 50%
-                v = 0.5 + v/2;
+                v = 0.5 + v / 2;
             }
             bar.setProgress(v);
         } else if (pn instanceof StateChangeNotification) {

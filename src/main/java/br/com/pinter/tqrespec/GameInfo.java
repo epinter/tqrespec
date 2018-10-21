@@ -49,7 +49,7 @@ public class GameInfo {
     public static GameInfo getInstance() {
         if (instance == null) {
             synchronized (GameInfo.class) {
-                if(instance == null)
+                if (instance == null)
                     instance = new GameInfo();
             }
         }
@@ -92,7 +92,7 @@ public class GameInfo {
 
             }
         } catch (IOException e) {
-            if(DBG) e.printStackTrace();
+            if (DBG) e.printStackTrace();
         }
         return null;
     }
@@ -122,7 +122,7 @@ public class GameInfo {
             installedApps = Advapi32Util.registryGetKeys(WinReg.HKEY_LOCAL_MACHINE,
                     "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall");
         } catch (Exception e) {
-            if(DBG) e.printStackTrace();
+            if (DBG) e.printStackTrace();
         }
 
         for (String app : installedApps)
@@ -138,14 +138,14 @@ public class GameInfo {
                         System.err.println("Installed: displayname not found --- " + regexGameName + "---" + appDisplayName);
                 }
             } catch (Win32Exception e) {
-                if(DBG) e.printStackTrace();
+                if (DBG) e.printStackTrace();
             }
         return null;
     }
 
     private String detectGamePath() {
         String installed = this.getGameInstalledPath();
-        if(StringUtils.isNotEmpty(installed)) {
+        if (StringUtils.isNotEmpty(installed)) {
             Path installedPath = Paths.get(installed);
             if (Files.exists(installedPath)) {
                 if (DBG) System.err.println("Installed: found");
@@ -154,7 +154,7 @@ public class GameInfo {
         }
 
         String steamLibrary = this.getGameSteamLibraryPath();
-        if(StringUtils.isNotEmpty(steamLibrary)) {
+        if (StringUtils.isNotEmpty(steamLibrary)) {
             Path steamLibraryPath = Paths.get(steamLibrary);
             if (Files.exists(steamLibraryPath)) {
                 if (DBG) System.err.println("SteamLibrary: found");
@@ -164,7 +164,7 @@ public class GameInfo {
 
 
         String gog = this.getGameGogPath();
-        if(StringUtils.isNotEmpty(gog)) {
+        if (StringUtils.isNotEmpty(gog)) {
             Path gogPath = Paths.get(gog);
             if (Files.exists(gogPath)) {
                 if (DBG) System.err.println("Gog: found");
@@ -174,7 +174,7 @@ public class GameInfo {
 
 
         String disc = this.getGameDiscPath();
-        if(StringUtils.isNotEmpty(disc)) {
+        if (StringUtils.isNotEmpty(disc)) {
             Path discPath = Paths.get(this.getGameDiscPath());
             if (Files.exists(discPath)) {
                 if (DBG) System.err.println("Disc: found");
@@ -235,10 +235,10 @@ public class GameInfo {
     public String[] getPlayerListMain() throws Exception {
         String savePath = this.getSaveDataMainPath();
         File directory = new File(savePath);
-        ArrayList <String> playerList = new ArrayList<>();
-        if(directory.exists()) {
-            for (File player: directory.listFiles((File fileName) -> fileName.getName().startsWith("_"))) {
-                playerList.add(player.getName().replaceAll("^_",""));
+        ArrayList<String> playerList = new ArrayList<>();
+        if (directory.exists()) {
+            for (File player : directory.listFiles((File fileName) -> fileName.getName().startsWith("_"))) {
+                playerList.add(player.getName().replaceAll("^_", ""));
             }
         } else {
             throw new Exception("No player found");

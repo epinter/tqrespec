@@ -25,12 +25,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Hashtable;
 
-public class ChangesTable extends Hashtable<Integer, byte[]>  implements DeepCloneable {
+public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepCloneable {
     private Hashtable<Integer, Integer> valuesLengthIndex = null;
 
     public ChangesTable() {
@@ -76,9 +74,9 @@ public class ChangesTable extends Hashtable<Integer, byte[]>  implements DeepClo
                     byte str[];
                     if (utf16le) {
                         //encode string to the format the game uses, a wide character with second byte always 0
-                        str = encodeString(value,true);
+                        str = encodeString(value, true);
                     } else {
-                        str = encodeString(value,false);
+                        str = encodeString(value, false);
                     }
                     byte len[] = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(value.length()).array();
                     byte[] data = new byte[4 + str.length];
@@ -94,7 +92,7 @@ public class ChangesTable extends Hashtable<Integer, byte[]>  implements DeepClo
 
     private byte[] encodeString(String str, boolean wide) {
         //allocate the number of characters * 2 so the buffer can hold the '0'
-        ByteBuffer buffer = ByteBuffer.allocate(str.length() * (wide?2:1));
+        ByteBuffer buffer = ByteBuffer.allocate(str.length() * (wide ? 2 : 1));
 
         for (char c : str.toCharArray()) {
             byte n;
@@ -105,9 +103,9 @@ public class ChangesTable extends Hashtable<Integer, byte[]>  implements DeepClo
             } else {
                 n = (byte) c;
             }
-            if(wide) {
+            if (wide) {
                 buffer.put(new byte[]{n, 0});
-            }else {
+            } else {
                 buffer.put(new byte[]{n});
             }
         }

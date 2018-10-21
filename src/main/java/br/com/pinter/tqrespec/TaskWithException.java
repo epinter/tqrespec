@@ -21,14 +21,14 @@
 package br.com.pinter.tqrespec;
 
 import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
-import javafx.event.EventHandler;
 
 public abstract class TaskWithException<T> extends Task {
 
     public TaskWithException() {
         super();
-        this.setOnFailed((WorkerStateEvent) -> {throw new RuntimeException(this.getException());});
+        this.setOnFailed((WorkerStateEvent) -> {
+            throw new RuntimeException(this.getException());
+        });
     }
 
     @Override

@@ -72,12 +72,12 @@ public class VariableInfo {
     }
 
     public Object getValue() {
-        if(variableType == VariableType.Integer)
+        if (variableType == VariableType.Integer)
             return valueInteger;
-        if(variableType == VariableType.String)
+        if (variableType == VariableType.String)
             return valueString;
-        if(variableType == VariableType.Float)
-            return  valueFloat;
+        if (variableType == VariableType.Float)
+            return valueFloat;
         return null;
     }
 

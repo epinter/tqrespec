@@ -20,14 +20,10 @@
 
 package br.com.pinter.tqrespec;
 
-import org.xml.sax.helpers.DefaultHandler;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import java.io.*;
-import java.net.MalformedURLException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Properties;
 
 public class Version implements Comparable<Version> {
@@ -78,13 +74,13 @@ public class Version implements Comparable<Version> {
             if (reader != null)
                 prop.load(reader);
             reader.close();
-            if(prop.getProperty("current_version")!=null && prop.getProperty("module")!=null && prop.getProperty("module").equals("tqrespec")) {
+            if (prop.getProperty("current_version") != null && prop.getProperty("module") != null && prop.getProperty("module").equals("tqrespec")) {
                 String currentVersion = prop.getProperty("current_version");
                 this.urlPage = prop.getProperty("urlpage");
                 this.url1 = prop.getProperty("url1");
                 this.url2 = prop.getProperty("url2");
                 this.url3 = prop.getProperty("url3");
-                if(DBG) {
+                if (DBG) {
                     for (Object o : prop.keySet()) {
                         String k = (String) o;
                         String v = prop.getProperty(k);
@@ -101,19 +97,19 @@ public class Version implements Comparable<Version> {
 
     @Override
     public int compareTo(Version o) {
-        if(o == null)
+        if (o == null)
             return 1;
         String[] thisVersion = this.getVersion().split("\\.");
         String[] otherVersion = o.getVersion().split("\\.");
         int length = Math.max(thisVersion.length, otherVersion.length);
-        for(int i = 0; i < length; i++) {
+        for (int i = 0; i < length; i++) {
             int thisVersionNumber = i < thisVersion.length ?
                     Integer.parseInt(thisVersion[i]) : 0;
             int otherVersionNumber = i < otherVersion.length ?
                     Integer.parseInt(otherVersion[i]) : 0;
-            if(thisVersionNumber < otherVersionNumber)
+            if (thisVersionNumber < otherVersionNumber)
                 return -1;
-            if(thisVersionNumber > otherVersionNumber)
+            if (thisVersionNumber > otherVersionNumber)
                 return 1;
         }
         return 0;

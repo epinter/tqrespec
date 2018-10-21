@@ -20,7 +20,7 @@
 
 package br.com.pinter.tqrespec;
 
-public class WorkerThread extends  Thread {
+public class WorkerThread extends Thread {
     public WorkerThread() {
         super();
         this.setUncaughtExceptionHandler(ExceptionHandler::unhandled);

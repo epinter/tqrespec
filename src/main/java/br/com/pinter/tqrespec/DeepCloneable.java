@@ -19,7 +19,6 @@
 */
 package br.com.pinter.tqrespec;
 
-import br.com.pinter.tqrespec.save.ChangesTable;
 import org.apache.commons.lang3.exception.CloneFailedException;
 
 import java.io.*;

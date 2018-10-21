@@ -37,14 +37,14 @@ public class ExceptionHandler {
     public static void unhandled(Thread t, Throwable e) {
         e.printStackTrace();
         PlayerData.getInstance().reset();
-        if(Platform.isFxApplicationThread()) {
-            ExceptionHandler.showAlert(t,e);
+        if (Platform.isFxApplicationThread()) {
+            ExceptionHandler.showAlert(t, e);
         }
     }
 
     public static void showAlert(Thread t, Throwable e) {
         String header = e.toString();
-        header = header.replaceAll("^java.lang.RuntimeException: (.*Exception.*)","$1");
+        header = header.replaceAll("^java.lang.RuntimeException: (.*Exception.*)", "$1");
         StringWriter stackTrace = new StringWriter();
         e.printStackTrace(new PrintWriter(stackTrace));
 
@@ -74,7 +74,7 @@ public class ExceptionHandler {
 
 
         Optional<ButtonType> result = alert.showAndWait();
-        if(result.get() == abort) {
+        if (result.get() == abort) {
             Platform.exit();
             System.exit(0);
         }

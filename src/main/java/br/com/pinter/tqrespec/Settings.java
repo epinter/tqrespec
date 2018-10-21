@@ -31,6 +31,6 @@ public class Settings {
     public static boolean getAlwaysFullBackup() {
         Preferences prefs = Preferences.userNodeForPackage(Settings.class);
 
-        return prefs.getBoolean("always_fullbackup",false);
+        return prefs.getBoolean("always_fullbackup", false);
     }
 }

@@ -127,7 +127,7 @@ public class PlayerWriter {
     }
 
     private void writeBuffer(String filename) throws IOException {
-        this.writeBuffer(filename,PlayerData.getInstance().getChanges());
+        this.writeBuffer(filename, PlayerData.getInstance().getChanges());
     }
 
     private void writeBuffer(String filename, ChangesTable changesTable) throws IOException {
@@ -175,7 +175,7 @@ public class PlayerWriter {
         Path playerSaveDirSource = Paths.get(path, "_" + fromPlayerName);
         Path playerSaveDirTarget = Paths.get(path, "_" + toPlayerName);
 
-        if(Files.exists(playerSaveDirTarget)) {
+        if (Files.exists(playerSaveDirTarget)) {
             PlayerData.getInstance().setSaveInProgress(false);
             throw new FileAlreadyExistsException("Target Directory already exists");
         }
@@ -183,9 +183,9 @@ public class PlayerWriter {
 
         ChangesTable changesTable = (ChangesTable) PlayerData.getInstance().getChanges().deepClone();
 
-        changesTable.setString("myPlayerName",toPlayerName,true);
+        changesTable.setString("myPlayerName", toPlayerName, true);
 
-        this.writeBuffer(Paths.get(playerSaveDirTarget.toString(),"Player.chr").toString(),changesTable);
+        this.writeBuffer(Paths.get(playerSaveDirTarget.toString(), "Player.chr").toString(), changesTable);
         PlayerData.getInstance().setSaveInProgress(false);
     }
 }

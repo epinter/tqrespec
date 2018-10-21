@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Emerson Pinter - All Rights Reserved 
+ * Copyright (C) 2018 Emerson Pinter - All Rights Reserved
  */
 
 /*    This file is part of TQ Respec.
@@ -22,11 +22,11 @@ package br.com.pinter.tqrespec;
 
 public class Constants {
     public static final int STR_ATTR_STEP = 4;
-    public static final int STR_ATTR_MIN  = 50;
+    public static final int STR_ATTR_MIN = 50;
     public static final int INT_ATTR_STEP = 4;
-    public static final int INT_ATTR_MIN  = 50;
+    public static final int INT_ATTR_MIN = 50;
     public static final int DEX_ATTR_STEP = 4;
-    public static final int DEX_ATTR_MIN  = 50;
+    public static final int DEX_ATTR_MIN = 50;
     public static final int LIFE_ATTR_STEP = 40;
     public static final int LIFE_ATTR_MIN = 300;
     public static final int MANA_ATTR_STEP = 40;
