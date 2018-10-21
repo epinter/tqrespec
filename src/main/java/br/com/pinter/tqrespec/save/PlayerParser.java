@@ -36,7 +36,8 @@ import java.util.Hashtable;
 
 public class PlayerParser {
     private final static boolean DBG = false;
-    private String playerSelected = null;
+    private String player = null;
+    private boolean customQuest = false;
 
     private int inventoryStart = -1;
 
@@ -45,32 +46,26 @@ public class PlayerParser {
         put("end_block", new byte[]{0x09, 0x00, 0x00, 0x00, 0x65, 0x6E, 0x64, 0x5F, 0x62, 0x6C, 0x6F, 0x63, 0x6B});
     }};
 
-    PlayerParser(String playerSelected) throws Exception {
-        this(playerSelected, false);
-
-    }
-
-    private PlayerParser(String playerName, boolean customQuest) throws Exception {
-        this.playerSelected = playerName;
+    public void parse() throws Exception {
         PlayerData.getInstance().reset();
-        this.loadPlayerChr(customQuest);
+        this.loadPlayerChr();
 
         if (this.getBuffer() == null || this.getBuffer().capacity() <= 50) {
-            throw new IOException("Can't read Player.chr from player " + this.playerSelected);
+            throw new IOException("Can't read Player.chr from player " + this.player);
         }
         if (DBG) Util.log(String.format("File '%s' loaded, size=%d",
-                this.playerSelected, this.getBuffer().capacity()));
+                this.player, this.getBuffer().capacity()));
         HeaderInfo headerInfo = parseHeader();
 
         PlayerData.getInstance().setHeaderInfo(headerInfo);
 
         if (headerInfo.getHeaderVersion() != 2) {
             throw new IncompatibleSavegameException(
-                    String.format("Incompatible player '%s' (headerVersion must be == 2)", this.playerSelected));
+                    String.format("Incompatible player '%s' (headerVersion must be == 2)", this.player));
         }
         if (headerInfo.getPlayerVersion() != 5) {
             throw new IncompatibleSavegameException(
-                    String.format("Incompatible player '%s' (playerVersion must be == 5)", this.playerSelected));
+                    String.format("Incompatible player '%s' (playerVersion must be == 5)", this.player));
         }
         Hashtable<Integer, BlockInfo> blocks = this.parseAllBlocks();
         PlayerData.getInstance().setBlockInfo(blocks);
@@ -78,7 +73,7 @@ public class PlayerParser {
             this.parseFooter();
         }
         this.prepareBufferForRead();
-        PlayerData.getInstance().setPlayerName(playerName);
+        PlayerData.getInstance().setPlayerName(player);
     }
 
     private void prepareBufferForRead() {
@@ -94,7 +89,7 @@ public class PlayerParser {
         return (blockTagSize + 4);
     }
 
-    private void loadPlayerChr(boolean customQuest) throws Exception {
+    private void loadPlayerChr() throws Exception {
         if (this.getBuffer() != null) {
             PlayerData.getInstance().reset();
         }
@@ -105,7 +100,7 @@ public class PlayerParser {
             path = GameInfo.getInstance().getSaveDataMainPath();
         }
         File playerChr = new File(path +
-                String.format("\\_%s\\Player.chr", this.playerSelected));
+                String.format("\\_%s\\Player.chr", this.player));
 
         if (!playerChr.exists()) {
             return;
@@ -547,5 +542,23 @@ public class PlayerParser {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public String getPlayer() {
+        return player;
+    }
+
+    public PlayerParser player(String player) {
+        this.player = player;
+        return this;
+    }
+
+    public boolean isCustomQuest() {
+        return customQuest;
+    }
+
+    public PlayerParser customQuest(boolean customQuest) {
+        this.customQuest = customQuest;
+        return this;
     }
 }

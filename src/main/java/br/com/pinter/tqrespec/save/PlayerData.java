@@ -20,10 +20,19 @@
 
 package br.com.pinter.tqrespec.save;
 
+import br.com.pinter.tqdatabase.Skill;
+import br.com.pinter.tqrespec.Data;
+import br.com.pinter.tqrespec.Util;
+
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class PlayerData {
     private static PlayerData instance = null;
@@ -124,7 +133,7 @@ public class PlayerData {
             return false;
         }
         try {
-            new PlayerParser(playerName);
+            new PlayerParser().player(playerName).parse();
             return true;
         } catch (Exception e) {
             throw e;
