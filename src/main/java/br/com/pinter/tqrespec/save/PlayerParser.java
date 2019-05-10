@@ -101,9 +101,9 @@ public class PlayerParser extends FileParser {
 
         PlayerData.getInstance().setHeaderInfo(headerInfo);
 
-        if (headerInfo.getHeaderVersion() != 2) {
+        if (headerInfo.getHeaderVersion() != 2 && headerInfo.getHeaderVersion() != 3) {
             throw new IncompatibleSavegameException(
-                    String.format("Incompatible player '%s' (headerVersion must be == 2)", this.player));
+                    String.format("Incompatible player '%s' (headerVersion must be 2 or 3)", this.player));
         }
         if (headerInfo.getPlayerVersion() != 5) {
             throw new IncompatibleSavegameException(
