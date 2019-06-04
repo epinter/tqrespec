@@ -234,7 +234,6 @@ public class PlayerParser extends FileParser {
                     || name.equalsIgnoreCase("useAlternate")
                     || name.equalsIgnoreCase("alternateConfig")
                     || name.equalsIgnoreCase("alternateConfigEnabled")
-                    || name.equalsIgnoreCase("alternateConfig")
                     || name.equalsIgnoreCase("itemsFoundOverLifetimeUniqueTotal")
                     || name.equalsIgnoreCase("itemsFoundOverLifetimeRandomizedTotal")
                     || name.equalsIgnoreCase("hasBeenInGame")
@@ -267,9 +266,6 @@ public class PlayerParser extends FileParser {
                     || name.equalsIgnoreCase("max")
                     || name.equalsIgnoreCase("equipmentSelection")
                     || name.equalsIgnoreCase("equipmentCtrlIOStreamVersion")
-                    || name.equalsIgnoreCase("equipmentSelection")
-                    || name.equalsIgnoreCase("equipmentSelection")
-                    || name.equalsIgnoreCase("equipmentSelection")
                     || name.equalsIgnoreCase("seed")
                     || name.equalsIgnoreCase("var1")
                     || name.equalsIgnoreCase("storedType")) {
