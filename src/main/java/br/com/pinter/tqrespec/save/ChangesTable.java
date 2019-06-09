@@ -222,7 +222,12 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
             if (PlayerData.getInstance().getBlockInfo().get(block) != null) {
                 if (PlayerData.getInstance().getBlockInfo().get(block).getVariables().get(variable).getVariableType()
                         == VariableInfo.VariableType.Integer) {
-                    return (Integer) PlayerData.getInstance().getBlockInfo().get(block).getVariables().get(variable).getValue();
+                    VariableInfo v = PlayerData.getInstance().getBlockInfo().get(block).getVariables().get(variable);
+                    if (this.get(v.getValOffset()) != null) {
+                        return ByteBuffer.wrap(this.get(v.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getInt();
+                    } else {
+                        return (Integer) v.getValue();
+                    }
                 }
 
             }
