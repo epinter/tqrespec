@@ -185,6 +185,13 @@ public class Util {
         return recordId.toUpperCase().replace("/", "\\");
     }
 
+    public static boolean recordPathEquals(String r1, String r2) {
+        if(Util.normalizeRecordPath(r1).equals(Util.normalizeRecordPath(r2))) {
+            return true;
+        }
+        return false;
+    }
+
     public static void closeApplication() {
         if (!Util.tryToCloseApplication()) {
             Util.showWarning(Util.getUIMessage("alert.saveinprogress_header"), Util.getUIMessage("alert.saveinprogress_content"));
