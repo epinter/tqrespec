@@ -163,6 +163,22 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
         return (Float[]) ret.toArray();
     }
 
+    public void setInt(int blockStart, String variable, int value) throws Exception {
+        if (PlayerData.getInstance().getBlockInfo().get(blockStart) != null) {
+            if (PlayerData.getInstance().getBlockInfo().get(blockStart).getVariables().get(variable).getVariableType()
+                    == VariableInfo.VariableType.Integer) {
+                VariableInfo variableInfo = PlayerData.getInstance().getBlockInfo().get(blockStart).getVariables().get(variable);
+                if (variableInfo.getValSize() == 4) {
+                    byte data[] = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(value).array();
+                    this.put(variableInfo.getValOffset(), data);
+                    this.valuesLengthIndex.put(variableInfo.getValOffset(), variableInfo.getValSize());
+                }
+            } else {
+                throw new Exception(String.format("Variable '%s' is not an int", variable));
+            }
+        }
+    }
+
     public void setInt(String variable, int value) throws Exception {
         if (PlayerData.getInstance().getVariableLocation().get(variable) != null) {
             if (PlayerData.getInstance().getVariableLocation().get(variable).size() > 1) {
@@ -183,6 +199,21 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
                 }
             }
         }
+    }
+
+    public Integer getInt(int blockStart, String variable) {
+        if (PlayerData.getInstance().getBlockInfo().get(blockStart) != null) {
+            if (PlayerData.getInstance().getBlockInfo().get(blockStart).getVariables().get(variable).getVariableType()
+                    == VariableInfo.VariableType.Integer) {
+                VariableInfo v = PlayerData.getInstance().getBlockInfo().get(blockStart).getVariables().get(variable);
+                if (this.get(v.getValOffset()) != null) {
+                    return ByteBuffer.wrap(this.get(v.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getInt();
+                } else {
+                    return (Integer) v.getValue();
+                }
+            }
+        }
+        return -1;
     }
 
     public Integer getInt(String variable) {
@@ -214,5 +245,10 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
         return (Integer[]) ret.toArray();
     }
 
+    public void removeBlock(int offset) {
+        BlockInfo current = PlayerData.getInstance().getBlockInfo().get(offset);
+        this.put(current.getStart(), new byte[0]);
+        this.valuesLengthIndex.put(current.getStart(), current.getSize());
+    }
 
 }
