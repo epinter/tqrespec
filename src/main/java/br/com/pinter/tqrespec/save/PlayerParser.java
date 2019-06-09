@@ -286,6 +286,7 @@ public class PlayerParser extends FileParser {
             } else if (name.equalsIgnoreCase("currentStats.experiencePoints")
                     || name.equalsIgnoreCase("currentStats.charLevel")
                     || name.equalsIgnoreCase("modifierPoints")
+                    || name.equalsIgnoreCase("skillPoints")
                     || name.equalsIgnoreCase("versionRespawnPoint")
                     || name.equalsIgnoreCase("money")) {
                 this.readInt(variableInfo);
