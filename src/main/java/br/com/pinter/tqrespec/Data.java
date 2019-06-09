@@ -30,7 +30,7 @@ public class Data {
     private Database db;
     private Text text;
 
-    public static Data getInstance() {
+    private static Data getInstance() {
         Data d = _instance;
         if (d == null) {
             synchronized (Data.class) {
@@ -56,11 +56,11 @@ public class Data {
         }
     }
 
-    public Database getDb() {
-        return db;
+    public static Database db() {
+        return getInstance().db;
     }
 
-    public Text getText() {
-        return text;
+    public static Text text() {
+        return getInstance().text;
     }
 }

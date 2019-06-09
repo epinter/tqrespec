@@ -458,7 +458,7 @@ public class ControllerMainForm implements Initializable {
             String charClass = PlayerData.getInstance().getHeaderInfo().getPlayerClassTag();
 
             if (StringUtils.isNotEmpty(charClass)) {
-                charClassText.setText(Data.getInstance().getText().getString(charClass));
+                charClassText.setText(Data.text().getString(charClass));
             }
             int difficulty = PlayerData.getInstance().getChanges().getInt("difficulty");
             difficultyText.setText(Util.getUIMessage(String.format("difficulty.%d", difficulty)));
