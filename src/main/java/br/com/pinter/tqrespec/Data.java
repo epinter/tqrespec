@@ -29,6 +29,8 @@ public class Data {
     private static volatile Data _instance;
     private Database db;
     private Text text;
+    private String textPath;
+    private String dbPath;
 
     private static Data getInstance() {
         Data d = _instance;
@@ -45,11 +47,9 @@ public class Data {
     }
 
     private Data() {
-        String dbPath = null;
         try {
+            textPath = GameInfo.getInstance().getGamePath() + "/Text";
             dbPath = String.format("%s/Database/database.arz", GameInfo.getInstance().getGamePath());
-            db = new Database(dbPath);
-            text = new Text(GameInfo.getInstance().getGamePath() + "/Text");
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(String.format("Error loading database from '%s'", dbPath));
@@ -57,10 +57,16 @@ public class Data {
     }
 
     public static Database db() {
+        try {
+            getInstance().db = new Database(getInstance().dbPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return getInstance().db;
     }
 
     public static Text text() {
+        getInstance().text = new Text(getInstance().textPath);
         return getInstance().text;
     }
 }
