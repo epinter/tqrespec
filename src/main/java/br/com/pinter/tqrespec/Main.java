@@ -28,7 +28,6 @@ import javafx.application.Preloader;
 import javafx.beans.binding.Bindings;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -44,7 +43,7 @@ import java.util.ResourceBundle;
 
 public class Main extends Application {
     public static void main(String[] args) {
-        System.setProperty("javafx.preloader","br.com.pinter.tqrespec.gui.AppPreloader");
+        System.setProperty("javafx.preloader", "br.com.pinter.tqrespec.gui.AppPreloader");
         launch(args);
     }
 
@@ -53,25 +52,37 @@ public class Main extends Application {
     private void load(Stage stage) {
         TaskWithException<Void> task = new TaskWithException<Void>() {
             @Override
-            public Void call()
-            {
-                notifyPreloader(new Preloader.ProgressNotification(0.5));
+            public Void call() {
+                //preload game database metadata and skills
+                notifyPreloader(new Preloader.ProgressNotification(0.3));
+                Data.db();
+                notifyPreloader(new Preloader.ProgressNotification(0.7));
+                Data.db().getSkillList();
+                //preload text
+                notifyPreloader(new Preloader.ProgressNotification(0.9));
+                Data.text();
                 return null;
             }
         };
         task.setOnSucceeded(e -> {
-            notifyPreloader(new Preloader.StateChangeNotification(
-                    Preloader.StateChangeNotification.Type.BEFORE_START));
+            notifyPreloader(new Preloader.ProgressNotification(1.0));
             stage.show();
         });
         new WorkerThread(task).start();
+        stage.setOnShown(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent windowEvent) {
+                notifyPreloader(new Preloader.StateChangeNotification(
+                        Preloader.StateChangeNotification.Type.BEFORE_START));
+            }
+        });
+
     }
 
     @Override
     public void start(Stage primaryStage) {
-        notifyPreloader(new Preloader.ProgressNotification(0.3));
-        Font.loadFont(getClass().getResourceAsStream("/fxml/albertus-mt.ttf"),16);
-        Font.loadFont(getClass().getResourceAsStream("/fxml/albertus-mt-light.ttf"),16);
+        Font.loadFont(getClass().getResourceAsStream("/fxml/albertus-mt.ttf"), 16);
+        Font.loadFont(getClass().getResourceAsStream("/fxml/albertus-mt-light.ttf"), 16);
         Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler::unhandled);
 
         ResourceBundle bundle = ResourceBundle.getBundle("i18n.UI");
@@ -84,7 +95,7 @@ public class Main extends Application {
         }
 
         primaryStage.setTitle(Util.getBuildTitle());
-        primaryStage.getIcons().addAll(new Image("icon/icon64.png"),new Image("icon/icon32.png"),new Image("icon/icon16.png"));
+        primaryStage.getIcons().addAll(new Image("icon/icon64.png"), new Image("icon/icon32.png"), new Image("icon/icon16.png"));
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
 
@@ -137,7 +148,7 @@ public class Main extends Application {
                 ControllerMainForm.mainFormInitialized.setValue(true);
             }
         });
-
         load(primaryStage);
+
     }
 }
