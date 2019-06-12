@@ -25,10 +25,11 @@
       <element id="archive" name="tqrespec.jar">
         <element id="module-output" name="tqrespec" />
         <element id="dir-copy" path="$PROJECT_DIR$/src/main/resources" />
+        <element id="module-output" name="tqdatabase" />
       </element>
       <element id="library" level="project" name="Gradle: net.java.dev.jna:platform:3.5.0" />
-      <element id="library" level="project" name="Gradle: org.apache.commons:commons-lang3:3.7" />
       <element id="library" level="project" name="Gradle: net.java.dev.jna:jna:3.5.0" />
+      <element id="library" level="project" name="Gradle: org.apache.commons:commons-lang3:3.9" />
     </root>
   </artifact>
 </component>

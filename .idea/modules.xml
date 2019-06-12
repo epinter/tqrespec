@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tqrespec.iml" filepath="$PROJECT_DIR$/.idea/modules/tqrespec.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-519557109/tqdatabase.iml" filepath="$PROJECT_DIR$/.idea/modules/-519557109/tqdatabase.iml" group="tqrespec/tqdatabase" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tqrespec.iml" filepath="$PROJECT_DIR$/.idea/modules/tqrespec.iml" group="tqrespec" />
     </modules>
   </component>
 </project>

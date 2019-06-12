@@ -3,4 +3,5 @@
  */
 
 rootProject.name = 'tqrespec'
-
+include ':tqdatabase'
+project(':tqdatabase').projectDir = new File(settingsDir,'../tqdatabase')
