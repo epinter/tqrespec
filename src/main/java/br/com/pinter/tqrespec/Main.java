@@ -26,10 +26,13 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.application.Preloader;
 import javafx.beans.binding.Bindings;
+import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -37,8 +40,11 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ResourceBundle;
 
 public class Main extends Application {
@@ -50,9 +56,11 @@ public class Main extends Application {
     private static double scale = 0;
 
     private void load(Stage stage) {
-        TaskWithException<Void> task = new TaskWithException<Void>() {
+
+        Task<Void> task = new Task<Void>() {
             @Override
             public Void call() {
+                StringUtils.isEmpty("");
                 //preload game database metadata and skills
                 notifyPreloader(new Preloader.ProgressNotification(0.3));
                 Data.db();
@@ -64,11 +72,26 @@ public class Main extends Application {
                 return null;
             }
         };
+        task.setOnFailed(e -> {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error loading application");
+            StringWriter stringWriter = new StringWriter();
+            PrintWriter printWriter = new PrintWriter(stringWriter);
+            e.getSource().getException().printStackTrace(printWriter);
+            TextArea textArea = new TextArea(stringWriter.toString());
+            textArea.setMaxWidth(Double.MAX_VALUE);
+            textArea.setMaxHeight(Double.MAX_VALUE);
+            alert.getDialogPane().setExpandableContent(textArea);
+            alert.showAndWait();
+            System.exit(1);
+        });
+
         task.setOnSucceeded(e -> {
             notifyPreloader(new Preloader.ProgressNotification(1.0));
             stage.show();
         });
-        new WorkerThread(task).start();
+        new Thread(task).start();
         stage.setOnShown(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent windowEvent) {
