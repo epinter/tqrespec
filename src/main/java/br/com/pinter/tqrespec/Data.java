@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Emerson Pinter - All Rights Reserved
+ * Copyright (C) 2019 Emerson Pinter - All Rights Reserved
  */
 
 /*    This file is part of TQ Respec.
