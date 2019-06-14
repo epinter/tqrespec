@@ -29,6 +29,9 @@
       <element id="library" level="project" name="Gradle: net.java.dev.jna:platform:3.5.0" />
       <element id="library" level="project" name="Gradle: net.java.dev.jna:jna:3.5.0" />
       <element id="library" level="project" name="Gradle: org.apache.commons:commons-lang3:3.9" />
+      <element id="archive" name="tqdatabase.jar">
+        <element id="module-output" name="tqdatabase" />
+      </element>
     </root>
   </artifact>
 </component>
