@@ -58,7 +58,9 @@ public class Data {
 
     public static Database db() {
         try {
-            getInstance().db = new Database(getInstance().dbPath);
+            if (getInstance().db == null) {
+                getInstance().db = new Database(getInstance().dbPath);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -66,7 +68,9 @@ public class Data {
     }
 
     public static Text text() {
-        getInstance().text = new Text(getInstance().textPath);
+        if (getInstance().text == null) {
+            getInstance().text = new Text(getInstance().textPath);
+        }
         return getInstance().text;
     }
 }
