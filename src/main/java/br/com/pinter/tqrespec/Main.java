@@ -60,15 +60,14 @@ public class Main extends Application {
         Task<Void> task = new Task<Void>() {
             @Override
             public Void call() {
-                StringUtils.isEmpty("");
                 //preload game database metadata and skills
                 notifyPreloader(new Preloader.ProgressNotification(0.3));
                 Data.db();
                 notifyPreloader(new Preloader.ProgressNotification(0.7));
-                Data.db().getSkillList();
+                Data.db().preload();
                 //preload text
                 notifyPreloader(new Preloader.ProgressNotification(0.9));
-                Data.text();
+                Data.text().preload();
                 return null;
             }
         };
