@@ -51,7 +51,7 @@ public class PlayerParser extends FileParser {
         return PlayerData.getInstance().getVariableLocation();
     }
 
-    private HeaderInfo parseHeader() {
+    HeaderInfo parseHeader() {
         int headerEnd = searchBlockTag("begin_block", 0) - 1;
         HeaderInfo headerInfo = new HeaderInfo();
 
@@ -89,8 +89,7 @@ public class PlayerParser extends FileParser {
     }
 
     public void parse() throws Exception {
-        PlayerData.getInstance().reset();
-        this.loadPlayerChr();
+        loadPlayerChr();
 
         if (this.getBuffer() == null || this.getBuffer().capacity() <= 50) {
             throw new IOException("Can't read Player.chr from player " + this.player);
@@ -118,7 +117,8 @@ public class PlayerParser extends FileParser {
         PlayerData.getInstance().setPlayerName(player);
     }
 
-    private void loadPlayerChr() throws Exception {
+    void loadPlayerChr() throws Exception {
+        PlayerData.getInstance().reset();
         if (this.getBuffer() != null) {
             PlayerData.getInstance().reset();
         }
