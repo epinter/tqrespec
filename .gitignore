@@ -1,4 +1,7 @@
 tqdatabase/
+*.arz
+*.arc
+Player.chr
 hs_err_pid*
 .gradle
 
