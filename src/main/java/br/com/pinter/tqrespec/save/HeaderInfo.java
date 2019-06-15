@@ -20,6 +20,7 @@
 
 package br.com.pinter.tqrespec.save;
 
+@SuppressWarnings("unused")
 public class HeaderInfo {
     private int headerVersion = -1;
     private String playerCharacterClass = null;

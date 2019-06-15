@@ -31,13 +31,12 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import java.io.IOException;
-
+@SuppressWarnings("RedundantThrows")
 public class AppPreloader extends Preloader {
     private ProgressBar bar;
     private Stage stage;
 
-    private Scene createPreloaderScene() throws IOException {
+    private Scene createPreloaderScene() {
         BorderPane pane = new BorderPane();
         Scene scene = new Scene(pane, 370, 210);
         pane.getStylesheets().add("/fxml/preloader.css");

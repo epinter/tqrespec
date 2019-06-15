@@ -31,11 +31,13 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.text.MessageFormat;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
+@SuppressWarnings("ALL")
 public class Util {
     public static void log(String message) {
         System.err.println(message);
@@ -43,18 +45,12 @@ public class Util {
 
     public static String getBuildVersion() {
         String implementationVersion = Util.class.getPackage().getImplementationVersion();
-        if (implementationVersion == null) {
-            return "0.0";
-        }
-        return implementationVersion;
+        return Objects.requireNonNullElse(implementationVersion, "0.0");
     }
 
     public static String getBuildTitle() {
         String implementationTitle = Util.class.getPackage().getImplementationTitle();
-        if (implementationTitle == null) {
-            return "Development";
-        }
-        return implementationTitle;
+        return Objects.requireNonNullElse(implementationTitle, "Development");
     }
 
     public static void showError(String message, String contentText) {
@@ -66,7 +62,7 @@ public class Util {
         alert.showAndWait();
     }
 
-    public static void showWarning(String message, String contentText) {
+    private static void showWarning(String message, String contentText) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.initModality(Modality.APPLICATION_MODAL);
         alert.setTitle("Warning");
@@ -100,7 +96,7 @@ public class Util {
         return message;
     }
 
-    public static boolean tryToCloseApplication() {
+    private static boolean tryToCloseApplication() {
         if (PlayerData.getInstance().getSaveInProgress() != null && !PlayerData.getInstance().getSaveInProgress()
                 || PlayerData.getInstance().getSaveInProgress() == null) {
             Platform.exit();
@@ -109,12 +105,14 @@ public class Util {
         return false;
     }
 
+    @SuppressWarnings("unchecked")
     public static void copyDirectoryRecurse(Path source, Path target, boolean replace) throws FileAlreadyExistsException {
         boolean DBG = false;
         if (!replace && Files.exists(target)) {
             throw new FileAlreadyExistsException(target.toString() + " already exists");
         }
         FileVisitor fileVisitor = new FileVisitor() {
+            @SuppressWarnings("ConstantConditions")
             @Override
             public FileVisitResult preVisitDirectory(Object dir, BasicFileAttributes attrs) {
                 Path targetDir = target.resolve(source.relativize((Path) dir));
@@ -125,6 +123,7 @@ public class Util {
                     Files.copy((Path) dir, targetDir, COPY_ATTRIBUTES);
                 } catch (DirectoryNotEmptyException ignored) {
                 } catch (IOException e) {
+                    //noinspection ConstantConditions
                     if (DBG) System.err.println(String.format("Unable to create directory '%s'", targetDir));
                     return FileVisitResult.TERMINATE;
                 }
@@ -186,10 +185,7 @@ public class Util {
     }
 
     public static boolean recordPathEquals(String r1, String r2) {
-        if(Util.normalizeRecordPath(r1).equals(Util.normalizeRecordPath(r2))) {
-            return true;
-        }
-        return false;
+        return Util.normalizeRecordPath(r1).equals(Util.normalizeRecordPath(r2));
     }
 
     public static void closeApplication() {
@@ -197,7 +193,7 @@ public class Util {
             Util.showWarning(Util.getUIMessage("alert.saveinprogress_header"), Util.getUIMessage("alert.saveinprogress_content"));
             Task tryAgain = new Task() {
                 @Override
-                protected Object call() throws Exception {
+                protected Object call() {
                     try {
                         Thread.sleep(2000);
                     } catch (InterruptedException e) {

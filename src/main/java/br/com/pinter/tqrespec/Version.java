@@ -24,8 +24,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
+@SuppressWarnings({"WeakerAccess", "CanBeFinal", "unused"})
 public class Version implements Comparable<Version> {
     private static final boolean DBG = false;
     private String version;
@@ -63,16 +65,16 @@ public class Version implements Comparable<Version> {
         return lastCheck;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public int checkNewerVersion(String urlPropFile) {
-        URL url = null;
-        Reader reader = null;
+        URL url;
+        Reader reader;
         try {
             url = new URL(urlPropFile);
             InputStream in = url.openStream();
-            reader = new InputStreamReader(in, "UTF-8");
+            reader = new InputStreamReader(in, StandardCharsets.UTF_8);
             Properties prop = new Properties();
-            if (reader != null)
-                prop.load(reader);
+            prop.load(reader);
             reader.close();
             if (prop.getProperty("current_version") != null && prop.getProperty("module") != null && prop.getProperty("module").equals("tqrespec")) {
                 String currentVersion = prop.getProperty("current_version");
@@ -91,6 +93,7 @@ public class Version implements Comparable<Version> {
                 return lastCheck;
             }
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return -2;
     }

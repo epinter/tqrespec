@@ -22,6 +22,7 @@ package br.com.pinter.tqrespec;
 
 import java.util.prefs.Preferences;
 
+@SuppressWarnings("unused")
 public class Settings {
     public static void setAlwaysFullBackup(boolean alwaysFullBackup) {
         Preferences prefs = Preferences.userNodeForPackage(Settings.class);

@@ -28,6 +28,7 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+@SuppressWarnings("ALL")
 public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepCloneable {
     private Hashtable<Integer, Integer> valuesLengthIndex = null;
 
@@ -57,7 +58,7 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
         return null;
     }
 
-    public void setString(String variable, String value) throws Exception {
+    public void setString(String variable, String value) {
         this.setString(variable, value, false);
     }
 
@@ -71,14 +72,14 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
                 if (PlayerData.getInstance().getBlockInfo().get(block).getVariables().get(variable).getVariableType()
                         == VariableInfo.VariableType.String) {
                     VariableInfo variableInfo = PlayerData.getInstance().getBlockInfo().get(block).getVariables().get(variable);
-                    byte str[];
+                    byte[] str;
                     if (utf16le) {
                         //encode string to the format the game uses, a wide character with second byte always 0
                         str = encodeString(value, true);
                     } else {
                         str = encodeString(value, false);
                     }
-                    byte len[] = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(value.length()).array();
+                    byte[] len = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(value.length()).array();
                     byte[] data = new byte[4 + str.length];
                     System.arraycopy(len, 0, data, 0, len.length);
                     System.arraycopy(str, 0, data, len.length, str.length);
@@ -123,7 +124,7 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
                         == VariableInfo.VariableType.Float) {
                     VariableInfo variableInfo = PlayerData.getInstance().getBlockInfo().get(block).getVariables().get(variable);
                     if (variableInfo.getValSize() == 4) {
-                        byte data[] = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putFloat(value).array();
+                        byte[] data = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putFloat(value).array();
                         this.put(variableInfo.getValOffset(), data);
                         this.valuesLengthIndex.put(variableInfo.getValOffset(), variableInfo.getValSize());
                     }
@@ -174,7 +175,7 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
                     == VariableInfo.VariableType.Integer) {
                 VariableInfo variableInfo = PlayerData.getInstance().getBlockInfo().get(blockStart).getVariables().get(variable);
                 if (variableInfo.getValSize() == 4) {
-                    byte data[] = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(value).array();
+                    byte[] data = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(value).array();
                     this.put(variableInfo.getValOffset(), data);
                     this.valuesLengthIndex.put(variableInfo.getValOffset(), variableInfo.getValSize());
                 }
@@ -195,7 +196,7 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
                         == VariableInfo.VariableType.Integer) {
                     VariableInfo variableInfo = PlayerData.getInstance().getBlockInfo().get(block).getVariables().get(variable);
                     if (variableInfo.getValSize() == 4) {
-                        byte data[] = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(value).array();
+                        byte[] data = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(value).array();
                         this.put(variableInfo.getValOffset(), data);
                         this.valuesLengthIndex.put(variableInfo.getValOffset(), variableInfo.getValSize());
                     }

@@ -29,7 +29,8 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-public abstract class FileParser {
+@SuppressWarnings("CanBeFinal")
+abstract class FileParser {
     private final static boolean DBG = false;
 
     abstract Hashtable<String, VariableInfo> parseBlock(BlockInfo blockInfo);
@@ -45,13 +46,11 @@ public abstract class FileParser {
     abstract protected Hashtable<String, ArrayList<Integer>> getVariableLocation();
 
     void putVarIndex(String varName, int blockStart) {
-        if (this.getVariableLocation().get(varName) == null) {
-            this.getVariableLocation().put(varName, new ArrayList<Integer>());
-        }
+        this.getVariableLocation().computeIfAbsent(varName, k -> new ArrayList<>());
         this.getVariableLocation().get(varName).add(blockStart);
     }
 
-    private Hashtable<String, byte[]> blockTag = new Hashtable<String, byte[]>() {{
+    private Hashtable<String, byte[]> blockTag = new Hashtable<>() {{
         put("begin_block", new byte[]{0x0B, 0x00, 0x00, 0x00, 0x62, 0x65, 0x67, 0x69, 0x6E, 0x5F, 0x62, 0x6C, 0x6F, 0x63, 0x6B});
         put("end_block", new byte[]{0x09, 0x00, 0x00, 0x00, 0x65, 0x6E, 0x64, 0x5F, 0x62, 0x6C, 0x6F, 0x63, 0x6B});
     }};
@@ -144,7 +143,7 @@ public abstract class FileParser {
                 len *= 2;
             }
 
-            byte buf[] = new byte[len];
+            byte[] buf = new byte[len];
 
             byteBuffer.get(buf, 0, len);
 
@@ -190,7 +189,7 @@ public abstract class FileParser {
             if (utf16le) {
                 len *= 2;
             }
-            byte buf[] = new byte[len];
+            byte[] buf = new byte[len];
 
             byteBuffer.get(buf, 0, len);
             return new String(buf, utf16le ? "UTF-16LE" : "UTF-8");

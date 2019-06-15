@@ -21,6 +21,7 @@
 package br.com.pinter.tqrespec;
 
 public class WorkerThread extends Thread {
+    @SuppressWarnings("unused")
     public WorkerThread() {
         super();
         this.setUncaughtExceptionHandler(ExceptionHandler::unhandled);

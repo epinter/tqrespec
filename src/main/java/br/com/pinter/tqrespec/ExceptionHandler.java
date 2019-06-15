@@ -33,7 +33,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Optional;
 
-public class ExceptionHandler {
+@SuppressWarnings("unused")
+class ExceptionHandler {
     public static void unhandled(Thread t, Throwable e) {
         e.printStackTrace();
         PlayerData.getInstance().reset();
@@ -42,7 +43,7 @@ public class ExceptionHandler {
         }
     }
 
-    public static void showAlert(Thread t, Throwable e) {
+    private static void showAlert(Thread t, Throwable e) {
         String header = e.toString();
         header = header.replaceAll("^java.lang.RuntimeException: (.*Exception.*)", "$1");
         StringWriter stackTrace = new StringWriter();
@@ -74,7 +75,7 @@ public class ExceptionHandler {
 
 
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == abort) {
+        if (result.isPresent() && result.get() == abort) {
             Platform.exit();
             System.exit(0);
         }

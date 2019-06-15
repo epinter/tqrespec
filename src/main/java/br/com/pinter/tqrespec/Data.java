@@ -52,7 +52,7 @@ public class Data {
             dbPath = String.format("%s/Database/database.arz", GameInfo.getInstance().getGamePath());
         } catch (IOException e) {
             e.printStackTrace();
-            throw new RuntimeException(String.format("Error loading database from '%s'", dbPath));
+            throw new RuntimeException("Error loading database.");
         }
     }
 

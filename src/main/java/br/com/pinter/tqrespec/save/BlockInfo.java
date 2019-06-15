@@ -22,6 +22,7 @@ package br.com.pinter.tqrespec.save;
 
 import java.util.Hashtable;
 
+@SuppressWarnings("unused")
 public class BlockInfo {
     private String tag = null;
     private int start = -1;

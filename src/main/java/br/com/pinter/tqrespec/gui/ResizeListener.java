@@ -26,16 +26,14 @@ import javafx.scene.Cursor;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
+@SuppressWarnings("CanBeFinal")
 public class ResizeListener implements EventHandler<MouseEvent> {
-    Stage stage;
+    private Stage stage;
 
-    double dx;
-    double dy;
-    double deltaX;
-    double deltaY;
-    double border = 10;
-    boolean resizeH = false;
-    boolean resizeV = false;
+    private double dx;
+    private double dy;
+    private boolean resizeH = false;
+    private boolean resizeV = false;
 
     public ResizeListener(Stage stage) {
         this.stage = stage;
@@ -54,6 +52,7 @@ public class ResizeListener implements EventHandler<MouseEvent> {
             return;
         }
         if (MouseEvent.MOUSE_MOVED.equals(t.getEventType())) {
+            double border = 10;
             if (t.getX() < border && t.getY() > stage.getScene().getHeight() - border) {
                 stage.getScene().setCursor(Cursor.SW_RESIZE);
                 resizeH = true;

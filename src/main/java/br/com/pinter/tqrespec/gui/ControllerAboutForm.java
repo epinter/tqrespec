@@ -32,6 +32,7 @@ import javafx.stage.Stage;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+@SuppressWarnings("unused")
 public class ControllerAboutForm implements Initializable {
     @FXML
     private AnchorPane rootelement;

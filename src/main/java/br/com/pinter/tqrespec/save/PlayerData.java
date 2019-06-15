@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+@SuppressWarnings("unused")
 public class PlayerData {
     private static PlayerData instance = null;
     private String playerName = null;
@@ -43,8 +44,8 @@ public class PlayerData {
                 if (instance == null) {
                     instance = new PlayerData();
                     instance.changes = new ChangesTable();
-                    instance.variableLocation = new Hashtable<String, ArrayList<Integer>>();
-                    instance.blockInfo = new Hashtable<Integer, BlockInfo>();
+                    instance.variableLocation = new Hashtable<>();
+                    instance.blockInfo = new Hashtable<>();
                 }
             }
         }
@@ -123,22 +124,16 @@ public class PlayerData {
         if (PlayerData.getInstance().getSaveInProgress() != null && PlayerData.getInstance().getSaveInProgress()) {
             return false;
         }
-        try {
-            new PlayerParser().player(playerName).parse();
-            return true;
-        } catch (Exception e) {
-            throw e;
-        }
-
-
+        new PlayerParser().player(playerName).parse();
+        return true;
     }
 
     public void reset() {
         this.buffer = null;
         this.headerInfo = null;
-        this.blockInfo = new Hashtable<Integer, BlockInfo>();
+        this.blockInfo = new Hashtable<>();
         this.playerName = null;
-        this.variableLocation = variableLocation = new Hashtable<String, ArrayList<Integer>>();
+        this.variableLocation = new Hashtable<>();
         this.changes = new ChangesTable();
         this.playerChr = null;
         this.saveInProgress = null;

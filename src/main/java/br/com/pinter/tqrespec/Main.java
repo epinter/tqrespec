@@ -27,7 +27,7 @@ import javafx.application.Platform;
 import javafx.application.Preloader;
 import javafx.beans.binding.Bindings;
 import javafx.concurrent.Task;
-import javafx.event.EventHandler;
+import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -40,7 +40,6 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -53,11 +52,9 @@ public class Main extends Application {
         launch(args);
     }
 
-    private static double scale = 0;
-
     private void load(Stage stage) {
 
-        Task<Void> task = new Task<Void>() {
+        Task<Void> task = new Task<>() {
             @Override
             public Void call() {
                 //preload game database metadata and skills
@@ -91,13 +88,8 @@ public class Main extends Application {
             stage.show();
         });
         new Thread(task).start();
-        stage.setOnShown(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent windowEvent) {
-                notifyPreloader(new Preloader.StateChangeNotification(
-                        Preloader.StateChangeNotification.Type.BEFORE_START));
-            }
-        });
+        stage.setOnShown(windowEvent -> notifyPreloader(new Preloader.StateChangeNotification(
+                Preloader.StateChangeNotification.Type.BEFORE_START)));
 
     }
 
@@ -108,7 +100,7 @@ public class Main extends Application {
         Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler::unhandled);
 
         ResourceBundle bundle = ResourceBundle.getBundle("i18n.UI");
-        Parent root = null;
+        Parent root;
         try {
             root = FXMLLoader.load(getClass().getResource("/fxml/main.fxml"), bundle);
         } catch (IOException e) {
@@ -123,12 +115,7 @@ public class Main extends Application {
 
         //disable alt+f4
         Platform.setImplicitExit(false);
-        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent event) {
-                event.consume();
-            }
-        });
+        primaryStage.setOnCloseRequest(Event::consume);
 
         //remove default window decoration
         String osName = System.getProperty("os.name");
@@ -154,22 +141,14 @@ public class Main extends Application {
         primaryStage.setMaxHeight(root.maxHeight(-1));
         primaryStage.setMaxWidth(root.maxWidth(-1));
 
-        primaryStage.addEventHandler(KeyEvent.KEY_PRESSED, (new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent event) {
-                if (event.getCode() == KeyCode.ESCAPE) {
-                    Util.closeApplication();
-                }
+        primaryStage.addEventHandler(KeyEvent.KEY_PRESSED, (event -> {
+            if (event.getCode() == KeyCode.ESCAPE) {
+                Util.closeApplication();
             }
         }));
 
         //handler to prepare controls on startup, the use of initialize and risk of crash
-        primaryStage.addEventHandler(WindowEvent.WINDOW_SHOWN, new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent window) {
-                ControllerMainForm.mainFormInitialized.setValue(true);
-            }
-        });
+        primaryStage.addEventHandler(WindowEvent.WINDOW_SHOWN, window -> ControllerMainForm.mainFormInitialized.setValue(true));
         load(primaryStage);
 
     }

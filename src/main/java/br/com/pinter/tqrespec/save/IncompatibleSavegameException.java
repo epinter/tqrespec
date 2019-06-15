@@ -20,7 +20,8 @@
 
 package br.com.pinter.tqrespec.save;
 
-public class IncompatibleSavegameException extends Exception {
+@SuppressWarnings("unused")
+class IncompatibleSavegameException extends Exception {
     public IncompatibleSavegameException() {
         super();
     }

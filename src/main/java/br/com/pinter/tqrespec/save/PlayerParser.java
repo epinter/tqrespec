@@ -34,6 +34,7 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+@SuppressWarnings("unused")
 public class PlayerParser extends FileParser {
     private final static boolean DBG = false;
     private String player = null;

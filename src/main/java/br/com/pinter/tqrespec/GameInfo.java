@@ -28,6 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,10 +39,6 @@ public class GameInfo {
     private static GameInfo instance = null;
 
     private String gamePath = null;
-
-    private String savePath = null;
-
-    private String saveDataPath = null;
 
     private GameInfo() {
     }
@@ -56,6 +53,7 @@ public class GameInfo {
         return instance;
     }
 
+    @SuppressWarnings("unused")
     public String getWindowsVersion() {
         int major = Advapi32Util.registryGetIntValue(
                 WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
@@ -117,7 +115,7 @@ public class GameInfo {
 
     private String getGameInstalledPath() {
         String regexGameName = "Titan Quest.*Anniversary Edition";
-        String installedApps[] = new String[0];
+        String[] installedApps = new String[0];
         try {
             installedApps = Advapi32Util.registryGetKeys(WinReg.HKEY_LOCAL_MACHINE,
                     "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall");
@@ -237,13 +235,13 @@ public class GameInfo {
         File directory = new File(savePath);
         ArrayList<String> playerList = new ArrayList<>();
         if (directory.exists()) {
-            for (File player : directory.listFiles((File fileName) -> fileName.getName().startsWith("_"))) {
+            for (File player : Objects.requireNonNull(directory.listFiles((File fileName) -> fileName.getName().startsWith("_")))) {
                 playerList.add(player.getName().replaceAll("^_", ""));
             }
         } else {
             throw new Exception("No player found");
         }
-        String ret[] = new String[playerList.size()];
+        String[] ret = new String[playerList.size()];
         playerList.toArray(ret);
         return ret;
     }

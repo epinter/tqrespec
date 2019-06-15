@@ -20,6 +20,7 @@
 
 package br.com.pinter.tqrespec.save;
 
+@SuppressWarnings("unused")
 public class VariableInfo {
     private String name = null;
     private int keyOffset = -1;

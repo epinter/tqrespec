@@ -690,6 +690,7 @@ public class ControllerMainForm implements Initializable {
 
 }
 
+@SuppressWarnings("CanBeFinal")
 class AttrIntegerSpinnerValueFactory extends SpinnerValueFactory.IntegerSpinnerValueFactory {
     private SimpleIntegerProperty available;
     private int originalMax = -1;

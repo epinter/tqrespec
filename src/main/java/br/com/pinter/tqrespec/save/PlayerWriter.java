@@ -40,7 +40,8 @@ public class PlayerWriter {
     public PlayerWriter() {
     }
 
-    private boolean backupSaveGame(String fileName, String playerName, boolean fullBackup) {
+    @SuppressWarnings("SameParameterValue")
+    private boolean backupSaveGame(String fileName, String playerName, boolean fullBackup) throws IOException {
         File backupDirectory = new File(String.format("%s\\%s", GameInfo.getInstance().getSavePath(), Constants.BACKUP_DIRECTORY));
         Path player = Paths.get(fileName);
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HH");
@@ -52,7 +53,9 @@ public class PlayerWriter {
             return true;
         }
         if (!backupDirectory.exists()) {
-            backupDirectory.mkdir();
+            if(backupDirectory.mkdir()) {
+                throw new IOException("Unable to create backup directory");
+            }
         }
         if (backupDirectory.canWrite()) {
             URI zipUri = URI.create("jar:" + destPlayerZip.toURI().toString());
@@ -61,7 +64,7 @@ public class PlayerWriter {
             }})) {
                 final Path root = zipFs.getPath("/");
                 if (fullBackup || Settings.getAlwaysFullBackup()) {
-                    Files.walkFileTree(player.getParent(), new SimpleFileVisitor<Path>() {
+                    Files.walkFileTree(player.getParent(), new SimpleFileVisitor<>() {
                         @Override
                         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                             Path subPath = file.subpath(player.getParent().getNameCount() - 1, file.getNameCount());
@@ -88,7 +91,7 @@ public class PlayerWriter {
                     Files.createDirectories(zipFs.getPath(root.toString(), "/" + player.getName(player.getNameCount() - 2)));
 
                     Path destPlayer = zipFs.getPath("/" + player.getName(player.getNameCount() - 2) + "/" + player.getFileName());
-                    Path createdBackup = Files.copy(player, destPlayer, StandardCopyOption.REPLACE_EXISTING);
+                    Files.copy(player, destPlayer, StandardCopyOption.REPLACE_EXISTING);
                 }
                 return true;
             } catch (IOException e) {
@@ -100,13 +103,10 @@ public class PlayerWriter {
         return false;
     }
 
-    public boolean backupCurrent() {
+    public boolean backupCurrent() throws IOException {
         String playerChr = PlayerData.getInstance().getPlayerChr().toString();
         String playerName = PlayerData.getInstance().getPlayerName();
-        if (this.backupSaveGame(playerChr, playerName, false)) {
-            return true;
-        }
-        return false;
+        return this.backupSaveGame(playerChr, playerName, false);
     }
 
     public boolean saveCurrent() throws IOException {
@@ -145,7 +145,7 @@ public class PlayerWriter {
             );
             outChannel.write(PlayerData.getInstance().getBuffer());
             PlayerData.getInstance().getBuffer().limit(PlayerData.getInstance().getBuffer().capacity());
-            byte c[] = changesTable.get(offset);
+            byte[] c = changesTable.get(offset);
             outChannel.write(ByteBuffer.wrap(c));
             int previousValueLength = changesTable.getValuesLengthIndex().get(offset);
             PlayerData.getInstance().getBuffer().position(
