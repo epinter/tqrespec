@@ -35,4 +35,12 @@ public class Constants {
     public static final String BACKUP_DIRECTORY = "SaveData\\TQRespec Backup";
     public static final boolean SKIP_INVENTORY_BLOCKS = true;
     public static final String VERSION_CHECK_URL = "https://epinter.github.io/version/tqrespec";
+    public static class Save {
+        public static final String SKILL_NAME="skillName";
+        public static final String SKILL_ENABLED = "skillEnabled";
+        public static final String SKILL_ACTIVE = "skillActive";
+        public static final String SKILL_SUB_LEVEL = "skillSubLevel";
+        public static final String SKILL_TRANSITION = "skillTransition";
+        public static final String SKILL_LEVEL = "skillLevel";
+    }
 }
