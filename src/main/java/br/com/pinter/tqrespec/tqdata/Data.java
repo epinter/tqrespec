@@ -18,10 +18,11 @@
     along with TQ Respec.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package br.com.pinter.tqrespec;
+package br.com.pinter.tqrespec.tqdata;
 
 import br.com.pinter.tqdatabase.Database;
 import br.com.pinter.tqdatabase.Text;
+import br.com.pinter.tqrespec.GameInfo;
 
 import java.io.IOException;
 

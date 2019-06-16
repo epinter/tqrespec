@@ -22,6 +22,7 @@ package br.com.pinter.tqrespec;
 
 import br.com.pinter.tqrespec.gui.ControllerMainForm;
 import br.com.pinter.tqrespec.gui.ResizeListener;
+import br.com.pinter.tqrespec.tqdata.Data;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.application.Preloader;

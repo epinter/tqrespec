@@ -23,6 +23,7 @@ package br.com.pinter.tqrespec.gui;
 import br.com.pinter.tqrespec.*;
 import br.com.pinter.tqrespec.save.PlayerData;
 import br.com.pinter.tqrespec.save.PlayerWriter;
+import br.com.pinter.tqrespec.tqdata.Data;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
