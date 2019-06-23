@@ -266,7 +266,7 @@
 }
 
 .tq-tabpane .tab-header-area .headers-region {
-    visibility: hidden ;
+    visibility: visible;
 }
 .tq-tabpane .tab-header-area .headers-region {
 }
@@ -301,12 +301,35 @@
 	-fx-font-family: 'Albertus MT';
     -fx-border-image-source: url('border.png');
     -fx-border-image-insets: 0;
+    -fx-background-insets: 0;
     -fx-border-image-repeat: stretch;
     -fx-border-image-width: 3 3 0 3;
     -fx-border-image-slice: 3 3 0 3;
-    display:none;
+
+}
+
+.tq-tabbutton:selected {
+        -fx-border-image-width: 3 3 0 3;
+        -fx-border-image-slice: 3 3 0 3;
 }
 
 .tab-pane {
     -fx-tab-max-height: 48px ;
+}
+
+//skill tab
+.tq-listview-skill > label {
+ 	-fx-text-fill: #ffffff;
+}
+
+.tq-listview-skill .list-cell {
+    -fx-background-insets: 0;
+}
+
+.tq-label-skillpoints {
+	-fx-text-fill: #ffffff;
+	-fx-font-size: 1.4em;
+	-fx-font-family: 'Albertus MT Light';
+    -fx-effect: dropshadow( one-pass-box , black , 0, 0.0 , 0 , 2 );
+    -fx-text-alignment: center;
 }
