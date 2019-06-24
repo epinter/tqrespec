@@ -20,20 +20,13 @@
 
 package br.com.pinter.tqrespec.gui;
 
-import br.com.pinter.tqdatabase.models.Skill;
 import br.com.pinter.tqrespec.*;
 import br.com.pinter.tqrespec.save.PlayerData;
 import br.com.pinter.tqrespec.save.PlayerWriter;
-import br.com.pinter.tqrespec.save.SkillBlock;
 import br.com.pinter.tqrespec.tqdata.Data;
-import br.com.pinter.tqrespec.tqdata.SkillUtils;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
@@ -53,13 +46,13 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
-import javafx.util.Callback;
 import javafx.util.converter.NumberStringConverter;
 import org.apache.commons.lang3.StringUtils;
 
@@ -69,7 +62,6 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.FileAlreadyExistsException;
 import java.text.NumberFormat;
-import java.util.List;
 import java.util.ResourceBundle;
 
 @SuppressWarnings({"RedundantThrows", "unused"})
@@ -143,36 +135,10 @@ public class ControllerMainForm implements Initializable {
     public static BooleanProperty mainFormInitialized = new SimpleBooleanProperty();
 
     @FXML
-    private Tab tabSkills;
+    public GridPane skillsPane;
 
     @FXML
-    private ListView<SkillListViewItem> firstMasteryListView;
-
-    @FXML
-    private ListView<SkillListViewItem> secondMasteryListView;
-
-    @FXML
-    private Label firstMasteryLabel;
-
-    @FXML
-    private Label secondMasteryLabel;
-
-    @FXML
-    private Button reclaimMasteryFirstButton;
-
-    @FXML
-    private Button reclaimMasterySecondButton;
-
-    @FXML
-    private Button reclaimSkillsFirstButton;
-
-    @FXML
-    private Button reclaimSkillsSecondButton;
-
-    @FXML
-    private Label freeSkillPointsLabel;
-
-    private SimpleStringProperty currentSkillPoints = null;
+    public SkillsPaneController skillsPaneController;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -444,6 +410,7 @@ public class ControllerMainForm implements Initializable {
         }
 
         setSpinnersDisable(disable);
+        skillsPaneController.disableControls();
     }
 
     private void setSpinnersDisable(boolean disable) {
@@ -515,15 +482,7 @@ public class ControllerMainForm implements Initializable {
         });
 
         loadTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, (e) -> {
-            currentSkillPoints = new SimpleStringProperty();
-
-            freeSkillPointsLabel.textProperty().bind(
-                    Bindings.createStringBinding(() -> Util.getUIMessage("skills.availableSkillPoints",
-                            currentSkillPoints.getValue()),
-                            currentSkillPoints
-                    )
-            );
-            updateMasteries();
+            skillsPaneController.loadCharEventHandler();
         });
 
         new WorkerThread(loadTask).start();
@@ -741,159 +700,6 @@ public class ControllerMainForm implements Initializable {
         if (charClassText != null)
             charClassText.setText("");
 
-    }
-
-    @FXML
-    public void skillsTabSelected(Event event) {
-        if (PlayerData.getInstance().getSkillBlocks() != null && tabSkills.isSelected()) {
-            updateMasteries();
-        }
-    }
-
-    private void resetSkilltabControls() {
-        firstMasteryLabel.setText(null);
-        firstMasteryListView.setDisable(true);
-        firstMasteryListView.getItems().clear();
-        secondMasteryLabel.setText(null);
-        secondMasteryListView.setDisable(true);
-        secondMasteryListView.getItems().clear();
-        firstMasteryListView.addEventFilter(MouseEvent.MOUSE_PRESSED, Event::consume);
-        secondMasteryListView.addEventFilter(MouseEvent.MOUSE_PRESSED, Event::consume);
-        reclaimSkillsFirstButton.setDisable(true);
-        reclaimMasteryFirstButton.setDisable(true);
-        reclaimSkillsSecondButton.setDisable(true);
-        reclaimMasterySecondButton.setDisable(true);
-    }
-
-    private void updateMasteries() {
-        if(!PlayerData.getInstance().isCharacterLoaded()) {
-            return;
-        }
-        resetSkilltabControls();
-
-        if (fillMastery(0)) {
-            firstMasteryListView.setDisable(false);
-            reclaimSkillsFirstButton.setDisable(false);
-            reclaimMasteryFirstButton.setDisable(false);
-        }
-
-        if (fillMastery(1)) {
-            secondMasteryListView.setDisable(false);
-            reclaimSkillsSecondButton.setDisable(false);
-            reclaimMasterySecondButton.setDisable(false);
-
-        }
-
-        currentSkillPoints.setValue(String.valueOf(PlayerData.getInstance().getAvailableSkillPoints()));
-    }
-
-    private boolean fillMastery(int i) {
-        boolean ret = false;
-        Label masteryLabel;
-        ListView<SkillListViewItem> masteryListView;
-
-        switch (i) {
-            case 0:
-                masteryLabel = firstMasteryLabel;
-                masteryListView = firstMasteryListView;
-                break;
-            case 1:
-                masteryLabel = secondMasteryLabel;
-                masteryListView = secondMasteryListView;
-                break;
-            default:
-                return false;
-        }
-
-        Skill mastery = null;
-
-        if (!(SkillUtils.getPlayerMasteries().size() == 1 && i > 0) && SkillUtils.getPlayerMasteries().size() > 0) {
-            mastery = SkillUtils.getPlayerMasteries().get(i);
-            masteryLabel.setText(
-                    String.format("%s (%d)",
-                            Data.text().getString(mastery.getSkillDisplayName()),
-                            PlayerData.getInstance().getSkillBlocks().get(mastery.getRecordPath()).getSkillLevel()
-                    )
-            );
-            ret = true;
-        }
-
-        ObservableList<SkillListViewItem> observableSkills = createObservableListFromMastery(mastery);
-
-        Callback<ListView<SkillListViewItem>, ListCell<SkillListViewItem>> listViewCallback
-                = skillListView -> new SkillListCell();
-
-        masteryListView.setItems(observableSkills);
-        masteryListView.setCellFactory(listViewCallback);
-        return ret;
-    }
-
-    private ObservableList<SkillListViewItem> createObservableListFromMastery(Skill mastery) {
-        ObservableList<SkillListViewItem> ret = FXCollections.observableArrayList();
-
-        if (mastery == null) return ret;
-
-
-        for (Skill s : SkillUtils.getPlayerSkillsFromMastery(mastery)) {
-            Skill s1 = s;
-            if (s.isPointsToPet() || s.isPointsToBuff()) {
-                s1 = SkillUtils.getSkill(s.getRecordPath(), true);
-            }
-
-            SkillBlock sb = PlayerData.getInstance().getSkillBlocks().get(s.getRecordPath());
-            if (sb == null || s1.getRecordPath() == null) continue;
-            ret.add(new SkillListViewItem(s1.getSkillDisplayName(),
-                    sb.getSkillLevel()));
-        }
-        return ret;
-    }
-
-    private void reclaimPointsFromSkills(Skill mastery) throws Exception {
-        for (Skill s : SkillUtils.getPlayerSkillsFromMastery(mastery)) {
-            SkillBlock sb = PlayerData.getInstance().getSkillBlocks().get(s.getRecordPath());
-            if (sb == null || s.getRecordPath() == null) continue;
-            PlayerData.getInstance().reclaimSkillPoints(sb);
-        }
-    }
-
-    public void reclaimMasteryFirst(Event event) throws Exception {
-        Skill mastery = SkillUtils.getPlayerMasteries().get(0);
-        SkillBlock sb = PlayerData.getInstance().getSkillBlocks().get(mastery.getRecordPath());
-
-        List<Skill> list = SkillUtils.getPlayerSkillsFromMastery(mastery);
-        if (list.size() > 0) {
-            Util.showInformation(Util.getUIMessage("skills.removeSkillsBefore"), null);
-            return;
-        }
-
-        PlayerData.getInstance().reclaimMasteryPoints(sb);
-        updateMasteries();
-    }
-
-    public void reclaimMasterySecond(Event event) throws Exception {
-        Skill mastery = SkillUtils.getPlayerMasteries().get(1);
-        SkillBlock sb = PlayerData.getInstance().getSkillBlocks().get(mastery.getRecordPath());
-
-        List<Skill> list = SkillUtils.getPlayerSkillsFromMastery(mastery);
-        if (list.size() > 0) {
-            Util.showInformation(Util.getUIMessage("skills.removeSkillsBefore"), null);
-            return;
-        }
-
-        PlayerData.getInstance().reclaimMasteryPoints(sb);
-        updateMasteries();
-    }
-
-    public void reclaimSkillsFirst(Event event) throws Exception {
-        Skill mastery = SkillUtils.getPlayerMasteries().get(0);
-        reclaimPointsFromSkills(mastery);
-        updateMasteries();
-    }
-
-    public void reclaimSkillsSecond(Event event) throws Exception {
-        Skill mastery = SkillUtils.getPlayerMasteries().get(1);
-        reclaimPointsFromSkills(mastery);
-        updateMasteries();
     }
 }
 
