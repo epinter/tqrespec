@@ -235,9 +235,11 @@ public class PlayerData {
 
         int currentSkillPoints = PlayerData.getInstance().getChanges().getInt("skillPoints");
         int currentSkillLevel = PlayerData.getInstance().getChanges().getInt(blockStart, "skillLevel");
-        PlayerData.getInstance().getChanges().setInt("skillPoints", currentSkillPoints + (currentSkillLevel - 1));
-        PlayerData.getInstance().getChanges().setInt(blockStart, "skillLevel", 1);
-        prepareSkillsList();
+        if(currentSkillLevel > 1) {
+            PlayerData.getInstance().getChanges().setInt("skillPoints", currentSkillPoints + (currentSkillLevel - 1));
+            PlayerData.getInstance().getChanges().setInt(blockStart, "skillLevel", 1);
+            prepareSkillsList();
+        }
     }
 
     public void reset() {

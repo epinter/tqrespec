@@ -17,7 +17,10 @@ import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 
@@ -94,7 +97,7 @@ public class SkillsPaneController implements Initializable {
     }
 
     protected void updateMasteries() {
-        if(!PlayerData.getInstance().isCharacterLoaded()) {
+        if (!PlayerData.getInstance().isCharacterLoaded()) {
             return;
         }
         resetSkilltabControls();
@@ -102,14 +105,17 @@ public class SkillsPaneController implements Initializable {
         if (fillMastery(0)) {
             firstMasteryListView.setDisable(false);
             reclaimSkillsFirstButton.setDisable(false);
-            reclaimMasteryFirstButton.setDisable(false);
+            if (firstMasteryListView.getItems().size() == 0) {
+                reclaimMasteryFirstButton.setDisable(false);
+            }
         }
 
         if (fillMastery(1)) {
             secondMasteryListView.setDisable(false);
             reclaimSkillsSecondButton.setDisable(false);
-            reclaimMasterySecondButton.setDisable(false);
-
+            if (secondMasteryListView.getItems().size() == 0) {
+                reclaimMasterySecondButton.setDisable(false);
+            }
         }
 
         currentSkillPoints.setValue(String.valueOf(PlayerData.getInstance().getAvailableSkillPoints()));
@@ -160,7 +166,6 @@ public class SkillsPaneController implements Initializable {
         ObservableList<SkillListViewItem> ret = FXCollections.observableArrayList();
 
         if (mastery == null) return ret;
-
 
         for (Skill s : SkillUtils.getPlayerSkillsFromMastery(mastery)) {
             Skill s1 = s;
