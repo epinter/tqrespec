@@ -11,6 +11,8 @@ import br.com.pinter.tqrespec.save.SkillBlock;
 import br.com.pinter.tqrespec.tqdata.Data;
 import br.com.pinter.tqrespec.tqdata.SkillUtils;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -58,10 +60,23 @@ public class SkillsPaneController implements Initializable {
 
     private SimpleStringProperty currentSkillPoints = null;
 
+    private BooleanProperty saveDisabled = new SimpleBooleanProperty();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
+    }
+
+    public boolean isSaveDisabled() {
+        return saveDisabled.get();
+    }
+
+    public BooleanProperty saveDisabledProperty() {
+        return saveDisabled;
+    }
+
+    public void setSaveDisabled(boolean saveDisabled) {
+        this.saveDisabled.set(saveDisabled);
     }
 
     public void loadCharEventHandler() {
@@ -228,5 +243,4 @@ public class SkillsPaneController implements Initializable {
         reclaimPointsFromSkills(mastery);
         updateMasteries();
     }
-
 }

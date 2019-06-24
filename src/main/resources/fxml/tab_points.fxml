@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<!--
+  ~ Copyright (C) 2019 Emerson Pinter - All Rights Reserved
+  -->
+
+<GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
+          fx:controller="br.com.pinter.tqrespec.gui.PointsPaneController"
+          stylesheets="@main.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+    <columnConstraints>
+        <ColumnConstraints />
+        <ColumnConstraints hgrow="SOMETIMES" percentWidth="25.0" />
+        <ColumnConstraints hgrow="SOMETIMES" percentWidth="25.0" />
+        <ColumnConstraints hgrow="SOMETIMES" percentWidth="25.0" />
+        <ColumnConstraints hgrow="SOMETIMES" />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints maxHeight="-Infinity" percentHeight="20.0" vgrow="SOMETIMES" />
+        <RowConstraints maxHeight="-Infinity" percentHeight="20.0" vgrow="SOMETIMES" />
+        <RowConstraints maxHeight="-Infinity" percentHeight="20.0" vgrow="SOMETIMES" />
+        <RowConstraints maxHeight="-Infinity" percentHeight="20.0" vgrow="SOMETIMES" />
+        <RowConstraints maxHeight="-Infinity" percentHeight="20.0" vgrow="SOMETIMES" />
+        <RowConstraints maxHeight="-Infinity" percentHeight="20.0" vgrow="SOMETIMES" />
+    </rowConstraints>
+    <children>
+        <Spinner fx:id="lifeSpinner" disable="true" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="110.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+        <Spinner fx:id="manaSpinner" disable="true" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="110.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+        <Spinner fx:id="strSpinner" disable="true" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="110.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
+        <Spinner fx:id="intSpinner" disable="true" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="110.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER" />
+        <Spinner fx:id="dexSpinner" disable="true" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="110.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="5" GridPane.valignment="CENTER" />
+        <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" styleClass="tq-label" stylesheets="@main.css" text="%main.strength" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.vgrow="ALWAYS" />
+        <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" styleClass="tq-label" stylesheets="@main.css" text="%main.intelligence" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
+        <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" styleClass="tq-label" stylesheets="@main.css" text="%main.dexterity" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="5" />
+        <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" styleClass="tq-label" stylesheets="@main.css" text="%main.energy" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+        <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" styleClass="tq-label" stylesheets="@main.css" text="%main.health" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+            <GridPane.margin>
+                <Insets />
+            </GridPane.margin>
+        </Label>
+        <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" styleClass="tq-label" stylesheets="@main.css" text="%main.available" textAlignment="RIGHT" GridPane.columnIndex="1">
+            <GridPane.margin>
+                <Insets />
+            </GridPane.margin>
+        </Label>
+        <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="tq-label" text="%main.experience" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+        <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="tq-label" text="%main.charlevel" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+        <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="tq-label" text="%main.gold" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+        <Label fx:id="experienceText" maxWidth="1.7976931348623157E308" styleClass="tq-labelbox" GridPane.columnIndex="4" GridPane.rowIndex="2">
+            <GridPane.margin>
+                <Insets left="10.0" />
+            </GridPane.margin>
+            <padding>
+                <Insets bottom="2.0" left="10.0" right="10.0" top="2.0" />
+            </padding>
+        </Label>
+        <Label fx:id="charLevelText" maxWidth="1.7976931348623157E308" styleClass="tq-labelbox" GridPane.columnIndex="4" GridPane.rowIndex="3">
+            <GridPane.margin>
+                <Insets left="10.0" />
+            </GridPane.margin>
+            <padding>
+                <Insets bottom="2.0" left="10.0" right="10.0" top="2.0" />
+            </padding>
+        </Label>
+        <Label fx:id="goldText" maxWidth="1.7976931348623157E308" styleClass="tq-labelbox" GridPane.columnIndex="4" GridPane.rowIndex="4">
+            <GridPane.margin>
+                <Insets left="10.0" />
+            </GridPane.margin>
+            <padding>
+                <Insets bottom="2.0" left="10.0" right="10.0" top="2.0" />
+            </padding>
+        </Label>
+        <Label fx:id="availPointsText" prefHeight="30.0" prefWidth="110.0" styleClass="tq-labelbox" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <GridPane.margin>
+                <Insets left="10.0" right="10.0" />
+            </GridPane.margin>
+            <padding>
+                <Insets bottom="2.0" left="10.0" right="10.0" top="2.0" />
+            </padding>
+        </Label>
+        <Label fx:id="charClassText" maxWidth="1.7976931348623157E308" styleClass="tq-labelbox" GridPane.columnIndex="4" GridPane.valignment="CENTER">
+            <padding>
+                <Insets bottom="2.0" left="10.0" right="10.0" top="2.0" />
+            </padding>
+            <GridPane.margin>
+                <Insets left="10.0" />
+            </GridPane.margin>
+        </Label>
+        <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="tq-label" text="%main.charclass" GridPane.columnIndex="3" />
+        <Label fx:id="difficultyText" maxWidth="1.7976931348623157E308" styleClass="tq-labelbox" GridPane.columnIndex="4" GridPane.rowIndex="1">
+            <padding>
+                <Insets bottom="2.0" left="10.0" right="10.0" top="2.0" />
+            </padding>
+            <GridPane.margin>
+                <Insets left="10.0" />
+            </GridPane.margin>
+        </Label>
+        <Label alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="tq-label" text="%main.difficulty" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+    </children>
+    <padding>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+    </padding>
+</GridPane>
