@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with TQ Respec.  If not, see <http://www.gnu.org/licenses/>.
 */
-package br.com.pinter.tqrespec;
+package br.com.pinter.tqrespec.save;
 
 import org.apache.commons.lang3.exception.CloneFailedException;
 

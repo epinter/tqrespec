@@ -7,9 +7,8 @@ package br.com.pinter.tqrespec.gui;
 import br.com.pinter.tqdatabase.models.Skill;
 import br.com.pinter.tqrespec.Util;
 import br.com.pinter.tqrespec.save.PlayerData;
-import br.com.pinter.tqrespec.save.SkillBlock;
+import br.com.pinter.tqrespec.save.PlayerSkill;
 import br.com.pinter.tqrespec.tqdata.Data;
-import br.com.pinter.tqrespec.tqdata.SkillUtils;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -156,12 +155,12 @@ public class SkillsPaneController implements Initializable {
 
         Skill mastery = null;
 
-        if (!(SkillUtils.getPlayerMasteries().size() == 1 && i > 0) && SkillUtils.getPlayerMasteries().size() > 0) {
-            mastery = SkillUtils.getPlayerMasteries().get(i);
+        if (!(PlayerData.getInstance().getPlayerMasteries().size() == 1 && i > 0) && PlayerData.getInstance().getPlayerMasteries().size() > 0) {
+            mastery = PlayerData.getInstance().getPlayerMasteries().get(i);
             masteryLabel.setText(
                     String.format("%s (%d)",
                             Data.text().getString(mastery.getSkillDisplayName()),
-                            PlayerData.getInstance().getSkillBlocks().get(mastery.getRecordPath()).getSkillLevel()
+                            PlayerData.getInstance().getPlayerSkills().get(mastery.getRecordPath()).getSkillLevel()
                     )
             );
             ret = true;
@@ -182,13 +181,13 @@ public class SkillsPaneController implements Initializable {
 
         if (mastery == null) return ret;
 
-        for (Skill s : SkillUtils.getPlayerSkillsFromMastery(mastery)) {
+        for (Skill s : PlayerData.getInstance().getPlayerSkillsFromMastery(mastery)) {
             Skill s1 = s;
             if (s.isPointsToPet() || s.isPointsToBuff()) {
-                s1 = SkillUtils.getSkill(s.getRecordPath(), true);
+                s1 = Data.db().getSkillDAO().getSkill(s.getRecordPath(), true);
             }
 
-            SkillBlock sb = PlayerData.getInstance().getSkillBlocks().get(s.getRecordPath());
+            PlayerSkill sb = PlayerData.getInstance().getPlayerSkills().get(s.getRecordPath());
             if (sb == null || s1.getRecordPath() == null) continue;
             ret.add(new SkillListViewItem(s1.getSkillDisplayName(),
                     sb.getSkillLevel()));
@@ -197,18 +196,18 @@ public class SkillsPaneController implements Initializable {
     }
 
     private void reclaimPointsFromSkills(Skill mastery) throws Exception {
-        for (Skill s : SkillUtils.getPlayerSkillsFromMastery(mastery)) {
-            SkillBlock sb = PlayerData.getInstance().getSkillBlocks().get(s.getRecordPath());
+        for (Skill s : PlayerData.getInstance().getPlayerSkillsFromMastery(mastery)) {
+            PlayerSkill sb = PlayerData.getInstance().getPlayerSkills().get(s.getRecordPath());
             if (sb == null || s.getRecordPath() == null) continue;
             PlayerData.getInstance().reclaimSkillPoints(sb);
         }
     }
 
     public void reclaimMasteryFirst(Event event) throws Exception {
-        Skill mastery = SkillUtils.getPlayerMasteries().get(0);
-        SkillBlock sb = PlayerData.getInstance().getSkillBlocks().get(mastery.getRecordPath());
+        Skill mastery = PlayerData.getInstance().getPlayerMasteries().get(0);
+        PlayerSkill sb = PlayerData.getInstance().getPlayerSkills().get(mastery.getRecordPath());
 
-        List<Skill> list = SkillUtils.getPlayerSkillsFromMastery(mastery);
+        List<Skill> list = PlayerData.getInstance().getPlayerSkillsFromMastery(mastery);
         if (list.size() > 0) {
             Util.showInformation(Util.getUIMessage("skills.removeSkillsBefore"), null);
             return;
@@ -219,10 +218,10 @@ public class SkillsPaneController implements Initializable {
     }
 
     public void reclaimMasterySecond(Event event) throws Exception {
-        Skill mastery = SkillUtils.getPlayerMasteries().get(1);
-        SkillBlock sb = PlayerData.getInstance().getSkillBlocks().get(mastery.getRecordPath());
+        Skill mastery = PlayerData.getInstance().getPlayerMasteries().get(1);
+        PlayerSkill sb = PlayerData.getInstance().getPlayerSkills().get(mastery.getRecordPath());
 
-        List<Skill> list = SkillUtils.getPlayerSkillsFromMastery(mastery);
+        List<Skill> list = PlayerData.getInstance().getPlayerSkillsFromMastery(mastery);
         if (list.size() > 0) {
             Util.showInformation(Util.getUIMessage("skills.removeSkillsBefore"), null);
             return;
@@ -233,13 +232,13 @@ public class SkillsPaneController implements Initializable {
     }
 
     public void reclaimSkillsFirst(Event event) throws Exception {
-        Skill mastery = SkillUtils.getPlayerMasteries().get(0);
+        Skill mastery = PlayerData.getInstance().getPlayerMasteries().get(0);
         reclaimPointsFromSkills(mastery);
         updateMasteries();
     }
 
     public void reclaimSkillsSecond(Event event) throws Exception {
-        Skill mastery = SkillUtils.getPlayerMasteries().get(1);
+        Skill mastery = PlayerData.getInstance().getPlayerMasteries().get(1);
         reclaimPointsFromSkills(mastery);
         updateMasteries();
     }

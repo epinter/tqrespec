@@ -7,7 +7,7 @@ package br.com.pinter.tqrespec.gui;
 import br.com.pinter.tqrespec.Constants;
 import br.com.pinter.tqrespec.Util;
 import br.com.pinter.tqrespec.save.PlayerData;
-import br.com.pinter.tqrespec.save.PlayerWriter;
+import br.com.pinter.tqrespec.save.SaveData;
 import br.com.pinter.tqrespec.tqdata.Data;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -342,7 +342,7 @@ public class PointsPaneController implements Initializable {
         int xp = PlayerData.getInstance().getChanges().getInt("currentStats.experiencePoints");
         int level = PlayerData.getInstance().getChanges().getInt("currentStats.charLevel");
         int gold = PlayerData.getInstance().getChanges().getInt("money");
-        String charClass = PlayerData.getInstance().getHeaderInfo().getPlayerClassTag();
+        String charClass = SaveData.getInstance().getHeaderInfo().getPlayerClassTag();
 
         if (StringUtils.isNotEmpty(charClass)) {
             charClassText.setText(Data.text().getString(charClass));

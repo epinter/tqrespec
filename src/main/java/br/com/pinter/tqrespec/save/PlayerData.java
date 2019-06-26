@@ -24,14 +24,11 @@ import br.com.pinter.tqdatabase.Database;
 import br.com.pinter.tqdatabase.models.Skill;
 import br.com.pinter.tqrespec.Constants;
 import br.com.pinter.tqrespec.Util;
-import br.com.pinter.tqrespec.tqdata.SkillUtils;
+import br.com.pinter.tqrespec.tqdata.Data;
 
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.LinkedHashMap;
-import java.util.Objects;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public class PlayerData {
@@ -39,16 +36,14 @@ public class PlayerData {
     private String playerName = null;
     private Path playerChr = null;
     private ByteBuffer buffer = null;
-    private Hashtable<Integer, BlockInfo> blockInfo = null;
-    private HeaderInfo headerInfo = null;
-    private Hashtable<String, ArrayList<Integer>> variableLocation = null;
     private ChangesTable changes = null;
     private Boolean saveInProgress = null;
     private boolean isCustomQuest = false;
-    private final LinkedHashMap<String, SkillBlock> skillBlocks;
+    private final LinkedHashMap<String, PlayerSkill> playerSkills;
 
-    public PlayerData() {
-        skillBlocks = new LinkedHashMap<>();
+    private PlayerData() {
+        playerSkills = new LinkedHashMap<>();
+        changes = new ChangesTable();
     }
 
     public static PlayerData getInstance() {
@@ -56,9 +51,6 @@ public class PlayerData {
             synchronized (PlayerData.class) {
                 if (instance == null) {
                     instance = new PlayerData();
-                    instance.changes = new ChangesTable();
-                    instance.variableLocation = new Hashtable<>();
-                    instance.blockInfo = new Hashtable<>();
                 }
             }
         }
@@ -79,30 +71,6 @@ public class PlayerData {
 
     public void setBuffer(ByteBuffer buffer) {
         this.buffer = buffer;
-    }
-
-    public Hashtable<Integer, BlockInfo> getBlockInfo() {
-        return blockInfo;
-    }
-
-    public void setBlockInfo(Hashtable<Integer, BlockInfo> blockInfo) {
-        this.blockInfo = blockInfo;
-    }
-
-    public HeaderInfo getHeaderInfo() {
-        return headerInfo;
-    }
-
-    public void setHeaderInfo(HeaderInfo headerInfo) {
-        this.headerInfo = headerInfo;
-    }
-
-    public Hashtable<String, ArrayList<Integer>> getVariableLocation() {
-        return variableLocation;
-    }
-
-    public void setVariableLocation(Hashtable<String, ArrayList<Integer>> variableLocation) {
-        this.variableLocation = variableLocation;
     }
 
     public ChangesTable getChanges() {
@@ -133,38 +101,29 @@ public class PlayerData {
         isCustomQuest = customQuest;
     }
 
-    public boolean loadPlayerData(String playerName) throws Exception {
-        if (PlayerData.getInstance().getSaveInProgress() != null && PlayerData.getInstance().getSaveInProgress()) {
-            return false;
-        }
-        new PlayerParser().player(playerName).parse();
-        prepareSkillsList();
-        return true;
-    }
-
-    private void prepareSkillsList() {
-        skillBlocks.clear();
-        for (String v : PlayerData.getInstance().getVariableLocation().keySet()) {
+    void prepareSkillsList() {
+        playerSkills.clear();
+        for (String v : SaveData.getInstance().getVariableLocation().keySet()) {
             if (v.startsWith(Database.Variables.PREFIX_SKILL_NAME)) {
-                for (int blockOffset : PlayerData.getInstance().getVariableLocation().get(v)) {
-                    BlockInfo b = PlayerData.getInstance().getBlockInfo().get(blockOffset);
-                    if (PlayerData.getInstance().getChanges().get(b.getStart()) != null
-                            && PlayerData.getInstance().getChanges().get(b.getStart()).length == 0) {
+                for (int blockOffset : SaveData.getInstance().getVariableLocation().get(v)) {
+                    BlockInfo b = SaveData.getInstance().getBlockInfo().get(blockOffset);
+                    if (changes.get(b.getStart()) != null
+                            && changes.get(b.getStart()).length == 0) {
                         //new block size is zero, was removed, ignore
                         continue;
                     }
 
-                    SkillBlock sb = new SkillBlock();
+                    PlayerSkill sb = new PlayerSkill();
                     sb.setSkillName((String) b.getVariables().get(Constants.Save.SKILL_NAME).getValue());
                     sb.setSkillEnabled((Integer) b.getVariables().get(Constants.Save.SKILL_ENABLED).getValue());
                     sb.setSkillActive((Integer) b.getVariables().get(Constants.Save.SKILL_ACTIVE).getValue());
                     sb.setSkillSubLevel((Integer) b.getVariables().get(Constants.Save.SKILL_SUB_LEVEL).getValue());
                     sb.setSkillTransition((Integer) b.getVariables().get(Constants.Save.SKILL_TRANSITION).getValue());
-                    sb.setSkillLevel(PlayerData.getInstance().getChanges().getInt(b.getStart(), Constants.Save.SKILL_LEVEL));
+                    sb.setSkillLevel(changes.getInt(b.getStart(), Constants.Save.SKILL_LEVEL));
                     sb.setBlockStart(b.getStart());
                     if (sb.getSkillName() != null) {
-                        synchronized (skillBlocks) {
-                            skillBlocks.put(Objects.requireNonNull(Util.normalizeRecordPath(sb.getSkillName())),
+                        synchronized (playerSkills) {
+                            playerSkills.put(Objects.requireNonNull(Util.normalizeRecordPath(sb.getSkillName())),
                                     sb);
                         }
                     }
@@ -174,82 +133,104 @@ public class PlayerData {
     }
 
     public boolean isCharacterLoaded() {
-        return PlayerData.getInstance().getBuffer() != null;
+        return getBuffer() != null;
     }
 
     public int getAvailableSkillPoints() {
         if (!isCharacterLoaded()) return 0;
 
-        int block = PlayerData.getInstance().getVariableLocation().get("skillPoints").get(0);
-        BlockInfo statsBlock = PlayerData.getInstance().getBlockInfo().get(block);
-        return PlayerData.getInstance().getChanges().getInt(statsBlock.getStart(), "skillPoints");
+        int block = SaveData.getInstance().getVariableLocation().get("skillPoints").get(0);
+        BlockInfo statsBlock = SaveData.getInstance().getBlockInfo().get(block);
+        return changes.getInt(statsBlock.getStart(), "skillPoints");
     }
 
-    public LinkedHashMap<String, SkillBlock> getSkillBlocks() {
+    public LinkedHashMap<String, PlayerSkill> getPlayerSkills() {
         boolean update = false;
 
-        for (SkillBlock b : skillBlocks.values()) {
-            if (PlayerData.getInstance().getChanges().get(b.getBlockStart()) != null
-                    && PlayerData.getInstance().getChanges().get(b.getBlockStart()).length == 0) {
+        for (PlayerSkill b : playerSkills.values()) {
+            if (changes.get(b.getBlockStart()) != null
+                    && changes.get(b.getBlockStart()).length == 0) {
                 //new block size is zero, was removed, ignore
                 update = true;
             }
         }
 
-        if (skillBlocks.isEmpty() || update) {
+        if (playerSkills.isEmpty() || update) {
             prepareSkillsList();
         }
 
-        return skillBlocks;
+        return playerSkills;
     }
 
-    public void reclaimSkillPoints(SkillBlock sb) throws Exception {
+    public void reclaimSkillPoints(PlayerSkill sb) throws Exception {
         int blockStart = sb.getBlockStart();
-        Skill skill = SkillUtils.getSkill(sb.getSkillName(), false);
+        Skill skill = Data.db().getSkillDAO().getSkill(sb.getSkillName(), false);
         if (skill.isMastery()) {
             throw new IllegalStateException("Error reclaiming points. Mastery detected.");
         }
 
-        BlockInfo skillToRemove = PlayerData.getInstance().getBlockInfo().get(blockStart);
+        BlockInfo skillToRemove = SaveData.getInstance().getBlockInfo().get(blockStart);
         VariableInfo varSkillLevel = skillToRemove.getVariables().get("skillLevel");
         if (varSkillLevel.getVariableType() == VariableInfo.VariableType.Integer) {
-            int currentSkillPoints = PlayerData.getInstance().getChanges().getInt("skillPoints");
+            int currentSkillPoints = changes.getInt("skillPoints");
             int currentSkillLevel = (int) varSkillLevel.getValue();
-            PlayerData.getInstance().getChanges().setInt("skillPoints", currentSkillPoints + currentSkillLevel);
-            PlayerData.getInstance().getChanges().removeBlock(blockStart);
-            PlayerData.getInstance().getChanges().setInt("max", PlayerData.getInstance().getChanges().getInt("max") - 1);
+            changes.setInt("skillPoints", currentSkillPoints + currentSkillLevel);
+            changes.removeBlock(blockStart);
+            changes.setInt("max", changes.getInt("max") - 1);
 
-            if (PlayerData.getInstance().getChanges().get(blockStart) != null
-                    && PlayerData.getInstance().getChanges().get(blockStart).length == 0) {
+            if (changes.get(blockStart) != null
+                    && changes.get(blockStart).length == 0) {
                 prepareSkillsList();
             }
         }
     }
 
-    public void reclaimMasteryPoints(SkillBlock sb) throws Exception {
+    public void reclaimMasteryPoints(PlayerSkill sb) throws Exception {
         int blockStart = sb.getBlockStart();
-        Skill mastery = SkillUtils.getSkill(sb.getSkillName(), false);
+        Skill mastery = Data.db().getSkillDAO().getSkill(sb.getSkillName(), false);
         if (!mastery.isMastery()) {
             throw new IllegalStateException("Error reclaiming points. Not a mastery.");
         }
 
-        int currentSkillPoints = PlayerData.getInstance().getChanges().getInt("skillPoints");
-        int currentSkillLevel = PlayerData.getInstance().getChanges().getInt(blockStart, "skillLevel");
+        int currentSkillPoints = changes.getInt("skillPoints");
+        int currentSkillLevel = changes.getInt(blockStart, "skillLevel");
         if(currentSkillLevel > 1) {
-            PlayerData.getInstance().getChanges().setInt("skillPoints", currentSkillPoints + (currentSkillLevel - 1));
-            PlayerData.getInstance().getChanges().setInt(blockStart, "skillLevel", 1);
+            changes.setInt("skillPoints", currentSkillPoints + (currentSkillLevel - 1));
+            changes.setInt(blockStart, "skillLevel", 1);
             prepareSkillsList();
         }
     }
 
+    public List<Skill> getPlayerMasteries() {
+        List<Skill> ret = new ArrayList<>();
+        for (PlayerSkill sb : getPlayerSkills().values()) {
+            Skill skill = Data.db().getSkillDAO().getSkill(sb.getSkillName(), false);
+            if (skill != null && skill.isMastery()) {
+                ret.add(skill);
+            }
+        }
+        return ret;
+    }
+
+    public List<Skill> getPlayerSkillsFromMastery(Skill mastery) {
+        List<Skill> ret = new ArrayList<>();
+        for (PlayerSkill sb : getPlayerSkills().values()) {
+            Skill skill = Data.db().getSkillDAO().getSkill(sb.getSkillName(), false);
+            if (skill != null && !skill.isMastery() && skill.getParentPath().equals(mastery.getRecordPath())) {
+                ret.add(skill);
+            }
+        }
+        return ret;
+    }
+
     public void reset() {
         this.buffer = null;
-        this.headerInfo = null;
-        this.blockInfo = new Hashtable<>();
         this.playerName = null;
-        this.variableLocation = new Hashtable<>();
         this.changes = new ChangesTable();
         this.playerChr = null;
         this.saveInProgress = null;
+        SaveData.getInstance().reset();
     }
+
+
 }

@@ -22,15 +22,16 @@ package br.com.pinter.tqrespec.gui;
 
 import br.com.pinter.tqrespec.*;
 import br.com.pinter.tqrespec.save.PlayerData;
+import br.com.pinter.tqrespec.save.PlayerParser;
 import br.com.pinter.tqrespec.save.PlayerWriter;
-import br.com.pinter.tqrespec.tqdata.Data;
+import br.com.pinter.tqrespec.Constants;
+import br.com.pinter.tqrespec.tqdata.GameInfo;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -53,7 +54,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
-import javafx.util.converter.NumberStringConverter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.awt.*;
@@ -61,7 +61,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.FileAlreadyExistsException;
-import java.text.NumberFormat;
 import java.util.ResourceBundle;
 
 @SuppressWarnings({"RedundantThrows", "unused"})
@@ -375,7 +374,7 @@ public class ControllerMainForm implements Initializable {
         TaskWithException<Boolean> loadTask = new TaskWithException<>() {
             @Override
             protected Boolean call() throws Exception {
-                return PlayerData.getInstance().loadPlayerData(playerName);
+                return new PlayerParser().loadPlayer(playerName);
             }
         };
 

@@ -21,7 +21,7 @@
 package br.com.pinter.tqrespec.save;
 
 import br.com.pinter.tqrespec.Constants;
-import br.com.pinter.tqrespec.GameInfo;
+import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.Util;
 import org.apache.commons.lang3.StringUtils;
 
@@ -49,7 +49,7 @@ public class PlayerParser extends FileParser {
     }
 
     protected Hashtable<String, ArrayList<Integer>> getVariableLocation() {
-        return PlayerData.getInstance().getVariableLocation();
+        return SaveData.getInstance().getVariableLocation();
     }
 
     HeaderInfo parseHeader() {
@@ -90,7 +90,7 @@ public class PlayerParser extends FileParser {
     }
 
     public void parse() throws Exception {
-        loadPlayerChr();
+        readPlayerChr();
 
         if (this.getBuffer() == null || this.getBuffer().capacity() <= 50) {
             throw new IOException("Can't read Player.chr from player " + this.player);
@@ -99,7 +99,7 @@ public class PlayerParser extends FileParser {
                 this.player, this.getBuffer().capacity()));
         HeaderInfo headerInfo = parseHeader();
 
-        PlayerData.getInstance().setHeaderInfo(headerInfo);
+        SaveData.getInstance().setHeaderInfo(headerInfo);
 
         if (headerInfo.getHeaderVersion() != 2 && headerInfo.getHeaderVersion() != 3) {
             throw new IncompatibleSavegameException(
@@ -110,7 +110,7 @@ public class PlayerParser extends FileParser {
                     String.format("Incompatible player '%s' (playerVersion must be == 5)", this.player));
         }
         Hashtable<Integer, BlockInfo> blocks = this.parseAllBlocks();
-        PlayerData.getInstance().setBlockInfo(blocks);
+        SaveData.getInstance().setBlockInfo(blocks);
         if (inventoryStart == -1) {
             this.parseFooter();
         }
@@ -118,7 +118,18 @@ public class PlayerParser extends FileParser {
         PlayerData.getInstance().setPlayerName(player);
     }
 
-    void loadPlayerChr() throws Exception {
+    public boolean loadPlayer(String playerName) throws Exception {
+        if (PlayerData.getInstance().getSaveInProgress() != null &&  PlayerData.getInstance().getSaveInProgress()) {
+            return false;
+        }
+        player = playerName;
+        parse();
+        PlayerData.getInstance().prepareSkillsList();
+        return true;
+    }
+
+
+    void readPlayerChr() throws Exception {
         PlayerData.getInstance().reset();
         if (this.getBuffer() != null) {
             PlayerData.getInstance().reset();
@@ -375,13 +386,8 @@ public class PlayerParser extends FileParser {
 
     }
 
-    public String getPlayer() {
-        return player;
-    }
-
-    public PlayerParser player(String player) {
+    public void setPlayer(String player) {
         this.player = player;
-        return this;
     }
 
     public boolean isCustomQuest() {

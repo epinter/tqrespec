@@ -22,7 +22,6 @@ package br.com.pinter.tqrespec.tqdata;
 
 import br.com.pinter.tqdatabase.Database;
 import br.com.pinter.tqdatabase.Text;
-import br.com.pinter.tqrespec.GameInfo;
 
 import java.io.IOException;
 

@@ -4,7 +4,7 @@
 
 package br.com.pinter.tqrespec.save;
 
-import br.com.pinter.tqrespec.GameInfo;
+import br.com.pinter.tqrespec.tqdata.GameInfo;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,16 +37,17 @@ public class PlayerParserTest {
         PowerMockito.mockStatic(GameInfo.class);
         PowerMockito.when(GameInfo.getInstance()).thenReturn(gameInfo);
         PowerMockito.when(gameInfo.getSaveDataMainPath()).thenReturn("src/test/resources");
-        playerParser = new PlayerParser().player("savegame");
+        playerParser = new PlayerParser();
+        playerParser.setPlayer("savegame");
     }
 
     @Test
     public void parseAllBlocks_Should_parseAllBlocksFromSavegame() {
         try {
-            playerParser.loadPlayerChr();
+            playerParser.readPlayerChr();
         } catch (Exception e) {
             e.printStackTrace();
-            fail("parseAllBlocks: loadPlayerChr() failed");
+            fail("parseAllBlocks: readPlayerChr() failed");
         }
         Hashtable<Integer, BlockInfo> blocks = playerParser.parseAllBlocks();
         assertNotNull(blocks);
@@ -63,9 +64,9 @@ public class PlayerParserTest {
             e.printStackTrace();
         }
 
-        int varLocation = PlayerData.getInstance().getVariableLocation().get("str").get(0);
+        int varLocation = SaveData.getInstance().getVariableLocation().get("str").get(0);
         assertTrue(varLocation > 0);
-        BlockInfo blockInfo = PlayerData.getInstance().getBlockInfo().get(varLocation);
+        BlockInfo blockInfo = SaveData.getInstance().getBlockInfo().get(varLocation);
         assertNotNull(blockInfo);
         assertEquals(blockInfo.getVariables().get("str").getVariableType(), VariableInfo.VariableType.Float);
         Float str = (Float) blockInfo.getVariables().get("str").getValue();
@@ -110,7 +111,7 @@ public class PlayerParserTest {
     @Test
     public void parseHeader_Should_parseFileHeader() {
         try {
-            playerParser.loadPlayerChr();
+            playerParser.readPlayerChr();
         } catch (Exception e) {
             e.printStackTrace();
         }
