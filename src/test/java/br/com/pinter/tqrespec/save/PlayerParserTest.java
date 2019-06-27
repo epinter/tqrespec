@@ -5,13 +5,17 @@
 package br.com.pinter.tqrespec.save;
 
 import br.com.pinter.tqrespec.tqdata.GameInfo;
+import org.jboss.weld.junit4.WeldInitiator;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,7 +26,20 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(GameInfo.class)
+@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "org.w3c.*", "com.sun.org.apache.xalan.*"})
 public class PlayerParserTest {
+    @Rule
+    public WeldInitiator weld = WeldInitiator.from(
+            SaveData.class,
+            PlayerParser.class,
+            PlayerData.class,
+            ChangesTable.class
+    ).inject(this).build();
+
+    @Inject
+    private SaveData saveData;
+
+    @Inject
     private PlayerParser playerParser;
 
     @Before
@@ -37,7 +54,6 @@ public class PlayerParserTest {
         PowerMockito.mockStatic(GameInfo.class);
         PowerMockito.when(GameInfo.getInstance()).thenReturn(gameInfo);
         PowerMockito.when(gameInfo.getSaveDataMainPath()).thenReturn("src/test/resources");
-        playerParser = new PlayerParser();
         playerParser.setPlayer("savegame");
     }
 
@@ -64,9 +80,9 @@ public class PlayerParserTest {
             e.printStackTrace();
         }
 
-        int varLocation = SaveData.getInstance().getVariableLocation().get("str").get(0);
+        int varLocation = saveData.getVariableLocation().get("str").get(0);
         assertTrue(varLocation > 0);
-        BlockInfo blockInfo = SaveData.getInstance().getBlockInfo().get(varLocation);
+        BlockInfo blockInfo = saveData.getBlockInfo().get(varLocation);
         assertNotNull(blockInfo);
         assertEquals(blockInfo.getVariables().get("str").getVariableType(), VariableInfo.VariableType.Float);
         Float str = (Float) blockInfo.getVariables().get("str").getValue();
@@ -76,12 +92,22 @@ public class PlayerParserTest {
 
     @Test
     public void prepareBufferForRead_Should_rewindBuffer() {
+        try {
+            playerParser.parse();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         playerParser.prepareBufferForRead();
         assertEquals(playerParser.getBuffer().position(), 0);
     }
 
     @Test
     public void getBuffer_Should_returnByteBuffer() {
+        try {
+            playerParser.parse();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         assertNotNull(playerParser.getBuffer());
         assertTrue(playerParser.getBuffer().capacity() > 0);
     }

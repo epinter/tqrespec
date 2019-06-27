@@ -25,6 +25,7 @@ import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.Settings;
 import br.com.pinter.tqrespec.Util;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -37,6 +38,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class PlayerWriter {
+    @Inject
+    private PlayerData playerData;
+
     public PlayerWriter() {
     }
 
@@ -104,34 +108,34 @@ public class PlayerWriter {
     }
 
     public boolean backupCurrent() throws IOException {
-        String playerChr = PlayerData.getInstance().getPlayerChr().toString();
-        String playerName = PlayerData.getInstance().getPlayerName();
+        String playerChr = playerData.getPlayerChr().toString();
+        String playerName = playerData.getPlayerName();
         return this.backupSaveGame(playerChr, playerName, false);
     }
 
     public boolean saveCurrent() throws IOException {
-        if (PlayerData.getInstance().getSaveInProgress() != null && PlayerData.getInstance().getSaveInProgress()) {
+        if (playerData.getSaveInProgress() != null && playerData.getSaveInProgress()) {
             return false;
         }
-        PlayerData.getInstance().setSaveInProgress(true);
-        String playerChr = PlayerData.getInstance().getPlayerChr().toString();
+        playerData.setSaveInProgress(true);
+        String playerChr = playerData.getPlayerChr().toString();
         try {
             this.writeBuffer(playerChr);
-            PlayerData.getInstance().setSaveInProgress(false);
+            playerData.setSaveInProgress(false);
             return true;
         } catch (IOException e) {
-            PlayerData.getInstance().setSaveInProgress(false);
+            playerData.setSaveInProgress(false);
             e.printStackTrace();
             throw e;
         }
     }
 
     private void writeBuffer(String filename) throws IOException {
-        this.writeBuffer(filename, PlayerData.getInstance().getChanges());
+        this.writeBuffer(filename, playerData.getChanges());
     }
 
     private void writeBuffer(String filename, ChangesTable changesTable) throws IOException {
-        PlayerData.getInstance().getBuffer().rewind();
+        playerData.getBuffer().rewind();
         List<Integer> changedOffsets = new ArrayList<>(changesTable.keySet());
         Collections.sort(changedOffsets);
 
@@ -139,53 +143,53 @@ public class PlayerWriter {
         FileChannel outChannel = new FileOutputStream(out).getChannel();
 
         for (int offset : changedOffsets) {
-            int rawCount = offset - PlayerData.getInstance().getBuffer().position();
-            PlayerData.getInstance().getBuffer().limit(rawCount +
-                    PlayerData.getInstance().getBuffer().position()
+            int rawCount = offset - playerData.getBuffer().position();
+            playerData.getBuffer().limit(rawCount +
+                    playerData.getBuffer().position()
             );
-            outChannel.write(PlayerData.getInstance().getBuffer());
-            PlayerData.getInstance().getBuffer().limit(PlayerData.getInstance().getBuffer().capacity());
+            outChannel.write(playerData.getBuffer());
+            playerData.getBuffer().limit(playerData.getBuffer().capacity());
             byte[] c = changesTable.get(offset);
             outChannel.write(ByteBuffer.wrap(c));
             int previousValueLength = changesTable.getValuesLengthIndex().get(offset);
-            PlayerData.getInstance().getBuffer().position(
-                    PlayerData.getInstance().getBuffer().position() + previousValueLength);
+            playerData.getBuffer().position(
+                    playerData.getBuffer().position() + previousValueLength);
         }
 
         while (true) {
-            if (outChannel.write(PlayerData.getInstance().getBuffer()) <= 0) break;
+            if (outChannel.write(playerData.getBuffer()) <= 0) break;
         }
 
-        PlayerData.getInstance().getBuffer().rewind();
+        playerData.getBuffer().rewind();
         outChannel.force(false);
         outChannel.close();
     }
 
     public void copyCurrentSave(String toPlayerName) throws IOException {
-        PlayerData.getInstance().setSaveInProgress(true);
+        playerData.setSaveInProgress(true);
         String path;
-        if (PlayerData.getInstance().isCustomQuest()) {
+        if (playerData.isCustomQuest()) {
             path = GameInfo.getInstance().getSaveDataUserPath();
         } else {
             path = GameInfo.getInstance().getSaveDataMainPath();
         }
 
-        String fromPlayerName = PlayerData.getInstance().getPlayerName();
+        String fromPlayerName = playerData.getPlayerName();
 
         Path playerSaveDirSource = Paths.get(path, "_" + fromPlayerName);
         Path playerSaveDirTarget = Paths.get(path, "_" + toPlayerName);
 
         if (Files.exists(playerSaveDirTarget)) {
-            PlayerData.getInstance().setSaveInProgress(false);
+            playerData.setSaveInProgress(false);
             throw new FileAlreadyExistsException("Target Directory already exists");
         }
         Util.copyDirectoryRecurse(playerSaveDirSource, playerSaveDirTarget, false);
 
-        ChangesTable changesTable = (ChangesTable) PlayerData.getInstance().getChanges().deepClone();
+        ChangesTable changesTable = (ChangesTable) playerData.getChanges().deepClone();
 
         changesTable.setString("myPlayerName", toPlayerName, true);
 
         this.writeBuffer(Paths.get(playerSaveDirTarget.toString(), "Player.chr").toString(), changesTable);
-        PlayerData.getInstance().setSaveInProgress(false);
+        playerData.setSaveInProgress(false);
     }
 }

@@ -20,10 +20,11 @@
 
 package br.com.pinter.tqrespec.save;
 
+import java.io.Serializable;
 import java.util.Hashtable;
 
 @SuppressWarnings("unused")
-public class BlockInfo {
+public class BlockInfo implements Serializable {
     private String tag = null;
     private int start = -1;
     private int end = -1;

@@ -7,7 +7,6 @@ package br.com.pinter.tqrespec.gui;
 import br.com.pinter.tqrespec.Constants;
 import br.com.pinter.tqrespec.Util;
 import br.com.pinter.tqrespec.save.PlayerData;
-import br.com.pinter.tqrespec.save.SaveData;
 import br.com.pinter.tqrespec.tqdata.Data;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -20,12 +19,15 @@ import javafx.scene.control.SpinnerValueFactory;
 import javafx.util.converter.NumberStringConverter;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.inject.Inject;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.util.ResourceBundle;
 
 public class PointsPaneController implements Initializable {
     private static final boolean DBG = false;
+    @Inject
+    private PlayerData playerData;
 
     @FXML
     private Spinner strSpinner;
@@ -291,42 +293,42 @@ public class PointsPaneController implements Initializable {
     public void saveCharHandler() throws Exception {
         if (DBG) System.out.println("starting savegame task");
 
-        int strOld = Math.round(PlayerData.getInstance().getChanges().getFloat("str"));
-        int intOld = Math.round(PlayerData.getInstance().getChanges().getFloat("int"));
-        int dexOld = Math.round(PlayerData.getInstance().getChanges().getFloat("dex"));
-        int lifeOld = Math.round(PlayerData.getInstance().getChanges().getFloat("life"));
-        int manaOld = Math.round(PlayerData.getInstance().getChanges().getFloat("mana"));
-        int modifierOld = PlayerData.getInstance().getChanges().getInt("modifierPoints");
+        int strOld = Math.round(playerData.getChanges().getFloat("str"));
+        int intOld = Math.round(playerData.getChanges().getFloat("int"));
+        int dexOld = Math.round(playerData.getChanges().getFloat("dex"));
+        int lifeOld = Math.round(playerData.getChanges().getFloat("life"));
+        int manaOld = Math.round(playerData.getChanges().getFloat("mana"));
+        int modifierOld = playerData.getChanges().getInt("modifierPoints");
 
         if (strOld != currentStr.get() && currentStr.get() > 0) {
-            PlayerData.getInstance().getChanges().setFloat("str", currentStr.get());
+            playerData.getChanges().setFloat("str", currentStr.get());
         }
         if (intOld != currentInt.get() && currentInt.get() > 0) {
-            PlayerData.getInstance().getChanges().setFloat("int", currentInt.get());
+            playerData.getChanges().setFloat("int", currentInt.get());
         }
         if (dexOld != currentDex.get() && currentDex.get() > 0) {
-            PlayerData.getInstance().getChanges().setFloat("dex", currentDex.get());
+            playerData.getChanges().setFloat("dex", currentDex.get());
         }
         if (lifeOld != currentLife.get() && currentLife.get() > 0) {
-            PlayerData.getInstance().getChanges().setFloat("life", currentLife.get());
+            playerData.getChanges().setFloat("life", currentLife.get());
         }
         if (manaOld != currentMana.get() && currentMana.get() > 0) {
-            PlayerData.getInstance().getChanges().setFloat("mana", currentMana.get());
+            playerData.getChanges().setFloat("mana", currentMana.get());
         }
         if (modifierOld != currentAvail.get() && currentAvail.get() > 0) {
-            PlayerData.getInstance().getChanges().setInt("modifierPoints", currentAvail.get());
+            playerData.getChanges().setInt("modifierPoints", currentAvail.get());
         }
         if (DBG) System.out.println("returning savegame task");
     }
 
     public void loadCharHandler() {
         clearProperties();
-        int str = Math.round(PlayerData.getInstance().getChanges().getFloat("str"));
-        int inl = Math.round(PlayerData.getInstance().getChanges().getFloat("int"));
-        int dex = Math.round(PlayerData.getInstance().getChanges().getFloat("dex"));
-        int life = Math.round(PlayerData.getInstance().getChanges().getFloat("life"));
-        int mana = Math.round(PlayerData.getInstance().getChanges().getFloat("mana"));
-        int modifier = PlayerData.getInstance().getChanges().getInt("modifierPoints");
+        int str = Math.round(playerData.getChanges().getFloat("str"));
+        int inl = Math.round(playerData.getChanges().getFloat("int"));
+        int dex = Math.round(playerData.getChanges().getFloat("dex"));
+        int life = Math.round(playerData.getChanges().getFloat("life"));
+        int mana = Math.round(playerData.getChanges().getFloat("mana"));
+        int modifier = playerData.getChanges().getInt("modifierPoints");
         if (modifier < 0 || str < 0 || dex < 0 || inl < 0 || life < 0 || mana < 0) {
             Util.showError(Util.getUIMessage("alert.errorloadingchar_header"),
                     Util.getUIMessage("alert.errorloadingchar_content", life, mana, str, inl, dex));
@@ -339,15 +341,15 @@ public class PointsPaneController implements Initializable {
         this.setDexField(dex);
         this.setLifeField(life);
         this.setManaField(mana);
-        int xp = PlayerData.getInstance().getChanges().getInt("currentStats.experiencePoints");
-        int level = PlayerData.getInstance().getChanges().getInt("currentStats.charLevel");
-        int gold = PlayerData.getInstance().getChanges().getInt("money");
-        String charClass = SaveData.getInstance().getHeaderInfo().getPlayerClassTag();
+        int xp = playerData.getChanges().getInt("currentStats.experiencePoints");
+        int level = playerData.getChanges().getInt("currentStats.charLevel");
+        int gold = playerData.getChanges().getInt("money");
+        String charClass = playerData.getPlayerClassTag();
 
         if (StringUtils.isNotEmpty(charClass)) {
             charClassText.setText(Data.text().getString(charClass));
         }
-        int difficulty = PlayerData.getInstance().getChanges().getInt("difficulty");
+        int difficulty = playerData.getChanges().getInt("difficulty");
         difficultyText.setText(Util.getUIMessage(String.format("difficulty.%d", difficulty)));
         experienceText.setText(NumberFormat.getInstance().format(xp));
         charLevelText.setText(String.valueOf(level));

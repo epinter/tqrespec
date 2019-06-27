@@ -22,6 +22,7 @@ package br.com.pinter.tqrespec.save;
 
 import org.apache.commons.lang3.StringUtils;
 
+import javax.inject.Inject;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -29,6 +30,9 @@ import java.util.Hashtable;
 
 @SuppressWarnings("ALL")
 public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepCloneable {
+    @Inject
+    private SaveData saveData;
+
     private Hashtable<Integer, Integer> valuesLengthIndex = null;
 
     public ChangesTable() {
@@ -45,12 +49,12 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
     }
 
     public String getString(String variable) {
-        if (SaveData.getInstance().getVariableLocation().get(variable) != null) {
-            int block = SaveData.getInstance().getVariableLocation().get(variable).get(0);
-            if (SaveData.getInstance().getBlockInfo().get(block) != null) {
-                if (SaveData.getInstance().getBlockInfo().get(block).getVariables().get(variable).getVariableType()
+        if (saveData.getVariableLocation().get(variable) != null) {
+            int block = saveData.getVariableLocation().get(variable).get(0);
+            if (saveData.getBlockInfo().get(block) != null) {
+                if (saveData.getBlockInfo().get(block).getVariables().get(variable).getVariableType()
                         == VariableInfo.VariableType.String) {
-                    return (String) SaveData.getInstance().getBlockInfo().get(block).getVariables().get(variable).getValue();
+                    return (String) saveData.getBlockInfo().get(block).getVariables().get(variable).getValue();
                 }
             }
         }
@@ -62,15 +66,15 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
     }
 
     public void setString(String variable, String value, boolean utf16le) {
-        if (SaveData.getInstance().getVariableLocation().get(variable) != null) {
-            if (SaveData.getInstance().getVariableLocation().get(variable).size() > 1) {
+        if (saveData.getVariableLocation().get(variable) != null) {
+            if (saveData.getVariableLocation().get(variable).size() > 1) {
                 throw new IllegalStateException("Variable is defined on multiple blocks, aborting");
             }
-            int block = SaveData.getInstance().getVariableLocation().get(variable).get(0);
-            if (SaveData.getInstance().getBlockInfo().get(block) != null) {
-                if (SaveData.getInstance().getBlockInfo().get(block).getVariables().get(variable).getVariableType()
+            int block = saveData.getVariableLocation().get(variable).get(0);
+            if (saveData.getBlockInfo().get(block) != null) {
+                if (saveData.getBlockInfo().get(block).getVariables().get(variable).getVariableType()
                         == VariableInfo.VariableType.String) {
-                    VariableInfo variableInfo = SaveData.getInstance().getBlockInfo().get(block).getVariables().get(variable);
+                    VariableInfo variableInfo = saveData.getBlockInfo().get(block).getVariables().get(variable);
                     byte[] str;
                     if (utf16le) {
                         //encode string to the format the game uses, a wide character with second byte always 0
@@ -113,15 +117,15 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
     }
 
     public void setFloat(String variable, float value) throws Exception {
-        if (SaveData.getInstance().getVariableLocation().get(variable) != null) {
-            if (SaveData.getInstance().getVariableLocation().get(variable).size() > 1) {
+        if (saveData.getVariableLocation().get(variable) != null) {
+            if (saveData.getVariableLocation().get(variable).size() > 1) {
                 throw new Exception("Variable is defined on multiple blocks, aborting");
             }
-            int block = SaveData.getInstance().getVariableLocation().get(variable).get(0);
-            if (SaveData.getInstance().getBlockInfo().get(block) != null) {
-                if (SaveData.getInstance().getBlockInfo().get(block).getVariables().get(variable).getVariableType()
+            int block = saveData.getVariableLocation().get(variable).get(0);
+            if (saveData.getBlockInfo().get(block) != null) {
+                if (saveData.getBlockInfo().get(block).getVariables().get(variable).getVariableType()
                         == VariableInfo.VariableType.Float) {
-                    VariableInfo variableInfo = SaveData.getInstance().getBlockInfo().get(block).getVariables().get(variable);
+                    VariableInfo variableInfo = saveData.getBlockInfo().get(block).getVariables().get(variable);
                     if (variableInfo.getValSize() == 4) {
                         byte[] data = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putFloat(value).array();
                         this.put(variableInfo.getValOffset(), data);
@@ -135,12 +139,12 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
     }
 
     public float getFloat(String variable) {
-        if (SaveData.getInstance().getVariableLocation().get(variable) != null) {
-            int block = SaveData.getInstance().getVariableLocation().get(variable).get(0);
-            if (SaveData.getInstance().getBlockInfo().get(block) != null) {
-                if (SaveData.getInstance().getBlockInfo().get(block).getVariables().get(variable).getVariableType()
+        if (saveData.getVariableLocation().get(variable) != null) {
+            int block = saveData.getVariableLocation().get(variable).get(0);
+            if (saveData.getBlockInfo().get(block) != null) {
+                if (saveData.getBlockInfo().get(block).getVariables().get(variable).getVariableType()
                         == VariableInfo.VariableType.Float) {
-                    VariableInfo v = SaveData.getInstance().getBlockInfo().get(block).getVariables().get(variable);
+                    VariableInfo v = saveData.getBlockInfo().get(block).getVariables().get(variable);
                     if (this.get(v.getValOffset()) != null) {
                         return ByteBuffer.wrap(this.get(v.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getFloat();
                     } else {
@@ -155,10 +159,10 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
 
     public Float[] getFloatList(String variable) {
         ArrayList<Float> ret = new ArrayList<>();
-        if (SaveData.getInstance().getVariableLocation().get(variable) != null) {
-            ArrayList<Integer> blocksList = SaveData.getInstance().getVariableLocation().get(variable);
+        if (saveData.getVariableLocation().get(variable) != null) {
+            ArrayList<Integer> blocksList = saveData.getVariableLocation().get(variable);
             for (int block : blocksList) {
-                BlockInfo current = SaveData.getInstance().getBlockInfo().get(block);
+                BlockInfo current = saveData.getBlockInfo().get(block);
                 if (current.getVariables().get(variable).getVariableType() == VariableInfo.VariableType.Float) {
                     float v = (Float) current.getVariables().get(variable).getValue();
                     ret.add(v);
@@ -169,10 +173,10 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
     }
 
     public void setInt(int blockStart, String variable, int value) throws Exception {
-        if (SaveData.getInstance().getBlockInfo().get(blockStart) != null) {
-            if (SaveData.getInstance().getBlockInfo().get(blockStart).getVariables().get(variable).getVariableType()
+        if (saveData.getBlockInfo().get(blockStart) != null) {
+            if (saveData.getBlockInfo().get(blockStart).getVariables().get(variable).getVariableType()
                     == VariableInfo.VariableType.Integer) {
-                VariableInfo variableInfo = SaveData.getInstance().getBlockInfo().get(blockStart).getVariables().get(variable);
+                VariableInfo variableInfo = saveData.getBlockInfo().get(blockStart).getVariables().get(variable);
                 if (variableInfo.getValSize() == 4) {
                     byte[] data = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(value).array();
                     this.put(variableInfo.getValOffset(), data);
@@ -185,15 +189,15 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
     }
 
     public void setInt(String variable, int value) throws Exception {
-        if (SaveData.getInstance().getVariableLocation().get(variable) != null) {
-            if (SaveData.getInstance().getVariableLocation().get(variable).size() > 1) {
+        if (saveData.getVariableLocation().get(variable) != null) {
+            if (saveData.getVariableLocation().get(variable).size() > 1) {
                 throw new Exception("Variable is defined on multiple blocks, aborting");
             }
-            int block = SaveData.getInstance().getVariableLocation().get(variable).get(0);
-            if (SaveData.getInstance().getBlockInfo().get(block) != null) {
-                if (SaveData.getInstance().getBlockInfo().get(block).getVariables().get(variable).getVariableType()
+            int block = saveData.getVariableLocation().get(variable).get(0);
+            if (saveData.getBlockInfo().get(block) != null) {
+                if (saveData.getBlockInfo().get(block).getVariables().get(variable).getVariableType()
                         == VariableInfo.VariableType.Integer) {
-                    VariableInfo variableInfo = SaveData.getInstance().getBlockInfo().get(block).getVariables().get(variable);
+                    VariableInfo variableInfo = saveData.getBlockInfo().get(block).getVariables().get(variable);
                     if (variableInfo.getValSize() == 4) {
                         byte[] data = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(value).array();
                         this.put(variableInfo.getValOffset(), data);
@@ -207,10 +211,10 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
     }
 
     public Integer getInt(int blockStart, String variable) {
-        if (SaveData.getInstance().getBlockInfo().get(blockStart) != null) {
-            if (SaveData.getInstance().getBlockInfo().get(blockStart).getVariables().get(variable).getVariableType()
+        if (saveData.getBlockInfo().get(blockStart) != null) {
+            if (saveData.getBlockInfo().get(blockStart).getVariables().get(variable).getVariableType()
                     == VariableInfo.VariableType.Integer) {
-                VariableInfo v = SaveData.getInstance().getBlockInfo().get(blockStart).getVariables().get(variable);
+                VariableInfo v = saveData.getBlockInfo().get(blockStart).getVariables().get(variable);
                 if (this.get(v.getValOffset()) != null) {
                     return ByteBuffer.wrap(this.get(v.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getInt();
                 } else {
@@ -222,12 +226,12 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
     }
 
     public Integer getInt(String variable) {
-        if (SaveData.getInstance().getVariableLocation().get(variable) != null) {
-            int block = SaveData.getInstance().getVariableLocation().get(variable).get(0);
-            if (SaveData.getInstance().getBlockInfo().get(block) != null) {
-                if (SaveData.getInstance().getBlockInfo().get(block).getVariables().get(variable).getVariableType()
+        if (saveData.getVariableLocation().get(variable) != null) {
+            int block = saveData.getVariableLocation().get(variable).get(0);
+            if (saveData.getBlockInfo().get(block) != null) {
+                if (saveData.getBlockInfo().get(block).getVariables().get(variable).getVariableType()
                         == VariableInfo.VariableType.Integer) {
-                    VariableInfo v = SaveData.getInstance().getBlockInfo().get(block).getVariables().get(variable);
+                    VariableInfo v = saveData.getBlockInfo().get(block).getVariables().get(variable);
                     if (this.get(v.getValOffset()) != null) {
                         return ByteBuffer.wrap(this.get(v.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getInt();
                     } else {
@@ -242,10 +246,10 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
 
     public Integer[] getIntList(String variable) {
         ArrayList<Integer> ret = new ArrayList<>();
-        if (SaveData.getInstance().getVariableLocation().get(variable) != null) {
-            ArrayList<Integer> blocksList = SaveData.getInstance().getVariableLocation().get(variable);
+        if (saveData.getVariableLocation().get(variable) != null) {
+            ArrayList<Integer> blocksList = saveData.getVariableLocation().get(variable);
             for (int block : blocksList) {
-                BlockInfo current = SaveData.getInstance().getBlockInfo().get(block);
+                BlockInfo current = saveData.getBlockInfo().get(block);
                 if (current.getVariables().get(variable).getVariableType() == VariableInfo.VariableType.Integer) {
                     int v = (Integer) current.getVariables().get(variable).getValue();
                     ret.add(v);
@@ -256,7 +260,7 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
     }
 
     public void removeBlock(int offset) {
-        BlockInfo current = SaveData.getInstance().getBlockInfo().get(offset);
+        BlockInfo current = saveData.getBlockInfo().get(offset);
         this.put(current.getStart(), new byte[0]);
         this.valuesLengthIndex.put(current.getStart(), current.getSize());
     }

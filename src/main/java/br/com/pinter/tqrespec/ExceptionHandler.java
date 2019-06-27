@@ -37,7 +37,7 @@ import java.util.Optional;
 class ExceptionHandler {
     public static void unhandled(Thread t, Throwable e) {
         e.printStackTrace();
-        PlayerData.getInstance().reset();
+
         if (Platform.isFxApplicationThread()) {
             ExceptionHandler.showAlert(t, e);
         }

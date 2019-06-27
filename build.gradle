@@ -18,7 +18,8 @@ dependencies {
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '2.28.2'
     testImplementation group: 'org.powermock', name: 'powermock-module-junit4', version: '2.0.2'
     testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.2'
-
+    testImplementation group: 'org.jboss.weld', name: 'weld-junit4', version: '2.0.0.Final'
+    compile group: 'org.jboss.weld.se', name: 'weld-se-shaded', version: '3.1.1.Final'
     compile group: 'net.java.dev.jna', name: 'platform', version: '3.5.0'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
     compile project(':tqdatabase')
@@ -28,5 +29,12 @@ jar {
     manifest {
         attributes 'Class-Path': configurations.compile.collect { it.getName() }.join(' ')
     }
+    from ('src/main/resources/META-INF')
 }
 
+task copyMetaInf(type: Copy) {
+    from fileTree(new File(sourceSets.main.output.resourcesDir,'/META-INF'))
+    into new File(sourceSets.main.java.outputDir,'/META-INF')
+}
+
+classes.dependsOn('copyMetaInf')

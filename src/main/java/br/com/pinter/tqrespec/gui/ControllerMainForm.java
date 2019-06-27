@@ -25,6 +25,7 @@ import br.com.pinter.tqrespec.save.PlayerData;
 import br.com.pinter.tqrespec.save.PlayerParser;
 import br.com.pinter.tqrespec.save.PlayerWriter;
 import br.com.pinter.tqrespec.Constants;
+import br.com.pinter.tqrespec.save.SaveData;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -55,7 +56,9 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import org.apache.commons.lang3.StringUtils;
+import org.jboss.weld.environment.se.contexts.ThreadScoped;
 
+import javax.inject.Inject;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
@@ -66,6 +69,16 @@ import java.util.ResourceBundle;
 @SuppressWarnings({"RedundantThrows", "unused"})
 public class ControllerMainForm implements Initializable {
     private static final boolean DBG = false;
+
+    @Inject
+    private PlayerData playerData;
+
+    @Inject
+    private PlayerParser playerParser;
+
+    @Inject
+    private PlayerWriter playerWriter;
+
     @FXML
     private VBox rootelement;
 
@@ -262,7 +275,7 @@ public class ControllerMainForm implements Initializable {
             @Override
             protected Integer call() {
                 try {
-                    new PlayerWriter().copyCurrentSave(targetPlayerName);
+                    playerWriter.copyCurrentSave(targetPlayerName);
                     return 2;
                 } catch (FileAlreadyExistsException e) {
                     return 3;
@@ -274,7 +287,7 @@ public class ControllerMainForm implements Initializable {
 
         copyCharTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, (e) -> {
             if ((int) copyCharTask.getValue() == 2) {
-                PlayerData.getInstance().reset();
+                playerData.reset();
                 setAllControlsDisable(false);
                 addCharactersToCombo();
                 if (characterCombo.getItems().contains(targetPlayerName)) {
@@ -306,14 +319,14 @@ public class ControllerMainForm implements Initializable {
             protected Integer call() throws Exception {
                 if (DBG) System.out.println("starting backup task");
                 setAllControlsDisable(true);
-                return new PlayerWriter().backupCurrent() ? 2 : 0;
+                return playerWriter.backupCurrent() ? 2 : 0;
             }
         };
         TaskWithException<Integer> saveGameTask = new TaskWithException<>() {
             @Override
             protected Integer call() throws Exception {
                 pointsPaneController.saveCharHandler();
-                return new PlayerWriter().saveCurrent() ? 2 : 0;
+                return playerWriter.saveCurrent() ? 2 : 0;
             }
         };
 
@@ -374,7 +387,7 @@ public class ControllerMainForm implements Initializable {
         TaskWithException<Boolean> loadTask = new TaskWithException<>() {
             @Override
             protected Boolean call() throws Exception {
-                return new PlayerParser().loadPlayer(playerName);
+                return playerParser.loadPlayer(playerName);
             }
         };
 

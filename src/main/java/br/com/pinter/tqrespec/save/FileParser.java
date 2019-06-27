@@ -45,6 +45,10 @@ abstract class FileParser {
 
     abstract protected Hashtable<String, ArrayList<Integer>> getVariableLocation();
 
+    protected void reset() {
+        inventoryStart = -1;
+    }
+
     void putVarIndex(String varName, int blockStart) {
         this.getVariableLocation().computeIfAbsent(varName, k -> new ArrayList<>());
         this.getVariableLocation().get(varName).add(blockStart);
@@ -61,6 +65,10 @@ abstract class FileParser {
     }
 
     Hashtable<Integer, BlockInfo> parseAllBlocks() {
+        if(inventoryStart != -1) {
+            throw new IllegalStateException("Illegal inventory offset, value was not reset on load");
+        }
+
         Hashtable<Integer, BlockInfo> ret = new Hashtable<>();
         int nextBlock = 0;
         while (nextBlock >= 0) {

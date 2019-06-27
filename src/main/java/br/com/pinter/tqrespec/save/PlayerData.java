@@ -24,37 +24,33 @@ import br.com.pinter.tqdatabase.Database;
 import br.com.pinter.tqdatabase.models.Skill;
 import br.com.pinter.tqrespec.Constants;
 import br.com.pinter.tqrespec.Util;
+import br.com.pinter.tqrespec.gui.State;
 import br.com.pinter.tqrespec.tqdata.Data;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.*;
 
 @SuppressWarnings("unused")
+@Singleton
 public class PlayerData {
+    @Inject
+    private SaveData saveData;
+
+    @Inject
+    private ChangesTable changes;
+
     private static PlayerData instance = null;
     private String playerName = null;
     private Path playerChr = null;
     private ByteBuffer buffer = null;
-    private ChangesTable changes = null;
-    private Boolean saveInProgress = null;
     private boolean isCustomQuest = false;
     private final LinkedHashMap<String, PlayerSkill> playerSkills;
 
-    private PlayerData() {
+    public PlayerData() {
         playerSkills = new LinkedHashMap<>();
-        changes = new ChangesTable();
-    }
-
-    public static PlayerData getInstance() {
-        if (instance == null) {
-            synchronized (PlayerData.class) {
-                if (instance == null) {
-                    instance = new PlayerData();
-                }
-            }
-        }
-        return instance;
     }
 
     public String getPlayerName() {
@@ -85,14 +81,6 @@ public class PlayerData {
         this.playerChr = playerChr;
     }
 
-    public Boolean getSaveInProgress() {
-        return saveInProgress;
-    }
-
-    public void setSaveInProgress(Boolean saveInProgress) {
-        this.saveInProgress = saveInProgress;
-    }
-
     public boolean isCustomQuest() {
         return isCustomQuest;
     }
@@ -101,12 +89,19 @@ public class PlayerData {
         isCustomQuest = customQuest;
     }
 
+    public String getPlayerClassTag() {
+        if(saveData.getHeaderInfo()!=null) {
+            return saveData.getHeaderInfo().getPlayerClassTag();
+        }
+        return null;
+    }
+
     void prepareSkillsList() {
         playerSkills.clear();
-        for (String v : SaveData.getInstance().getVariableLocation().keySet()) {
+        for (String v : saveData.getVariableLocation().keySet()) {
             if (v.startsWith(Database.Variables.PREFIX_SKILL_NAME)) {
-                for (int blockOffset : SaveData.getInstance().getVariableLocation().get(v)) {
-                    BlockInfo b = SaveData.getInstance().getBlockInfo().get(blockOffset);
+                for (int blockOffset : saveData.getVariableLocation().get(v)) {
+                    BlockInfo b = saveData.getBlockInfo().get(blockOffset);
                     if (changes.get(b.getStart()) != null
                             && changes.get(b.getStart()).length == 0) {
                         //new block size is zero, was removed, ignore
@@ -139,8 +134,8 @@ public class PlayerData {
     public int getAvailableSkillPoints() {
         if (!isCharacterLoaded()) return 0;
 
-        int block = SaveData.getInstance().getVariableLocation().get("skillPoints").get(0);
-        BlockInfo statsBlock = SaveData.getInstance().getBlockInfo().get(block);
+        int block = saveData.getVariableLocation().get("skillPoints").get(0);
+        BlockInfo statsBlock = saveData.getBlockInfo().get(block);
         return changes.getInt(statsBlock.getStart(), "skillPoints");
     }
 
@@ -169,7 +164,7 @@ public class PlayerData {
             throw new IllegalStateException("Error reclaiming points. Mastery detected.");
         }
 
-        BlockInfo skillToRemove = SaveData.getInstance().getBlockInfo().get(blockStart);
+        BlockInfo skillToRemove = saveData.getBlockInfo().get(blockStart);
         VariableInfo varSkillLevel = skillToRemove.getVariables().get("skillLevel");
         if (varSkillLevel.getVariableType() == VariableInfo.VariableType.Integer) {
             int currentSkillPoints = changes.getInt("skillPoints");
@@ -212,6 +207,14 @@ public class PlayerData {
         return ret;
     }
 
+    public Boolean getSaveInProgress() {
+        return State.get().getSaveInProgress();
+    }
+
+    public void setSaveInProgress(Boolean saveInProgress) {
+        State.get().setSaveInProgress(saveInProgress);
+    }
+
     public List<Skill> getPlayerSkillsFromMastery(Skill mastery) {
         List<Skill> ret = new ArrayList<>();
         for (PlayerSkill sb : getPlayerSkills().values()) {
@@ -226,10 +229,10 @@ public class PlayerData {
     public void reset() {
         this.buffer = null;
         this.playerName = null;
-        this.changes = new ChangesTable();
+        this.changes.clear();
         this.playerChr = null;
-        this.saveInProgress = null;
-        SaveData.getInstance().reset();
+        State.get().setSaveInProgress(null);
+        saveData.reset();
     }
 
 

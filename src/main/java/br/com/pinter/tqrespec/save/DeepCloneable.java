@@ -34,7 +34,7 @@ public interface DeepCloneable extends Serializable {
             ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
             return objectInputStream.readUnshared();
         } catch (IOException | ClassNotFoundException e) {
-            throw new CloneFailedException("deep clone failed");
+            throw new CloneFailedException("deep clone failed",e);
         }
     }
 }

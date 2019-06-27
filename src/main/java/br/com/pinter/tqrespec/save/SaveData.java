@@ -4,29 +4,21 @@
 
 package br.com.pinter.tqrespec.save;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Singleton;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-public class SaveData {
-    private static SaveData instance = null;
+@Singleton
+public class SaveData implements Serializable {
     private Hashtable<Integer, BlockInfo> blockInfo = null;
     private HeaderInfo headerInfo = null;
     private Hashtable<String, ArrayList<Integer>> variableLocation = null;
 
-    private SaveData() {
+    public SaveData() {
         variableLocation = new Hashtable<>();
         blockInfo = new Hashtable<>();
-    }
-
-    public static SaveData getInstance() {
-        if (instance == null) {
-            synchronized (SaveData.class) {
-                if (instance == null) {
-                    instance = new SaveData();
-                }
-            }
-        }
-        return instance;
     }
 
     public Hashtable<Integer, BlockInfo> getBlockInfo() {

@@ -42,29 +42,33 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
+import javax.enterprise.event.Observes;
+import javax.inject.Inject;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ResourceBundle;
 
-public class Main extends Application {
-    public static void main(String[] args) {
-        System.setProperty("javafx.preloader", "br.com.pinter.tqrespec.gui.AppPreloader");
-        launch(args);
-    }
+public class Main {
+    @Inject
+    private FXMLLoader fxmlLoader;
 
-    private void load(Stage stage) {
+    private Stage primaryStage;
+    private Application application;
 
+    private void load() {
         Task<Void> task = new Task<>() {
             @Override
             public Void call() {
                 //preload game database metadata and skills
-                notifyPreloader(new Preloader.ProgressNotification(0.3));
+                application.notifyPreloader(new Preloader.ProgressNotification(0.3));
                 Data.db();
-                notifyPreloader(new Preloader.ProgressNotification(0.7));
+                application.notifyPreloader(new Preloader.ProgressNotification(0.7));
                 Data.db().preload();
                 //preload text
-                notifyPreloader(new Preloader.ProgressNotification(0.9));
+                application.notifyPreloader(new Preloader.ProgressNotification(0.9));
                 Data.text().preload();
                 return null;
             }
@@ -85,17 +89,23 @@ public class Main extends Application {
         });
 
         task.setOnSucceeded(e -> {
-            notifyPreloader(new Preloader.ProgressNotification(1.0));
-            stage.show();
+            application.notifyPreloader(new Preloader.ProgressNotification(1.0));
+            primaryStage.show();
         });
         new Thread(task).start();
-        stage.setOnShown(windowEvent -> notifyPreloader(new Preloader.StateChangeNotification(
+        primaryStage.setOnShown(windowEvent -> application.notifyPreloader(new Preloader.StateChangeNotification(
                 Preloader.StateChangeNotification.Type.BEFORE_START)));
 
     }
 
-    @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage, Application application) {
+        this.primaryStage = primaryStage;
+        this.application = application;
+        prepareMainStage();
+        load();
+    }
+
+    public void prepareMainStage() {
         Font.loadFont(getClass().getResourceAsStream("/fxml/albertus-mt.ttf"), 16);
         Font.loadFont(getClass().getResourceAsStream("/fxml/albertus-mt-light.ttf"), 16);
         Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler::unhandled);
@@ -103,7 +113,9 @@ public class Main extends Application {
         ResourceBundle bundle = ResourceBundle.getBundle("i18n.UI");
         Parent root;
         try {
-            root = FXMLLoader.load(getClass().getResource("/fxml/main.fxml"), bundle);
+            fxmlLoader.setLocation(getClass().getResource("/fxml/main.fxml"));
+            fxmlLoader.setResources(bundle);
+            root = fxmlLoader.load();
         } catch (IOException e) {
             e.printStackTrace();
             return;
@@ -150,7 +162,5 @@ public class Main extends Application {
 
         //handler to prepare controls on startup, the use of initialize and risk of crash
         primaryStage.addEventHandler(WindowEvent.WINDOW_SHOWN, window -> ControllerMainForm.mainFormInitialized.setValue(true));
-        load(primaryStage);
-
     }
 }

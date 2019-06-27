@@ -23,8 +23,10 @@ package br.com.pinter.tqrespec.save;
 import br.com.pinter.tqrespec.Constants;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.Util;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -36,20 +38,26 @@ import java.util.Hashtable;
 
 @SuppressWarnings("unused")
 public class PlayerParser extends FileParser {
+    @Inject
+    private SaveData saveData;
+
+    @Inject
+    private PlayerData playerData;
+
     private final static boolean DBG = false;
     private String player = null;
     private boolean customQuest = false;
 
     protected void prepareBufferForRead() {
-        PlayerData.getInstance().getBuffer().rewind();
+        playerData.getBuffer().rewind();
     }
 
     protected ByteBuffer getBuffer() {
-        return PlayerData.getInstance().getBuffer();
+        return playerData.getBuffer();
     }
 
     protected Hashtable<String, ArrayList<Integer>> getVariableLocation() {
-        return SaveData.getInstance().getVariableLocation();
+        return saveData.getVariableLocation();
     }
 
     HeaderInfo parseHeader() {
@@ -99,7 +107,7 @@ public class PlayerParser extends FileParser {
                 this.player, this.getBuffer().capacity()));
         HeaderInfo headerInfo = parseHeader();
 
-        SaveData.getInstance().setHeaderInfo(headerInfo);
+        saveData.setHeaderInfo(headerInfo);
 
         if (headerInfo.getHeaderVersion() != 2 && headerInfo.getHeaderVersion() != 3) {
             throw new IncompatibleSavegameException(
@@ -110,30 +118,31 @@ public class PlayerParser extends FileParser {
                     String.format("Incompatible player '%s' (playerVersion must be == 5)", this.player));
         }
         Hashtable<Integer, BlockInfo> blocks = this.parseAllBlocks();
-        SaveData.getInstance().setBlockInfo(blocks);
+        saveData.setBlockInfo(blocks);
         if (inventoryStart == -1) {
             this.parseFooter();
         }
         this.prepareBufferForRead();
-        PlayerData.getInstance().setPlayerName(player);
+        playerData.setPlayerName(player);
     }
 
     public boolean loadPlayer(String playerName) throws Exception {
-        if (PlayerData.getInstance().getSaveInProgress() != null &&  PlayerData.getInstance().getSaveInProgress()) {
+        if (playerData.getSaveInProgress() != null &&  playerData.getSaveInProgress()) {
             return false;
         }
         player = playerName;
         parse();
-        PlayerData.getInstance().prepareSkillsList();
+        playerData.prepareSkillsList();
         return true;
     }
 
+    protected void reset() {
+        super.reset();
+        playerData.reset();
+    }
 
     void readPlayerChr() throws Exception {
-        PlayerData.getInstance().reset();
-        if (this.getBuffer() != null) {
-            PlayerData.getInstance().reset();
-        }
+        reset();
         String path;
         if (customQuest) {
             path = GameInfo.getInstance().getSaveDataUserPath();
@@ -149,9 +158,9 @@ public class PlayerParser extends FileParser {
 
         try {
             FileChannel in = new FileInputStream(playerChr).getChannel();
-            PlayerData.getInstance().setBuffer(ByteBuffer.allocate((int) in.size()));
+            playerData.setBuffer(ByteBuffer.allocate((int) in.size()));
             this.getBuffer().order(ByteOrder.LITTLE_ENDIAN);
-            PlayerData.getInstance().getBuffer().rewind();
+            playerData.getBuffer().rewind();
 
             while (true) {
                 if (in.read(this.getBuffer()) <= 0) break;
@@ -162,9 +171,9 @@ public class PlayerParser extends FileParser {
 
             if (DBG) Util.log("File read to buffer: " + this.getBuffer());
 
-            PlayerData.getInstance().setPlayerChr(playerChr.toPath());
+            playerData.setPlayerChr(playerChr.toPath());
         } catch (Exception e) {
-            PlayerData.getInstance().reset();
+            playerData.reset();
             throw e;
         }
 
@@ -309,6 +318,8 @@ public class PlayerParser extends FileParser {
                 //inventory
                 if (Constants.SKIP_INVENTORY_BLOCKS) {
                     inventoryStart = variableInfo.getValOffset();
+                } else {
+                    throw new IllegalArgumentException("Inventory parsing not implemented");
                 }
                 break;
             } else if (name.equalsIgnoreCase("temp")) {

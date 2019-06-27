@@ -20,6 +20,7 @@
 
 package br.com.pinter.tqrespec;
 
+import br.com.pinter.tqrespec.gui.State;
 import br.com.pinter.tqrespec.save.PlayerData;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -97,8 +98,8 @@ public class Util {
     }
 
     private static boolean tryToCloseApplication() {
-        if (PlayerData.getInstance().getSaveInProgress() != null && !PlayerData.getInstance().getSaveInProgress()
-                || PlayerData.getInstance().getSaveInProgress() == null) {
+        if (State.get().getSaveInProgress() != null && !State.get().getSaveInProgress()
+                || State.get().getSaveInProgress() == null) {
             Platform.exit();
             System.exit(0);
         }

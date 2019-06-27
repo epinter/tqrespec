@@ -20,8 +20,10 @@
 
 package br.com.pinter.tqrespec.save;
 
+import java.io.Serializable;
+
 @SuppressWarnings("unused")
-public class HeaderInfo {
+public class HeaderInfo implements Serializable {
     private int headerVersion = -1;
     private String playerCharacterClass = null;
     private String playerClassTag = null;

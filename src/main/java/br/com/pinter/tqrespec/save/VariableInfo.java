@@ -20,8 +20,10 @@
 
 package br.com.pinter.tqrespec.save;
 
+import java.io.Serializable;
+
 @SuppressWarnings("unused")
-public class VariableInfo {
+public class VariableInfo implements Serializable {
     private String name = null;
     private int keyOffset = -1;
     private int valOffset = -1;

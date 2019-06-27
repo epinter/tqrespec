@@ -25,11 +25,15 @@ import javafx.scene.control.ListView;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 
+import javax.inject.Inject;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
 public class SkillsPaneController implements Initializable {
+    @Inject
+    private PlayerData playerData;
+
     @FXML
     private ListView<SkillListViewItem> firstMasteryListView;
 
@@ -111,7 +115,7 @@ public class SkillsPaneController implements Initializable {
     }
 
     protected void updateMasteries() {
-        if (!PlayerData.getInstance().isCharacterLoaded()) {
+        if (!playerData.isCharacterLoaded()) {
             return;
         }
         resetSkilltabControls();
@@ -132,7 +136,7 @@ public class SkillsPaneController implements Initializable {
             }
         }
 
-        currentSkillPoints.setValue(String.valueOf(PlayerData.getInstance().getAvailableSkillPoints()));
+        currentSkillPoints.setValue(String.valueOf(playerData.getAvailableSkillPoints()));
     }
 
     private boolean fillMastery(int i) {
@@ -155,12 +159,12 @@ public class SkillsPaneController implements Initializable {
 
         Skill mastery = null;
 
-        if (!(PlayerData.getInstance().getPlayerMasteries().size() == 1 && i > 0) && PlayerData.getInstance().getPlayerMasteries().size() > 0) {
-            mastery = PlayerData.getInstance().getPlayerMasteries().get(i);
+        if (!(playerData.getPlayerMasteries().size() == 1 && i > 0) && playerData.getPlayerMasteries().size() > 0) {
+            mastery = playerData.getPlayerMasteries().get(i);
             masteryLabel.setText(
                     String.format("%s (%d)",
                             Data.text().getString(mastery.getSkillDisplayName()),
-                            PlayerData.getInstance().getPlayerSkills().get(mastery.getRecordPath()).getSkillLevel()
+                            playerData.getPlayerSkills().get(mastery.getRecordPath()).getSkillLevel()
                     )
             );
             ret = true;
@@ -181,13 +185,13 @@ public class SkillsPaneController implements Initializable {
 
         if (mastery == null) return ret;
 
-        for (Skill s : PlayerData.getInstance().getPlayerSkillsFromMastery(mastery)) {
+        for (Skill s : playerData.getPlayerSkillsFromMastery(mastery)) {
             Skill s1 = s;
             if (s.isPointsToPet() || s.isPointsToBuff()) {
                 s1 = Data.db().getSkillDAO().getSkill(s.getRecordPath(), true);
             }
 
-            PlayerSkill sb = PlayerData.getInstance().getPlayerSkills().get(s.getRecordPath());
+            PlayerSkill sb = playerData.getPlayerSkills().get(s.getRecordPath());
             if (sb == null || s1.getRecordPath() == null) continue;
             ret.add(new SkillListViewItem(s1.getSkillDisplayName(),
                     sb.getSkillLevel()));
@@ -196,49 +200,49 @@ public class SkillsPaneController implements Initializable {
     }
 
     private void reclaimPointsFromSkills(Skill mastery) throws Exception {
-        for (Skill s : PlayerData.getInstance().getPlayerSkillsFromMastery(mastery)) {
-            PlayerSkill sb = PlayerData.getInstance().getPlayerSkills().get(s.getRecordPath());
+        for (Skill s : playerData.getPlayerSkillsFromMastery(mastery)) {
+            PlayerSkill sb = playerData.getPlayerSkills().get(s.getRecordPath());
             if (sb == null || s.getRecordPath() == null) continue;
-            PlayerData.getInstance().reclaimSkillPoints(sb);
+            playerData.reclaimSkillPoints(sb);
         }
     }
 
     public void reclaimMasteryFirst(Event event) throws Exception {
-        Skill mastery = PlayerData.getInstance().getPlayerMasteries().get(0);
-        PlayerSkill sb = PlayerData.getInstance().getPlayerSkills().get(mastery.getRecordPath());
+        Skill mastery = playerData.getPlayerMasteries().get(0);
+        PlayerSkill sb = playerData.getPlayerSkills().get(mastery.getRecordPath());
 
-        List<Skill> list = PlayerData.getInstance().getPlayerSkillsFromMastery(mastery);
+        List<Skill> list = playerData.getPlayerSkillsFromMastery(mastery);
         if (list.size() > 0) {
             Util.showInformation(Util.getUIMessage("skills.removeSkillsBefore"), null);
             return;
         }
 
-        PlayerData.getInstance().reclaimMasteryPoints(sb);
+        playerData.reclaimMasteryPoints(sb);
         updateMasteries();
     }
 
     public void reclaimMasterySecond(Event event) throws Exception {
-        Skill mastery = PlayerData.getInstance().getPlayerMasteries().get(1);
-        PlayerSkill sb = PlayerData.getInstance().getPlayerSkills().get(mastery.getRecordPath());
+        Skill mastery = playerData.getPlayerMasteries().get(1);
+        PlayerSkill sb = playerData.getPlayerSkills().get(mastery.getRecordPath());
 
-        List<Skill> list = PlayerData.getInstance().getPlayerSkillsFromMastery(mastery);
+        List<Skill> list = playerData.getPlayerSkillsFromMastery(mastery);
         if (list.size() > 0) {
             Util.showInformation(Util.getUIMessage("skills.removeSkillsBefore"), null);
             return;
         }
 
-        PlayerData.getInstance().reclaimMasteryPoints(sb);
+        playerData.reclaimMasteryPoints(sb);
         updateMasteries();
     }
 
     public void reclaimSkillsFirst(Event event) throws Exception {
-        Skill mastery = PlayerData.getInstance().getPlayerMasteries().get(0);
+        Skill mastery = playerData.getPlayerMasteries().get(0);
         reclaimPointsFromSkills(mastery);
         updateMasteries();
     }
 
     public void reclaimSkillsSecond(Event event) throws Exception {
-        Skill mastery = PlayerData.getInstance().getPlayerMasteries().get(1);
+        Skill mastery = playerData.getPlayerMasteries().get(1);
         reclaimPointsFromSkills(mastery);
         updateMasteries();
     }
