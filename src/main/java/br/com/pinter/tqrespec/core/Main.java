@@ -48,10 +48,11 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ResourceBundle;
 
 public class Main {
     @Inject
+    @FxmlLoaderLocation("/fxml/main.fxml")
+    @FxmlResourceBundle("i18n.UI")
     private FXMLLoader fxmlLoader;
 
     private Stage primaryStage;
@@ -109,11 +110,8 @@ public class Main {
         Font.loadFont(getClass().getResourceAsStream("/fxml/albertus-mt-light.ttf"), 16);
         Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler::unhandled);
 
-        ResourceBundle bundle = ResourceBundle.getBundle("i18n.UI");
         Parent root;
         try {
-            fxmlLoader.setLocation(getClass().getResource("/fxml/main.fxml"));
-            fxmlLoader.setResources(bundle);
             root = fxmlLoader.load();
         } catch (IOException e) {
             e.printStackTrace();

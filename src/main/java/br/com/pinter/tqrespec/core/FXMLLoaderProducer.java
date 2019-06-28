@@ -5,21 +5,31 @@
 package br.com.pinter.tqrespec.core;
 
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.JavaFXBuilderFactory;
-import javafx.util.Callback;
 
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
-import javax.enterprise.inject.spi.CDI;
+import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
+import java.util.ResourceBundle;
 
 public class FXMLLoaderProducer {
     @Inject
     Instance<Object> instance;
 
     @Produces
-    public FXMLLoader produceLoader() {
+    @FxmlLoaderLocation("")
+    @FxmlResourceBundle("")
+    public FXMLLoader produceLoader(InjectionPoint injectionPoint) {
+        FxmlLoaderLocation locationAnn = injectionPoint.getAnnotated().getAnnotation(FxmlLoaderLocation.class);
+        FxmlResourceBundle bundleAnn = injectionPoint.getAnnotated().getAnnotation(FxmlResourceBundle.class);
+
         FXMLLoader fxmlLoader = new FXMLLoader();
+        if (locationAnn != null && !locationAnn.value().isEmpty()) {
+            fxmlLoader.setLocation(getClass().getResource(locationAnn.value()));
+        }
+        if (bundleAnn != null && !bundleAnn.value().isEmpty()) {
+            fxmlLoader.setResources(ResourceBundle.getBundle(bundleAnn.value()));
+        }
         fxmlLoader.setControllerFactory(objects -> instance.select(objects).get());
         return fxmlLoader;
     }
