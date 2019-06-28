@@ -22,8 +22,8 @@ package br.com.pinter.tqrespec.save;
 
 import br.com.pinter.tqdatabase.Database;
 import br.com.pinter.tqdatabase.models.Skill;
-import br.com.pinter.tqrespec.Constants;
-import br.com.pinter.tqrespec.Util;
+import br.com.pinter.tqrespec.util.Constants;
+import br.com.pinter.tqrespec.util.Util;
 import br.com.pinter.tqrespec.gui.State;
 import br.com.pinter.tqrespec.tqdata.Data;
 

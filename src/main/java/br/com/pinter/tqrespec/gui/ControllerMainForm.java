@@ -20,13 +20,15 @@
 
 package br.com.pinter.tqrespec.gui;
 
-import br.com.pinter.tqrespec.*;
+import br.com.pinter.tqrespec.core.TaskWithException;
+import br.com.pinter.tqrespec.core.WorkerThread;
 import br.com.pinter.tqrespec.save.PlayerData;
 import br.com.pinter.tqrespec.save.PlayerParser;
 import br.com.pinter.tqrespec.save.PlayerWriter;
-import br.com.pinter.tqrespec.Constants;
-import br.com.pinter.tqrespec.save.SaveData;
+import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
+import br.com.pinter.tqrespec.util.Util;
+import br.com.pinter.tqrespec.util.Version;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -56,7 +58,6 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import org.apache.commons.lang3.StringUtils;
-import org.jboss.weld.environment.se.contexts.ThreadScoped;
 
 import javax.inject.Inject;
 import java.awt.*;

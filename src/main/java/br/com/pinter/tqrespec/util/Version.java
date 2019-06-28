@@ -18,7 +18,7 @@
     along with TQ Respec.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package br.com.pinter.tqrespec;
+package br.com.pinter.tqrespec.util;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;

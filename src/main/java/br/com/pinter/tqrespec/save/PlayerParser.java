@@ -20,10 +20,9 @@
 
 package br.com.pinter.tqrespec.save;
 
-import br.com.pinter.tqrespec.Constants;
+import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
-import br.com.pinter.tqrespec.Util;
-import org.apache.commons.lang3.NotImplementedException;
+import br.com.pinter.tqrespec.util.Util;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;

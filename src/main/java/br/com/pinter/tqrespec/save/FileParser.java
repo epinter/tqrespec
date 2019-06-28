@@ -20,8 +20,8 @@
 
 package br.com.pinter.tqrespec.save;
 
-import br.com.pinter.tqrespec.Constants;
-import br.com.pinter.tqrespec.Util;
+import br.com.pinter.tqrespec.util.Constants;
+import br.com.pinter.tqrespec.util.Util;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;

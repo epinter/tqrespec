@@ -18,10 +18,9 @@
     along with TQ Respec.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package br.com.pinter.tqrespec;
+package br.com.pinter.tqrespec.util;
 
 import br.com.pinter.tqrespec.gui.State;
-import br.com.pinter.tqrespec.save.PlayerData;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Alert;

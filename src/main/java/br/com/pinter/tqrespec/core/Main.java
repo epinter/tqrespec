@@ -18,11 +18,13 @@
     along with TQ Respec.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package br.com.pinter.tqrespec;
+package br.com.pinter.tqrespec.core;
 
 import br.com.pinter.tqrespec.gui.ControllerMainForm;
 import br.com.pinter.tqrespec.gui.ResizeListener;
 import br.com.pinter.tqrespec.tqdata.Data;
+import br.com.pinter.tqrespec.util.Constants;
+import br.com.pinter.tqrespec.util.Util;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.application.Preloader;
@@ -42,13 +44,10 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ResourceBundle;
 
 public class Main {

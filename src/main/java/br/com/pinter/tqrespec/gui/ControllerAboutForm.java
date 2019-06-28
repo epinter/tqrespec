@@ -20,7 +20,7 @@
 
 package br.com.pinter.tqrespec.gui;
 
-import br.com.pinter.tqrespec.Util;
+import br.com.pinter.tqrespec.util.Util;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;

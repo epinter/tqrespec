@@ -18,9 +18,8 @@
     along with TQ Respec.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package br.com.pinter.tqrespec;
+package br.com.pinter.tqrespec.core;
 
-import br.com.pinter.tqrespec.save.PlayerData;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -30,8 +29,6 @@ import javafx.scene.layout.Priority;
 import javafx.stage.Modality;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Optional;
 
 @SuppressWarnings("unused")

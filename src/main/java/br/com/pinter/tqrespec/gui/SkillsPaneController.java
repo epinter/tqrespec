@@ -5,7 +5,7 @@
 package br.com.pinter.tqrespec.gui;
 
 import br.com.pinter.tqdatabase.models.Skill;
-import br.com.pinter.tqrespec.Util;
+import br.com.pinter.tqrespec.util.Util;
 import br.com.pinter.tqrespec.save.PlayerData;
 import br.com.pinter.tqrespec.save.PlayerSkill;
 import br.com.pinter.tqrespec.tqdata.Data;

@@ -2,7 +2,7 @@
  * Copyright (C) 2019 Emerson Pinter - All Rights Reserved
  */
 
-package br.com.pinter.tqrespec;
+package br.com.pinter.tqrespec.core;
 
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;

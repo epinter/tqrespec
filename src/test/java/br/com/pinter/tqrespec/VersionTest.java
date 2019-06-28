@@ -4,6 +4,7 @@
 
 package br.com.pinter.tqrespec;
 
+import br.com.pinter.tqrespec.util.Version;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

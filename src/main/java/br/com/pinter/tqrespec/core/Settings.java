@@ -18,4 +18,20 @@
     along with TQ Respec.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package br.com.pinter.tqrespec;
+package br.com.pinter.tqrespec.core;
+
+import java.util.prefs.Preferences;
+
+@SuppressWarnings("unused")
+public class Settings {
+    public static void setAlwaysFullBackup(boolean alwaysFullBackup) {
+        Preferences prefs = Preferences.userNodeForPackage(Settings.class);
+        prefs.putBoolean("always_fullbackup", alwaysFullBackup);
+    }
+
+    public static boolean getAlwaysFullBackup() {
+        Preferences prefs = Preferences.userNodeForPackage(Settings.class);
+
+        return prefs.getBoolean("always_fullbackup", false);
+    }
+}
