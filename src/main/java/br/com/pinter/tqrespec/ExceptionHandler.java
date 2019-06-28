@@ -28,6 +28,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.stage.Modality;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -46,8 +47,6 @@ class ExceptionHandler {
     private static void showAlert(Thread t, Throwable e) {
         String header = e.toString();
         header = header.replaceAll("^java.lang.RuntimeException: (.*Exception.*)", "$1");
-        StringWriter stackTrace = new StringWriter();
-        e.printStackTrace(new PrintWriter(stackTrace));
 
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.initModality(Modality.APPLICATION_MODAL);
@@ -55,7 +54,7 @@ class ExceptionHandler {
         alert.setHeaderText("An unhandled exception occurred");
         alert.setContentText(header);
 
-        TextArea textArea = new TextArea(stackTrace.toString());
+        TextArea textArea = new TextArea(ExceptionUtils.getStackTrace(e.getCause()));
         textArea.setEditable(false);
         textArea.setWrapText(false);
 
