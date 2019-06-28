@@ -4,16 +4,22 @@
 
 package br.com.pinter.tqrespec.gui;
 
-import br.com.pinter.tqrespec.tqdata.Data;
+import br.com.pinter.tqrespec.tqdata.Db;
+import br.com.pinter.tqrespec.tqdata.Txt;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
+import javax.inject.Inject;
+
 public class SkillListCell extends ListCell<SkillListViewItem> {
     private HBox container;
     private Label skillName;
     private Label skillPoints;
+
+    @Inject
+    private Txt txt;
 
     SkillListCell() {
         super();
@@ -33,7 +39,7 @@ public class SkillListCell extends ListCell<SkillListViewItem> {
             skillName.setText(null);
             skillPoints.setText(null);
         } else if (s != null) {
-            skillName.setText(Data.text().getString(s.getSkillName()));
+            skillName.setText(s.getSkillNameText());
             skillPoints.setText(String.valueOf(s.getSkillPoints()));
             setGraphic(container);
         }

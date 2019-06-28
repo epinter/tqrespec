@@ -4,10 +4,11 @@
 
 package br.com.pinter.tqrespec.gui;
 
+import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
 import br.com.pinter.tqrespec.save.PlayerData;
-import br.com.pinter.tqrespec.tqdata.Data;
+import br.com.pinter.tqrespec.tqdata.Db;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -26,6 +27,12 @@ import java.util.ResourceBundle;
 
 public class PointsPaneController implements Initializable {
     private static final boolean DBG = false;
+    @Inject
+    private Db db;
+
+    @Inject
+    private Txt txt;
+
     @Inject
     private PlayerData playerData;
 
@@ -347,7 +354,7 @@ public class PointsPaneController implements Initializable {
         String charClass = playerData.getPlayerClassTag();
 
         if (StringUtils.isNotEmpty(charClass)) {
-            charClassText.setText(Data.text().getString(charClass));
+            charClassText.setText(txt.getString(charClass));
         }
         int difficulty = playerData.getChanges().getInt("difficulty");
         difficultyText.setText(Util.getUIMessage(String.format("difficulty.%d", difficulty)));

@@ -22,7 +22,8 @@ package br.com.pinter.tqrespec.core;
 
 import br.com.pinter.tqrespec.gui.ControllerMainForm;
 import br.com.pinter.tqrespec.gui.ResizeListener;
-import br.com.pinter.tqrespec.tqdata.Data;
+import br.com.pinter.tqrespec.tqdata.Db;
+import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
 import javafx.application.Application;
@@ -51,6 +52,12 @@ import java.io.StringWriter;
 
 public class Main {
     @Inject
+    private Db db;
+
+    @Inject
+    private Txt txt;
+
+    @Inject
     @FxmlLoaderLocation("/fxml/main.fxml")
     @FxmlResourceBundle("i18n.UI")
     private FXMLLoader fxmlLoader;
@@ -64,12 +71,12 @@ public class Main {
             public Void call() {
                 //preload game database metadata and skills
                 application.notifyPreloader(new Preloader.ProgressNotification(0.3));
-                Data.db();
+                db.initialize();
                 application.notifyPreloader(new Preloader.ProgressNotification(0.7));
-                Data.db().preload();
+                db.skills().preload();
                 //preload text
                 application.notifyPreloader(new Preloader.ProgressNotification(0.9));
-                Data.text().preload();
+                txt.preload();
                 return null;
             }
         };

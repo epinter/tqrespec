@@ -4,8 +4,6 @@
 
 package br.com.pinter.tqrespec.save;
 
-import br.com.pinter.tqdatabase.Database;
-
 public class PlayerSkill {
     private String skillName;
     private Integer skillEnabled;

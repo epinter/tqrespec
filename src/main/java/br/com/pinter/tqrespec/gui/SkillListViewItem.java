@@ -7,10 +7,12 @@ package br.com.pinter.tqrespec.gui;
 public class SkillListViewItem {
     private String skillName;
     private int skillPoints;
+    private String skillNameText;
 
-    SkillListViewItem(String skillName, int skillPoints) {
+    SkillListViewItem(String skillName, int skillPoints, String skillNameText) {
         this.skillName = skillName;
         this.skillPoints = skillPoints;
+        this.skillNameText = skillNameText;
     }
 
     String getSkillName() {
@@ -21,4 +23,7 @@ public class SkillListViewItem {
         return skillPoints;
     }
 
+    public String getSkillNameText() {
+        return skillNameText;
+    }
 }

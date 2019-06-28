@@ -5,10 +5,11 @@
 package br.com.pinter.tqrespec.gui;
 
 import br.com.pinter.tqdatabase.models.Skill;
-import br.com.pinter.tqrespec.util.Util;
 import br.com.pinter.tqrespec.save.PlayerData;
 import br.com.pinter.tqrespec.save.PlayerSkill;
-import br.com.pinter.tqrespec.tqdata.Data;
+import br.com.pinter.tqrespec.tqdata.Db;
+import br.com.pinter.tqrespec.tqdata.Txt;
+import br.com.pinter.tqrespec.util.Util;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -31,6 +32,12 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class SkillsPaneController implements Initializable {
+    @Inject
+    private Db db;
+
+    @Inject
+    private Txt txt;
+
     @Inject
     private PlayerData playerData;
 
@@ -163,7 +170,7 @@ public class SkillsPaneController implements Initializable {
             mastery = playerData.getPlayerMasteries().get(i);
             masteryLabel.setText(
                     String.format("%s (%d)",
-                            Data.text().getString(mastery.getSkillDisplayName()),
+                            txt.getString(mastery.getSkillDisplayName()),
                             playerData.getPlayerSkills().get(mastery.getRecordPath()).getSkillLevel()
                     )
             );
@@ -188,13 +195,13 @@ public class SkillsPaneController implements Initializable {
         for (Skill s : playerData.getPlayerSkillsFromMastery(mastery)) {
             Skill s1 = s;
             if (s.isPointsToPet() || s.isPointsToBuff()) {
-                s1 = Data.db().getSkillDAO().getSkill(s.getRecordPath(), true);
+                s1 = db.skills().getSkill(s.getRecordPath(), true);
             }
 
             PlayerSkill sb = playerData.getPlayerSkills().get(s.getRecordPath());
             if (sb == null || s1.getRecordPath() == null) continue;
             ret.add(new SkillListViewItem(s1.getSkillDisplayName(),
-                    sb.getSkillLevel()));
+                    sb.getSkillLevel(), txt.getString(s1.getSkillDisplayName())));
         }
         return ret;
     }

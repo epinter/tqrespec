@@ -22,10 +22,11 @@ package br.com.pinter.tqrespec.save;
 
 import br.com.pinter.tqdatabase.Database;
 import br.com.pinter.tqdatabase.models.Skill;
+import br.com.pinter.tqrespec.tqdata.Db;
+import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
 import br.com.pinter.tqrespec.gui.State;
-import br.com.pinter.tqrespec.tqdata.Data;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -36,6 +37,12 @@ import java.util.*;
 @SuppressWarnings("unused")
 @Singleton
 public class PlayerData {
+    @Inject
+    private Db db;
+
+    @Inject
+    private Txt txt;
+
     @Inject
     private SaveData saveData;
 
@@ -159,7 +166,7 @@ public class PlayerData {
 
     public void reclaimSkillPoints(PlayerSkill sb) throws Exception {
         int blockStart = sb.getBlockStart();
-        Skill skill = Data.db().getSkillDAO().getSkill(sb.getSkillName(), false);
+        Skill skill = db.skills().getSkill(sb.getSkillName(), false);
         if (skill.isMastery()) {
             throw new IllegalStateException("Error reclaiming points. Mastery detected.");
         }
@@ -182,7 +189,7 @@ public class PlayerData {
 
     public void reclaimMasteryPoints(PlayerSkill sb) throws Exception {
         int blockStart = sb.getBlockStart();
-        Skill mastery = Data.db().getSkillDAO().getSkill(sb.getSkillName(), false);
+        Skill mastery = db.skills().getSkill(sb.getSkillName(), false);
         if (!mastery.isMastery()) {
             throw new IllegalStateException("Error reclaiming points. Not a mastery.");
         }
@@ -199,7 +206,7 @@ public class PlayerData {
     public List<Skill> getPlayerMasteries() {
         List<Skill> ret = new ArrayList<>();
         for (PlayerSkill sb : getPlayerSkills().values()) {
-            Skill skill = Data.db().getSkillDAO().getSkill(sb.getSkillName(), false);
+            Skill skill = db.skills().getSkill(sb.getSkillName(), false);
             if (skill != null && skill.isMastery()) {
                 ret.add(skill);
             }
@@ -218,7 +225,7 @@ public class PlayerData {
     public List<Skill> getPlayerSkillsFromMastery(Skill mastery) {
         List<Skill> ret = new ArrayList<>();
         for (PlayerSkill sb : getPlayerSkills().values()) {
-            Skill skill = Data.db().getSkillDAO().getSkill(sb.getSkillName(), false);
+            Skill skill = db.skills().getSkill(sb.getSkillName(), false);
             if (skill != null && !skill.isMastery() && skill.getParentPath().equals(mastery.getRecordPath())) {
                 ret.add(skill);
             }
