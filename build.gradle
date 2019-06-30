@@ -3,10 +3,31 @@
  */
 
 group 'br.com.pinter.tqrespec'
-
+apply plugin: 'application'
 apply plugin: 'java'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "com.github.jengelman.gradle.plugins:shadow:5.1.0"
+    }
+}
+
+sourceSets {
+    main.output.resourcesDir = main.java.outputDir
+}
 
 sourceCompatibility = 1.9
+ext.moduleName = 'br.com.pinter.tqrespec'
+ext.javahome = System.properties['java.home']
+ext.patchjarDir = new File(buildDir, '/patchedjar')
+apply from:"patchModulesJar.gradle"
+mainClassName = "$moduleName/br.com.pinter.tqrespec.core.FxApplication"
 
 repositories {
     mavenCentral()
@@ -27,14 +48,124 @@ dependencies {
 
 jar {
     manifest {
-        attributes 'Class-Path': configurations.compile.collect { it.getName() }.join(' ')
+        attributes('Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+                'Implementation-Version': project.version,
+                'Automatic-Module-Name': moduleName,
+                'Main-Class': 'br.com.pinter.tqrespec.core.FxApplication')
     }
-    from ('src/main/resources/META-INF')
+    from('src/main/resources/META-INF')
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+shadowJar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    version = null
 }
 
 task copyMetaInf(type: Copy) {
-    from fileTree(new File(sourceSets.main.output.resourcesDir,'/META-INF'))
-    into new File(sourceSets.main.java.outputDir,'/META-INF')
+    from fileTree(new File(sourceSets.main.output.resourcesDir, '/META-INF'))
+    into new File(sourceSets.main.java.outputDir, '/META-INF')
 }
 
+compileJava {
+    inputs.property("moduleName", moduleName)
+    doFirst {
+        options.compilerArgs = [
+                '--module-path', classpath.asPath,
+                '--patch-module', "$moduleName=" + files(sourceSets.main.resources.srcDirs).asPath,
+        ]
+        classpath = files()
+    }
+}
+
+run {
+    inputs.property("moduleName", moduleName)
+    doFirst {
+        jvmArgs = [
+                '--module-path', classpath.asPath,
+                '--module', mainClassName,
+                '--patch-module', "$moduleName=" + files(sourceSets.main.output.resourcesDir).asPath
+        ]
+        classpath = files()
+    }
+}
+task copyToLib(type: Copy) {
+    doFirst {
+        mkdir "$buildDir/jardist"
+    }
+    from configurations.compile
+    from "$buildDir/libs/tqrespec.jar"
+    into "$buildDir/jardist"
+}
+
+jar.dependsOn(copyToLib)
 classes.dependsOn('copyMetaInf')
+compileJava.dependsOn('patchLibs')
+
+task copyJarsToModuleDeps(type: Copy) {
+    from project(':tqdatabase').configurations.compile
+    from project.configurations.compile
+    into patchjarDir
+}
+
+
+task patchLibs(type: PatchJarModuleTask) {
+    tempPatchDir = new File(buildDir, '/temppatch')
+    delete = false
+    tempJarDir = new File(rootProject.projectDir,'libs')
+    moduleDeps = ['platform': 'jna', 'cdi.api': 'javax.inject,javax.interceptor,javax.el']
+}
+
+task patchModulesJar(type: PatchJarModuleTask) {
+    dependsOn 'copyJarsToModuleDeps'
+    tempPatchDir = new File(buildDir, '/temppatch')
+    tempJarDir = patchjarDir
+    moduleDeps = ['com.sun.jna.platform': 'com.sun.jna', 'cdi.api': 'javax.inject,javax.interceptor,javax.el']
+}
+
+task jlink(type: Exec) {
+    dependsOn clean
+    dependsOn 'jar'
+    dependsOn 'tqdatabase:jar'
+    dependsOn 'copyToLib'
+    dependsOn 'shadowJar'
+    workingDir buildDir
+
+    commandLine "${javahome}/bin/jlink.exe",
+            '--module-path', ("${File.pathSeparatorChar}libs" + "${File.pathSeparatorChar}${javahome}/jmods"),
+            '--add-modules', ("javafx.base,javafx.fxml,javafx.graphics,javafx.controls,"
+                +"java.prefs,java.base,"
+                +"jdk.zipfs,jdk.unsupported"),
+            '--output', new File(buildDir, '/dist'),
+            '--strip-debug',
+            '--compress', '2',
+            '--no-header-files',
+            '--no-man-pages'
+}
+
+task jlinkWithModules(type: Exec) {
+    dependsOn clean
+    dependsOn 'jar'
+    dependsOn 'tqdatabase:jar'
+    dependsOn 'copyToLib'
+    dependsOn 'copyJarsToModuleDeps'
+    dependsOn 'patchModulesJar'
+    workingDir buildDir
+
+    def tqdatabaseDeps = project(':tqdatabase').configurations.compile.collect { it.getPath() }
+            .join(File.pathSeparatorChar.toString())
+    def tqdatabaseJar = project(':tqdatabase').tasks.jar.outputs.files.collect { it.getPath() }
+            .join(File.pathSeparatorChar.toString())
+    //"c:/windows/system32/cmd.exe","/c","echo",
+    commandLine "${javahome}/bin/jlink.exe",
+            '--module-path', (tqdatabaseJar+ File.pathSeparatorChar.toString()+patchjarDir
+            + "${File.pathSeparatorChar}libs" + "${File.pathSeparatorChar}${javahome}/jmods"),
+            '--add-modules', "br.com.pinter.tqdatabase," +
+            "org.apache.commons.lang3,jna,platform," +
+            "javafx.base,javafx.fxml,javafx.graphics,javafx.controls,java.prefs,java.base," +
+            "jdk.zipfs,jdk.unsupported",
+            '--output', new File(buildDir, '/dist'),
+            '--strip-debug',
+            '--compress', '2',
+            '--no-header-files',
+            '--no-man-pages'
+}

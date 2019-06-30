@@ -1,0 +1,157 @@
+ext.PatchJarModuleTask = PatchJarModuleTask
+
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
+/*
+ * Copyright (C) 2019 Emerson Pinter - All Rights Reserved
+ */
+
+class PatchJarModuleTask extends DefaultTask {
+    boolean debug
+    boolean delete
+    String tempPatchDir
+    String tempJarDir
+    Map<String, String> moduleDeps
+    List<String> patchedModules = new ArrayList<>()
+
+    private File fileTempPatchDir
+    private File fileTempJarDir
+    private final String JAR = findJava("jar")
+    private final String JDEPS = findJava("jdeps")
+    private final String JAVAC = findJava("javac")
+
+    static void printStream(InputStream stream) {
+        stream.eachLine {
+            System.err.println(it)
+        }
+    }
+
+    private static String findJava(String tool) {
+        return String.format("%2\$s%1\$sbin%1\$s%3\$s",
+                File.separator,
+                System.getProperty("java.home"),
+                tool,
+                OperatingSystemFamily.WINDOWS ? ".exe" : "")
+    }
+
+    @TaskAction
+    void start() {
+        fileTempPatchDir = new File(tempPatchDir)
+        fileTempJarDir = new File(tempJarDir)
+
+        fileTempPatchDir.deleteDir()
+        fileTempPatchDir.mkdir()
+
+        if (!fileTempJarDir.exists()) {
+            fileTempJarDir.mkdir()
+        }
+
+        new File(tempJarDir).eachFile {
+            if (it.getName().endsWith(".jar")) {
+                processFile(it.getPath())
+            }
+        }
+    }
+
+    boolean processFile(String filename) {
+        if (debug) System.err.println("Verifying jar " + filename)
+
+        Process jar = null
+        ProcessBuilder processBuilder = new ProcessBuilder()
+        processBuilder.command(JAR, "-d", "-f", filename)
+        jar = processBuilder.start()
+
+
+        BufferedReader stdout = new BufferedReader(new InputStreamReader(jar.getInputStream()))
+
+        String s = ""
+        String line
+        String packageName = null
+        while ((line = stdout.readLine()) != null) {
+            Pattern p = Pattern.compile("(^[^@]+)@.* automatic\$")
+            Matcher m = p.matcher(line)
+            if (m.matches() && packageName == null) {
+                s += line
+                packageName = m.group(1)
+            }
+        }
+        jar.waitFor()
+
+//        if (packageName != null) {
+//            System.out.println(String.format("Package found '%s' on file '%s', generating module-info", packageName, filename))
+//        } else {
+//            if (debug) System.out.println(String.format("No automatic module found on file '%s', ignoring", filename))
+//            new File(filename).delete()
+//            return
+//        }
+
+        processBuilder = new ProcessBuilder()
+        processBuilder.directory(fileTempJarDir)
+        String addModules = ""
+
+        if (moduleDeps != null && moduleDeps.size() > 0 && moduleDeps.get(packageName) != null) {
+            addModules = "--add-modules="
+            for (Map.Entry<String, String> entry : moduleDeps.entrySet()) {
+                if (entry.key == packageName && entry.value != null && !entry.value.isEmpty()) {
+                    addModules += entry.value.replace(" ", "")
+                }
+            }
+        }
+        processBuilder.command(JDEPS, "--module-path", tempJarDir, addModules, "--generate-module-info", tempPatchDir, filename)
+        if (debug) System.err.println("Running: " + processBuilder.command())
+
+        Process jdeps = processBuilder.start()
+        printStream(jdeps.getInputStream())
+        printStream(jdeps.getErrorStream())
+        jdeps.waitFor()
+
+        if (jdeps.exitValue() != 0) {
+            return
+        }
+        if (debug) System.err.println("jdeps finished")
+
+        processBuilder = new ProcessBuilder()
+        processBuilder.directory(fileTempPatchDir)
+        processBuilder.command(JAVAC, "--module-path", tempJarDir, "--patch-module", String.format("%s=%s", packageName, filename),
+                String.format("%s/module-info.java", packageName), "-nowarn", "-d", ".")
+
+        if (debug) System.err.println("Running: " + processBuilder.command())
+        Process javac = processBuilder.start()
+        printStream(javac.getInputStream())
+        printStream(javac.getErrorStream())
+        javac.waitFor()
+        if (javac.exitValue() != 0) {
+            new File(filename).delete()
+            return
+        }
+        if (debug) System.err.println("javac finished")
+
+        processBuilder = new ProcessBuilder()
+        processBuilder.directory(fileTempPatchDir)
+        processBuilder.command(JAR, "--update", "--file", filename, "module-info.class")
+        if (debug) System.err.println("Running: " + processBuilder.command())
+        Process jarUpdate = processBuilder.start()
+        printStream(jarUpdate.getInputStream())
+        printStream(jarUpdate.getErrorStream())
+        jarUpdate.waitFor()
+        if (jarUpdate.exitValue() != 0) {
+            if (delete) {
+                new File(filename).delete()
+            }
+            return
+        }
+        fileTempPatchDir.deleteDir()
+        if (debug) System.err.println("jar update finished")
+        if (new File(filename).exists()) {
+            System.err.printf("JAR file '%s' (%s) patched\n", filename, packageName)
+            patchedModules.add(packageName)
+            return true
+        } else {
+            System.err.printf("JAR file '%s' (%s) discarded\n", filename, packageName)
+            return false
+        }
+
+    }
+
+}
