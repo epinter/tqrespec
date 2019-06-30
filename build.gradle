@@ -41,7 +41,7 @@ dependencies {
     testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.2'
     testImplementation group: 'org.jboss.weld', name: 'weld-junit4', version: '2.0.0.Final'
     compile group: 'org.jboss.weld.se', name: 'weld-se-shaded', version: '3.1.1.Final'
-    compile group: 'net.java.dev.jna', name: 'platform', version: '3.5.0'
+    compile group: 'net.java.dev.jna', name: 'jna-platform', version: '5.3.1'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
     compile project(':tqdatabase')
 }

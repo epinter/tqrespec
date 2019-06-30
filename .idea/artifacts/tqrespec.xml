@@ -26,14 +26,14 @@
         <element id="module-output" name="tqrespec" />
         <element id="dir-copy" path="$PROJECT_DIR$/src/main/resources" />
       </element>
-      <element id="library" level="project" name="Gradle: net.java.dev.jna:platform:3.5.0" />
-      <element id="library" level="project" name="Gradle: net.java.dev.jna:jna:3.5.0" />
       <element id="library" level="project" name="Gradle: org.apache.commons:commons-lang3:3.9" />
       <element id="library" level="project" name="Gradle: org.jboss.weld.se:weld-se-shaded:3.1.1.Final" />
       <element id="library" level="project" name="Gradle: org.jboss.logging:jboss-logging:3.2.1.Final" />
       <element id="archive" name="tqdatabase.jar">
         <element id="module-output" name="tqdatabase" />
       </element>
+      <element id="library" level="project" name="Gradle: net.java.dev.jna:jna-platform:5.3.1" />
+      <element id="library" level="project" name="Gradle: net.java.dev.jna:jna:5.3.1" />
     </root>
   </artifact>
 </component>
