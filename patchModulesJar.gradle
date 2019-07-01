@@ -9,7 +9,7 @@ import java.util.regex.Pattern
 
 class PatchJarModuleTask extends DefaultTask {
     boolean debug
-    boolean delete
+    boolean delete = true
     String tempPatchDir
     String tempJarDir
     Map<String, String> moduleDeps
@@ -78,13 +78,13 @@ class PatchJarModuleTask extends DefaultTask {
         }
         jar.waitFor()
 
-//        if (packageName != null) {
-//            System.out.println(String.format("Package found '%s' on file '%s', generating module-info", packageName, filename))
-//        } else {
-//            if (debug) System.out.println(String.format("No automatic module found on file '%s', ignoring", filename))
-//            new File(filename).delete()
-//            return
-//        }
+        if (packageName != null) {
+            System.out.println(String.format("Package found '%s' on file '%s', generating module-info", packageName, filename))
+        } else {
+            if (debug) System.out.println(String.format("No automatic module found on file '%s', ignoring", filename))
+            new File(filename).delete()
+            return
+        }
 
         processBuilder = new ProcessBuilder()
         processBuilder.directory(fileTempJarDir)
@@ -107,6 +107,9 @@ class PatchJarModuleTask extends DefaultTask {
         jdeps.waitFor()
 
         if (jdeps.exitValue() != 0) {
+            if(delete) {
+                new File(filename).delete()
+            }
             return
         }
         if (debug) System.err.println("jdeps finished")

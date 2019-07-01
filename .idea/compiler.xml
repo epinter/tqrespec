@@ -2,6 +2,7 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
+      <module name="tqdatabase" target="1.9" />
       <module name="tqdatabase.main" target="1.9" />
       <module name="tqdatabase.test" target="1.9" />
     </bytecodeTargetLevel>

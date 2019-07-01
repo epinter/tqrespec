@@ -7,10 +7,10 @@ module br.com.pinter.tqrespec {
     requires java.base;
     requires jdk.zipfs;
     requires java.desktop;
-    requires org.apache.commons.lang3;
+    requires static org.apache.commons.lang3;
     requires br.com.pinter.tqdatabase;
-    requires transitive weld.se.shaded;
-    requires com.sun.jna.platform;
+    requires static weld.se.shaded;
+    requires static com.sun.jna.platform;
     exports br.com.pinter.tqrespec.core;
     exports br.com.pinter.tqrespec.gui;
     opens br.com.pinter.tqrespec.core to weld.se.shaded,javafx.fxml;

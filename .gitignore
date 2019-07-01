@@ -1,4 +1,6 @@
+libs/
 tqdatabase/
+sdk/
 *.arz
 *.arc
 Player.chr
