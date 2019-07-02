@@ -20,8 +20,10 @@
 
 package br.com.pinter.tqrespec.tqdata;
 
+import br.com.pinter.tqrespec.util.Constants;
 import com.sun.jna.platform.win32.*;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -185,12 +187,20 @@ public class GameInfo {
     }
 
     public String getGamePath() throws FileNotFoundException {
+        if(DBG || !SystemUtils.IS_OS_WINDOWS) {
+            return Constants.DEV_GAMEDATA;
+        }
         if (StringUtils.isEmpty(gamePath)) {
             String detected = detectGamePath();
             if (StringUtils.isEmpty(detected))
                 throw new FileNotFoundException("Game Path not detected");
             gamePath = detected;
         }
+
+        if(StringUtils.isEmpty(gamePath)) {
+            return Constants.DEV_GAMEDATA;
+        }
+
         return gamePath;
     }
 
@@ -215,7 +225,7 @@ public class GameInfo {
     }
 
     public String getSaveDataMainPath() {
-        if (DBG) return Paths.get("d:", "dev", "save", "SaveData", "Main").toString();
+        if (DBG || !SystemUtils.IS_OS_WINDOWS) return Paths.get(Constants.DEV_GAMEDATA, "SaveData", "Main").toString();
         String savePath = getSavePath();
         if (StringUtils.isNotEmpty(savePath)) {
             return Paths.get(savePath, "SaveData", "Main").toString();
@@ -224,7 +234,7 @@ public class GameInfo {
     }
 
     public String getSaveDataUserPath() {
-        if (DBG) return Paths.get("d:", "dev", "save", "SaveData", "User").toString();
+        if (DBG || !SystemUtils.IS_OS_WINDOWS) return Paths.get(Constants.DEV_GAMEDATA, "SaveData", "User").toString();
         String savePath = getSavePath();
         if (StringUtils.isNotEmpty(savePath)) {
             return Paths.get(savePath, "SaveData", "User").toString();
