@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
@@ -148,10 +149,12 @@ public class PlayerParser extends FileParser {
         } else {
             path = GameInfo.getInstance().getSaveDataMainPath();
         }
-        File playerChr = new File(path +
-                String.format("\\_%s\\Player.chr", this.player));
+        File playerChr = new File(path ,
+                Paths.get("_"+this.player,"Player.chr").toString());
+
 
         if (!playerChr.exists()) {
+            System.err.printf("File '%s' doesn't exists\n",playerChr.toString());
             return;
         }
 

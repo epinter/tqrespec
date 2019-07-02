@@ -68,7 +68,9 @@ public class GameInfo {
         String steamPath = Advapi32Util.registryGetStringValue(
                 WinReg.HKEY_CURRENT_USER, "SOFTWARE\\Valve\\Steam", "SteamPath");
         try {
-            FileInputStream steamConfig = new FileInputStream(new File(steamPath + "\\config\\config.vdf"));
+            FileInputStream steamConfig = new FileInputStream(
+                    new File(steamPath, Paths.get("config", "config.vdf").toString())
+            );
             BufferedReader in = new BufferedReader(new InputStreamReader(steamConfig));
 
             Pattern regexConfig = Pattern.compile(".*\"BaseInstallFolder_\\d+\"\\s+\"([^\"]+)\".*");
@@ -83,7 +85,7 @@ public class GameInfo {
                 }
             }
             for (String baseInstallFolder : baseInstallFolderList) {
-                Path steamappsPath = Paths.get(baseInstallFolder + "\\SteamApps\\common\\Titan Quest Anniversary Edition");
+                Path steamappsPath = Paths.get(baseInstallFolder, "SteamApps", "common", "Titan Quest Anniversary Edition");
                 if (Files.exists(steamappsPath)) {
                     return steamappsPath.toAbsolutePath().toString();
                 }
@@ -194,7 +196,7 @@ public class GameInfo {
 
     public String getSavePath() {
         String userHome = System.getProperty("user.home");
-        String subdirectory = "\\My Games\\Titan Quest - Immortal Throne";
+        String subdirectory = File.separator + Paths.get("My Games", "Titan Quest - Immortal Throne").toString();
 
         if (DBG) System.err.println("SavePath: user.home is " + userHome);
         String saveDirectory;
@@ -213,19 +215,19 @@ public class GameInfo {
     }
 
     public String getSaveDataMainPath() {
-        if (DBG) return "d:\\dev\\save\\SaveData\\Main";
+        if (DBG) return Paths.get("d:", "dev", "save", "SaveData", "Main").toString();
         String savePath = getSavePath();
         if (StringUtils.isNotEmpty(savePath)) {
-            return savePath + "\\SaveData\\Main";
+            return Paths.get(savePath, "SaveData", "Main").toString();
         }
         return null;
     }
 
     public String getSaveDataUserPath() {
-        if (DBG) return "d:\\dev\\save\\SaveData\\User";
+        if (DBG) return Paths.get("d:", "dev", "save", "SaveData", "User").toString();
         String savePath = getSavePath();
         if (StringUtils.isNotEmpty(savePath)) {
-            return savePath + "\\SaveData\\User";
+            return Paths.get(savePath, "SaveData", "User").toString();
         }
         return null;
     }

@@ -46,11 +46,11 @@ public class PlayerWriter {
 
     @SuppressWarnings("SameParameterValue")
     private boolean backupSaveGame(String fileName, String playerName, boolean fullBackup) throws IOException {
-        File backupDirectory = new File(String.format("%s\\%s", GameInfo.getInstance().getSavePath(), Constants.BACKUP_DIRECTORY));
+        File backupDirectory = new File(GameInfo.getInstance().getSavePath(), Constants.BACKUP_DIRECTORY);
         Path player = Paths.get(fileName);
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HH");
         String ts = df.format(new Date());
-        File destPlayerZip = new File(String.format("%s\\%s%s_%s.zip", backupDirectory.toPath().toString(), playerName, fullBackup ? "-fullbackup" : "", ts));
+        File destPlayerZip = new File(backupDirectory,String.format("%s%s_%s.zip", playerName, fullBackup ? "-fullbackup" : "", ts));
 
         //doesn't overwrite previous backup
         if (destPlayerZip.exists() && destPlayerZip.length() > 1) {
