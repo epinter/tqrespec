@@ -29,9 +29,16 @@ targetCompatibility = 11
 ext.moduleName = 'br.com.pinter.tqrespec'
 ext.javahome = System.properties['java.home']
 ext.moduleInfoPresent = false
+ext.javafxSdkLibDir = new File(projectDir,'sdk/javafx-sdk-11/lib')
+ext.javafxSdkBinDir = new File(projectDir,'sdk/javafx-sdk-11/bin')
 ext.patchjarDir = new File(buildDir, '/patchedjar')
 apply from: "patchModulesJar.gradle"
-mainClassName = "$moduleName/br.com.pinter.tqrespec.core.FxApplication"
+if (file('src/main/java/module-info.java').exists()) {
+    ext.moduleInfoPresent = true
+    mainClassName = "$moduleName/br.com.pinter.tqrespec.core.FxApplication"
+} else {
+    mainClassName = "br.com.pinter.tqrespec.core.FxApplication"
+}
 
 repositories {
     mavenCentral()
@@ -39,7 +46,7 @@ repositories {
 
 dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
-    compile fileTree(dir: 'sdk/javafx-sdk-11/lib', include: '*.jar')
+    compile fileTree(dir: javafxSdkLibDir, include: '*.jar')
     testImplementation group: 'junit', name: 'junit', version: '4.12'
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '2.28.2'
     testImplementation group: 'org.powermock', name: 'powermock-module-junit4', version: '2.0.2'
@@ -53,9 +60,7 @@ dependencies {
 
 jar {
     manifest {
-        attributes('Class-Path': configurations.compile.plus(configurations.runtimeClasspath.findAll {
-            it.getName().matches("javafx.*" + "win" + ".jar")
-        }).collect { it.getName() }.join(' '),
+        attributes('Class-Path': configurations.compile.collect { it.getName() }.join(' '),
                 'Implementation-Version': project.version,
                 'Automatic-Module-Name': moduleName,
                 'Main-Class': 'br.com.pinter.tqrespec.core.FxApplication')
@@ -73,8 +78,7 @@ task copyMetaInf(type: Copy) {
     into new File(sourceSets.main.java.outputDir, '/META-INF')
 }
 
-if (file('src/main/java/module-info.java').exists()) {
-    ext.moduleInfoPresent = true
+if (moduleInfoPresent) {
     compileJava {
         inputs.property("moduleName", moduleName)
         doFirst {
@@ -95,6 +99,15 @@ if (file('src/main/java/module-info.java').exists()) {
                     '--patch-module', "$moduleName=" + files(sourceSets.main.output.resourcesDir).asPath
             ]
             classpath = files()
+        }
+    }
+} else {
+    run {
+        doFirst {
+            jvmArgs = [
+                    '--module-path', javafxSdkLibDir,
+                    '--add-modules', 'javafx.base,javafx.fxml,javafx.graphics,javafx.controls'
+            ]
         }
     }
 }
@@ -172,7 +185,7 @@ task jlink(type: Exec) {
 
     if (moduleInfoPresent) {
         commandLine "${javahome}/bin/jlink.exe",
-                '--module-path', File.pathSeparator + new File(projectDir, "sdk/javafx-sdk-11/lib").toString() + File.pathSeparator + new File(buildDir, "appimage-modules").toString(),
+                '--module-path', "${javafxSdkLibDir}" + File.pathSeparator + "${buildDir}/appimage-modules",
                 '--add-modules', ("org.apache.commons.lang3,br.com.pinter.tqdatabase,br.com.pinter.tqrespec,com.sun.jna,com.sun.jna.platform,javafx.base,javafx.fxml,javafx.graphics,javafx.controls,java.prefs,java.base,jdk.zipfs,jdk.unsupported,java.logging"),
                 '--output', new File(buildDir, '/jre-image'),
                 '--strip-debug',
@@ -181,7 +194,7 @@ task jlink(type: Exec) {
                 '--no-man-pages'
     } else {
         commandLine "${javahome}/bin/jlink.exe",
-                '--module-path', File.pathSeparator + new File(projectDir, "sdk/javafx-sdk-11/lib").toString() + File.pathSeparator + new File(buildDir, "appimage-modules").toString(),
+                '--module-path', "${javafxSdkLibDir}" + File.pathSeparator + "${buildDir}/appimage-modules",
                 '--add-modules', ("javafx.base,javafx.fxml,javafx.graphics,javafx.controls,java.prefs,java.base,jdk.zipfs,jdk.unsupported,java.logging"),
                 '--output', new File(buildDir, '/jre-image'),
                 '--strip-debug',
@@ -225,7 +238,6 @@ task appimage(type: Exec) {
                 '--class', "br.com.pinter.tqrespec.core.FxApplication",
                 '--jvm-args', '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED'
     } else {
-        System.err.println(jar.outputs.files.collect { it.getPath() }.join(' '))
         commandLine "${javahome}/bin/java.exe",
                 "-Xmx1024M",
                 '--module-path', "${javahome}/jmods",
@@ -250,7 +262,7 @@ task appimage(type: Exec) {
     }
     doLast {
         copy {
-            from new File(projectDir, "sdk/javafx-sdk-11/bin").listFiles()
+            from javafxSdkBinDir.listFiles()
             into "$buildDir/app-image/tqrespec"
         }
         new File(buildDir, "jre-image").deleteDir()
