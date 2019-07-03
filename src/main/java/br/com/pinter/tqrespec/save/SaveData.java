@@ -4,7 +4,6 @@
 
 package br.com.pinter.tqrespec.save;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Singleton;
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -49,8 +49,10 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Collections;
+import java.util.ResourceBundle;
 
-public class Main {
+public class Main extends Application {
     @Inject
     private Db db;
 
@@ -58,24 +60,28 @@ public class Main {
     private Txt txt;
 
     @Inject
-    @FxmlLoaderLocation("/fxml/main.fxml")
-    @FxmlResourceBundle("i18n.UI")
     private FXMLLoader fxmlLoader;
 
-    private Stage primaryStage;
-    private Application application;
+    private InjectionContext injectionContext = new InjectionContext(this,
+            Collections.singletonList(new GuiceModule()));
 
-    private void load() {
+    public static void main(String... args) {
+        System.setProperty("javafx.preloader", "br.com.pinter.tqrespec.gui.AppPreloader");
+        launch(args);
+    }
+
+
+    private void load(Stage primaryStage) {
         Task<Void> task = new Task<>() {
             @Override
             public Void call() {
                 //preload game database metadata and skills
-                application.notifyPreloader(new Preloader.ProgressNotification(0.3));
+                notifyPreloader(new Preloader.ProgressNotification(0.3));
                 db.initialize();
-                application.notifyPreloader(new Preloader.ProgressNotification(0.7));
+                notifyPreloader(new Preloader.ProgressNotification(0.7));
                 db.skills().preload();
                 //preload text
-                application.notifyPreloader(new Preloader.ProgressNotification(0.9));
+                notifyPreloader(new Preloader.ProgressNotification(0.9));
                 txt.preload();
                 return null;
             }
@@ -96,29 +102,34 @@ public class Main {
         });
 
         task.setOnSucceeded(e -> {
-            application.notifyPreloader(new Preloader.ProgressNotification(1.0));
+            notifyPreloader(new Preloader.ProgressNotification(1.0));
             primaryStage.show();
         });
         new Thread(task).start();
-        primaryStage.setOnShown(windowEvent -> application.notifyPreloader(new Preloader.StateChangeNotification(
+        primaryStage.setOnShown(windowEvent -> notifyPreloader(new Preloader.StateChangeNotification(
                 Preloader.StateChangeNotification.Type.BEFORE_START)));
 
     }
 
-    public void start(Stage primaryStage, Application application) {
-        this.primaryStage = primaryStage;
-        this.application = application;
-        prepareMainStage();
-        load();
+
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        injectionContext.initialize();
+        notifyPreloader(new Preloader.ProgressNotification(0.1));
+
+        prepareMainStage(primaryStage);
+        load(primaryStage);
     }
 
-    public void prepareMainStage() {
+    public void prepareMainStage(Stage primaryStage) {
         Font.loadFont(getClass().getResourceAsStream("/fxml/albertus-mt.ttf"), 16);
         Font.loadFont(getClass().getResourceAsStream("/fxml/albertus-mt-light.ttf"), 16);
         Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler::unhandled);
 
         Parent root;
         try {
+            fxmlLoader.setResources(ResourceBundle.getBundle("i18n.UI"));
+            fxmlLoader.setLocation(getClass().getResource("/fxml/main.fxml"));
             root = fxmlLoader.load();
         } catch (IOException e) {
             e.printStackTrace();

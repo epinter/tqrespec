@@ -35,9 +35,9 @@ ext.patchjarDir = new File(buildDir, '/patchedjar')
 apply from: "patchModulesJar.gradle"
 if (file('src/main/java/module-info.java').exists()) {
     ext.moduleInfoPresent = true
-    mainClassName = "$moduleName/br.com.pinter.tqrespec.core.FxApplication"
+    mainClassName = "$moduleName/br.com.pinter.tqrespec.core.Main"
 } else {
-    mainClassName = "br.com.pinter.tqrespec.core.FxApplication"
+    mainClassName = "br.com.pinter.tqrespec.core.Main"
 }
 
 repositories {
@@ -51,8 +51,7 @@ dependencies {
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '2.28.2'
     testImplementation group: 'org.powermock', name: 'powermock-module-junit4', version: '2.0.2'
     testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.2'
-    testImplementation group: 'org.jboss.weld', name: 'weld-junit4', version: '2.0.0.Final'
-    compile group: 'org.jboss.weld.se', name: 'weld-se-shaded', version: '3.1.1.Final'
+    compile group: 'com.google.inject', name: 'guice', version: '4.2.2'
     compile group: 'net.java.dev.jna', name: 'jna-platform', version: '5.3.1'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
     compile project(':tqdatabase')
@@ -63,7 +62,7 @@ jar {
         attributes('Class-Path': configurations.compile.collect { it.getName() }.join(' '),
                 'Implementation-Version': project.version,
                 'Automatic-Module-Name': moduleName,
-                'Main-Class': 'br.com.pinter.tqrespec.core.FxApplication')
+                'Main-Class': 'br.com.pinter.tqrespec.core.Main')
     }
 //    from('src/main/resources/META-INF')
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -235,7 +234,7 @@ task appimage(type: Exec) {
                 '--vendor', 'Emerson Pinter',
                 '--input', new File(buildDir, '/appimage-files'),
                 '--description', 'The respec tool for Titan Quest game',
-                '--class', "br.com.pinter.tqrespec.core.FxApplication",
+                '--class', "br.com.pinter.tqrespec.core.Main",
                 '--jvm-args', '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED'
     } else {
         commandLine "${javahome}/bin/java.exe",
@@ -257,7 +256,7 @@ task appimage(type: Exec) {
                 '--version', project.version,
                 '--vendor', 'Emerson Pinter',
                 '--description', 'The respec tool for Titan Quest game',
-                '--class', "br.com.pinter.tqrespec.core.FxApplication",
+                '--class', "br.com.pinter.tqrespec.core.Main",
                 '--jvm-args', '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED'
     }
     doLast {

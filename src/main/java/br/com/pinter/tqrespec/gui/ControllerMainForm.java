@@ -20,8 +20,6 @@
 
 package br.com.pinter.tqrespec.gui;
 
-import br.com.pinter.tqrespec.core.FxmlLoaderLocation;
-import br.com.pinter.tqrespec.core.FxmlResourceBundle;
 import br.com.pinter.tqrespec.core.TaskWithException;
 import br.com.pinter.tqrespec.core.WorkerThread;
 import br.com.pinter.tqrespec.save.PlayerData;
@@ -74,8 +72,6 @@ public class ControllerMainForm implements Initializable {
     private static final boolean DBG = false;
 
     @Inject
-    @FxmlLoaderLocation("/fxml/about.fxml")
-    @FxmlResourceBundle("i18n.UI")
     private FXMLLoader fxmlLoaderAbout;
 
     @Inject
@@ -210,6 +206,8 @@ public class ControllerMainForm implements Initializable {
     public void openAboutWindow(MouseEvent evt) {
         Parent root;
         try {
+            fxmlLoaderAbout.setLocation(getClass().getResource("/fxml/about.fxml"));
+            fxmlLoaderAbout.setResources(ResourceBundle.getBundle("i18n.UI"));
             root = fxmlLoaderAbout.load();
         } catch (IOException e) {
             e.printStackTrace();
