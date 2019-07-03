@@ -57,6 +57,15 @@ dependencies {
     compile project(':tqdatabase')
 }
 
+import org.apache.tools.ant.taskdefs.condition.Os;
+if(Os.isFamily(Os.FAMILY_WINDOWS)) {
+    ext.binjlink = javahome+"/bin/jlink.exe"
+    ext.binjava = javahome+"/bin/java.exe"
+} else {
+    ext.binjlink = javahome+"/bin/jlink"
+    ext.binjava = javahome+"/bin/java"
+}
+
 jar {
     manifest {
         attributes('Class-Path': configurations.compile.collect { it.getName() }.join(' '),
@@ -183,7 +192,7 @@ task jlink(type: Exec) {
     workingDir buildDir
 
     if (moduleInfoPresent) {
-        commandLine "${javahome}/bin/jlink.exe",
+        commandLine binjlink,
                 '--module-path', "${javafxSdkLibDir}" + File.pathSeparator + "${buildDir}/appimage-modules",
                 '--add-modules', ("org.apache.commons.lang3,br.com.pinter.tqdatabase,br.com.pinter.tqrespec,com.sun.jna,com.sun.jna.platform,javafx.base,javafx.fxml,javafx.graphics,javafx.controls,java.prefs,java.base,jdk.zipfs,jdk.unsupported,java.logging"),
                 '--output', new File(buildDir, '/jre-image'),
@@ -192,7 +201,7 @@ task jlink(type: Exec) {
                 '--no-header-files',
                 '--no-man-pages'
     } else {
-        commandLine "${javahome}/bin/jlink.exe",
+        commandLine binjlink,
                 '--module-path', "${javafxSdkLibDir}" + File.pathSeparator + "${buildDir}/appimage-modules",
                 '--add-modules', ("javafx.base,javafx.fxml,javafx.graphics,javafx.controls,java.prefs,java.base,jdk.zipfs,jdk.unsupported,java.logging"),
                 '--output', new File(buildDir, '/jre-image'),
@@ -216,7 +225,7 @@ task appimage(type: Exec) {
 //    System.err.println(modulePath)
 //    "c:/windows/system32/cmd.exe","/c","echo",
     if (moduleInfoPresent) {
-        commandLine "${javahome}/bin/java.exe",
+        commandLine binjava,
                 "-Xmx1024M",
                 '--module-path', "${javahome}/jmods",
                 '--add-opens', 'jdk.jlink/jdk.tools.jlink.internal.packager=jdk.packager',
@@ -237,7 +246,7 @@ task appimage(type: Exec) {
                 '--class', "br.com.pinter.tqrespec.core.Main",
                 '--jvm-args', '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED'
     } else {
-        commandLine "${javahome}/bin/java.exe",
+        commandLine binjava,
                 "-Xmx1024M",
                 '--module-path', "${javahome}/jmods",
                 '--add-opens', 'jdk.jlink/jdk.tools.jlink.internal.packager=jdk.packager',
@@ -261,8 +270,13 @@ task appimage(type: Exec) {
     }
     doLast {
         copy {
-            from javafxSdkBinDir.listFiles()
-            into "$buildDir/app-image/tqrespec"
+            if(Os.isFamily(Os.FAMILY_WINDOWS)) {
+                from javafxSdkBinDir.listFiles()
+                into "$buildDir/app-image/TQRespec"
+            } else {
+                from javafxSdkLibDir.listFiles().findAll { it.getName().endsWith('.so') }.collect()
+                into "$buildDir/app-image/TQRespec"
+            }
         }
         new File(buildDir, "jre-image").deleteDir()
     }
