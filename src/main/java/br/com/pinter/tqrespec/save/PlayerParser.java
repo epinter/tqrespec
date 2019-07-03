@@ -64,9 +64,9 @@ public class PlayerParser {
 
         PlayerData.getInstance().setHeaderInfo(headerInfo);
 
-        if (headerInfo.getHeaderVersion() != 2 && headerInfo.getHeaderVersion() != 3) {
+        if (headerInfo.getHeaderVersion() != 2) {
             throw new IncompatibleSavegameException(
-                    String.format("Incompatible player '%s' (headerVersion must be 2 or 3)", this.playerSelected));
+                    String.format("Incompatible player '%s' (headerVersion must be == 2)", this.playerSelected));
         }
         if (headerInfo.getPlayerVersion() != 5) {
             throw new IncompatibleSavegameException(

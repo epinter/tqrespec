@@ -17,7 +17,7 @@
         <option name="nativeBundle" value="all" />
         <option name="title" value="TQ Respec" />
         <option name="vendor" value="Emerson Pinter" />
-        <option name="version" value="0.2.1" />
+        <option name="version" value="0.2.0" />
         <option name="width" value="660" />
       </options>
     </properties>
