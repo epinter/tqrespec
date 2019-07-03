@@ -20,7 +20,7 @@ import javafx.scene.control.SpinnerValueFactory;
 import javafx.util.converter.NumberStringConverter;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.util.ResourceBundle;

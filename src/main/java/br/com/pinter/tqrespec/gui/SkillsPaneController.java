@@ -26,7 +26,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;

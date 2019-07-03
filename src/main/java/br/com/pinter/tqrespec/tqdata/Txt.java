@@ -6,7 +6,7 @@ package br.com.pinter.tqrespec.tqdata;
 
 import br.com.pinter.tqdatabase.Text;
 
-import javax.inject.Singleton;
+import com.google.inject.Singleton;
 import java.io.FileNotFoundException;
 
 @Singleton

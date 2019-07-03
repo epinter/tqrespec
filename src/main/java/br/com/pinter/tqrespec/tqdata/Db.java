@@ -23,7 +23,7 @@ package br.com.pinter.tqrespec.tqdata;
 import br.com.pinter.tqdatabase.Database;
 import br.com.pinter.tqdatabase.Skills;
 
-import javax.inject.Singleton;
+import com.google.inject.Singleton;
 import java.io.IOException;
 
 @Singleton

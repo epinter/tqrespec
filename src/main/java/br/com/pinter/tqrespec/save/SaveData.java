@@ -4,7 +4,7 @@
 
 package br.com.pinter.tqrespec.save;
 
-import javax.inject.Singleton;
+import com.google.inject.Singleton;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;

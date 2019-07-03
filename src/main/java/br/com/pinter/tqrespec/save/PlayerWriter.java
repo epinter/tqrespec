@@ -25,7 +25,7 @@ import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.core.Settings;
 import br.com.pinter.tqrespec.util.Util;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;

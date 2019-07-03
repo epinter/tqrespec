@@ -22,7 +22,7 @@ package br.com.pinter.tqrespec.save;
 
 import org.apache.commons.lang3.StringUtils;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;

@@ -11,7 +11,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class SkillListCell extends ListCell<SkillListViewItem> {
     private HBox container;
