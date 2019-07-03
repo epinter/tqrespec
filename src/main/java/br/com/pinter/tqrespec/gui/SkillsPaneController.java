@@ -109,16 +109,16 @@ public class SkillsPaneController implements Initializable {
         secondMasteryListView.getItems().clear();
         firstMasteryListView.addEventFilter(MouseEvent.MOUSE_PRESSED, Event::consume);
         secondMasteryListView.addEventFilter(MouseEvent.MOUSE_PRESSED, Event::consume);
-        disableControls();
+        disableControls(true);
     }
 
-    protected void disableControls() {
-        firstMasteryListView.setDisable(true);
-        secondMasteryListView.setDisable(true);
-        reclaimSkillsFirstButton.setDisable(true);
-        reclaimMasteryFirstButton.setDisable(true);
-        reclaimSkillsSecondButton.setDisable(true);
-        reclaimMasterySecondButton.setDisable(true);
+    protected void disableControls(boolean disable) {
+        firstMasteryListView.setDisable(disable);
+        secondMasteryListView.setDisable(disable);
+        reclaimSkillsFirstButton.setDisable(disable);
+        reclaimMasteryFirstButton.setDisable(disable);
+        reclaimSkillsSecondButton.setDisable(disable);
+        reclaimMasterySecondButton.setDisable(disable);
     }
 
     protected void updateMasteries() {

@@ -379,7 +379,7 @@ public class MainController implements Initializable {
         }
 
         pointsPaneController.setSpinnersDisable(disable);
-        skillsPaneController.disableControls();
+        skillsPaneController.disableControls(disable);
     }
 
     @FXML
