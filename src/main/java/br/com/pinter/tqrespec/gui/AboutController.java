@@ -34,7 +34,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 @SuppressWarnings("unused")
-public class ControllerAboutForm implements Initializable {
+public class AboutController implements Initializable {
     @FXML
     private AnchorPane rootelement;
 

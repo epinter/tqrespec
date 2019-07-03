@@ -20,7 +20,7 @@
 
 package br.com.pinter.tqrespec.core;
 
-import br.com.pinter.tqrespec.gui.ControllerMainForm;
+import br.com.pinter.tqrespec.gui.MainController;
 import br.com.pinter.tqrespec.gui.ResizeListener;
 import br.com.pinter.tqrespec.tqdata.Db;
 import br.com.pinter.tqrespec.tqdata.Txt;
@@ -176,6 +176,6 @@ public class Main extends Application {
         }));
 
         //handler to prepare controls on startup, the use of initialize and risk of crash
-        primaryStage.addEventHandler(WindowEvent.WINDOW_SHOWN, window -> ControllerMainForm.mainFormInitialized.setValue(true));
+        primaryStage.addEventHandler(WindowEvent.WINDOW_SHOWN, window -> MainController.mainFormInitialized.setValue(true));
     }
 }

@@ -68,7 +68,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.util.ResourceBundle;
 
 @SuppressWarnings({"RedundantThrows", "unused"})
-public class ControllerMainForm implements Initializable {
+public class MainController implements Initializable {
     private static final boolean DBG = false;
 
     @Inject
