@@ -5,7 +5,6 @@
 package br.com.pinter.tqrespec.save;
 
 import br.com.pinter.tqrespec.tqdata.GameInfo;
-import org.jboss.weld.junit4.WeldInitiator;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,14 +27,14 @@ import static org.junit.Assert.assertTrue;
 @PrepareForTest(GameInfo.class)
 @PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "org.w3c.*", "com.sun.org.apache.xalan.*"})
 public class PlayerParserTest {
-    @Rule
-    public WeldInitiator weld = WeldInitiator.from(
-            SaveData.class,
-            PlayerParser.class,
-            PlayerData.class,
-            ChangesTable.class
-    ).inject(this).build();
-
+//    @Rule
+//    public WeldInitiator weld = WeldInitiator.from(
+//            SaveData.class,
+//            PlayerParser.class,
+//            PlayerData.class,
+//            ChangesTable.class
+//    ).inject(this).build();
+//
     @Inject
     private SaveData saveData;
 

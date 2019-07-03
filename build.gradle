@@ -32,6 +32,7 @@ ext.moduleInfoPresent = false
 ext.javafxSdkLibDir = new File(projectDir,'sdk/javafx-sdk-11/lib')
 ext.javafxSdkBinDir = new File(projectDir,'sdk/javafx-sdk-11/bin')
 ext.patchjarDir = new File(buildDir, '/patchedjar')
+ext.patchJars = false
 apply from: "patchModulesJar.gradle"
 if (file('src/main/java/module-info.java').exists()) {
     ext.moduleInfoPresent = true
@@ -144,7 +145,7 @@ task patchModulesJar(type: PatchJarModuleTask) {
     delete = true
     tempPatchDir = new File(buildDir, '/temppatch')
     tempJarDir = patchjarDir
-    moduleDeps = ['com.sun.jna.platform': 'com.sun.jna', 'cdi.api': 'javax.inject,javax.interceptor,javax.el']
+    moduleDeps = ['com.sun.jna.platform': 'com.sun.jna']
 }
 
 task copyAppimageFiles(type: Copy) {
@@ -154,16 +155,16 @@ task copyAppimageFiles(type: Copy) {
     }
     if (!moduleInfoPresent) {
         from project(':tqdatabase').tasks.jar.outputs.files.collect { it.getPath() }
+        from jar
     }
     from(configurations.compile.findAll {
         !it.getName().matches("javafx.*.jar") && !it.getName().matches("tqdatabase.*.jar")
     }).collect { it.getPath() }
-    from jar
     into "$buildDir/appimage-files"
 }
 
 task copyAppimageModules(type: Copy) {
-    if (moduleInfoPresent) {
+    if(patchJars) {
         dependsOn(patchModulesJar)
     }
 
@@ -173,7 +174,9 @@ task copyAppimageModules(type: Copy) {
     }
     from project(':tqdatabase').tasks.jar.outputs.files.collect { it.getPath() }
     if (moduleInfoPresent) {
-        from patchjarDir
+        if(patchJars) {
+            from patchjarDir
+        }
         from jar
     }
     into "$buildDir/appimage-modules"
@@ -185,7 +188,7 @@ task jlink(type: Exec) {
     dependsOn 'tqdatabase:jar'
     dependsOn 'copyToLib'
     dependsOn 'copyJarsToModuleDeps'
-    if (!moduleInfoPresent) {
+    if(!patchJars) {
         dependsOn 'copyAppimageFiles'
     }
     dependsOn 'copyAppimageModules'
@@ -194,7 +197,7 @@ task jlink(type: Exec) {
     if (moduleInfoPresent) {
         commandLine binjlink,
                 '--module-path', "${javafxSdkLibDir}" + File.pathSeparator + "${buildDir}/appimage-modules",
-                '--add-modules', ("org.apache.commons.lang3,br.com.pinter.tqdatabase,br.com.pinter.tqrespec,com.sun.jna,com.sun.jna.platform,javafx.base,javafx.fxml,javafx.graphics,javafx.controls,java.prefs,java.base,jdk.zipfs,jdk.unsupported,java.logging"),
+                '--add-modules', ("br.com.pinter.tqdatabase,br.com.pinter.tqrespec,javafx.base,javafx.fxml,javafx.graphics,javafx.controls,java.prefs,java.base,jdk.zipfs,jdk.unsupported,java.logging"),
                 '--output', new File(buildDir, '/jre-image'),
                 '--strip-debug',
                 '--compress', '2',
@@ -235,7 +238,7 @@ task appimage(type: Exec) {
                 '--echo-mode',
                 '--singleton',
                 '--runtime-image', new File(buildDir, "jre-image"),
-                '--module', 'br.com.pinter.tqrespec',
+                '--module', mainClassName,
                 '--output', new File(buildDir, '/app-image'),
                 '--name', 'TQRespec',
                 '--icon', "${projectDir}/src/main/resources/icon/icon64.ico",
@@ -244,7 +247,13 @@ task appimage(type: Exec) {
                 '--input', new File(buildDir, '/appimage-files'),
                 '--description', 'The respec tool for Titan Quest game',
                 '--class', "br.com.pinter.tqrespec.core.Main",
-                '--jvm-args', '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED'
+                '--jvm-args', '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED ' +
+                            '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED ' +
+                            '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.core=ALL-UNNAMED ' +
+                            '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.tqdata=ALL-UNNAMED ' +
+                            '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.gui=ALL-UNNAMED ' +
+                            '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.save=ALL-UNNAMED ' +
+                            '--add-reads br.com.pinter.tqrespec=ALL-UNNAMED'
     } else {
         commandLine binjava,
                 "-Xmx1024M",
@@ -265,7 +274,7 @@ task appimage(type: Exec) {
                 '--version', project.version,
                 '--vendor', 'Emerson Pinter',
                 '--description', 'The respec tool for Titan Quest game',
-                '--class', "br.com.pinter.tqrespec.core.Main",
+                '--class', mainClassName,
                 '--jvm-args', '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED'
     }
     doLast {
