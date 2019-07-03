@@ -205,8 +205,11 @@ public class GameInfo {
     }
 
     public String getSavePath() {
+
         String userHome = System.getProperty("user.home");
         String subdirectory = File.separator + Paths.get("My Games", "Titan Quest - Immortal Throne").toString();
+
+        if (DBG || !SystemUtils.IS_OS_WINDOWS) return Constants.DEV_GAMEDATA;
 
         if (DBG) System.err.println("SavePath: user.home is " + userHome);
         String saveDirectory;
