@@ -260,6 +260,7 @@ task appimage(type: Exec) {
                 '--class', "br.com.pinter.tqrespec.Main",
                 '--jvm-args', '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED ' +
                 '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED ' +
+                '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec=ALL-UNNAMED ' +
                 '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.core=ALL-UNNAMED ' +
                 '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.tqdata=ALL-UNNAMED ' +
                 '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.gui=ALL-UNNAMED ' +
