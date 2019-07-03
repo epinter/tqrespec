@@ -29,8 +29,8 @@ targetCompatibility = 11
 ext.moduleName = 'br.com.pinter.tqrespec'
 ext.javahome = System.properties['java.home']
 ext.moduleInfoPresent = false
-ext.javafxSdkLibDir = new File(projectDir,'sdk/javafx-sdk-11/lib')
-ext.javafxSdkBinDir = new File(projectDir,'sdk/javafx-sdk-11/bin')
+ext.javafxSdkLibDir = new File(projectDir, 'sdk/javafx-sdk-11/lib')
+ext.javafxSdkBinDir = new File(projectDir, 'sdk/javafx-sdk-11/bin')
 ext.patchjarDir = new File(buildDir, '/patchedjar')
 ext.patchJars = false
 apply from: "patchModulesJar.gradle"
@@ -59,12 +59,13 @@ dependencies {
 }
 
 import org.apache.tools.ant.taskdefs.condition.Os;
-if(Os.isFamily(Os.FAMILY_WINDOWS)) {
-    ext.binjlink = javahome+"/bin/jlink.exe"
-    ext.binjava = javahome+"/bin/java.exe"
+
+if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+    ext.binjlink = javahome + "/bin/jlink.exe"
+    ext.binjava = javahome + "/bin/java.exe"
 } else {
-    ext.binjlink = javahome+"/bin/jlink"
-    ext.binjava = javahome+"/bin/java"
+    ext.binjlink = javahome + "/bin/jlink"
+    ext.binjava = javahome + "/bin/java"
 }
 
 jar {
@@ -164,7 +165,7 @@ task copyAppimageFiles(type: Copy) {
 }
 
 task copyAppimageModules(type: Copy) {
-    if(patchJars) {
+    if (patchJars) {
         dependsOn(patchModulesJar)
     }
 
@@ -174,7 +175,7 @@ task copyAppimageModules(type: Copy) {
     }
     from project(':tqdatabase').tasks.jar.outputs.files.collect { it.getPath() }
     if (moduleInfoPresent) {
-        if(patchJars) {
+        if (patchJars) {
             from patchjarDir
         }
         from jar
@@ -188,7 +189,7 @@ task jlink(type: Exec) {
     dependsOn 'tqdatabase:jar'
     dependsOn 'copyToLib'
     dependsOn 'copyJarsToModuleDeps'
-    if(!patchJars) {
+    if (!patchJars) {
         dependsOn 'copyAppimageFiles'
     }
     dependsOn 'copyAppimageModules'
@@ -202,7 +203,8 @@ task jlink(type: Exec) {
                 '--strip-debug',
                 '--compress', '2',
                 '--no-header-files',
-                '--no-man-pages'
+                '--no-man-pages',
+                '--strip-native-commands'
     } else {
         commandLine binjlink,
                 '--module-path', "${javafxSdkLibDir}" + File.pathSeparator + "${buildDir}/appimage-modules",
@@ -211,7 +213,8 @@ task jlink(type: Exec) {
                 '--strip-debug',
                 '--compress', '2',
                 '--no-header-files',
-                '--no-man-pages'
+                '--no-man-pages',
+                '--strip-native-commands'
     }
 }
 
@@ -248,12 +251,12 @@ task appimage(type: Exec) {
                 '--description', 'The respec tool for Titan Quest game',
                 '--class', "br.com.pinter.tqrespec.core.Main",
                 '--jvm-args', '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED ' +
-                            '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED ' +
-                            '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.core=ALL-UNNAMED ' +
-                            '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.tqdata=ALL-UNNAMED ' +
-                            '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.gui=ALL-UNNAMED ' +
-                            '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.save=ALL-UNNAMED ' +
-                            '--add-reads br.com.pinter.tqrespec=ALL-UNNAMED'
+                '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED ' +
+                '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.core=ALL-UNNAMED ' +
+                '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.tqdata=ALL-UNNAMED ' +
+                '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.gui=ALL-UNNAMED ' +
+                '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.save=ALL-UNNAMED ' +
+                '--add-reads br.com.pinter.tqrespec=ALL-UNNAMED'
     } else {
         commandLine binjava,
                 "-Xmx1024M",
@@ -279,14 +282,37 @@ task appimage(type: Exec) {
     }
     doLast {
         copy {
-            if(Os.isFamily(Os.FAMILY_WINDOWS)) {
-                from javafxSdkBinDir.listFiles()
+            if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+                from javafxSdkBinDir.listFiles().findAll {
+                    it.getName().equals("decora_sse.dll") ||
+                            it.getName().equals("fxplugins.dll") ||
+                            it.getName().equals("glass.dll") ||
+                            it.getName().equals("javafx_font.dll") ||
+                            it.getName().equals("javafx_iio.dll") ||
+                            it.getName().equals("prism_common.dll") ||
+                            it.getName().equals("prism_d3d.dll") ||
+                            it.getName().equals("prism_sw.dll")
+                }.collect()
                 into "$buildDir/app-image/TQRespec"
             } else {
                 from javafxSdkLibDir.listFiles().findAll { it.getName().endsWith('.so') }.collect()
                 into "$buildDir/app-image/TQRespec"
             }
         }
+        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+            //remove unneeded dlls
+            new File(buildDir, "app-image/TQRespec").listFiles().findAll {
+                new File(buildDir,"app-image/TQRespec/runtime/bin/"+it.getName()).exists()
+            }.each {
+                it.delete()
+            }
+        }
+        new File(buildDir, "app-image/TQRespec/jfxwebkit.dll").delete()
+        new File(buildDir, "app-image/TQRespec/ucrtbase.dll").delete()
+        new File(buildDir, "app-image/TQRespec/gstreamer-lite.dll").delete()
+        new File(buildDir, "app-image/TQRespec/glib-lite.dll").delete()
+        new File(buildDir, "app-image/TQRespec/msvcp140.dll").delete()
+        new File(buildDir, "app-image/TQRespec/vcruntime140.dll").delete()
         new File(buildDir, "jre-image").deleteDir()
     }
 }
