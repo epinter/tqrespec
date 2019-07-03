@@ -206,16 +206,19 @@ public class ControllerMainForm implements Initializable {
     public void openAboutWindow(MouseEvent evt) {
         Parent root;
         try {
-            fxmlLoaderAbout.setLocation(getClass().getResource("/fxml/about.fxml"));
-            fxmlLoaderAbout.setResources(ResourceBundle.getBundle("i18n.UI"));
-            root = fxmlLoaderAbout.load();
+            if(fxmlLoaderAbout.getRoot()==null) {
+                fxmlLoaderAbout.setLocation(getClass().getResource("/fxml/about.fxml"));
+                fxmlLoaderAbout.setResources(ResourceBundle.getBundle("i18n.UI"));
+                root = fxmlLoaderAbout.load();
+            } else {
+                root = fxmlLoaderAbout.getRoot();
+            }
         } catch (IOException e) {
             e.printStackTrace();
             return;
         }
 
         Stage stage = new Stage();
-
         //remove default window decoration
         String osName = System.getProperty("os.name");
         if (osName != null && osName.startsWith("Windows")) {
@@ -229,7 +232,12 @@ public class ControllerMainForm implements Initializable {
         stage.getIcons().addAll(new Image("icon/icon64.png"), new Image("icon/icon32.png"), new Image("icon/icon16.png"));
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setTitle(Util.getUIMessage("about.title", Util.getBuildTitle()));
-        Scene scene = new Scene(root);
+        Scene scene = null;
+        if(root.getScene()==null) {
+            scene = new Scene(root);
+        } else {
+            scene = root.getScene();
+        }
         scene.setFill(Color.TRANSPARENT);
         stage.setScene(scene);
         stage.setMinHeight(root.minHeight(-1));

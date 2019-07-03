@@ -23,6 +23,7 @@ package br.com.pinter.tqrespec.gui;
 import br.com.pinter.tqrespec.util.Util;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -55,5 +56,4 @@ public class ControllerAboutForm implements Initializable {
         Stage stage = (Stage) rootelement.getScene().getWindow();
         stage.close();
     }
-
 }
