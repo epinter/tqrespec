@@ -104,9 +104,16 @@ if (moduleInfoPresent) {
         inputs.property("moduleName", moduleName)
         doFirst {
             jvmArgs = [
+                    '--add-reads', 'br.com.pinter.tqrespec=ALL-UNNAMED',
+                    '--add-opens', 'javafx.base/com.sun.javafx.reflect=ALL-UNNAMED',
+                    '--add-opens', 'br.com.pinter.tqrespec/br.com.pinter.tqrespec.core=ALL-UNNAMED',
+                    '--add-opens', 'br.com.pinter.tqrespec/br.com.pinter.tqrespec.tqdata=ALL-UNNAMED',
+                    '--add-opens', 'br.com.pinter.tqrespec/br.com.pinter.tqrespec.gui=ALL-UNNAMED',
+                    '--add-opens', 'br.com.pinter.tqrespec/br.com.pinter.tqrespec.save=ALL-UNNAMED',
                     '--module-path', classpath.asPath,
+                    '--class-path', classpath.asPath,
                     '--module', mainClassName,
-                    '--patch-module', "$moduleName=" + files(sourceSets.main.output.resourcesDir).asPath
+                    '--patch-module', "$moduleName=" + files(sourceSets.main.output.resourcesDir).asPath,
             ]
             classpath = files()
         }
@@ -302,7 +309,7 @@ task appimage(type: Exec) {
         if (Os.isFamily(Os.FAMILY_WINDOWS)) {
             //remove unneeded dlls
             new File(buildDir, "app-image/TQRespec").listFiles().findAll {
-                new File(buildDir,"app-image/TQRespec/runtime/bin/"+it.getName()).exists()
+                new File(buildDir, "app-image/TQRespec/runtime/bin/" + it.getName()).exists()
             }.each {
                 it.delete()
             }
