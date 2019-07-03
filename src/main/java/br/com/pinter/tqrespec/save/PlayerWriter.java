@@ -57,7 +57,7 @@ public class PlayerWriter {
             return true;
         }
         if (!backupDirectory.exists()) {
-            if(backupDirectory.mkdir()) {
+            if(!backupDirectory.mkdir()) {
                 throw new IOException("Unable to create backup directory");
             }
         }
