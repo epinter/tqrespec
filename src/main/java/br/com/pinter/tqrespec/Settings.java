@@ -18,7 +18,7 @@
     along with TQ Respec.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package br.com.pinter.tqrespec.core;
+package br.com.pinter.tqrespec;
 
 import java.util.prefs.Preferences;
 

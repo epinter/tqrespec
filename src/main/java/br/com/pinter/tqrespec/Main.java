@@ -18,8 +18,11 @@
     along with TQ Respec.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package br.com.pinter.tqrespec.core;
+package br.com.pinter.tqrespec;
 
+import br.com.pinter.tqrespec.core.ExceptionHandler;
+import br.com.pinter.tqrespec.core.GuiceModule;
+import br.com.pinter.tqrespec.core.InjectionContext;
 import br.com.pinter.tqrespec.gui.MainController;
 import br.com.pinter.tqrespec.gui.ResizeListener;
 import br.com.pinter.tqrespec.tqdata.Db;

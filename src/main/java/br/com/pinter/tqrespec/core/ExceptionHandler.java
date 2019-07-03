@@ -32,7 +32,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import java.util.Optional;
 
 @SuppressWarnings("unused")
-class ExceptionHandler {
+public class ExceptionHandler {
     public static void unhandled(Thread t, Throwable e) {
         e.printStackTrace();
 

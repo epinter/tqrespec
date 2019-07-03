@@ -22,7 +22,7 @@ package br.com.pinter.tqrespec.save;
 
 import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
-import br.com.pinter.tqrespec.core.Settings;
+import br.com.pinter.tqrespec.Settings;
 import br.com.pinter.tqrespec.util.Util;
 
 import com.google.inject.Inject;

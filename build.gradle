@@ -36,9 +36,9 @@ ext.patchJars = false
 apply from: "patchModulesJar.gradle"
 if (file('src/main/java/module-info.java').exists()) {
     ext.moduleInfoPresent = true
-    mainClassName = "$moduleName/br.com.pinter.tqrespec.core.Main"
+    mainClassName = "$moduleName/br.com.pinter.tqrespec.Main"
 } else {
-    mainClassName = "br.com.pinter.tqrespec.core.Main"
+    mainClassName = "br.com.pinter.tqrespec.Main"
 }
 
 repositories {
@@ -73,7 +73,7 @@ jar {
         attributes('Class-Path': configurations.compile.collect { it.getName() }.join(' '),
                 'Implementation-Version': project.version,
                 'Automatic-Module-Name': moduleName,
-                'Main-Class': 'br.com.pinter.tqrespec.core.Main')
+                'Main-Class': 'br.com.pinter.tqrespec.Main')
     }
 //    from('src/main/resources/META-INF')
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -106,6 +106,7 @@ if (moduleInfoPresent) {
             jvmArgs = [
                     '--add-reads', 'br.com.pinter.tqrespec=ALL-UNNAMED',
                     '--add-opens', 'javafx.base/com.sun.javafx.reflect=ALL-UNNAMED',
+                    '--add-opens', 'br.com.pinter.tqrespec/br.com.pinter.tqrespec=ALL-UNNAMED',
                     '--add-opens', 'br.com.pinter.tqrespec/br.com.pinter.tqrespec.core=ALL-UNNAMED',
                     '--add-opens', 'br.com.pinter.tqrespec/br.com.pinter.tqrespec.tqdata=ALL-UNNAMED',
                     '--add-opens', 'br.com.pinter.tqrespec/br.com.pinter.tqrespec.gui=ALL-UNNAMED',
@@ -256,7 +257,7 @@ task appimage(type: Exec) {
                 '--vendor', 'Emerson Pinter',
                 '--input', new File(buildDir, '/appimage-files'),
                 '--description', 'The respec tool for Titan Quest game',
-                '--class', "br.com.pinter.tqrespec.core.Main",
+                '--class', "br.com.pinter.tqrespec.Main",
                 '--jvm-args', '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED ' +
                 '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED ' +
                 '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.core=ALL-UNNAMED ' +
