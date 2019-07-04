@@ -29,6 +29,7 @@ import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.apache.commons.lang3.StringUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
@@ -249,6 +250,78 @@ public class PlayerData {
             }
         }
         return ret;
+    }
+
+    public int getStr() {
+        return Math.round(changes.getFloat("str"));
+    }
+
+    public void setStr(int val) throws Exception {
+        changes.setFloat("str", val);
+    }
+
+    public int getInt() {
+        return Math.round(changes.getFloat("int"));
+    }
+
+    public void setInt(int val) throws Exception {
+        changes.setFloat("int", val);
+    }
+
+    public int getDex() {
+        return Math.round(changes.getFloat("dex"));
+    }
+
+    public void setDex(int val) throws Exception {
+        changes.setFloat("dex", val);
+    }
+
+    public int getLife() {
+        return Math.round(changes.getFloat("life"));
+    }
+
+    public void setLife(int val) throws Exception {
+        changes.setFloat("life", val);
+    }
+
+    public int getMana() {
+        return Math.round(changes.getFloat("mana"));
+    }
+
+    public void setMana(int val) throws Exception {
+        changes.setFloat("mana", val);
+    }
+
+    public int getModifierPoints() {
+        return Math.round(changes.getInt("modifierPoints"));
+    }
+
+    public void setModifierPoints(int val) throws Exception {
+        changes.setInt("modifierPoints", val);
+    }
+
+    public int getXp() {
+        return changes.getInt("currentStats.experiencePoints");
+    }
+
+    public int getLevel() {
+        return changes.getInt("currentStats.charLevel");
+    }
+
+    public int getMoney() {
+        return changes.getInt("money");
+    }
+
+    public String getPlayerClassName() {
+        String charClass = getPlayerClassTag();
+        if (StringUtils.isNotEmpty(charClass)) {
+            return txt.getString(charClass);
+        }
+        return charClass;
+    }
+
+    public int getDifficulty() {
+        return changes.getInt("difficulty");
     }
 
     public void reset() {
