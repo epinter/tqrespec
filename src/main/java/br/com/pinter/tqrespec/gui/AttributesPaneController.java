@@ -41,7 +41,7 @@ import java.net.URL;
 import java.text.NumberFormat;
 import java.util.ResourceBundle;
 
-public class PointsPaneController implements Initializable {
+public class AttributesPaneController implements Initializable {
     private static final boolean DBG = false;
     @Inject
     private Db db;

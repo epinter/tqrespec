@@ -114,7 +114,7 @@ public class MainController implements Initializable {
     public GridPane pointsPane;
 
     @FXML
-    public PointsPaneController pointsPaneController;
+    public AttributesPaneController pointsPaneController;
 
     @FXML
     public GridPane skillsPane;
