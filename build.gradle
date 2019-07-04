@@ -23,6 +23,7 @@ sourceSets {
     main.output.resourcesDir = main.java.outputDir
 }
 
+ext.distAppName = 'TQRespec'
 version = '0.4.0'
 sourceCompatibility = 11
 targetCompatibility = 11
@@ -226,6 +227,13 @@ task jlink(type: Exec) {
     }
 }
 
+task archiveAppimage(type: Zip) {
+    dependsOn 'appimage'
+    from "${buildDir}/app-image"
+    archiveFileName = "${distAppName}-${project.version}.zip"
+    destinationDirectory = file("$buildDir")
+}
+
 task appimage(type: Exec) {
     dependsOn 'jlink'
     workingDir buildDir
@@ -251,7 +259,7 @@ task appimage(type: Exec) {
                 '--runtime-image', new File(buildDir, "jre-image"),
                 '--module', mainClassName,
                 '--output', new File(buildDir, '/app-image'),
-                '--name', 'TQRespec',
+                '--name', distAppName,
                 '--icon', "${projectDir}/src/main/resources/icon/icon64.ico",
                 '--version', project.version,
                 '--vendor', 'Emerson Pinter',
@@ -281,7 +289,7 @@ task appimage(type: Exec) {
                 '--input', new File(buildDir, '/appimage-files'),
                 '--main-jar', jar.outputs.files.collect { it.getName() }.get(0),
                 '--output', new File(buildDir, '/app-image'),
-                '--name', 'TQRespec',
+                '--name', distAppName,
                 '--icon', "${projectDir}/src/main/resources/icon/icon64.ico",
                 '--version', project.version,
                 '--vendor', 'Emerson Pinter',
@@ -302,26 +310,26 @@ task appimage(type: Exec) {
                             it.getName().equals("prism_d3d.dll") ||
                             it.getName().equals("prism_sw.dll")
                 }.collect()
-                into "$buildDir/app-image/TQRespec"
+                into "$buildDir/app-image/${distAppName}"
             } else {
                 from javafxSdkLibDir.listFiles().findAll { it.getName().endsWith('.so') }.collect()
-                into "$buildDir/app-image/TQRespec"
+                into "$buildDir/app-image/${distAppName}"
             }
         }
         if (Os.isFamily(Os.FAMILY_WINDOWS)) {
             //remove unneeded dlls
-            new File(buildDir, "app-image/TQRespec").listFiles().findAll {
-                new File(buildDir, "app-image/TQRespec/runtime/bin/" + it.getName()).exists()
+            new File(buildDir, "app-image/${distAppName}").listFiles().findAll {
+                new File(buildDir, "app-image/${distAppName}/runtime/bin/" + it.getName()).exists()
             }.each {
                 it.delete()
             }
         }
-        new File(buildDir, "app-image/TQRespec/jfxwebkit.dll").delete()
-        new File(buildDir, "app-image/TQRespec/ucrtbase.dll").delete()
-        new File(buildDir, "app-image/TQRespec/gstreamer-lite.dll").delete()
-        new File(buildDir, "app-image/TQRespec/glib-lite.dll").delete()
-        new File(buildDir, "app-image/TQRespec/msvcp140.dll").delete()
-        new File(buildDir, "app-image/TQRespec/vcruntime140.dll").delete()
+        new File(buildDir, "app-image/${distAppName}/jfxwebkit.dll").delete()
+        new File(buildDir, "app-image/${distAppName}/ucrtbase.dll").delete()
+        new File(buildDir, "app-image/${distAppName}/gstreamer-lite.dll").delete()
+        new File(buildDir, "app-image/${distAppName}/glib-lite.dll").delete()
+        new File(buildDir, "app-image/${distAppName}/msvcp140.dll").delete()
+        new File(buildDir, "app-image/${distAppName}/vcruntime140.dll").delete()
         new File(buildDir, "jre-image").deleteDir()
     }
 }
