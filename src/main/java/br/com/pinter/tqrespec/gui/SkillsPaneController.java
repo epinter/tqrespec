@@ -136,7 +136,7 @@ public class SkillsPaneController implements Initializable {
         } else {
             reclaimSkillsFirstButton.setDisable(true);
         }
-        if (!disable && getMasteryLevel(0) > 1) {
+        if ((!disable && getMasteryLevel(0) > 1) && firstMasteryListView.getItems().size() == 0) {
             reclaimMasteryFirstButton.setDisable(false);
         } else {
             reclaimMasteryFirstButton.setDisable(true);
@@ -147,7 +147,7 @@ public class SkillsPaneController implements Initializable {
         } else {
             reclaimSkillsSecondButton.setDisable(true);
         }
-        if (!disable && getMasteryLevel(1) > 1) {
+        if ((!disable && getMasteryLevel(1) > 1) && secondMasteryListView.getItems().size() == 0) {
             reclaimMasterySecondButton.setDisable(false);
         } else {
             reclaimMasterySecondButton.setDisable(true);
