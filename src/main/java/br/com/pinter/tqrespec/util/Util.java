@@ -27,12 +27,16 @@ import javafx.scene.control.Alert;
 import javafx.stage.Modality;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.text.MessageFormat;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
@@ -45,12 +49,37 @@ public class Util {
 
     public static String getBuildVersion() {
         String implementationVersion = Util.class.getPackage().getImplementationVersion();
+        if(implementationVersion == null) {
+            Attributes attr = readManifest();
+            if (attr != null) {
+                implementationVersion = attr.getValue("Implementation-Version");
+            }
+        }
         return Objects.requireNonNullElse(implementationVersion, "0.0");
     }
 
     public static String getBuildTitle() {
         String implementationTitle = Util.class.getPackage().getImplementationTitle();
+        if(implementationTitle == null) {
+            Attributes attr = readManifest();
+            if (attr != null) {
+                implementationTitle = attr.getValue("Implementation-Title");
+            }
+        }
         return Objects.requireNonNullElse(implementationTitle, "Development");
+    }
+
+    private static Attributes readManifest() {
+        Manifest manifest = null;
+        try {
+            FileSystem fs = FileSystems.getFileSystem(URI.create("jrt:/"));
+            InputStream stream = Files.newInputStream(
+                    fs.getPath("modules",Util.class.getModule().getName(),"META-INF/MANIFEST.MF"));
+            manifest = new Manifest(stream);
+            return manifest.getMainAttributes();
+        } catch (IOException e) {
+        }
+        return null;
     }
 
     public static void showError(String message, String contentText) {

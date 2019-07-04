@@ -72,6 +72,7 @@ if (Os.isFamily(Os.FAMILY_WINDOWS)) {
 jar {
     manifest {
         attributes('Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+                'Implementation-Title': distAppName,
                 'Implementation-Version': project.version,
                 'Automatic-Module-Name': moduleName,
                 'Main-Class': 'br.com.pinter.tqrespec.Main')
@@ -237,15 +238,6 @@ task archiveAppimage(type: Zip) {
 task appimage(type: Exec) {
     dependsOn 'jlink'
     workingDir buildDir
-//    def tqdatabaseDeps = project(':tqdatabase').configurations.compile.collect { it.getPath() }
-//            .join(File.pathSeparatorChar.toString())
-//    def tqdatabaseJar = project(':tqdatabase').tasks.jar.outputs.files.collect { it.getPath() }
-//            .join(File.pathSeparatorChar.toString())
-
-//    def modulePath = (configurations.compile.findAll{ !it.getName().matches("javafx.*.jar") }).collect { it.getPath() }.join(';')
-//    def modulePath = 'build/jardist;libs'
-//    System.err.println(modulePath)
-//    "c:/windows/system32/cmd.exe","/c","echo",
     if (moduleInfoPresent) {
         commandLine binjava,
                 "-Xmx1024M",
