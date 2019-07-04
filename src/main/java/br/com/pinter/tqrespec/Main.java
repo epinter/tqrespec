@@ -49,9 +49,8 @@ import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
 import com.google.inject.Inject;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+
+import java.io.*;
 import java.util.Collections;
 import java.util.ResourceBundle;
 
@@ -117,9 +116,15 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        //close stderr before initialize guice, we want to hide java warning about reflection
+        System.err.close();
         injectionContext.initialize();
+        try {
+            System.setErr(new PrintStream(new FileOutputStream(
+                    new File(System.getProperty("java.io.tmpdir"), "tqrespec.log"))));
+        }catch (Exception ignored) {
+        }
         notifyPreloader(new Preloader.ProgressNotification(0.1));
-
         prepareMainStage(primaryStage);
         load(primaryStage);
     }
