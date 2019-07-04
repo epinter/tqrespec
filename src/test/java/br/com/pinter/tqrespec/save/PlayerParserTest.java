@@ -4,9 +4,10 @@
 
 package br.com.pinter.tqrespec.save;
 
+import br.com.pinter.tqrespec.core.GuiceModule;
+import br.com.pinter.tqrespec.core.InjectionContext;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
@@ -18,6 +19,7 @@ import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
 
 import static org.junit.Assert.*;
@@ -35,6 +37,10 @@ public class PlayerParserTest {
 //            ChangesTable.class
 //    ).inject(this).build();
 //
+
+    private InjectionContext injectionContext = new InjectionContext(this,
+            Collections.singletonList(new GuiceModule()));
+
     @Inject
     private SaveData saveData;
 
@@ -43,6 +49,8 @@ public class PlayerParserTest {
 
     @Before
     public void setUp() throws IOException {
+        injectionContext.initialize();
+
         if(!new File("src/test/resources/_savegame/Player.chr").exists()) {
             throw new IOException("File src/test/resources/_savegame/Player.chr is missing," +
                     " copy the savegame to execute the tests");
