@@ -22,17 +22,20 @@ package br.com.pinter.tqrespec.save;
 
 import br.com.pinter.tqdatabase.Database;
 import br.com.pinter.tqdatabase.models.Skill;
+import br.com.pinter.tqrespec.gui.State;
 import br.com.pinter.tqrespec.tqdata.Db;
 import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
-import br.com.pinter.tqrespec.gui.State;
-
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Objects;
 
 @SuppressWarnings("unused")
 @Singleton
@@ -97,7 +100,7 @@ public class PlayerData {
     }
 
     public String getPlayerClassTag() {
-        if(saveData.getHeaderInfo()!=null) {
+        if (saveData.getHeaderInfo() != null) {
             return saveData.getHeaderInfo().getPlayerClassTag();
         }
         return null;
@@ -164,6 +167,21 @@ public class PlayerData {
         return playerSkills;
     }
 
+    public int getMasteryLevel(PlayerSkill sb) {
+        int blockStart = sb.getBlockStart();
+        Skill mastery = db.skills().getSkill(sb.getSkillName(), false);
+        if (!mastery.isMastery()) {
+            throw new IllegalStateException("Error reclaiming points. Skill detected.");
+        }
+        BlockInfo sk = saveData.getBlockInfo().get(blockStart);
+        VariableInfo varSkillLevel = sk.getVariables().get("skillLevel");
+
+        if (varSkillLevel.getVariableType() == VariableInfo.VariableType.Integer) {
+            return changes.getInt(blockStart, "skillLevel");
+        }
+        return -1;
+    }
+
     public void reclaimSkillPoints(PlayerSkill sb) throws Exception {
         int blockStart = sb.getBlockStart();
         Skill skill = db.skills().getSkill(sb.getSkillName(), false);
@@ -196,7 +214,7 @@ public class PlayerData {
 
         int currentSkillPoints = changes.getInt("skillPoints");
         int currentSkillLevel = changes.getInt(blockStart, "skillLevel");
-        if(currentSkillLevel > 1) {
+        if (currentSkillLevel > 1) {
             changes.setInt("skillPoints", currentSkillPoints + (currentSkillLevel - 1));
             changes.setInt(blockStart, "skillLevel", 1);
             prepareSkillsList();

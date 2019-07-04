@@ -26,6 +26,7 @@ import br.com.pinter.tqrespec.save.PlayerSkill;
 import br.com.pinter.tqrespec.tqdata.Db;
 import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Util;
+import com.google.inject.Inject;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -42,7 +43,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 
-import com.google.inject.Inject;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -131,10 +131,27 @@ public class SkillsPaneController implements Initializable {
     protected void disableControls(boolean disable) {
         firstMasteryListView.setDisable(disable);
         secondMasteryListView.setDisable(disable);
-        reclaimSkillsFirstButton.setDisable(disable);
-        reclaimMasteryFirstButton.setDisable(disable);
-        reclaimSkillsSecondButton.setDisable(disable);
-        reclaimMasterySecondButton.setDisable(disable);
+        if (!disable && firstMasteryListView.getItems().size() > 0) {
+            reclaimSkillsFirstButton.setDisable(false);
+        } else {
+            reclaimSkillsFirstButton.setDisable(true);
+        }
+        if (!disable && getMasteryLevel(0) > 1) {
+            reclaimMasteryFirstButton.setDisable(false);
+        } else {
+            reclaimMasteryFirstButton.setDisable(true);
+        }
+
+        if (!disable && secondMasteryListView.getItems().size() > 0) {
+            reclaimSkillsSecondButton.setDisable(false);
+        } else {
+            reclaimSkillsSecondButton.setDisable(true);
+        }
+        if (!disable && getMasteryLevel(1) > 1) {
+            reclaimMasterySecondButton.setDisable(false);
+        } else {
+            reclaimMasterySecondButton.setDisable(true);
+        }
     }
 
     protected void updateMasteries() {
@@ -143,23 +160,23 @@ public class SkillsPaneController implements Initializable {
         }
         resetSkilltabControls();
 
-        if (fillMastery(0)) {
-            firstMasteryListView.setDisable(false);
-            reclaimSkillsFirstButton.setDisable(false);
-            if (firstMasteryListView.getItems().size() == 0) {
-                reclaimMasteryFirstButton.setDisable(false);
-            }
-        }
+        fillMastery(0);
+        fillMastery(1);
+        disableControls(false);
 
-        if (fillMastery(1)) {
-            secondMasteryListView.setDisable(false);
-            reclaimSkillsSecondButton.setDisable(false);
-            if (secondMasteryListView.getItems().size() == 0) {
-                reclaimMasterySecondButton.setDisable(false);
-            }
-        }
 
         currentSkillPoints.setValue(String.valueOf(playerData.getAvailableSkillPoints()));
+    }
+
+    private int getMasteryLevel(int i) {
+        List<Skill> masteries = playerData.getPlayerMasteries();
+
+        if (!(masteries.size() == 1 && i > 0) && masteries.size() > 0) {
+            PlayerSkill sb = playerData.getPlayerSkills().get(masteries.get(i).getRecordPath());
+            return playerData.getMasteryLevel(sb);
+        } else {
+            return -1;
+        }
     }
 
     private boolean fillMastery(int i) {
@@ -231,6 +248,7 @@ public class SkillsPaneController implements Initializable {
     }
 
     public void reclaimMasteryFirst(Event event) throws Exception {
+        disableControls(true);
         Skill mastery = playerData.getPlayerMasteries().get(0);
         PlayerSkill sb = playerData.getPlayerSkills().get(mastery.getRecordPath());
 
@@ -245,6 +263,7 @@ public class SkillsPaneController implements Initializable {
     }
 
     public void reclaimMasterySecond(Event event) throws Exception {
+        disableControls(true);
         Skill mastery = playerData.getPlayerMasteries().get(1);
         PlayerSkill sb = playerData.getPlayerSkills().get(mastery.getRecordPath());
 
@@ -259,12 +278,14 @@ public class SkillsPaneController implements Initializable {
     }
 
     public void reclaimSkillsFirst(Event event) throws Exception {
+        disableControls(true);
         Skill mastery = playerData.getPlayerMasteries().get(0);
         reclaimPointsFromSkills(mastery);
         updateMasteries();
     }
 
     public void reclaimSkillsSecond(Event event) throws Exception {
+        disableControls(true);
         Skill mastery = playerData.getPlayerMasteries().get(1);
         reclaimPointsFromSkills(mastery);
         updateMasteries();
