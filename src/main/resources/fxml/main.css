@@ -299,6 +299,7 @@
 
 .tq-tabbutton {
 	-fx-font-family: 'Albertus MT';
+	-fx-font-size: 0.7em;
     -fx-border-image-source: url('border.png');
     -fx-border-image-insets: 0;
     -fx-background-insets: 0;

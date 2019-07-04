@@ -89,12 +89,12 @@
             </GridPane>
             <TabPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" side="LEFT" styleClass="tq-tabpane" tabMaxHeight="100.0" tabMaxWidth="100.0" VBox.vgrow="ALWAYS">
                <tabs>
-                  <Tab closable="false" styleClass="tq-tabbutton" text="Points">
+                  <Tab closable="false" styleClass="tq-tabbutton" text="%main.attributesTab">
                      <content>
                          <fx:include fx:id="pointsPane" source="tab_points.fxml"/>
                      </content>
                   </Tab>
-                  <Tab fx:id="tabSkills" closable="false" styleClass="tq-tabbutton" text="Skills">
+                  <Tab fx:id="tabSkills" closable="false" styleClass="tq-tabbutton" text="%main.skillsTab">
                      <content>
                          <fx:include fx:id="skillsPane" source="tab_skills.fxml"/>
                      </content>
