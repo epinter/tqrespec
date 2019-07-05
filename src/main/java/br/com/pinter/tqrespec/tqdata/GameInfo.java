@@ -25,7 +25,9 @@ import com.sun.jna.platform.win32.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -69,29 +71,35 @@ public class GameInfo {
     private String getGameSteamLibraryPath() {
         String steamPath = Advapi32Util.registryGetStringValue(
                 WinReg.HKEY_CURRENT_USER, "SOFTWARE\\Valve\\Steam", "SteamPath");
+
+        Path steamappsMainPath = Paths.get(steamPath, "SteamApps", "common", "Titan Quest Anniversary Edition");
+        if (Files.exists(steamappsMainPath) && Files.isDirectory(steamappsMainPath)) {
+            return steamappsMainPath.toAbsolutePath().toString();
+        }
+
         try {
-            FileInputStream steamConfig = new FileInputStream(
-                    new File(steamPath, Paths.get("config", "config.vdf").toString())
-            );
-            BufferedReader in = new BufferedReader(new InputStreamReader(steamConfig));
+            Pattern regexOuter = Pattern.compile(".*LibraryFolders.*\\{(.*)}.*", Pattern.DOTALL);
+            Pattern regexInner = Pattern.compile("\\s*\"\\d\"\\s+\"([^\"]+)\".*");
 
-            Pattern regexConfig = Pattern.compile(".*\"BaseInstallFolder_\\d+\"\\s+\"([^\"]+)\".*");
+            ArrayList<String> libraryFolderList = new ArrayList<>();
+            String steamConfig = Files.readString(Paths.get(steamPath, "SteamApps", "libraryfolders.vdf"));
 
-            ArrayList<String> baseInstallFolderList = new ArrayList<>();
-            String line;
-            while ((line = in.readLine()) != null) {
-                Matcher m = regexConfig.matcher(line);
-                if (m.find()) {
-                    baseInstallFolderList.add(m.group(1));
-                    if (DBG) System.err.println("SteamLibrary: Match Found!!" + m.group(1));
+            Matcher outer = regexOuter.matcher(steamConfig);
+            if (outer.find()) {
+                String content = outer.group(1);
+                Matcher inner = regexInner.matcher(content);
+                while (inner.find()) {
+                    if (inner.group(1) != null && !inner.group(1).isEmpty()) {
+                        libraryFolderList.add(inner.group(1));
+                    }
                 }
             }
-            for (String baseInstallFolder : baseInstallFolderList) {
-                Path steamappsPath = Paths.get(baseInstallFolder, "SteamApps", "common", "Titan Quest Anniversary Edition");
-                if (Files.exists(steamappsPath)) {
+
+            for (String libraryFolder : libraryFolderList) {
+                Path steamappsPath = Paths.get(libraryFolder, "SteamApps", "common", "Titan Quest Anniversary Edition");
+                if (Files.exists(steamappsPath) && Files.isDirectory(steamappsPath)) {
                     return steamappsPath.toAbsolutePath().toString();
                 }
-
             }
         } catch (IOException e) {
             if (DBG) e.printStackTrace();
@@ -164,7 +172,6 @@ public class GameInfo {
             }
         }
 
-
         String gog = this.getGameGogPath();
         if (StringUtils.isNotEmpty(gog)) {
             Path gogPath = Paths.get(gog);
@@ -193,7 +200,7 @@ public class GameInfo {
         if (StringUtils.isEmpty(gamePath)) {
             String detected = detectGamePath();
             if (StringUtils.isEmpty(detected))
-                throw new FileNotFoundException("Game Path not detected");
+                throw new FileNotFoundException("Game path not detected");
             gamePath = detected;
         }
 
@@ -205,7 +212,6 @@ public class GameInfo {
     }
 
     public String getSavePath() {
-
         String userHome = System.getProperty("user.home");
         String subdirectory = File.separator + Paths.get("My Games", "Titan Quest - Immortal Throne").toString();
 

@@ -37,7 +37,7 @@ public class Db {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            throw new RuntimeException("Error loading database.");
+            throw new RuntimeException("Error loading database.",e);
         }
     }
 
