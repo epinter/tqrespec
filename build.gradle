@@ -34,7 +34,7 @@ ext.javafxSdkLibDir = new File(projectDir, 'sdk/javafx-sdk-11/lib')
 ext.javafxSdkBinDir = new File(projectDir, 'sdk/javafx-sdk-11/bin')
 ext.patchjarDir = new File(buildDir, '/patchedjar')
 ext.patchJars = false
-apply from: "patchModulesJar.gradle"
+apply from: "gradle/patchModulesJar.gradle"
 if (file('src/main/java/module-info.java').exists()) {
     ext.moduleInfoPresent = true
     mainClassName = "$moduleName/br.com.pinter.tqrespec.Main"
