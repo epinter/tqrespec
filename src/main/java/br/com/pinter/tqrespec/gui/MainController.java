@@ -20,15 +20,17 @@
 
 package br.com.pinter.tqrespec.gui;
 
+import br.com.pinter.tqrespec.core.EventHandlerWithException;
 import br.com.pinter.tqrespec.core.TaskWithException;
 import br.com.pinter.tqrespec.core.WorkerThread;
 import br.com.pinter.tqrespec.save.PlayerData;
 import br.com.pinter.tqrespec.save.PlayerParser;
 import br.com.pinter.tqrespec.save.PlayerWriter;
-import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
+import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
 import br.com.pinter.tqrespec.util.Version;
+import com.google.inject.Inject;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -59,7 +61,6 @@ import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import org.apache.commons.lang3.StringUtils;
 
-import com.google.inject.Inject;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
@@ -203,7 +204,7 @@ public class MainController implements Initializable {
     public void openAboutWindow(MouseEvent evt) {
         Parent root;
         try {
-            if(fxmlLoaderAbout.getRoot()==null) {
+            if (fxmlLoaderAbout.getRoot() == null) {
                 fxmlLoaderAbout.setLocation(getClass().getResource("/fxml/about.fxml"));
                 fxmlLoaderAbout.setResources(ResourceBundle.getBundle("i18n.UI"));
                 root = fxmlLoaderAbout.load();
@@ -230,7 +231,7 @@ public class MainController implements Initializable {
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setTitle(Util.getUIMessage("about.title", Util.getBuildTitle()));
         Scene scene;
-        if(root.getScene()==null) {
+        if (root.getScene() == null) {
             scene = new Scene(root);
         } else {
             scene = root.getScene();
@@ -294,23 +295,27 @@ public class MainController implements Initializable {
             }
         };
 
-        copyCharTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, (e) -> {
-            if ((int) copyCharTask.getValue() == 2) {
-                playerData.reset();
-                setAllControlsDisable(false);
-                addCharactersToCombo();
-                if (characterCombo.getItems().contains(targetPlayerName)) {
-                    characterCombo.setValue(targetPlayerName);
+        //noinspection Convert2Lambda
+        copyCharTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandlerWithException<>() {
+            @Override
+            public void handleEvent(WorkerStateEvent workerStateEvent) {
+                if ((int) copyCharTask.getValue() == 2) {
+                    playerData.reset();
+                    setAllControlsDisable(false);
+                    addCharactersToCombo();
+                    if (characterCombo.getItems().contains(targetPlayerName)) {
+                        characterCombo.setValue(targetPlayerName);
+                    }
+                } else if ((int) copyCharTask.getValue() == 3) {
+                    Util.showError("Target Directory already exists!",
+                            String.format("The specified target directory already exists. Aborting the copy to character '%s'",
+                                    targetPlayerName));
+                } else {
+                    Util.showError(Util.getUIMessage("alert.errorcopying_header"),
+                            Util.getUIMessage("alert.errorcopying_content", targetPlayerName));
                 }
-            } else if ((int) copyCharTask.getValue() == 3) {
-                Util.showError("Target Directory already exists!",
-                        String.format("The specified target directory already exists. Aborting the copy to character '%s'",
-                                targetPlayerName));
-            } else {
-                Util.showError(Util.getUIMessage("alert.errorcopying_header"),
-                        Util.getUIMessage("alert.errorcopying_content", targetPlayerName));
+                setAllControlsDisable(false);
             }
-            setAllControlsDisable(false);
         });
 
         new WorkerThread(copyCharTask).start();
@@ -338,34 +343,41 @@ public class MainController implements Initializable {
             }
         };
 
-        backupSaveGameTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, (e) -> {
-            if (DBG) System.out.println("starting backup listener");
+        //noinspection Convert2Lambda
+        backupSaveGameTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandlerWithException<>() {
+            @Override
+            public void handleEvent(WorkerStateEvent workerStateEvent) {
+                if (DBG) System.out.println("starting backup listener");
 
-            if ((int) backupSaveGameTask.getValue() == 2) {
-                if (DBG) System.out.println("backupcreated==" + backupCreated.get());
-                new WorkerThread(saveGameTask).start();
-            } else {
-                if (DBG) System.out.println("backupcreated==+=" + backupCreated.get());
-                Util.showError(Util.getUIMessage("alert.errorbackup_header"),
-                        Util.getUIMessage("alert.errorbackup_content", Constants.BACKUP_DIRECTORY));
+                if ((int) backupSaveGameTask.getValue() == 2) {
+                    if (DBG) System.out.println("backupcreated==" + backupCreated.get());
+                    new WorkerThread(saveGameTask).start();
+                } else {
+                    if (DBG) System.out.println("backupcreated==+=" + backupCreated.get());
+                    Util.showError(Util.getUIMessage("alert.errorbackup_header"),
+                            Util.getUIMessage("alert.errorbackup_content", Constants.BACKUP_DIRECTORY));
+                    setAllControlsDisable(false);
+
+                }
+            }
+        });
+
+        //noinspection Convert2Lambda
+        saveGameTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandlerWithException<>() {
+            @Override
+            public void handleEvent(WorkerStateEvent workerStateEvent) {
+                if ((int) saveGameTask.getValue() != 2) {
+                    Util.showError(Util.getUIMessage("alert.errorsaving_header"),
+                            Util.getUIMessage("alert.errorsaving_content", Constants.BACKUP_DIRECTORY));
+                } else {
+                    if (DBG) System.out.println("character saved==" + saveGameTask.getValue());
+                }
                 setAllControlsDisable(false);
 
             }
         });
 
-        saveGameTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, (e) -> {
-            if ((int) saveGameTask.getValue() != 2) {
-                Util.showError(Util.getUIMessage("alert.errorsaving_header"),
-                        Util.getUIMessage("alert.errorsaving_content", Constants.BACKUP_DIRECTORY));
-            } else {
-                if (DBG) System.out.println("character saved==" + saveGameTask.getValue());
-            }
-            setAllControlsDisable(false);
-
-        });
-
         new WorkerThread(backupSaveGameTask).start();
-
     }
 
     private void setAllControlsDisable(boolean disable) {
@@ -399,15 +411,25 @@ public class MainController implements Initializable {
             }
         };
 
-        loadTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, (e) -> {
-            pointsPaneController.loadCharHandler();
-            if (pointsPaneController.getCurrentAvail() >= 0) {
-                saveDisabled.set(false);
+        //noinspection Convert2Lambda
+        loadTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandlerWithException<>() {
+            @Override
+            public void handleEvent(WorkerStateEvent workerStateEvent) {
+                pointsPaneController.loadCharHandler();
+                if (pointsPaneController.getCurrentAvail() >= 0) {
+                    saveDisabled.set(false);
+                }
+                characterCombo.setDisable(false);
             }
-            characterCombo.setDisable(false);
         });
 
-        loadTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, (e) -> skillsPaneController.loadCharEventHandler());
+        //noinspection Convert2Lambda
+        loadTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandlerWithException<>() {
+            @Override
+            public void handleEvent(WorkerStateEvent workerStateEvent) {
+                skillsPaneController.loadCharEventHandler();
+            }
+        });
 
         new WorkerThread(loadTask).start();
     }

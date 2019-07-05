@@ -22,7 +22,7 @@ package br.com.pinter.tqrespec.core;
 
 import javafx.concurrent.Task;
 
-public abstract class TaskWithException<T> extends Task {
+public abstract class TaskWithException<T> extends Task<T> {
 
     public TaskWithException() {
         super();
