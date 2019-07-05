@@ -65,6 +65,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.FileAlreadyExistsException;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.ResourceBundle;
 
 @SuppressWarnings({"RedundantThrows", "unused"})
@@ -87,7 +90,7 @@ public class MainController implements Initializable {
     private VBox rootelement;
 
     @FXML
-    private ComboBox characterCombo;
+    private ComboBox<String> characterCombo;
 
     @FXML
     private Button saveButton;
@@ -184,11 +187,8 @@ public class MainController implements Initializable {
     private void addCharactersToCombo() {
         try {
             characterCombo.getSelectionModel().clearSelection();
-            characterCombo.getItems().clear();
-            for (String playerName : GameInfo.getInstance().getPlayerListMain()) {
-                //noinspection unchecked
-                characterCombo.getItems().add(playerName);
-            }
+            characterCombo.getItems().setAll(GameInfo.getInstance().getPlayerListMain());
+            characterCombo.getItems().sort(String::compareTo);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -232,7 +232,7 @@ public class MainController implements Initializable {
         stage.getIcons().addAll(new Image("icon/icon64.png"), new Image("icon/icon32.png"), new Image("icon/icon16.png"));
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setTitle(Util.getUIMessage("about.title", Util.getBuildTitle()));
-        Scene scene = null;
+        Scene scene;
         if(root.getScene()==null) {
             scene = new Scene(root);
         } else {
@@ -303,7 +303,6 @@ public class MainController implements Initializable {
                 setAllControlsDisable(false);
                 addCharactersToCombo();
                 if (characterCombo.getItems().contains(targetPlayerName)) {
-                    //noinspection unchecked
                     characterCombo.setValue(targetPlayerName);
                 }
             } else if ((int) copyCharTask.getValue() == 3) {
@@ -411,9 +410,7 @@ public class MainController implements Initializable {
             characterCombo.setDisable(false);
         });
 
-        loadTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, (e) -> {
-            skillsPaneController.loadCharEventHandler();
-        });
+        loadTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, (e) -> skillsPaneController.loadCharEventHandler());
 
         new WorkerThread(loadTask).start();
     }
