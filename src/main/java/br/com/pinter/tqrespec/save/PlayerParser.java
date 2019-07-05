@@ -48,14 +48,17 @@ public class PlayerParser extends FileParser {
     private String player = null;
     private boolean customQuest = false;
 
+    @Override
     protected void prepareBufferForRead() {
         playerData.getBuffer().rewind();
     }
 
+    @Override
     protected ByteBuffer getBuffer() {
         return playerData.getBuffer();
     }
 
+    @Override
     protected Hashtable<String, ArrayList<Integer>> getVariableLocation() {
         return saveData.getVariableLocation();
     }
@@ -97,6 +100,7 @@ public class PlayerParser extends FileParser {
         return headerInfo;
     }
 
+    @Override
     public void parse() throws Exception {
         readPlayerChr();
 
@@ -136,6 +140,7 @@ public class PlayerParser extends FileParser {
         return true;
     }
 
+    @Override
     protected void reset() {
         super.reset();
         playerData.reset();
@@ -181,6 +186,7 @@ public class PlayerParser extends FileParser {
 
     }
 
+    @Override
     protected Hashtable<String, VariableInfo> parseBlock(BlockInfo blockInfo) {
         Hashtable<String, VariableInfo> ret = new Hashtable<>();
 
@@ -397,6 +403,19 @@ public class PlayerParser extends FileParser {
         }
         return ret;
 
+    }
+
+    void parseFooter() {
+        if (DBG) Util.log(String.format("Buffer(footer): '%s'", this.getBuffer()));
+
+        while (this.getBuffer().position() < this.getBuffer().capacity()) {
+            String name = readString(this.getBuffer());
+            if (StringUtils.isEmpty(name)) continue;
+            if (name.equalsIgnoreCase("description")) {
+                String value = readString(this.getBuffer());
+                if (DBG) Util.log(String.format("name=%s; value=%s", name, value));
+            }
+        }
     }
 
     public void setPlayer(String player) {

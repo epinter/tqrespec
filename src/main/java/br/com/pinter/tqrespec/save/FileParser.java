@@ -85,6 +85,7 @@ abstract class FileParser {
             if ((blockInfo.getStart() >= inventoryStart && Constants.SKIP_INVENTORY_BLOCKS && inventoryStart > 0)) {
                 break;
             }
+
             Hashtable<String, VariableInfo> variables = parseBlock(blockInfo);
             blockInfo.setVariables(variables);
             ret.put(blockInfo.getStart(), blockInfo);
@@ -206,18 +207,4 @@ abstract class FileParser {
         }
         return null;
     }
-
-    void parseFooter() {
-        if (DBG) Util.log(String.format("Buffer(footer): '%s'", this.getBuffer()));
-
-        while (this.getBuffer().position() < this.getBuffer().capacity()) {
-            String name = readString(this.getBuffer());
-            if (StringUtils.isEmpty(name)) continue;
-            if (name.equalsIgnoreCase("description")) {
-                String value = readString(this.getBuffer());
-                if (DBG) Util.log(String.format("name=%s; value=%s", name, value));
-            }
-        }
-    }
-
 }
