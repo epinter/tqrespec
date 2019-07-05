@@ -42,8 +42,11 @@ public class ExceptionHandler {
     }
 
     private static void showAlert(Thread t, Throwable e) {
-        String header = e.toString();
-        header = header.replaceAll("^java.lang.RuntimeException: (.*Exception.*)", "$1");
+        String header = ExceptionUtils.getRootCause(e).toString();
+        if(header == null) {
+            header = e.toString();
+        }
+        header = header.replaceAll("^java.lang.RuntimeException: (.*)", "$1");
 
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.initModality(Modality.APPLICATION_MODAL);
