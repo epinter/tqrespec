@@ -63,11 +63,11 @@ public class BlockInfo implements Serializable {
         this.size = size;
     }
 
-    public Hashtable<String, VariableInfo> getVariables() {
+    Hashtable<String, VariableInfo> getVariables() {
         return variables;
     }
 
-    public void setVariables(Hashtable<String, VariableInfo> variables) {
+    void setVariables(Hashtable<String, VariableInfo> variables) {
         this.variables = variables;
     }
 

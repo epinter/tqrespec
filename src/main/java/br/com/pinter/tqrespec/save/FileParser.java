@@ -22,14 +22,12 @@ package br.com.pinter.tqrespec.save;
 
 import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-@SuppressWarnings("CanBeFinal")
 abstract class FileParser {
     private final static boolean DBG = false;
 
@@ -65,7 +63,7 @@ abstract class FileParser {
     }
 
     Hashtable<Integer, BlockInfo> parseAllBlocks() {
-        if(inventoryStart != -1) {
+        if (inventoryStart != -1) {
             throw new IllegalStateException("Illegal inventory offset, value was not reset on load");
         }
 

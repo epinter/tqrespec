@@ -20,12 +20,12 @@
 
 package br.com.pinter.tqrespec.save;
 
-import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
+import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
+import com.google.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 
-import com.google.inject.Inject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -36,7 +36,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-@SuppressWarnings("unused")
 public class PlayerParser extends FileParser {
     @Inject
     private SaveData saveData;
@@ -131,7 +130,7 @@ public class PlayerParser extends FileParser {
     }
 
     public boolean loadPlayer(String playerName) throws Exception {
-        if (playerData.getSaveInProgress() != null &&  playerData.getSaveInProgress()) {
+        if (playerData.getSaveInProgress() != null && playerData.getSaveInProgress()) {
             return false;
         }
         player = playerName;
@@ -154,12 +153,12 @@ public class PlayerParser extends FileParser {
         } else {
             path = GameInfo.getInstance().getSaveDataMainPath();
         }
-        File playerChr = new File(path ,
-                Paths.get("_"+this.player,"Player.chr").toString());
+        File playerChr = new File(path,
+                Paths.get("_" + this.player, "Player.chr").toString());
 
 
         if (!playerChr.exists()) {
-            System.err.printf("File '%s' doesn't exists\n",playerChr.toString());
+            System.err.printf("File '%s' doesn't exists\n", playerChr.toString());
             return;
         }
 
@@ -405,7 +404,7 @@ public class PlayerParser extends FileParser {
 
     }
 
-    void parseFooter() {
+    private void parseFooter() {
         if (DBG) Util.log(String.format("Buffer(footer): '%s'", this.getBuffer()));
 
         while (this.getBuffer().position() < this.getBuffer().capacity()) {
@@ -418,16 +417,19 @@ public class PlayerParser extends FileParser {
         }
     }
 
-    public void setPlayer(String player) {
+    @SuppressWarnings("SameParameterValue")
+    void setPlayer(String player) {
         this.player = player;
     }
 
+
+    @SuppressWarnings("unused")
     public boolean isCustomQuest() {
         return customQuest;
     }
 
-    public PlayerParser customQuest(boolean customQuest) {
+    @SuppressWarnings("unused")
+    public void customQuest(boolean customQuest) {
         this.customQuest = customQuest;
-        return this;
     }
 }

@@ -20,35 +20,31 @@
 
 package br.com.pinter.tqrespec.save;
 
+import com.google.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 
-import com.google.inject.Inject;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-@SuppressWarnings("ALL")
-public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepCloneable {
+@SuppressWarnings("unused")
+class ChangesTable extends Hashtable<Integer, byte[]> implements DeepCloneable {
     @Inject
     private SaveData saveData;
 
     private Hashtable<Integer, Integer> valuesLengthIndex = null;
 
-    public ChangesTable() {
+    ChangesTable() {
         super();
         this.valuesLengthIndex = new Hashtable<Integer, Integer>();
     }
 
-    public Hashtable<Integer, Integer> getValuesLengthIndex() {
+    Hashtable<Integer, Integer> getValuesLengthIndex() {
         return valuesLengthIndex;
     }
 
-    public void setValuesLengthIndex(Hashtable<Integer, Integer> valuesLengthIndex) {
-        this.valuesLengthIndex = valuesLengthIndex;
-    }
-
-    public String getString(String variable) {
+    String getString(String variable) {
         if (saveData.getVariableLocation().get(variable) != null) {
             int block = saveData.getVariableLocation().get(variable).get(0);
             if (saveData.getBlockInfo().get(block) != null) {
@@ -61,11 +57,11 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
         return null;
     }
 
-    public void setString(String variable, String value) {
+    void setString(String variable, String value) {
         this.setString(variable, value, false);
     }
 
-    public void setString(String variable, String value, boolean utf16le) {
+    void setString(String variable, String value, boolean utf16le) {
         if (saveData.getVariableLocation().get(variable) != null) {
             if (saveData.getVariableLocation().get(variable).size() > 1) {
                 throw new IllegalStateException("Variable is defined on multiple blocks, aborting");
@@ -116,7 +112,7 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
         return buffer.array();
     }
 
-    public void setFloat(String variable, float value) throws Exception {
+    void setFloat(String variable, float value) throws Exception {
         if (saveData.getVariableLocation().get(variable) != null) {
             if (saveData.getVariableLocation().get(variable).size() > 1) {
                 throw new Exception("Variable is defined on multiple blocks, aborting");
@@ -138,7 +134,7 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
         }
     }
 
-    public float getFloat(String variable) {
+    float getFloat(String variable) {
         if (saveData.getVariableLocation().get(variable) != null) {
             int block = saveData.getVariableLocation().get(variable).get(0);
             if (saveData.getBlockInfo().get(block) != null) {
@@ -157,7 +153,7 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
         return -1;
     }
 
-    public Float[] getFloatList(String variable) {
+    Float[] getFloatList(String variable) {
         ArrayList<Float> ret = new ArrayList<>();
         if (saveData.getVariableLocation().get(variable) != null) {
             ArrayList<Integer> blocksList = saveData.getVariableLocation().get(variable);
@@ -172,7 +168,7 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
         return (Float[]) ret.toArray();
     }
 
-    public void setInt(int blockStart, String variable, int value) throws Exception {
+    void setInt(int blockStart, String variable, int value) throws Exception {
         if (saveData.getBlockInfo().get(blockStart) != null) {
             if (saveData.getBlockInfo().get(blockStart).getVariables().get(variable).getVariableType()
                     == VariableInfo.VariableType.Integer) {
@@ -188,7 +184,7 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
         }
     }
 
-    public void setInt(String variable, int value) throws Exception {
+    void setInt(String variable, int value) throws Exception {
         if (saveData.getVariableLocation().get(variable) != null) {
             if (saveData.getVariableLocation().get(variable).size() > 1) {
                 throw new Exception("Variable is defined on multiple blocks, aborting");
@@ -210,7 +206,7 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
         }
     }
 
-    public Integer getInt(int blockStart, String variable) {
+    Integer getInt(int blockStart, String variable) {
         if (saveData.getBlockInfo().get(blockStart) != null) {
             if (saveData.getBlockInfo().get(blockStart).getVariables().get(variable).getVariableType()
                     == VariableInfo.VariableType.Integer) {
@@ -225,7 +221,7 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
         return -1;
     }
 
-    public Integer getInt(String variable) {
+    Integer getInt(String variable) {
         if (saveData.getVariableLocation().get(variable) != null) {
             int block = saveData.getVariableLocation().get(variable).get(0);
             if (saveData.getBlockInfo().get(block) != null) {
@@ -244,7 +240,7 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
         return -1;
     }
 
-    public Integer[] getIntList(String variable) {
+    Integer[] getIntList(String variable) {
         ArrayList<Integer> ret = new ArrayList<>();
         if (saveData.getVariableLocation().get(variable) != null) {
             ArrayList<Integer> blocksList = saveData.getVariableLocation().get(variable);
@@ -259,7 +255,7 @@ public class ChangesTable extends Hashtable<Integer, byte[]> implements DeepClon
         return (Integer[]) ret.toArray();
     }
 
-    public void removeBlock(int offset) {
+    void removeBlock(int offset) {
         BlockInfo current = saveData.getBlockInfo().get(offset);
         this.put(current.getStart(), new byte[0]);
         this.valuesLengthIndex.put(current.getStart(), current.getSize());
