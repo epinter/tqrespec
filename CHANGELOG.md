@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.1] - 2019-07-06
+### Fixed
+- Fixed GOG library detection
+
 ## [0.6.0] - 2019-07-06
 ### Added
 - Feature to reclaim points from all skills
