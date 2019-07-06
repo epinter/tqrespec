@@ -109,11 +109,21 @@ public class GameInfo {
 
     private String getGameGogPath() {
         try {
-            return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE,
+            String gog64bit = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE,
                     "SOFTWARE\\GOG.com\\Games\\1196955511", "PATH");
+            if (StringUtils.isNotEmpty(gog64bit)) {
+                return gog64bit;
+            }
+        } catch (Exception e) {
+        }
+
+        try {
+            return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE,
+                    "SOFTWARE\\Wow6432Node\\GOG.com\\Games\\1196955511", "PATH");
         } catch (Exception e) {
             return null;
         }
+
     }
 
     private String getGameDiscPath() {
@@ -194,7 +204,7 @@ public class GameInfo {
     }
 
     public String getGamePath() throws FileNotFoundException {
-        if(DBG || !SystemUtils.IS_OS_WINDOWS) {
+        if (DBG || !SystemUtils.IS_OS_WINDOWS) {
             return Constants.DEV_GAMEDATA;
         }
         if (StringUtils.isEmpty(gamePath)) {
@@ -204,7 +214,7 @@ public class GameInfo {
             gamePath = detected;
         }
 
-        if(StringUtils.isEmpty(gamePath)) {
+        if (StringUtils.isEmpty(gamePath)) {
             return Constants.DEV_GAMEDATA;
         }
 
