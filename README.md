@@ -22,7 +22,7 @@ This software requires **Microsoft Windows 64-bit** (tested with Windows 7, 8, 8
 
 #### ***Before you start***
 
-Keep in my that this software make modifications to your save game (more specifically the file Player.chr). You shouldn't run this software while the game is running, you can corrupt your save game. So, always close the game before opening TQRespec.
+Keep in mind that this software make modifications to your save game (more specifically the file Player.chr). You shouldn't run this software while the game is running, you can corrupt your save game. So, always close the game before opening TQRespec.
 
 ![TQRespec Screenshot 1](https://raw.githubusercontent.com/epinter/tqrespec/master/assets/screenshot_attributes.png "Attributes")
 ![TQRespec Screenshot 2](https://raw.githubusercontent.com/epinter/tqrespec/master/assets/screenshot_skills.png "Skills")
