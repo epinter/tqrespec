@@ -26,9 +26,6 @@ import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 import javafx.stage.Modality;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;

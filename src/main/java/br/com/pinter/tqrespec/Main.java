@@ -33,6 +33,7 @@ import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
 import com.google.inject.Inject;
 import javafx.application.Application;
+import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.application.Preloader;
 import javafx.beans.binding.Bindings;
@@ -52,7 +53,8 @@ import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
 import java.io.*;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class Main extends Application {
@@ -65,13 +67,26 @@ public class Main extends Application {
     @Inject
     private FXMLLoader fxmlLoader;
 
-    private InjectionContext injectionContext = new InjectionContext(this,
-            Collections.singletonList(new GuiceModule()));
-
     public static void main(String... args) {
         System.setProperty("javafx.preloader", "br.com.pinter.tqrespec.gui.AppPreloader");
         launch(args);
     }
+
+    public void prepareInjectionContext() {
+        //prepare injector instance
+        List<com.google.inject.Module> modules = new ArrayList<>();
+        GuiceModule hostServicesBinding = new GuiceModule() {
+            @Override
+            protected void configure() {
+                bind(HostServices.class).toInstance(getHostServices());
+            }
+        };
+        modules.add(new GuiceModule());
+        modules.add(hostServicesBinding);
+        InjectionContext injectionContext = new InjectionContext(this, modules);
+        injectionContext.initialize();
+    }
+
 
     private void load(Stage primaryStage) {
         Task<Void> task = new Task<>() {
@@ -124,7 +139,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         //close stderr before initialize guice, we want to hide java warning about reflection
         System.err.close();
-        injectionContext.initialize();
+        prepareInjectionContext();
         try {
             System.setErr(new PrintStream(new FileOutputStream(
                     new File(System.getProperty("java.io.tmpdir"), "tqrespec.log"))));

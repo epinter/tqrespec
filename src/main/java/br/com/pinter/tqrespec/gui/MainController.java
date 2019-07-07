@@ -31,6 +31,7 @@ import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
 import br.com.pinter.tqrespec.util.Version;
 import com.google.inject.Inject;
+import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -44,9 +45,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
@@ -62,7 +60,6 @@ import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import org.apache.commons.lang3.StringUtils;
 
-import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
@@ -84,6 +81,9 @@ public class MainController implements Initializable {
 
     @Inject
     private PlayerWriter playerWriter;
+
+    @Inject
+    private HostServices hostServices;
 
     @FXML
     private VBox rootelement;
@@ -154,18 +154,15 @@ public class MainController implements Initializable {
             Version version = taskCheckVersion.getValue();
             if (version != null && version.getLastCheck() == -1) {
                 versionCheck.setOnAction(event -> {
-                    if (Desktop.isDesktopSupported()) {
-                        Desktop.getDesktop().isSupported(Desktop.Action.BROWSE);
-                        final Task<Void> openUrl = new Task<>() {
-                            @Override
-                            public Void call() throws Exception {
-                                if (StringUtils.isNotEmpty(version.getUrlPage()))
-                                    Desktop.getDesktop().browse(new URI(version.getUrlPage()));
-                                return null;
-                            }
-                        };
-                        new Thread(openUrl).start();
-                    }
+                    final Task<Void> openUrl = new Task<>() {
+                        @Override
+                        public Void call() throws Exception {
+                            if (StringUtils.isNotEmpty(version.getUrlPage()))
+                                hostServices.showDocument(new URI(version.getUrlPage()).toString());
+                            return null;
+                        }
+                    };
+                    new Thread(openUrl).start();
                 });
                 versionCheck.setText(Util.getUIMessage("about.newversion"));
             } else {
@@ -267,7 +264,7 @@ public class MainController implements Initializable {
 
     @FXML
     public void copyCharInputChanged(KeyEvent event) {
-        if(characterCombo.getValue()==null || characterCombo.getValue().isEmpty()) {
+        if (characterCombo.getValue() == null || characterCombo.getValue().isEmpty()) {
             return;
         }
         String str = copyCharInput.getText();
