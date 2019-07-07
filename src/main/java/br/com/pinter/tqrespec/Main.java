@@ -21,14 +21,17 @@
 package br.com.pinter.tqrespec;
 
 import br.com.pinter.tqrespec.core.ExceptionHandler;
+import br.com.pinter.tqrespec.core.GameProcessMonitor;
 import br.com.pinter.tqrespec.core.GuiceModule;
 import br.com.pinter.tqrespec.core.InjectionContext;
 import br.com.pinter.tqrespec.gui.MainController;
 import br.com.pinter.tqrespec.gui.ResizeListener;
 import br.com.pinter.tqrespec.tqdata.Db;
+import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
+import com.google.inject.Inject;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.application.Preloader;
@@ -47,8 +50,6 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
-
-import com.google.inject.Inject;
 
 import java.io.*;
 import java.util.Collections;
@@ -72,7 +73,6 @@ public class Main extends Application {
         launch(args);
     }
 
-
     private void load(Stage primaryStage) {
         Task<Void> task = new Task<>() {
             @Override
@@ -85,6 +85,13 @@ public class Main extends Application {
                 //preload text
                 notifyPreloader(new Preloader.ProgressNotification(0.9));
                 txt.preload();
+
+                try {
+                    new Thread(new GameProcessMonitor(GameInfo.getInstance().getGamePath())).start();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+
                 return null;
             }
         };
@@ -113,7 +120,6 @@ public class Main extends Application {
 
     }
 
-
     @Override
     public void start(Stage primaryStage) throws Exception {
         //close stderr before initialize guice, we want to hide java warning about reflection
@@ -122,7 +128,7 @@ public class Main extends Application {
         try {
             System.setErr(new PrintStream(new FileOutputStream(
                     new File(System.getProperty("java.io.tmpdir"), "tqrespec.log"))));
-        }catch (Exception ignored) {
+        } catch (Exception ignored) {
         }
         notifyPreloader(new Preloader.ProgressNotification(0.1));
         prepareMainStage(primaryStage);

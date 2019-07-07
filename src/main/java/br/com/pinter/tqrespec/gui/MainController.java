@@ -31,6 +31,7 @@ import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
 import br.com.pinter.tqrespec.util.Version;
 import com.google.inject.Inject;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -179,6 +180,18 @@ public class MainController implements Initializable {
         saveDisabled.bindBidirectional(pointsPaneController.saveDisabledProperty());
         saveDisabled.bindBidirectional(skillsPaneController.saveDisabledProperty());
 
+        State.get().gameRunningProperty().addListener((value, oldV, newV) -> {
+            if (newV) {
+                Platform.runLater(() -> {
+                    reset();
+                    Toast.show((Stage) rootelement.getScene().getWindow(),
+                            Util.getUIMessage("alert.errorgamerunning_header"),
+                            Util.getUIMessage("alert.errorgamerunning_content"),
+                            8000);
+                });
+            }
+        });
+
         new Thread(taskCheckVersion).start();
     }
 
@@ -254,6 +267,9 @@ public class MainController implements Initializable {
 
     @FXML
     public void copyCharInputChanged(KeyEvent event) {
+        if(characterCombo.getValue()==null || characterCombo.getValue().isEmpty()) {
+            return;
+        }
         String str = copyCharInput.getText();
         int caret = copyCharInput.getCaretPosition();
         StringBuilder newStr = new StringBuilder();
@@ -276,8 +292,24 @@ public class MainController implements Initializable {
         }
     }
 
+    public void reset() {
+        pointsPaneController.clearProperties();
+        skillsPaneController.resetSkilltabControls();
+        playerData.reset();
+        copyCharInput.clear();
+        copyCharInput.setDisable(true);
+        characterCombo.setValue(null);
+        characterCombo.getItems().clear();
+        addCharactersToCombo();
+        characterCombo.setDisable(false);
+        setAllControlsDisable(true);
+    }
+
     @FXML
     public void copyChar(ActionEvent evt) {
+        if (gameRunningAlert()) {
+            return;
+        }
         String targetPlayerName = copyCharInput.getText();
         setAllControlsDisable(true);
 
@@ -322,8 +354,20 @@ public class MainController implements Initializable {
 
     }
 
+    private boolean gameRunningAlert() {
+        if (State.get().getGameRunning()) {
+            Util.showError(Util.getUIMessage("alert.errorgamerunning_header"),
+                    Util.getUIMessage("alert.errorgamerunning_content"));
+            return true;
+        }
+        return false;
+    }
+
     @FXML
     public void saveChar(ActionEvent evt) {
+        if (gameRunningAlert()) {
+            return;
+        }
         SimpleIntegerProperty backupCreated = new SimpleIntegerProperty();
         SimpleIntegerProperty characterSaved = new SimpleIntegerProperty();
 
@@ -420,6 +464,7 @@ public class MainController implements Initializable {
                     saveDisabled.set(false);
                 }
                 characterCombo.setDisable(false);
+                copyCharInput.setDisable(false);
             }
         });
 

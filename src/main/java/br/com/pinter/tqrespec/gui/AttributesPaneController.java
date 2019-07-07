@@ -20,11 +20,12 @@
 
 package br.com.pinter.tqrespec.gui;
 
+import br.com.pinter.tqrespec.save.PlayerData;
+import br.com.pinter.tqrespec.tqdata.Db;
 import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
-import br.com.pinter.tqrespec.save.PlayerData;
-import br.com.pinter.tqrespec.tqdata.Db;
+import com.google.inject.Inject;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -34,9 +35,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.util.converter.NumberStringConverter;
-import org.apache.commons.lang3.StringUtils;
 
-import com.google.inject.Inject;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.util.ResourceBundle;
@@ -268,7 +267,7 @@ public class AttributesPaneController implements Initializable {
         availPointsText.textProperty().bindBidirectional(currentAvail, new NumberStringConverter());
     }
 
-    private void clearProperties() {
+    public void clearProperties() {
         if (availPointsText.textProperty().isBound())
             availPointsText.textProperty().unbindBidirectional(currentAvail);
         if (strSpinner.getValueFactory() != null && strSpinner.getValueFactory().valueProperty().isBound())
@@ -296,12 +295,18 @@ public class AttributesPaneController implements Initializable {
         lifeSpinner.setValueFactory(null);
         //noinspection unchecked
         manaSpinner.setValueFactory(null);
-        currentAvail = null;
-        currentStr = null;
-        currentInt = null;
-        currentDex = null;
-        currentLife = null;
-        currentMana = null;
+        if (currentAvail != null)
+            currentAvail.setValue(null);
+        if (currentStr != null)
+            currentStr.setValue(null);
+        if (currentInt != null)
+            currentInt.setValue(null);
+        if (currentDex != null)
+            currentDex.setValue(null);
+        if (currentLife != null)
+            currentLife.setValue(null);
+        if (currentMana != null)
+            currentMana.setValue(null);
         if (experienceText != null)
             experienceText.setText("");
         if (charLevelText != null)
@@ -310,6 +315,8 @@ public class AttributesPaneController implements Initializable {
             goldText.setText("");
         if (charClassText != null)
             charClassText.setText("");
+        if (difficultyText != null)
+            difficultyText.setText("");
 
     }
 

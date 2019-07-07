@@ -38,6 +38,7 @@ public class Constants {
     public static final boolean SKIP_INVENTORY_BLOCKS = true;
     public static final String VERSION_CHECK_URL = "https://epinter.github.io/version/tqrespec";
     public static final String DEV_GAMEDATA = Paths.get(System.getProperty("user.dir"), "gamedata").toString();
+    public static final int PROCESS_SCAN_INTERVAL_MS = 3000;
 
     public static class Save {
         public static final String SKILL_NAME = "skillName";

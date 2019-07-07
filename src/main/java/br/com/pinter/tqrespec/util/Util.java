@@ -26,6 +26,9 @@ import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 import javafx.stage.Modality;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -49,7 +52,7 @@ public class Util {
 
     public static String getBuildVersion() {
         String implementationVersion = Util.class.getPackage().getImplementationVersion();
-        if(implementationVersion == null) {
+        if (implementationVersion == null) {
             Attributes attr = readManifest();
             if (attr != null) {
                 implementationVersion = attr.getValue("Implementation-Version");
@@ -60,7 +63,7 @@ public class Util {
 
     public static String getBuildTitle() {
         String implementationTitle = Util.class.getPackage().getImplementationTitle();
-        if(implementationTitle == null) {
+        if (implementationTitle == null) {
             Attributes attr = readManifest();
             if (attr != null) {
                 implementationTitle = attr.getValue("Implementation-Title");
@@ -74,7 +77,7 @@ public class Util {
         try {
             FileSystem fs = FileSystems.getFileSystem(URI.create("jrt:/"));
             InputStream stream = Files.newInputStream(
-                    fs.getPath("modules",Util.class.getModule().getName(),"META-INF/MANIFEST.MF"));
+                    fs.getPath("modules", Util.class.getModule().getName(), "META-INF/MANIFEST.MF"));
             manifest = new Manifest(stream);
             return manifest.getMainAttributes();
         } catch (IOException e) {

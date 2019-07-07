@@ -20,10 +20,12 @@
 
 package br.com.pinter.tqrespec.gui;
 
+import javafx.beans.property.SimpleBooleanProperty;
+
 public class State {
     private static State instance = null;
-    private Boolean saveInProgress = null;
-
+    private SimpleBooleanProperty saveInProgress = new SimpleBooleanProperty(false);
+    private SimpleBooleanProperty gameRunning = new SimpleBooleanProperty(false);
 
     public static State get() {
         if (instance == null) {
@@ -37,11 +39,26 @@ public class State {
     }
 
     public Boolean getSaveInProgress() {
-        return saveInProgress;
+        return saveInProgress.getValue();
     }
 
     public void setSaveInProgress(Boolean saveInProgress) {
-        this.saveInProgress = saveInProgress;
+        this.saveInProgress.setValue(saveInProgress);
     }
 
+    public Boolean getGameRunning() {
+        return gameRunning.getValue();
+    }
+
+    public void setGameRunning(Boolean gameRunning) {
+        this.gameRunning.setValue(gameRunning);
+    }
+
+    public SimpleBooleanProperty saveInProgressProperty() {
+        return saveInProgress;
+    }
+
+    public SimpleBooleanProperty gameRunningProperty() {
+        return gameRunning;
+    }
 }

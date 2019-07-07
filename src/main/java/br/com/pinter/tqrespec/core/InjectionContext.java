@@ -42,7 +42,6 @@ public class InjectionContext {
         modulesList.add(new FXMLProvider());
         guiceInjector = Guice.createInjector(modulesList.toArray(new Module[0]));
         injectMembers(context);
-
     }
 
     public void injectMembers(Object instance) {

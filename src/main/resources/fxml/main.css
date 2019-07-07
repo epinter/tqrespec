@@ -334,3 +334,22 @@
     -fx-effect: dropshadow( one-pass-box , black , 0, 0.0 , 0 , 2 );
     -fx-text-alignment: center;
 }
+
+.tq-toast-header {
+	-fx-text-fill: #ffffff;
+	-fx-font-size: 1.6em;
+	-fx-font-family: sans-serif;
+	-fx-font-weight: bold;
+    -fx-text-alignment: right;
+    -fx-border-width: 1px;
+
+}
+
+.tq-toast-content {
+	-fx-text-fill: #ffffff;
+	-fx-font-size: 1.2em;
+	-fx-font-family: sans-serif;
+	-fx-font-weight: bold;
+    -fx-text-alignment: right;
+
+}

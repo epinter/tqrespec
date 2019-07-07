@@ -118,7 +118,7 @@ public class SkillsPaneController implements Initializable {
         updateMasteries();
     }
 
-    private void resetSkilltabControls() {
+    public void resetSkilltabControls() {
         firstMasteryLabel.setText(null);
         firstMasteryListView.getItems().clear();
         secondMasteryLabel.setText(null);
