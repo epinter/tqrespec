@@ -257,6 +257,13 @@ class ChangesTable extends Hashtable<Integer, byte[]> implements DeepCloneable {
 
     void removeBlock(int offset) {
         BlockInfo current = saveData.getBlockInfo().get(offset);
+        //we shouldnt leave var changes in the list, the block will disappear
+        // and nothing should be changed
+        for (VariableInfo v : current.getVariables().values()) {
+            if (this.get(v.getValOffset()) != null) {
+                this.remove(v.getValOffset());
+            }
+        }
         this.put(current.getStart(), new byte[0]);
         this.valuesLengthIndex.put(current.getStart(), current.getSize());
     }
