@@ -83,6 +83,9 @@ public class PlayerParserTest {
     public void readFloat_Should_readFloatFromSavegame() {
         try {
             playerParser.parse();
+            saveData.setBlockInfo(playerParser.getBlockInfo());
+            saveData.setHeaderInfo(playerParser.getHeaderInfo());
+            saveData.setVariableLocation(playerParser.getVariableLocation());
         } catch (Exception e) {
             e.printStackTrace();
         }

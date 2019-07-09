@@ -55,9 +55,8 @@ public class PlayerData {
 
     private static PlayerData instance = null;
     private String playerName = null;
-    private Path playerChr = null;
     private ByteBuffer buffer = null;
-    private boolean isCustomQuest = false;
+    private boolean customQuest = false;
     private final LinkedHashMap<String, PlayerSkill> playerSkills;
 
     public PlayerData() {
@@ -80,24 +79,16 @@ public class PlayerData {
         this.buffer = buffer;
     }
 
-    public ChangesTable getChanges() {
+    ChangesTable getChanges() {
         return changes;
     }
 
-    public Path getPlayerChr() {
-        return playerChr;
-    }
-
-    public void setPlayerChr(Path playerChr) {
-        this.playerChr = playerChr;
-    }
-
-    public boolean isCustomQuest() {
-        return isCustomQuest;
+    boolean isCustomQuest() {
+        return customQuest;
     }
 
     public void setCustomQuest(boolean customQuest) {
-        isCustomQuest = customQuest;
+        this.customQuest = customQuest;
     }
 
     public String getPlayerClassTag() {
@@ -105,6 +96,28 @@ public class PlayerData {
             return saveData.getHeaderInfo().getPlayerClassTag();
         }
         return null;
+    }
+
+    public Path getPlayerChr() {
+        return Util.playerChr(playerName, customQuest);
+    }
+
+    public boolean loadPlayer(String playerName) {
+        try {
+            reset();
+            PlayerParser playerParser = new PlayerParser();
+            this.playerName = playerName;
+            buffer = playerParser.loadPlayer(playerName,customQuest);
+            saveData.setBlockInfo(playerParser.getBlockInfo());
+            saveData.setHeaderInfo(playerParser.getHeaderInfo());
+            saveData.setVariableLocation(playerParser.getVariableLocation());
+            prepareSkillsList();
+        } catch (Exception e) {
+            reset();
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
     void prepareSkillsList() {
@@ -139,7 +152,7 @@ public class PlayerData {
     }
 
     public boolean isCharacterLoaded() {
-        return getBuffer() != null;
+        return buffer != null;
     }
 
     public int getAvailableSkillPoints() {
@@ -233,14 +246,6 @@ public class PlayerData {
         return ret;
     }
 
-    public Boolean getSaveInProgress() {
-        return State.get().getSaveInProgress();
-    }
-
-    public void setSaveInProgress(Boolean saveInProgress) {
-        State.get().setSaveInProgress(saveInProgress);
-    }
-
     public List<Skill> getPlayerSkillsFromMastery(Skill mastery) {
         List<Skill> ret = new ArrayList<>();
         for (PlayerSkill sb : getPlayerSkills().values()) {
@@ -328,7 +333,6 @@ public class PlayerData {
         this.buffer = null;
         this.playerName = null;
         this.changes.clear();
-        this.playerChr = null;
         State.get().setSaveInProgress(null);
         saveData.reset();
     }

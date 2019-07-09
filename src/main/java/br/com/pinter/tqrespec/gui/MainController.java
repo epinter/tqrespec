@@ -24,7 +24,6 @@ import br.com.pinter.tqrespec.core.EventHandlerWithException;
 import br.com.pinter.tqrespec.core.TaskWithException;
 import br.com.pinter.tqrespec.core.WorkerThread;
 import br.com.pinter.tqrespec.save.PlayerData;
-import br.com.pinter.tqrespec.save.PlayerParser;
 import br.com.pinter.tqrespec.save.PlayerWriter;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.util.Constants;
@@ -75,9 +74,6 @@ public class MainController implements Initializable {
 
     @Inject
     private PlayerData playerData;
-
-    @Inject
-    private PlayerParser playerParser;
 
     @Inject
     private PlayerWriter playerWriter;
@@ -448,7 +444,7 @@ public class MainController implements Initializable {
         TaskWithException<Boolean> loadTask = new TaskWithException<>() {
             @Override
             protected Boolean call() throws Exception {
-                return playerParser.loadPlayer(playerName);
+                return playerData.loadPlayer(playerName);
             }
         };
 

@@ -21,11 +21,13 @@
 package br.com.pinter.tqrespec.util;
 
 import br.com.pinter.tqrespec.gui.State;
+import br.com.pinter.tqrespec.tqdata.GameInfo;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 import javafx.stage.Modality;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -233,5 +235,17 @@ public class Util {
                 }
             };
         }
+    }
+
+    public static Path playerChr(String playerName, boolean customQuest) {
+        String path;
+
+        if (customQuest) {
+            path = GameInfo.getInstance().getSaveDataUserPath();
+        } else {
+            path = GameInfo.getInstance().getSaveDataMainPath();
+        }
+
+        return Paths.get(path,"_" + playerName, "Player.chr");
     }
 }

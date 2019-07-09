@@ -20,7 +20,7 @@
 
 package br.com.pinter.tqrespec.save;
 
-import br.com.pinter.tqrespec.tqdata.GameInfo;
+import br.com.pinter.tqrespec.gui.State;
 import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
 import com.google.inject.Inject;
@@ -32,34 +32,49 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
-import java.nio.file.Paths;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-public class PlayerParser extends FileParser {
-    @Inject
-    private SaveData saveData;
-
-    @Inject
-    private PlayerData playerData;
-
+public final class PlayerParser extends FileParser {
     private final static boolean DBG = false;
     private String player = null;
     private boolean customQuest = false;
+    private ByteBuffer buffer = null;
+
+    private Hashtable<Integer, BlockInfo> blockInfo = new Hashtable<>();
+    private HeaderInfo headerInfo = new HeaderInfo();
+    private Hashtable<String, ArrayList<Integer>> variableLocation = new Hashtable<>();
 
     @Override
     protected void prepareBufferForRead() {
-        playerData.getBuffer().rewind();
+        buffer.rewind();
     }
 
     @Override
     protected ByteBuffer getBuffer() {
-        return playerData.getBuffer();
+        return buffer;
+    }
+
+    public void setBuffer(ByteBuffer buffer) {
+        this.buffer = buffer;
+    }
+
+    void setPlayer(String player) {
+        this.player = player;
     }
 
     @Override
     protected Hashtable<String, ArrayList<Integer>> getVariableLocation() {
-        return saveData.getVariableLocation();
+        return variableLocation;
+    }
+
+    public Hashtable<Integer, BlockInfo> getBlockInfo() {
+        return blockInfo;
+    }
+
+    public HeaderInfo getHeaderInfo() {
+        return headerInfo;
     }
 
     HeaderInfo parseHeader() {
@@ -108,9 +123,7 @@ public class PlayerParser extends FileParser {
         }
         if (DBG) Util.log(String.format("File '%s' loaded, size=%d",
                 this.player, this.getBuffer().capacity()));
-        HeaderInfo headerInfo = parseHeader();
-
-        saveData.setHeaderInfo(headerInfo);
+        headerInfo = parseHeader();
 
         if (headerInfo.getHeaderVersion() != 2 && headerInfo.getHeaderVersion() != 3) {
             throw new IncompatibleSavegameException(
@@ -120,68 +133,56 @@ public class PlayerParser extends FileParser {
             throw new IncompatibleSavegameException(
                     String.format("Incompatible player '%s' (playerVersion must be == 5)", this.player));
         }
-        Hashtable<Integer, BlockInfo> blocks = this.parseAllBlocks();
-        saveData.setBlockInfo(blocks);
+        blockInfo = this.parseAllBlocks();
+
         if (inventoryStart == -1) {
             this.parseFooter();
         }
         this.prepareBufferForRead();
-        playerData.setPlayerName(player);
     }
 
-    public boolean loadPlayer(String playerName) throws Exception {
-        if (playerData.getSaveInProgress() != null && playerData.getSaveInProgress()) {
-            return false;
+    public ByteBuffer loadPlayer(String playerName, boolean customQuest) throws Exception {
+        if (State.get().getSaveInProgress() != null && State.get().getSaveInProgress()) {
+            return null;
         }
-        player = playerName;
+        this.customQuest = customQuest;
+        this.player = playerName;
         parse();
-        playerData.prepareSkillsList();
-        return true;
+        return buffer;
     }
 
     @Override
     protected void reset() {
         super.reset();
-        playerData.reset();
+        buffer = null;
+        variableLocation = new Hashtable<>();
+        blockInfo = new Hashtable<>();
+        headerInfo = new HeaderInfo();
     }
 
     void readPlayerChr() throws Exception {
         reset();
-        String path;
-        if (customQuest) {
-            path = GameInfo.getInstance().getSaveDataUserPath();
-        } else {
-            path = GameInfo.getInstance().getSaveDataMainPath();
-        }
-        File playerChr = new File(path,
-                Paths.get("_" + this.player, "Player.chr").toString());
 
+        File playerChr = new File(Util.playerChr(player, customQuest).toString());
 
         if (!playerChr.exists()) {
             System.err.printf("File '%s' doesn't exists\n", playerChr.toString());
             return;
         }
 
-        try {
-            FileChannel in = new FileInputStream(playerChr).getChannel();
-            playerData.setBuffer(ByteBuffer.allocate((int) in.size()));
-            this.getBuffer().order(ByteOrder.LITTLE_ENDIAN);
-            playerData.getBuffer().rewind();
+        FileChannel in = new FileInputStream(playerChr).getChannel();
+        setBuffer(ByteBuffer.allocate((int) in.size()));
+        this.getBuffer().order(ByteOrder.LITTLE_ENDIAN);
+        this.getBuffer().rewind();
 
-            while (true) {
-                if (in.read(this.getBuffer()) <= 0) break;
-            }
-            in.close();
-
-            this.prepareBufferForRead();
-
-            if (DBG) Util.log("File read to buffer: " + this.getBuffer());
-
-            playerData.setPlayerChr(playerChr.toPath());
-        } catch (Exception e) {
-            playerData.reset();
-            throw e;
+        while (true) {
+            if (in.read(this.getBuffer()) <= 0) break;
         }
+        in.close();
+
+        this.prepareBufferForRead();
+
+        if (DBG) Util.log("File read to buffer: " + this.getBuffer());
 
     }
 
@@ -415,21 +416,5 @@ public class PlayerParser extends FileParser {
                 if (DBG) Util.log(String.format("name=%s; value=%s", name, value));
             }
         }
-    }
-
-    @SuppressWarnings("SameParameterValue")
-    void setPlayer(String player) {
-        this.player = player;
-    }
-
-
-    @SuppressWarnings("unused")
-    public boolean isCustomQuest() {
-        return customQuest;
-    }
-
-    @SuppressWarnings("unused")
-    public void customQuest(boolean customQuest) {
-        this.customQuest = customQuest;
     }
 }

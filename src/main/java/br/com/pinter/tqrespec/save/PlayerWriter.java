@@ -20,6 +20,7 @@
 
 package br.com.pinter.tqrespec.save;
 
+import br.com.pinter.tqrespec.gui.State;
 import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.Settings;
@@ -114,17 +115,17 @@ public class PlayerWriter {
     }
 
     public boolean saveCurrent() throws IOException {
-        if (playerData.getSaveInProgress() != null && playerData.getSaveInProgress()) {
+        if (State.get().getSaveInProgress() != null && State.get().getSaveInProgress()) {
             return false;
         }
-        playerData.setSaveInProgress(true);
+        State.get().setSaveInProgress(true);
         String playerChr = playerData.getPlayerChr().toString();
         try {
             this.writeBuffer(playerChr);
-            playerData.setSaveInProgress(false);
+            State.get().setSaveInProgress(false);
             return true;
         } catch (IOException e) {
-            playerData.setSaveInProgress(false);
+            State.get().setSaveInProgress(false);
             e.printStackTrace();
             throw e;
         }
@@ -166,7 +167,7 @@ public class PlayerWriter {
     }
 
     public void copyCurrentSave(String toPlayerName) throws IOException {
-        playerData.setSaveInProgress(true);
+        State.get().setSaveInProgress(true);
         String path;
         if (playerData.isCustomQuest()) {
             path = GameInfo.getInstance().getSaveDataUserPath();
@@ -180,7 +181,7 @@ public class PlayerWriter {
         Path playerSaveDirTarget = Paths.get(path, "_" + toPlayerName);
 
         if (Files.exists(playerSaveDirTarget)) {
-            playerData.setSaveInProgress(false);
+            State.get().setSaveInProgress(false);
             throw new FileAlreadyExistsException("Target Directory already exists");
         }
         Util.copyDirectoryRecurse(playerSaveDirSource, playerSaveDirTarget, false);
@@ -190,6 +191,6 @@ public class PlayerWriter {
         changesTable.setString("myPlayerName", toPlayerName, true);
 
         this.writeBuffer(Paths.get(playerSaveDirTarget.toString(), "Player.chr").toString(), changesTable);
-        playerData.setSaveInProgress(false);
+        State.get().setSaveInProgress(false);
     }
 }
