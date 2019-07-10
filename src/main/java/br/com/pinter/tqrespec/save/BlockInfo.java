@@ -30,6 +30,7 @@ public class BlockInfo implements Serializable {
     private int end = -1;
     private int size = -1;
     private Hashtable<String, VariableInfo> variables = null;
+    private int parentOffset = -1;
 
     public String getTag() {
         return tag;
@@ -63,6 +64,14 @@ public class BlockInfo implements Serializable {
         this.size = size;
     }
 
+    public int getParentOffset() {
+        return parentOffset;
+    }
+
+    public void setParentOffset(int parentOffset) {
+        this.parentOffset = parentOffset;
+    }
+
     Hashtable<String, VariableInfo> getVariables() {
         return variables;
     }
@@ -79,6 +88,7 @@ public class BlockInfo implements Serializable {
                 ", end=" + end +
                 ", size=" + size +
                 ", variables=" + variables +
+                ", parentOffset=" + parentOffset +
                 '}';
     }
 }

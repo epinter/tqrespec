@@ -84,4 +84,17 @@ public class PlayerSkill {
     public void setBlockStart(int blockStart) {
         this.blockStart = blockStart;
     }
+
+    @Override
+    public String toString() {
+        return "PlayerSkill{" +
+                "skillName='" + skillName + '\'' +
+                ", skillEnabled=" + skillEnabled +
+                ", skillActive=" + skillActive +
+                ", skillSubLevel=" + skillSubLevel +
+                ", skillTransition=" + skillTransition +
+                ", skillLevel=" + skillLevel +
+                ", blockStart=" + blockStart +
+                '}';
+    }
 }

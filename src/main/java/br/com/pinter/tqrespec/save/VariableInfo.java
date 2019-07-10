@@ -31,15 +31,7 @@ public class VariableInfo implements Serializable {
     private String valueString = null;
     private Integer valueInteger = null;
     private Float valueFloat = null;
-
-    public enum VariableType {
-        Unknown,
-        String,
-        Integer,
-        Float,
-        UID
-    }
-
+    private byte[] valueByteArray = null;
     private VariableType variableType;
 
     public String getName() {
@@ -77,10 +69,14 @@ public class VariableInfo implements Serializable {
     public Object getValue() {
         if (variableType == VariableType.Integer)
             return valueInteger;
-        if (variableType == VariableType.String)
+        if (variableType == VariableType.String || variableType == VariableType.StringUtf16le)
             return valueString;
         if (variableType == VariableType.Float)
             return valueFloat;
+        if (variableType == VariableType.UID)
+            return valueByteArray;
+        if (variableType == VariableType.Stream)
+            return valueByteArray;
         return null;
     }
 
@@ -94,6 +90,10 @@ public class VariableInfo implements Serializable {
 
     public void setValue(float value) {
         this.valueFloat = value;
+    }
+
+    public void setValue(byte[] value) {
+        this.valueByteArray = value;
     }
 
     public VariableType getVariableType() {

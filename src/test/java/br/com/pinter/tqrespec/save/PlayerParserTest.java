@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertTrue;
@@ -72,10 +73,20 @@ public class PlayerParserTest {
             e.printStackTrace();
             fail("parseAllBlocks: readPlayerChr() failed");
         }
-        Hashtable<Integer, BlockInfo> blocks = playerParser.parseAllBlocks();
-        assertNotNull(blocks);
-        assertFalse(blocks.isEmpty());
-        assertTrue(blocks.size() > 1);
+
+
+        try {
+            playerParser.fillBuffer();
+            playerParser.buildBlocksTable();
+            playerParser.prepareForParse();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        playerParser.parseAllBlocks();
+        assertNotNull(playerParser.getBlockInfo());
+        assertFalse(playerParser.getBlockInfo().isEmpty());
+        assertTrue(playerParser.getBlockInfo().size() > 1);
 
     }
 
@@ -94,7 +105,7 @@ public class PlayerParserTest {
         assertTrue(varLocation > 0);
         BlockInfo blockInfo = saveData.getBlockInfo().get(varLocation);
         assertNotNull(blockInfo);
-        assertEquals(blockInfo.getVariables().get("str").getVariableType(), VariableInfo.VariableType.Float);
+        assertEquals(blockInfo.getVariables().get("str").getVariableType(), VariableType.Float);
         Float str = (Float) blockInfo.getVariables().get("str").getValue();
         assertNotNull(str);
         assertTrue(str > 0.0);
@@ -129,7 +140,7 @@ public class PlayerParserTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Hashtable<String, ArrayList<Integer>> variableLocation = playerParser.getVariableLocation();
+        ConcurrentHashMap<String, ArrayList<Integer>> variableLocation = playerParser.getVariableLocation();
         assertNotNull(variableLocation);
         assertFalse(variableLocation.isEmpty());
     }
@@ -148,9 +159,14 @@ public class PlayerParserTest {
     public void parseHeader_Should_parseFileHeader() {
         try {
             playerParser.readPlayerChr();
+            playerParser.fillBuffer();
+            playerParser.buildBlocksTable();
+            playerParser.prepareForParse();
+            playerParser.prepareBufferForRead();
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         HeaderInfo headerInfo = playerParser.parseHeader();
         assertNotNull(headerInfo);
         assertTrue(headerInfo.getHeaderVersion() > 0);

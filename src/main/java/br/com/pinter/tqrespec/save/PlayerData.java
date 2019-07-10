@@ -115,7 +115,7 @@ public class PlayerData {
         } catch (Exception e) {
             reset();
             e.printStackTrace();
-            return false;
+            throw new RuntimeException(e);
         }
         return true;
     }
@@ -125,6 +125,14 @@ public class PlayerData {
         for (String v : saveData.getVariableLocation().keySet()) {
             if (v.startsWith(Database.Variables.PREFIX_SKILL_NAME)) {
                 for (int blockOffset : saveData.getVariableLocation().get(v)) {
+                    int parent = saveData.getBlockInfo().get(blockOffset).getParentOffset();
+                    if (parent >= 0) {
+                        if (!saveData.getBlockInfo().get(parent).getVariables().containsKey("max")) {
+                            continue;
+                        }
+                    } else {
+                        continue;
+                    }
                     BlockInfo b = saveData.getBlockInfo().get(blockOffset);
                     if (changes.get(b.getStart()) != null
                             && changes.get(b.getStart()).length == 0) {
@@ -190,7 +198,7 @@ public class PlayerData {
         BlockInfo sk = saveData.getBlockInfo().get(blockStart);
         VariableInfo varSkillLevel = sk.getVariables().get("skillLevel");
 
-        if (varSkillLevel.getVariableType() == VariableInfo.VariableType.Integer) {
+        if (varSkillLevel.getVariableType() == VariableType.Integer) {
             return changes.getInt(blockStart, "skillLevel");
         }
         return -1;
@@ -205,7 +213,7 @@ public class PlayerData {
 
         BlockInfo skillToRemove = saveData.getBlockInfo().get(blockStart);
         VariableInfo varSkillLevel = skillToRemove.getVariables().get("skillLevel");
-        if (varSkillLevel.getVariableType() == VariableInfo.VariableType.Integer) {
+        if (varSkillLevel.getVariableType() == VariableType.Integer) {
             int currentSkillPoints = changes.getInt("skillPoints");
             int currentSkillLevel = (int) varSkillLevel.getValue();
             changes.setInt("skillPoints", currentSkillPoints + currentSkillLevel);

@@ -45,8 +45,12 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 @SuppressWarnings("ALL")
 public class Util {
-    public static void log(String message) {
+    public static void log(Object message) {
         System.err.println(message);
+    }
+
+    public static void log(String fmt, Object... args) {
+        System.err.printf(fmt, args);
     }
 
     public static String getBuildVersion() {
@@ -245,6 +249,7 @@ public class Util {
         } else {
             path = GameInfo.getInstance().getSaveDataMainPath();
         }
+
 
         return Paths.get(path,"_" + playerName, "Player.chr");
     }

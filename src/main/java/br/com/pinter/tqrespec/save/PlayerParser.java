@@ -21,9 +21,7 @@
 package br.com.pinter.tqrespec.save;
 
 import br.com.pinter.tqrespec.gui.State;
-import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
-import com.google.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -32,97 +30,112 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-public final class PlayerParser extends FileParser {
+final class PlayerParser extends FileParser {
     private final static boolean DBG = false;
     private String player = null;
     private boolean customQuest = false;
-    private ByteBuffer buffer = null;
-
-    private Hashtable<Integer, BlockInfo> blockInfo = new Hashtable<>();
     private HeaderInfo headerInfo = new HeaderInfo();
-    private Hashtable<String, ArrayList<Integer>> variableLocation = new Hashtable<>();
-
-    @Override
-    protected void prepareBufferForRead() {
-        buffer.rewind();
-    }
-
-    @Override
-    protected ByteBuffer getBuffer() {
-        return buffer;
-    }
-
-    public void setBuffer(ByteBuffer buffer) {
-        this.buffer = buffer;
-    }
 
     void setPlayer(String player) {
         this.player = player;
     }
 
-    @Override
-    protected Hashtable<String, ArrayList<Integer>> getVariableLocation() {
-        return variableLocation;
-    }
-
-    public Hashtable<Integer, BlockInfo> getBlockInfo() {
-        return blockInfo;
-    }
-
-    public HeaderInfo getHeaderInfo() {
+    HeaderInfo getHeaderInfo() {
         return headerInfo;
     }
 
     HeaderInfo parseHeader() {
-        int headerEnd = searchBlockTag("begin_block", 0) - 1;
-        HeaderInfo headerInfo = new HeaderInfo();
+        BlockInfo block = new BlockInfo();
+        int headerEnd = getBuffer().capacity() - 1;
+        block.setStart(0);
+        block.setEnd(headerEnd);
+        block.setSize(headerEnd + 1);
+        block.setVariables(new Hashtable<>());
 
+        HeaderInfo headerInfo = new HeaderInfo();
         while (this.getBuffer().position() <= headerEnd) {
-            String name = readString(this.getBuffer());
+            int keyOffset = getBuffer().position();
+
+            String name = readString();
             if (StringUtils.isEmpty(name)) continue;
-            if (name.equalsIgnoreCase("headerVersion")) {
-                int value = this.getBuffer().getInt();
-                if (DBG) Util.log(String.format("name=%s; value=%s", name, value));
-                headerInfo.setHeaderVersion(value);
-            } else if (name.equalsIgnoreCase("playerCharacterClass")) {
-                String value = readString(this.getBuffer());
-                headerInfo.setPlayerCharacterClass(value);
-                if (DBG) Util.log(String.format("name=%s; value=%s", name, value));
-            } else if (name.equalsIgnoreCase("uniqueId")) {
-                this.getBuffer().position(this.getBuffer().position() + 16);
-            } else if (name.equalsIgnoreCase("streamData")) {
-                int data_length = this.getBuffer().getInt();
-                this.getBuffer().position(this.getBuffer().position() + data_length);
-            } else if (name.equalsIgnoreCase("playerClassTag")) {
-                String value = readString(this.getBuffer());
-                headerInfo.setPlayerClassTag(value);
-                if (DBG) Util.log(String.format("name=%s; value=%s", name, value));
-            } else if (name.equalsIgnoreCase("playerLevel")) {
-                int value = this.getBuffer().getInt();
-                if (DBG) Util.log(String.format("name=%s; value=%s", name, value));
-                headerInfo.setPlayerLevel(value);
-            } else if (name.equalsIgnoreCase("playerVersion")) {
-                int value = this.getBuffer().getInt();
-                if (DBG) Util.log(String.format("name=%s; value=%s", name, value));
-                headerInfo.setPlayerVersion(value);
+
+            if (name.equals(BEGIN_BLOCK)) {
+                BlockInfo b = getBlockInfo().get(keyOffset);
+                if (DBG) {
+                    Util.log("ignoring block offset: " + keyOffset);
+                }
+                getBuffer().position(b.getEnd() + 1);
+                continue;
             }
+
+            VariableInfo variableInfo = new VariableInfo();
+            variableInfo.setKeyOffset(keyOffset);
+            variableInfo.setName(name);
+            variableInfo.setVariableType(VariableType.Unknown);
+
+            for (PlayerFileVariable e : PlayerFileVariable.values()) {
+                if (e.var().equals(name) && e.location() == FileBlockType.PlayerHeader) {
+                    readVar(name, variableInfo);
+
+                    if (e.type() == VariableType.Integer) {
+                        int value = (int) variableInfo.getValue();
+
+                        if (DBG) Util.log(String.format("name=%s; value=%s", name, value));
+                        if (name.equals(PlayerFileVariable.headerVersion.var()))
+                            headerInfo.setHeaderVersion(value);
+                        if (name.equals(PlayerFileVariable.playerVersion.var()))
+                            headerInfo.setPlayerVersion(value);
+                        if (name.equals(PlayerFileVariable.playerLevel.var()))
+                            headerInfo.setPlayerLevel(value);
+                    }
+
+                    if (e.type() == VariableType.String) {
+                        String value = (String) variableInfo.getValue();
+                        if (DBG) Util.log(String.format("name=%s; value=%s", name, value));
+                        if (name.equals(PlayerFileVariable.playerCharacterClass.var()))
+                            headerInfo.setPlayerCharacterClass(value);
+                        if (name.equals(PlayerFileVariable.playerClassTag.var())) {
+                            headerInfo.setPlayerClassTag(value);
+                        }
+                    }
+                    if (e.type() == VariableType.Stream) {
+                        byte[] value = (byte[]) variableInfo.getValue();
+                        if (DBG) Util.log(String.format("name=%s; value=%s", name, new String(value)));
+                    }
+                }
+
+            }
+
+            if (variableInfo.getVariableType() == VariableType.Unknown) {
+                throw new IllegalStateException(String.format("An invalid variable (%s) was found in header, aborting."
+                        , name));
+            }
+            block.getVariables().put(variableInfo.getName(), variableInfo);
         }
+        getBlockInfo().put(block.getStart(), block);
         return headerInfo;
     }
 
     @Override
-    public void parse() throws Exception {
+    void fillBuffer() throws Exception {
         readPlayerChr();
+        prepareBufferForRead();
+    }
+
+    @Override
+    void prepareForParse() throws Exception {
+        //add header to list of ignored blocks
+        getBlocksIgnore().add(0);
 
         if (this.getBuffer() == null || this.getBuffer().capacity() <= 50) {
             throw new IOException("Can't read Player.chr from player " + this.player);
         }
         if (DBG) Util.log(String.format("File '%s' loaded, size=%d",
                 this.player, this.getBuffer().capacity()));
+
         headerInfo = parseHeader();
 
         if (headerInfo.getHeaderVersion() != 2 && headerInfo.getHeaderVersion() != 3) {
@@ -133,30 +146,21 @@ public final class PlayerParser extends FileParser {
             throw new IncompatibleSavegameException(
                     String.format("Incompatible player '%s' (playerVersion must be == 5)", this.player));
         }
-        blockInfo = this.parseAllBlocks();
-
-        if (inventoryStart == -1) {
-            this.parseFooter();
-        }
-        this.prepareBufferForRead();
     }
 
-    public ByteBuffer loadPlayer(String playerName, boolean customQuest) throws Exception {
+    ByteBuffer loadPlayer(String playerName, boolean customQuest) throws Exception {
         if (State.get().getSaveInProgress() != null && State.get().getSaveInProgress()) {
             return null;
         }
         this.customQuest = customQuest;
         this.player = playerName;
         parse();
-        return buffer;
+        return getBuffer();
     }
 
     @Override
-    protected void reset() {
+    void reset() {
         super.reset();
-        buffer = null;
-        variableLocation = new Hashtable<>();
-        blockInfo = new Hashtable<>();
         headerInfo = new HeaderInfo();
     }
 
@@ -166,255 +170,121 @@ public final class PlayerParser extends FileParser {
         File playerChr = new File(Util.playerChr(player, customQuest).toString());
 
         if (!playerChr.exists()) {
-            System.err.printf("File '%s' doesn't exists\n", playerChr.toString());
+            Util.log("File '%s' doesn't exists\n", playerChr.toString());
             return;
         }
 
         FileChannel in = new FileInputStream(playerChr).getChannel();
         setBuffer(ByteBuffer.allocate((int) in.size()));
         this.getBuffer().order(ByteOrder.LITTLE_ENDIAN);
-        this.getBuffer().rewind();
 
         while (true) {
             if (in.read(this.getBuffer()) <= 0) break;
         }
         in.close();
 
-        this.prepareBufferForRead();
-
         if (DBG) Util.log("File read to buffer: " + this.getBuffer());
 
     }
 
     @Override
-    protected Hashtable<String, VariableInfo> parseBlock(BlockInfo blockInfo) {
+    Hashtable<String, VariableInfo> parseBlock(BlockInfo block) {
         Hashtable<String, VariableInfo> ret = new Hashtable<>();
-
-        this.getBuffer().position(blockInfo.getStart() + getBlockTagSize("begin_block"));
-
-        int keyread = 0;
-        int valread = 0;
-
+        FileBlockType fileBlock = FileBlockType.Body;
+        this.getBuffer().position(block.getStart() + BEGIN_BLOCK_SIZE);
         ArrayList<VariableInfo> temp = new ArrayList<>();
 
-        while (this.getBuffer().position() <= (blockInfo.getEnd() - getBlockTagSize("end_block"))) {
-            int dataOffset = 0;
+        while (this.getBuffer().position() < block.getEnd() - END_BLOCK_SIZE) {
             int keyOffset = getBuffer().position();
-            String name = readString(getBuffer());
-            keyread++;
+            String name = readString();
 
             if (StringUtils.isEmpty(name)) {
+                Util.log(String.format("empty name at block %d pos %d (BEGIN_BLOCK_SIZE=%d, END_BLOCK_SIZE=%d, block_start=%s block_end=%d",
+                        block.getStart(), keyOffset, BEGIN_BLOCK_SIZE, END_BLOCK_SIZE, block.getStart(), block.getEnd()));
                 continue;
             }
 
-            if (StringUtils.isEmpty(name)) {
-                if (DBG)
-                    Util.log(String.format("empty name at block %d pos %d", blockInfo.getStart(), getBuffer().position()));
+            if (name.equals(BEGIN_BLOCK)) {
+                //ignore all child blocks, will be parsed by main loop in parseAllBlocks
+                BlockInfo subBlock = getBlockInfo().get(keyOffset);
+                getBuffer().position(subBlock.getEnd() + 1);
+                continue;
+            }
+            if (name.equals(END_BLOCK)) {
+                continue;
             }
 
-            VariableInfo variableInfo = new VariableInfo();
-            variableInfo.setValOffset(getBuffer().position());
-            variableInfo.setVariableType(VariableInfo.VariableType.Unknown);
-            variableInfo.setKeyOffset(keyOffset);
+            IFileVariable fileVariable;
+            try {
+                fileVariable = PlayerFileVariable.valueOf(filterFileVariableName(name));
+                if (fileVariable.location() != FileBlockType.Body
+                        && fileVariable.location() != FileBlockType.Unknown
+                        && fileVariable.location() != FileBlockType.Multiple) {
+                    fileBlock = fileVariable.location();
+                }
+            } catch (Exception e) {
+                throw new IllegalStateException(String.format("An invalid variable (%s) was found in block %s (%s), aborting."
+                        , name, block.getStart(), fileBlock), e.getCause());
+            }
+
+            //prepare fileblock for special var 'temp'(attributes)
+            if (name.equals("temp") && fileBlock == FileBlockType.Body) {
+                fileBlock = FileBlockType.PlayerAttributes;
+            }
+
+            VariableInfo variableInfo = readVar(name, fileBlock);
             variableInfo.setName(name);
+            variableInfo.setKeyOffset(keyOffset);
 
-            if (name.equalsIgnoreCase("begin_block")) {
-                dataOffset -= getBlockTagSize("begin_block");
-                valread++;
-            } else if (name.equalsIgnoreCase("end_block")) {
-                dataOffset -= getBlockTagSize("end_block");
-                valread++;
-                if (temp.size() == 1) {
-                    VariableInfo endBlockVar = temp.get(temp.size() - 1);
-                    endBlockVar.setName("difficulty");
-                    ret.put(endBlockVar.getName(), endBlockVar);
-                    putVarIndex(endBlockVar.getName(), blockInfo.getStart());
-                    int diffInt = this.getBuffer().getInt(endBlockVar.getValOffset());
-                    endBlockVar.setValue(diffInt);
-                    endBlockVar.setVariableType(VariableInfo.VariableType.Integer);
-                    if (DBG)
-                        Util.log(String.format("blockStart: %d; variableInfo: %s; data_offset=%d", blockInfo.getStart(), endBlockVar.toString(), dataOffset));
-                }
-            } else if (name.equalsIgnoreCase("myPlayerName")
-                    || name.equalsIgnoreCase("defaultText")
-                    || name.equalsIgnoreCase("(*greatestMonsterKilledName)[i]")) {
-                this.readString(variableInfo, this.getBuffer(), true);
-                if (variableInfo.getValSize() >= 0) {
-                    valread++;
-                }
-            } else if (name.equalsIgnoreCase("playerTexture")
-                    || name.equalsIgnoreCase("skillName")) {
-                this.readString(variableInfo, this.getBuffer());
-                if (variableInfo.getValSize() >= 0) {
-                    valread++;
-                }
-            } else if (name.equalsIgnoreCase("isInMainQuest")
-                    || name.equalsIgnoreCase("disableAutoPopV2")
-                    || name.equalsIgnoreCase("numTutorialPagesV2")
-                    || name.equalsIgnoreCase("currentPageV2")
-                    || name.equalsIgnoreCase("teleportUIDsSize")
-                    || name.equalsIgnoreCase("markerUIDsSize")
-                    || name.equalsIgnoreCase("respawnUIDsSize")
-                    || name.equalsIgnoreCase("versionCheckRespawnInfo")
-                    || name.equalsIgnoreCase("versionCheckTeleportInfo")
-                    || name.equalsIgnoreCase("versionCheckMovementInfo")
-                    || name.equalsIgnoreCase("compassState")
-                    || name.equalsIgnoreCase("skillWindowShowHelp")
-                    || name.equalsIgnoreCase("useAlternate")
-                    || name.equalsIgnoreCase("alternateConfig")
-                    || name.equalsIgnoreCase("alternateConfigEnabled")
-                    || name.equalsIgnoreCase("itemsFoundOverLifetimeUniqueTotal")
-                    || name.equalsIgnoreCase("itemsFoundOverLifetimeRandomizedTotal")
-                    || name.equalsIgnoreCase("hasBeenInGame")
-                    || name.equalsIgnoreCase("tempBool")
-                    || name.equalsIgnoreCase("alternate")
-                    || name.equalsIgnoreCase("skillLevel")
-                    || name.equalsIgnoreCase("skillEnabled")
-                    || name.equalsIgnoreCase("skillSubLevel")
-                    || name.startsWith("skillActive")
-                    || name.equalsIgnoreCase("skillWindowSelection")
-                    || name.equalsIgnoreCase("skillSettingValid")
-                    || name.startsWith("primarySkill")
-                    || name.startsWith("secondarySkill")
-                    || name.equalsIgnoreCase("playTimeInSeconds")
-                    || name.equalsIgnoreCase("numberOfDeaths")
-                    || name.equalsIgnoreCase("numberOfKills")
-                    || name.equalsIgnoreCase("experienceFromKills")
-                    || name.equalsIgnoreCase("healthPotionsUsed")
-                    || name.equalsIgnoreCase("manaPotionsUsed")
-                    || name.equalsIgnoreCase("maxLevel")
-                    || name.equalsIgnoreCase("numHitsReceived")
-                    || name.equalsIgnoreCase("numHitsInflicted")
-                    || name.equalsIgnoreCase("greatestDamageInflicted")
-                    || name.equalsIgnoreCase("(*greatestMonsterKilledLevel)[i]")
-                    || name.equalsIgnoreCase("(*greatestMonsterKilledLifeAndMana)[i]")
-                    || name.equalsIgnoreCase("criticalHitsInflicted")
-                    || name.equalsIgnoreCase("skillTransition")
-                    || name.equalsIgnoreCase("criticalHitsReceived")
-                    || name.equalsIgnoreCase("size")
-                    || name.equalsIgnoreCase("max")
-                    || name.equalsIgnoreCase("equipmentSelection")
-                    || name.equalsIgnoreCase("equipmentCtrlIOStreamVersion")
-                    || name.equalsIgnoreCase("seed")
-                    || name.equalsIgnoreCase("var1")
-                    || name.equalsIgnoreCase("storedType")) {
-                variableInfo.setVariableType(VariableInfo.VariableType.Integer);
-                this.readInt(variableInfo);
-                if (variableInfo.getValSize() >= 0) {
-                    valread++;
-                }
-            } else if (name.equalsIgnoreCase("teleportUID")
-                    || name.equalsIgnoreCase("respawnUID")
-                    || name.equalsIgnoreCase("markerUID")
-                    || name.equalsIgnoreCase("strategicMovementRespawnPoint[i]")
-            ) {
-                variableInfo.setVariableType(VariableInfo.VariableType.UID);
-                dataOffset = 16;
-                variableInfo.setValSize(16);
-                valread++;
-            } else if (name.equalsIgnoreCase("currentStats.experiencePoints")
-                    || name.equalsIgnoreCase("currentStats.charLevel")
-                    || name.equalsIgnoreCase("modifierPoints")
-                    || name.equalsIgnoreCase("skillPoints")
-                    || name.equalsIgnoreCase("versionRespawnPoint")
-                    || name.equalsIgnoreCase("money")) {
-                this.readInt(variableInfo);
-                if (variableInfo.getValSize() >= 0) {
-                    valread++;
-                }
-            } else if (name.equalsIgnoreCase("itemPositionsSavedAsGridCoords")) {
-                //inventory
-                if (Constants.SKIP_INVENTORY_BLOCKS) {
-                    inventoryStart = variableInfo.getValOffset();
-                } else {
-                    throw new IllegalArgumentException("Inventory parsing not implemented");
-                }
-                break;
-            } else if (name.equalsIgnoreCase("temp")) {
-                this.readFloat(variableInfo);
-                if (variableInfo.getValSize() >= 0) {
-                    valread++;
-                }
-            } else {
-                variableInfo.setVariableType(VariableInfo.VariableType.Integer);
-                dataOffset = this.getBuffer().getInt();
-                variableInfo.setValSize(dataOffset);
-                valread++;
-            }
-            if (keyread > 0) {
-                if (valread > 0) {
-                    keyread = 0;
-                    valread = 0;
-                } else {
-                    dataOffset = 4;
-                }
+            //store variable for attributes and difficulty in a dedicated list
+            if (name.equals("temp")) {
+                temp.add(variableInfo);
             }
 
-            if (variableInfo.getValSize() >= 0) {
-                if (name.equalsIgnoreCase("temp")) {
-                    if (temp.size() == 4) {
-                        VariableInfo str = temp.get(0);
-                        VariableInfo dex = temp.get(1);
-                        VariableInfo inl = temp.get(2);
-                        VariableInfo life = temp.get(3);
-                        str.setName("str");
-                        dex.setName("dex");
-                        inl.setName("int");
-                        life.setName("life");
-                        variableInfo.setName("mana");
+            ret.put(variableInfo.getName(), variableInfo);
+            putVarIndex(variableInfo.getName(), block.getStart());
+        }
 
-                        ret.put(str.getName(), str);
-                        putVarIndex(str.getName(), blockInfo.getStart());
-                        ret.put(dex.getName(), dex);
-                        putVarIndex(dex.getName(), blockInfo.getStart());
-                        ret.put(inl.getName(), inl);
-                        putVarIndex(inl.getName(), blockInfo.getStart());
-                        ret.put(life.getName(), life);
-                        putVarIndex(life.getName(), blockInfo.getStart());
-                        if (DBG)
-                            Util.log(String.format("blockStart: %d; variableInfo: %s;", blockInfo.getStart(), ret.get("str").toString()));
-                        if (DBG)
-                            Util.log(String.format("blockStart: %d; variableInfo: %s;", blockInfo.getStart(), ret.get("dex").toString()));
-                        if (DBG)
-                            Util.log(String.format("blockStart: %d; variableInfo: %s;", blockInfo.getStart(), ret.get("int").toString()));
-                        if (DBG)
-                            Util.log(String.format("blockStart: %d; variableInfo: %s;", blockInfo.getStart(), ret.get("life").toString()));
-                    } else {
-                        temp.add(variableInfo);
-                    }
-                    if (DBG) Util.log(variableInfo.getName());
-                }
+        if (temp.size() == 1) {
+            VariableInfo difficulty = temp.get(0);
+            difficulty.setName("difficulty");
+            ret.put(difficulty.getName(), difficulty);
+            putVarIndex(difficulty.getName(), block.getStart());
+        }
 
-                if (!variableInfo.getName().equals("temp")) {
-                    ret.put(variableInfo.getName(), variableInfo);
-                    putVarIndex(variableInfo.getName(), blockInfo.getStart());
-                    if (DBG)
-                        Util.log(String.format("blockStart: %d; variableInfo: %s; data_offset=%d", blockInfo.getStart(), variableInfo.toString(), dataOffset));
-                }
-            } else {
-                if (DBG)
-                    Util.log(String.format("IGNORED %s", variableInfo));
-            }
-            if (dataOffset > 0) {
-                this.getBuffer().position(this.getBuffer().position() + dataOffset);
-                if (DBG) Util.log(String.format("DATAOFFSET: %d; POSITION: %d", dataOffset, getBuffer().position()));
-            }
+        if (temp.size() == 5) {
+            VariableInfo str = temp.get(0);
+            VariableInfo dex = temp.get(1);
+            VariableInfo inl = temp.get(2);
+            VariableInfo life = temp.get(3);
+            VariableInfo mana = temp.get(4);
+            str.setName("str");
+            dex.setName("dex");
+            inl.setName("int");
+            life.setName("life");
+            mana.setName("mana");
 
+            ret.put(str.getName(), str);
+            putVarIndex(str.getName(), block.getStart());
+            ret.put(dex.getName(), dex);
+            putVarIndex(dex.getName(), block.getStart());
+            ret.put(inl.getName(), inl);
+            putVarIndex(inl.getName(), block.getStart());
+            ret.put(life.getName(), life);
+            putVarIndex(life.getName(), block.getStart());
+            ret.put(mana.getName(), mana);
+            putVarIndex(mana.getName(), block.getStart());
+            if (DBG)
+                Util.log(String.format("blockStart: %d; variableInfo: %s;", block.getStart(), ret.get("str").toString()));
+            if (DBG)
+                Util.log(String.format("blockStart: %d; variableInfo: %s;", block.getStart(), ret.get("dex").toString()));
+            if (DBG)
+                Util.log(String.format("blockStart: %d; variableInfo: %s;", block.getStart(), ret.get("int").toString()));
+            if (DBG)
+                Util.log(String.format("blockStart: %d; variableInfo: %s;", block.getStart(), ret.get("life").toString()));
+            if (DBG)
+                Util.log(String.format("blockStart: %d; variableInfo: %s;", block.getStart(), ret.get("mana").toString()));
         }
         return ret;
-
-    }
-
-    private void parseFooter() {
-        if (DBG) Util.log(String.format("Buffer(footer): '%s'", this.getBuffer()));
-
-        while (this.getBuffer().position() < this.getBuffer().capacity()) {
-            String name = readString(this.getBuffer());
-            if (StringUtils.isEmpty(name)) continue;
-            if (name.equalsIgnoreCase("description")) {
-                String value = readString(this.getBuffer());
-                if (DBG) Util.log(String.format("name=%s; value=%s", name, value));
-            }
-        }
     }
 }
