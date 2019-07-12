@@ -24,6 +24,7 @@ import br.com.pinter.tqdatabase.Text;
 
 import com.google.inject.Singleton;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 @Singleton
 public class Txt {
@@ -42,11 +43,20 @@ public class Txt {
 
     public String getString(String str) {
         initialize();
-        return text.getString(str);
+        try {
+            return text.getString(str);
+        } catch (Exception ignore) {
+            return null;
+        }
     }
 
     public void preload() {
         initialize();
-        text.preload();
+        try {
+            text.preload();
+        } catch (IOException e) {
+            throw new RuntimeException("Error loading text resource",e);
+        }
+
     }
 }
