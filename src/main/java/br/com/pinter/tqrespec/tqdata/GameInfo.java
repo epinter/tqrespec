@@ -27,7 +27,6 @@ import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -207,15 +206,19 @@ public class GameInfo {
         if (DBG || !SystemUtils.IS_OS_WINDOWS) {
             return Constants.DEV_GAMEDATA;
         }
+
         if (StringUtils.isEmpty(gamePath)) {
-            String detected = detectGamePath();
-            if (StringUtils.isEmpty(detected))
-                throw new FileNotFoundException("Game path not detected");
-            gamePath = detected;
+            gamePath = detectGamePath();
         }
 
         if (StringUtils.isEmpty(gamePath)) {
-            return Constants.DEV_GAMEDATA;
+            if (Files.exists(Paths.get(Constants.DEV_GAMEDATA))) {
+                gamePath = Constants.DEV_GAMEDATA;
+            } else if (Files.exists(Paths.get(Constants.PARENT_GAMEDATA))) {
+                gamePath = Constants.PARENT_GAMEDATA;
+            } else {
+                throw new FileNotFoundException("Game path not detected");
+            }
         }
 
         return gamePath;
