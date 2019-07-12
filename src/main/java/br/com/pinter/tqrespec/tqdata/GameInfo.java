@@ -69,15 +69,15 @@ public class GameInfo {
     }
 
     private String getGameSteamLibraryPath() {
-        String steamPath = Advapi32Util.registryGetStringValue(
-                WinReg.HKEY_CURRENT_USER, "SOFTWARE\\Valve\\Steam", "SteamPath");
-
-        Path steamappsMainPath = Paths.get(steamPath, "SteamApps", "common", "Titan Quest Anniversary Edition");
-        if (Files.exists(steamappsMainPath) && Files.isDirectory(steamappsMainPath)) {
-            return steamappsMainPath.toAbsolutePath().toString();
-        }
-
         try {
+            String steamPath = Advapi32Util.registryGetStringValue(
+                    WinReg.HKEY_CURRENT_USER, "SOFTWARE\\Valve\\Steam", "SteamPath");
+
+            Path steamappsMainPath = Paths.get(steamPath, "SteamApps", "common", "Titan Quest Anniversary Edition");
+            if (Files.exists(steamappsMainPath) && Files.isDirectory(steamappsMainPath)) {
+                return steamappsMainPath.toAbsolutePath().toString();
+            }
+
             Pattern regexOuter = Pattern.compile(".*LibraryFolders.*\\{(.*)}.*", Pattern.DOTALL);
             Pattern regexInner = Pattern.compile("\\s*\"\\d\"\\s+\"([^\"]+)\".*");
 
@@ -101,7 +101,7 @@ public class GameInfo {
                     return steamappsPath.toAbsolutePath().toString();
                 }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             if (DBG) e.printStackTrace();
         }
         return null;
