@@ -102,8 +102,11 @@ public class Version implements Comparable<Version> {
     public int compareTo(Version o) {
         if (o == null)
             return 1;
-        String[] thisVersion = this.getVersion().split("\\.");
-        String[] otherVersion = o.getVersion().split("\\.");
+        String versionString = getVersion().replaceAll("[_-].*$","");
+        String otherVersionString = o.getVersion().replaceAll("[_-].*$","");
+        String[] thisVersion = versionString.split("\\.");
+        String[] otherVersion = otherVersionString.split("\\.");
+
         int length = Math.max(thisVersion.length, otherVersion.length);
         for (int i = 0; i < length; i++) {
             int thisVersionNumber = i < thisVersion.length ?
