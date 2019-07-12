@@ -36,10 +36,7 @@ import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 
@@ -70,12 +67,6 @@ public class SkillsPaneController implements Initializable {
     private Label secondMasteryLabel;
 
     @FXML
-    private Button reclaimMasteryFirstButton;
-
-    @FXML
-    private Button reclaimMasterySecondButton;
-
-    @FXML
     private Button reclaimSkillsFirstButton;
 
     @FXML
@@ -84,13 +75,42 @@ public class SkillsPaneController implements Initializable {
     @FXML
     private Label freeSkillPointsLabel;
 
-    private SimpleStringProperty currentSkillPoints = null;
+    @FXML
+    private MenuItem reclaimMasteryFirstItem;
 
+    @FXML
+    private MenuItem reclaimMasterySecondItem;
+
+    @FXML
+    private MenuItem removeMasteryFirstItem;
+
+    @FXML
+    private MenuItem removeMasterySecondItem;
+
+    @FXML
+    private MenuButton firstMasteryButton;
+
+    @FXML
+    private MenuButton secondMasteryButton;
+
+    private SimpleStringProperty currentSkillPoints = null;
     private BooleanProperty saveDisabled = new SimpleBooleanProperty();
+    private SimpleStringProperty currentFirstMasteryLevel = null;
+    private SimpleStringProperty currentSecondMasteryLevel = null;
+
+    private int firstMasteryLevel = -1;
+    private int secondMasteryLevel = -1;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
+        reclaimSkillsFirstButton.setGraphic(Icon.FA_UNDO.create());
+        reclaimSkillsSecondButton.setGraphic(Icon.FA_UNDO.create());
+        firstMasteryButton.setGraphic(Icon.FA_HAT_WIZARD.create());
+        secondMasteryButton.setGraphic(Icon.FA_HAT_WIZARD.create());
+        reclaimMasteryFirstItem.setGraphic(Icon.FA_ANGLE_DOUBLE_DOWN.create());
+        removeMasteryFirstItem.setGraphic(Icon.FA_TIMES.create());
+        reclaimMasterySecondItem.setGraphic(Icon.FA_ANGLE_DOUBLE_DOWN.create());
+        removeMasterySecondItem.setGraphic(Icon.FA_TIMES.create());
     }
 
     public boolean isSaveDisabled() {
@@ -107,11 +127,27 @@ public class SkillsPaneController implements Initializable {
 
     public void loadCharEventHandler() {
         currentSkillPoints = new SimpleStringProperty();
+        currentFirstMasteryLevel = new SimpleStringProperty();
+        currentSecondMasteryLevel = new SimpleStringProperty();
 
         freeSkillPointsLabel.textProperty().bind(
                 Bindings.createStringBinding(() -> Util.getUIMessage("skills.availableSkillPoints",
                         currentSkillPoints.getValue()),
                         currentSkillPoints
+                )
+        );
+
+        reclaimMasteryFirstItem.textProperty().bind(
+                Bindings.createStringBinding(() -> Util.getUIMessage("skills.reclaimMasteryPoints",
+                        currentFirstMasteryLevel.getValue()),
+                        currentFirstMasteryLevel
+                )
+        );
+
+        reclaimMasterySecondItem.textProperty().bind(
+                Bindings.createStringBinding(() -> Util.getUIMessage("skills.reclaimMasteryPoints",
+                        currentSecondMasteryLevel.getValue()),
+                        currentSecondMasteryLevel
                 )
         );
 
@@ -136,10 +172,15 @@ public class SkillsPaneController implements Initializable {
         } else {
             reclaimSkillsFirstButton.setDisable(true);
         }
-        if (playerData.isCharacterLoaded() && (!disable && getMasteryLevel(0) > 1) && firstMasteryListView.getItems().size() == 0) {
-            reclaimMasteryFirstButton.setDisable(false);
+        if (playerData.isCharacterLoaded() && (!disable && firstMasteryLevel > 0) && firstMasteryListView.getItems().size() == 0) {
+            if (firstMasteryLevel > 1) {
+                reclaimMasteryFirstItem.setDisable(false);
+            }
+            removeMasteryFirstItem.setDisable(false);
         } else {
-            reclaimMasteryFirstButton.setDisable(true);
+            reclaimMasteryFirstItem.setDisable(true);
+            removeMasteryFirstItem.setDisable(true);
+            firstMasteryButton.setDisable(true);
         }
 
         if (!disable && secondMasteryListView.getItems().size() > 0) {
@@ -147,25 +188,49 @@ public class SkillsPaneController implements Initializable {
         } else {
             reclaimSkillsSecondButton.setDisable(true);
         }
-        if (playerData.isCharacterLoaded() && (!disable && getMasteryLevel(1) > 1) && secondMasteryListView.getItems().size() == 0) {
-            reclaimMasterySecondButton.setDisable(false);
+        if (playerData.isCharacterLoaded() && (!disable && secondMasteryLevel > 0) && secondMasteryListView.getItems().size() == 0) {
+            if (secondMasteryLevel > 1) {
+                reclaimMasterySecondItem.setDisable(false);
+            }
+            removeMasterySecondItem.setDisable(false);
         } else {
-            reclaimMasterySecondButton.setDisable(true);
+            reclaimMasterySecondItem.setDisable(true);
+            removeMasterySecondItem.setDisable(true);
+            secondMasteryButton.setDisable(true);
         }
+
+        if (reclaimMasteryFirstItem.isDisable() && removeMasteryFirstItem.isDisable()) {
+            firstMasteryButton.setDisable(true);
+        } else {
+            firstMasteryButton.setDisable(false);
+        }
+
+        if (reclaimMasterySecondItem.isDisable() && removeMasterySecondItem.isDisable()) {
+            secondMasteryButton.setDisable(true);
+        } else {
+            secondMasteryButton.setDisable(false);
+        }
+
+
     }
 
     protected void updateMasteries() {
-        if (!playerData.isCharacterLoaded()) {
+        if (playerData.isCharacterLoaded()) {
+            firstMasteryLevel = getMasteryLevel(0);
+            secondMasteryLevel = getMasteryLevel(1);
+        } else {
             return;
         }
+
         resetSkilltabControls();
 
         fillMastery(0);
         fillMastery(1);
         disableControls(false);
 
-
         currentSkillPoints.setValue(String.valueOf(playerData.getAvailableSkillPoints()));
+        currentFirstMasteryLevel.setValue(String.valueOf(Math.max(firstMasteryLevel-1,0)));
+        currentSecondMasteryLevel.setValue(String.valueOf(Math.max(secondMasteryLevel-1,0)));
     }
 
     private int getMasteryLevel(int i) {
@@ -290,4 +355,35 @@ public class SkillsPaneController implements Initializable {
         reclaimPointsFromSkills(mastery);
         updateMasteries();
     }
+
+    public void removeMasteryFirst(Event event) throws Exception {
+        disableControls(true);
+        Skill mastery = playerData.getPlayerMasteries().get(0);
+        PlayerSkill sb = playerData.getPlayerSkills().get(mastery.getRecordPath());
+
+        List<Skill> list = playerData.getPlayerSkillsFromMastery(mastery);
+        if (list.size() > 0) {
+            Util.showInformation(Util.getUIMessage("skills.removeSkillsBefore"), null);
+            return;
+        }
+
+        playerData.removeMastery(sb);
+        updateMasteries();
+    }
+
+    public void removeMasterySecond(Event event) throws Exception {
+        disableControls(true);
+        Skill mastery = playerData.getPlayerMasteries().get(1);
+        PlayerSkill sb = playerData.getPlayerSkills().get(mastery.getRecordPath());
+
+        List<Skill> list = playerData.getPlayerSkillsFromMastery(mastery);
+        if (list.size() > 0) {
+            Util.showInformation(Util.getUIMessage("skills.removeSkillsBefore"), null);
+            return;
+        }
+
+        playerData.removeMastery(sb);
+        updateMasteries();
+    }
+
 }

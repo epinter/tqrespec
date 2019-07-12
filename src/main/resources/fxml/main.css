@@ -36,8 +36,56 @@
 	-fx-font-weight: bold;
 	-fx-font-family: 'Albertus MT';
 	-fx-font-size: 1.5em;
-	-fx-text-fill: #ffffff;}
+	-fx-text-fill: #ffffff;
+}
 
+.tq-menubutton .text {
+    -fx-effect: dropshadow( one-pass-box , black , 0, 0.0 , 0 , 2 );
+	-fx-font-family: 'Albertus MT';
+}
+
+.tq-menubutton .context-menu .menu-item:hover:disabled{
+    -fx-cursor: default;
+}
+
+.tq-menubutton .context-menu .menu-item:hover {
+    -fx-cursor: hand;
+}
+
+.tq-menubutton .context-menu .menu-item .text {
+    -fx-effect: none;
+}
+
+.tq-menubutton .context-menu .menu-item .text:hover{
+    -fx-effect: none;
+}
+
+.tq-menubutton .menu-item .label {
+    -fx-effect: none;
+}
+
+.tq-menubutton .label {
+	-fx-font-size: 1.5em;
+}
+.tq-menubutton {
+	-fx-background-image: url('bg-button.png');
+	-fx-background-size: stretch;
+	-fx-background-color:transparent;
+	-fx-font-weight: bold;
+	-fx-font-family: 'Albertus MT';
+	-fx-text-fill: #ffffff;
+}
+
+.tq-menubutton > .arrow-button > .arrow {
+    -fx-effect: dropshadow( one-pass-box , black , 0, 0.0 , 0 , 2 );
+    -fx-mark-color: #ffffff;
+}
+
+.tq-menubutton .label:pressed {
+    -fx-text-fill: #ffffff;
+
+}
+.tq-menubutton:pressed,
 .tq-button:pressed {
 	-fx-background-image: url('bg-button_pressed.png');
 	-fx-background-size: stretch;
@@ -147,6 +195,11 @@
 .tq-charactercombo:hover > .arrow-button > .arrow{
     -fx-background-insets: 1 0 -1 0, 0;
     -fx-background-color: #f6f0d0;
+}
+
+.tq-charactercombo .combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: -fx-accent;
+    -fx-cursor: hand;
 }
 
 .tq-charactercombo .list-cell{

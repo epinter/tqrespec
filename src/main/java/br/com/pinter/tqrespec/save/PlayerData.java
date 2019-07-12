@@ -227,6 +227,32 @@ public class PlayerData {
         }
     }
 
+    public void removeMastery(PlayerSkill sb) throws Exception {
+        int blockStart = sb.getBlockStart();
+        Skill mastery = db.skills().getSkill(sb.getSkillName(), false);
+        if (!mastery.isMastery()) {
+            throw new IllegalStateException("Error removing mastery. Not a mastery.");
+        }
+        List<Skill> currentSkillsInMastery = getPlayerSkillsFromMastery(mastery);
+        if (currentSkillsInMastery.size() > 0) {
+            throw new IllegalStateException("Mastery have skills, aborting.");
+        }
+
+        int currentSkillPoints = changes.getInt("skillPoints");
+        int currentSkillLevel = changes.getInt(blockStart, "skillLevel");
+        BlockInfo masteryToRemove = saveData.getBlockInfo().get(blockStart);
+        if (currentSkillLevel > 0) {
+            changes.setInt("skillPoints", currentSkillPoints + currentSkillLevel);
+            changes.removeBlock(blockStart);
+            changes.setInt("max", changes.getInt("max") - 1);
+        }
+
+        if (changes.get(blockStart) != null
+                && changes.get(blockStart).length == 0) {
+            prepareSkillsList();
+        }
+    }
+
     public void reclaimMasteryPoints(PlayerSkill sb) throws Exception {
         int blockStart = sb.getBlockStart();
         Skill mastery = db.skills().getSkill(sb.getSkillName(), false);
