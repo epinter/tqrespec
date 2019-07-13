@@ -268,6 +268,28 @@ public class AttributesPaneController implements Initializable {
     }
 
     public void clearProperties() {
+        if (currentAvail != null)
+            currentAvail.setValue(null);
+        if (currentStr != null)
+            currentStr.setValue(null);
+        if (currentInt != null)
+            currentInt.setValue(null);
+        if (currentDex != null)
+            currentDex.setValue(null);
+        if (currentLife != null)
+            currentLife.setValue(null);
+        if (currentMana != null)
+            currentMana.setValue(null);
+        if (experienceText != null)
+            experienceText.setText("");
+        if (charLevelText != null)
+            charLevelText.setText("");
+        if (goldText != null)
+            goldText.setText("");
+        if (charClassText != null)
+            charClassText.setText("");
+        if (difficultyText != null)
+            difficultyText.setText("");
         if (availPointsText.textProperty().isBound())
             availPointsText.textProperty().unbindBidirectional(currentAvail);
         if (strSpinner.getValueFactory() != null && strSpinner.getValueFactory().valueProperty().isBound())
@@ -295,29 +317,6 @@ public class AttributesPaneController implements Initializable {
         lifeSpinner.setValueFactory(null);
         //noinspection unchecked
         manaSpinner.setValueFactory(null);
-        if (currentAvail != null)
-            currentAvail.setValue(null);
-        if (currentStr != null)
-            currentStr.setValue(null);
-        if (currentInt != null)
-            currentInt.setValue(null);
-        if (currentDex != null)
-            currentDex.setValue(null);
-        if (currentLife != null)
-            currentLife.setValue(null);
-        if (currentMana != null)
-            currentMana.setValue(null);
-        if (experienceText != null)
-            experienceText.setText("");
-        if (charLevelText != null)
-            charLevelText.setText("");
-        if (goldText != null)
-            goldText.setText("");
-        if (charClassText != null)
-            charClassText.setText("");
-        if (difficultyText != null)
-            difficultyText.setText("");
-
     }
 
     public void saveCharHandler() throws Exception {
