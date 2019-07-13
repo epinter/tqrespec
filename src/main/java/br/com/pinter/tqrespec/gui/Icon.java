@@ -1403,7 +1403,7 @@ public enum Icon {
     }
 
     public Text create(double sizeEm) {
-        return IconHelper.createIcon(this,sizeEm);
+        return IconHelper.createIcon(this, sizeEm);
     }
 
     @Override

@@ -4,13 +4,12 @@
 
 package br.com.pinter.tqrespec.gui;
 
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 public class IconHelper {
 
     public static Text createIcon(Icon icon) {
-        return createIcon(icon,1.0);
+        return createIcon(icon, 1.0);
     }
 
     public static Text createIcon(Icon icon, double sizeEm) {
@@ -18,7 +17,7 @@ public class IconHelper {
         text.getStyleClass().add("tq-icon-graphic");
         if (icon.name().startsWith("FA_")) {
             text.getStyleClass().add("tq-icon-defaultstyle-fa");
-            text.setStyle(String.format("-fx-font-family: 'Font Awesome 5 Free Solid'; -fx-font-size: %s;",sizeEm+"em"));
+            text.setStyle(String.format("-fx-font-family: 'Font Awesome 5 Free Solid'; -fx-font-size: %s;", sizeEm + "em"));
         }
         return text;
     }

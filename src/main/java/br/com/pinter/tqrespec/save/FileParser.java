@@ -104,8 +104,7 @@ abstract class FileParser {
     /**
      * This method is called to parse a block, and should return a table of variables found inside the block.
      *
-     * @param blockInfo
-     *         the block the method should parse.
+     * @param blockInfo the block the method should parse.
      * @return a table with all variables found
      */
     abstract Hashtable<String, VariableInfo> parseBlock(BlockInfo blockInfo);
@@ -372,7 +371,7 @@ abstract class FileParser {
         } else if (type == VariableType.Stream) {
             readStream(variableInfo);
         } else {
-            throw new IllegalArgumentException(String.format("Variable type undefined for '%s'.",name));
+            throw new IllegalArgumentException(String.format("Variable type undefined for '%s'.", name));
         }
 
         return variableInfo;

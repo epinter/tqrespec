@@ -35,7 +35,6 @@ public class Constants {
     public static final int MANA_ATTR_MIN = 300;
     public static final String INITIAL_FONT_SIZE = "1";
     public static final String BACKUP_DIRECTORY = Paths.get("SaveData", "TQRespec Backup").toString();
-    public static final boolean SKIP_INVENTORY_BLOCKS = true;
     public static final String VERSION_CHECK_URL = "https://epinter.github.io/version/tqrespec";
     public static final String DEV_GAMEDATA = Paths.get(System.getProperty("user.dir"), "gamedata").toString();
     public static final String PARENT_GAMEDATA = Paths.get(Paths.get(System.getProperty("user.dir")).getParent().toString(), "gamedata").toString();

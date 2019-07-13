@@ -27,7 +27,6 @@ import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 import javafx.stage.Modality;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -251,6 +250,6 @@ public class Util {
         }
 
 
-        return Paths.get(path,"_" + playerName, "Player.chr");
+        return Paths.get(path, "_" + playerName, "Player.chr");
     }
 }

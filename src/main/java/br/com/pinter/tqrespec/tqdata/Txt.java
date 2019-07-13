@@ -21,8 +21,8 @@
 package br.com.pinter.tqrespec.tqdata;
 
 import br.com.pinter.tqdatabase.Text;
-
 import com.google.inject.Singleton;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -32,7 +32,7 @@ public class Txt {
 
     public void initialize() {
         try {
-            if(text == null) {
+            if (text == null) {
                 text = new Text(GameInfo.getInstance().getGamePath() + "/Text");
             }
         } catch (FileNotFoundException e) {
@@ -55,7 +55,7 @@ public class Txt {
         try {
             text.preload();
         } catch (IOException e) {
-            throw new RuntimeException("Error loading text resource",e);
+            throw new RuntimeException("Error loading text resource", e);
         }
 
     }

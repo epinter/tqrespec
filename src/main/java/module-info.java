@@ -14,12 +14,12 @@ module br.com.pinter.tqrespec {
     exports br.com.pinter.tqrespec;
     exports br.com.pinter.tqrespec.core;
     exports br.com.pinter.tqrespec.gui;
-    opens br.com.pinter.tqrespec to com.google.guice,javafx.fxml;
-    opens br.com.pinter.tqrespec.core to com.google.guice,javafx.fxml;
-    opens br.com.pinter.tqrespec.gui to com.google.guice,javafx.fxml;
-    opens br.com.pinter.tqrespec.save to com.google.guice,javafx.fxml;
-    opens br.com.pinter.tqrespec.tqdata to com.google.guice,javafx.fxml;
-    opens br.com.pinter.tqrespec.util to com.google.guice,javafx.fxml;
+    opens br.com.pinter.tqrespec to com.google.guice, javafx.fxml;
+    opens br.com.pinter.tqrespec.core to com.google.guice, javafx.fxml;
+    opens br.com.pinter.tqrespec.gui to com.google.guice, javafx.fxml;
+    opens br.com.pinter.tqrespec.save to com.google.guice, javafx.fxml;
+    opens br.com.pinter.tqrespec.tqdata to com.google.guice, javafx.fxml;
+    opens br.com.pinter.tqrespec.util to com.google.guice, javafx.fxml;
     opens fxml;
     opens i18n;
     opens icon;

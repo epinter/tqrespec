@@ -13,8 +13,8 @@ public enum PlayerFileVariable implements IFileVariable {
     playerClassTag("playerClassTag", VariableType.String, FileBlockType.PlayerHeader),
     playerVersion("playerVersion", VariableType.Integer, FileBlockType.PlayerHeader),
     playerLevel("playerLevel", VariableType.Integer, FileBlockType.PlayerHeader),
-    controllerStreamed("controllerStreamed",VariableType.Integer, FileBlockType.PlayerHeader),
-    description("description",VariableType.Stream, FileBlockType.PlayerHeader),
+    controllerStreamed("controllerStreamed", VariableType.Integer, FileBlockType.PlayerHeader),
+    description("description", VariableType.Stream, FileBlockType.PlayerHeader),
 
     playerTexture("playerTexture", VariableType.String, FileBlockType.PlayerMain),
     myPlayerName("myPlayerName", VariableType.StringUtf16le, FileBlockType.PlayerMain),
@@ -35,8 +35,8 @@ public enum PlayerFileVariable implements IFileVariable {
     itemsFoundOverLifetimeUniqueTotal("itemsFoundOverLifetimeUniqueTotal", VariableType.Integer, FileBlockType.PlayerMain),
     itemsFoundOverLifetimeRandomizedTotal("itemsFoundOverLifetimeRandomizedTotal", VariableType.Integer, FileBlockType.PlayerMain),
     hasBeenInGame("hasBeenInGame", VariableType.Integer, FileBlockType.PlayerMain),
-    versionRespawnPoint("versionRespawnPoint",VariableType.Integer, FileBlockType.PlayerMain),
-    money("money",VariableType.Integer, FileBlockType.PlayerMain),
+    versionRespawnPoint("versionRespawnPoint", VariableType.Integer, FileBlockType.PlayerMain),
+    money("money", VariableType.Integer, FileBlockType.PlayerMain),
     teleportUID("teleportUID", VariableType.UID, FileBlockType.PlayerMain),
     respawnUID("respawnUID", VariableType.UID, FileBlockType.PlayerMain),
     markerUID("markerUID", VariableType.UID, FileBlockType.PlayerMain),
@@ -53,8 +53,8 @@ public enum PlayerFileVariable implements IFileVariable {
     skillReclamationPointsUsed("skillReclamationPointsUsed", VariableType.Integer, FileBlockType.PlayerSkills),
 
     defaultText("defaultText", VariableType.StringUtf16le, FileBlockType.Body),
-    itemPositionsSavedAsGridCoords("itemPositionsSavedAsGridCoords",VariableType.Integer, FileBlockType.PlayerInventory),
-    numberOfSacks("numberOfSacks",VariableType.Integer, FileBlockType.PlayerInventory),
+    itemPositionsSavedAsGridCoords("itemPositionsSavedAsGridCoords", VariableType.Integer, FileBlockType.PlayerInventory),
+    numberOfSacks("numberOfSacks", VariableType.Integer, FileBlockType.PlayerInventory),
     currentlyFocusedSackNumber("currentlyFocusedSackNumber", VariableType.Integer, FileBlockType.PlayerInventory),
     currentlySelectedSackNumber("currentlySelectedSackNumber", VariableType.Integer, FileBlockType.PlayerInventory),
     tempBool("tempBool", VariableType.Integer, FileBlockType.PlayerInventory),
@@ -79,9 +79,9 @@ public enum PlayerFileVariable implements IFileVariable {
     isItemSkill("isItemSkill", VariableType.Integer, FileBlockType.PlayerHotSlot),
     itemName("itemName", VariableType.Integer, FileBlockType.PlayerHotSlot),
     scrollName("scrollName", VariableType.String, FileBlockType.PlayerHotSlot),
-    bitmapUpName("bitmapUpName",VariableType.String, FileBlockType.PlayerHotSlot),
-    bitmapDownName("bitmapDownName",VariableType.String, FileBlockType.PlayerHotSlot),
-    storedDefaultType("storedDefaultType",VariableType.Integer, FileBlockType.PlayerHotSlot),
+    bitmapUpName("bitmapUpName", VariableType.String, FileBlockType.PlayerHotSlot),
+    bitmapDownName("bitmapDownName", VariableType.String, FileBlockType.PlayerHotSlot),
+    storedDefaultType("storedDefaultType", VariableType.Integer, FileBlockType.PlayerHotSlot),
 
     equipmentSelection("equipmentSelection", VariableType.Integer, FileBlockType.PlayerUiSkill),
     skillActive1("skillActive1", VariableType.Integer, FileBlockType.PlayerUiSkill),
@@ -103,10 +103,10 @@ public enum PlayerFileVariable implements IFileVariable {
     skillWindowSelection("skillWindowSelection", VariableType.Integer, FileBlockType.PlayerUiSkill),
     skillSettingValid("skillSettingValid", VariableType.Integer, FileBlockType.PlayerUiSkill),
 
-    modifierPoints("modifierPoints",VariableType.Integer, FileBlockType.PlayerLevelPoints),
-    skillPoints("skillPoints",VariableType.Integer, FileBlockType.PlayerLevelPoints),
+    modifierPoints("modifierPoints", VariableType.Integer, FileBlockType.PlayerLevelPoints),
+    skillPoints("skillPoints", VariableType.Integer, FileBlockType.PlayerLevelPoints),
     currentStats_experiencePoints("currentStats.experiencePoints", VariableType.Integer, FileBlockType.PlayerLevelPoints),
-    currentStats_charLevel("currentStats.charLevel",VariableType.Integer, FileBlockType.PlayerLevelPoints),
+    currentStats_charLevel("currentStats.charLevel", VariableType.Integer, FileBlockType.PlayerLevelPoints),
 
     playTimeInSeconds("playTimeInSeconds", VariableType.Integer, FileBlockType.PlayerStats),
     greatestMonsterKilledName("greatestMonsterKilledName", VariableType.StringUtf16le, FileBlockType.PlayerStats),
@@ -125,9 +125,9 @@ public enum PlayerFileVariable implements IFileVariable {
     criticalHitsReceived("criticalHitsReceived", VariableType.Integer, FileBlockType.PlayerStats),
 
     //repeated variables with different types, should be named (name)__(blockname)
-    temp("temp",VariableType.Unknown, FileBlockType.Multiple),
-    temp__PlayerAttributes("temp",VariableType.Float, FileBlockType.PlayerAttributes),
-    temp__PlayerMain("temp",VariableType.Integer, FileBlockType.PlayerMain),
+    temp("temp", VariableType.Unknown, FileBlockType.Multiple),
+    temp__PlayerAttributes("temp", VariableType.Float, FileBlockType.PlayerAttributes),
+    temp__PlayerMain("temp", VariableType.Integer, FileBlockType.PlayerMain),
     ;
 
     private final FileBlockType location;

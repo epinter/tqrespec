@@ -20,14 +20,12 @@
 
 package br.com.pinter.tqrespec.gui;
 
-import br.com.pinter.tqrespec.tqdata.Db;
 import br.com.pinter.tqrespec.tqdata.Txt;
+import com.google.inject.Inject;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-
-import com.google.inject.Inject;
 
 public class SkillListCell extends ListCell<SkillListViewItem> {
     private HBox container;

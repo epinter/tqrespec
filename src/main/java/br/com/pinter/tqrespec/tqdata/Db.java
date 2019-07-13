@@ -22,9 +22,8 @@ package br.com.pinter.tqrespec.tqdata;
 
 import br.com.pinter.tqdatabase.Database;
 import br.com.pinter.tqdatabase.Skills;
-
-import br.com.pinter.tqdatabase.models.Skill;
 import com.google.inject.Singleton;
+
 import java.io.IOException;
 
 @Singleton
@@ -33,12 +32,12 @@ public class Db {
 
     public void initialize() {
         try {
-            if(db == null) {
+            if (db == null) {
                 db = new Database(String.format("%s/Database/database.arz", GameInfo.getInstance().getGamePath()));
             }
         } catch (IOException e) {
             e.printStackTrace();
-            throw new RuntimeException("Error loading database.",e);
+            throw new RuntimeException("Error loading database.", e);
         }
     }
 

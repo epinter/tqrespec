@@ -43,7 +43,7 @@ public class ExceptionHandler {
 
     private static void showAlert(Thread t, Throwable e) {
         String header = ExceptionUtils.getRootCause(e).toString();
-        if(header == null) {
+        if (header == null) {
             header = e.toString();
         }
         header = header.replaceAll("^java.lang.RuntimeException: (.*)", "$1");

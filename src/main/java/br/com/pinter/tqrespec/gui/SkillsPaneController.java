@@ -229,8 +229,8 @@ public class SkillsPaneController implements Initializable {
         disableControls(false);
 
         currentSkillPoints.setValue(String.valueOf(playerData.getAvailableSkillPoints()));
-        currentFirstMasteryLevel.setValue(String.valueOf(Math.max(firstMasteryLevel-1,0)));
-        currentSecondMasteryLevel.setValue(String.valueOf(Math.max(secondMasteryLevel-1,0)));
+        currentFirstMasteryLevel.setValue(String.valueOf(Math.max(firstMasteryLevel - 1, 0)));
+        currentSecondMasteryLevel.setValue(String.valueOf(Math.max(secondMasteryLevel - 1, 0)));
     }
 
     private int getMasteryLevel(int i) {

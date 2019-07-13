@@ -34,11 +34,11 @@ public class Toast {
         Label msg2 = new Label();
         VBox vBoxMsg = new VBox(msg);
         vBoxMsg.setFillWidth(true);
-        vBoxMsg.setPadding(new Insets(5,5,20,5));
+        vBoxMsg.setPadding(new Insets(5, 5, 20, 5));
         VBox vBoxMsg2 = new VBox(msg2);
         vBoxMsg2.setFillWidth(true);
-        vBoxMsg2.setPadding(new Insets(0,5,5,5));
-        VBox container = new VBox(vBoxMsg,vBoxMsg2);
+        vBoxMsg2.setPadding(new Insets(0, 5, 5, 5));
+        VBox container = new VBox(vBoxMsg, vBoxMsg2);
         container.setFillWidth(true);
 
         msg.setAlignment(Pos.CENTER);
@@ -56,8 +56,8 @@ public class Toast {
         msg2.setWrapText(true);
 
 
-        msg.setMaxWidth(stage.getWidth()/1.8);
-        msg2.setMaxWidth(stage.getWidth()/1.8);
+        msg.setMaxWidth(stage.getWidth() / 1.8);
+        msg2.setMaxWidth(stage.getWidth() / 1.8);
         root.getChildren().add(container);
 
         root.setStyle("-fx-padding: 30px; -fx-background-color: rgba(0, 0, 0, 0.8); -fx-background-radius: 5;");
@@ -68,14 +68,14 @@ public class Toast {
         toast.setScene(scene);
 
         toast.show();
-        toast.setX(stage.getX()+((stage.getWidth()-toast.getWidth())/2));
-        toast.setY(stage.getY()+((stage.getHeight()-toast.getHeight())/2));
+        toast.setX(stage.getX() + ((stage.getWidth() - toast.getWidth()) / 2));
+        toast.setY(stage.getY() + ((stage.getHeight() - toast.getHeight()) / 2));
 
         stage.xProperty().addListener(((observableValue, number, newValue) -> {
-            toast.setX(newValue.doubleValue()+((stage.getWidth()-toast.getWidth())/2));
+            toast.setX(newValue.doubleValue() + ((stage.getWidth() - toast.getWidth()) / 2));
         }));
         stage.yProperty().addListener(((observableValue, number, newValue) -> {
-            toast.setY(newValue.doubleValue()+((stage.getHeight()-toast.getHeight())/2));
+            toast.setY(newValue.doubleValue() + ((stage.getHeight() - toast.getHeight()) / 2));
         }));
 
         Timeline fadeIn = new Timeline();

@@ -107,7 +107,7 @@ public class PlayerData {
             reset();
             PlayerParser playerParser = new PlayerParser();
             this.playerName = playerName;
-            buffer = playerParser.loadPlayer(playerName,customQuest);
+            buffer = playerParser.loadPlayer(playerName, customQuest);
             saveData.setBlockInfo(playerParser.getBlockInfo());
             saveData.setHeaderInfo(playerParser.getHeaderInfo());
             saveData.setVariableLocation(playerParser.getVariableLocation());

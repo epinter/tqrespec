@@ -24,7 +24,6 @@ import br.com.pinter.tqrespec.core.ExceptionHandler;
 import br.com.pinter.tqrespec.core.GameProcessMonitor;
 import br.com.pinter.tqrespec.core.GuiceModule;
 import br.com.pinter.tqrespec.core.InjectionContext;
-import br.com.pinter.tqrespec.gui.IconHelper;
 import br.com.pinter.tqrespec.gui.MainController;
 import br.com.pinter.tqrespec.gui.ResizeListener;
 import br.com.pinter.tqrespec.tqdata.Db;

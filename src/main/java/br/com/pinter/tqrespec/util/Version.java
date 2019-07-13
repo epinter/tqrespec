@@ -102,8 +102,8 @@ public class Version implements Comparable<Version> {
     public int compareTo(Version o) {
         if (o == null)
             return 1;
-        String versionString = getVersion().replaceAll("[_-].*$","");
-        String otherVersionString = o.getVersion().replaceAll("[_-].*$","");
+        String versionString = getVersion().replaceAll("[_-].*$", "");
+        String otherVersionString = o.getVersion().replaceAll("[_-].*$", "");
         String[] thisVersion = versionString.split("\\.");
         String[] otherVersion = otherVersionString.split("\\.");
 

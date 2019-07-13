@@ -20,13 +20,13 @@
 
 package br.com.pinter.tqrespec.save;
 
-import br.com.pinter.tqrespec.gui.State;
-import br.com.pinter.tqrespec.util.Constants;
-import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.Settings;
+import br.com.pinter.tqrespec.gui.State;
+import br.com.pinter.tqrespec.tqdata.GameInfo;
+import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
-
 import com.google.inject.Inject;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -51,14 +51,14 @@ public class PlayerWriter {
         Path player = Paths.get(fileName);
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HH");
         String ts = df.format(new Date());
-        File destPlayerZip = new File(backupDirectory,String.format("%s%s_%s.zip", playerName, fullBackup ? "-fullbackup" : "", ts));
+        File destPlayerZip = new File(backupDirectory, String.format("%s%s_%s.zip", playerName, fullBackup ? "-fullbackup" : "", ts));
 
         //doesn't overwrite previous backup
         if (destPlayerZip.exists() && destPlayerZip.length() > 1) {
             return true;
         }
         if (!backupDirectory.exists()) {
-            if(!backupDirectory.mkdir()) {
+            if (!backupDirectory.mkdir()) {
                 throw new IOException("Unable to create backup directory");
             }
         }
