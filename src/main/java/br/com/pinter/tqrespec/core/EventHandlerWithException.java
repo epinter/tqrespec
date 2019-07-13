@@ -18,5 +18,5 @@ public interface EventHandlerWithException<T extends Event> extends EventHandler
         }
     }
 
-    void handleEvent(T t);
+    void handleEvent(T t) throws Exception;
 }
