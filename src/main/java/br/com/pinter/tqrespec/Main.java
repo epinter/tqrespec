@@ -24,6 +24,7 @@ import br.com.pinter.tqrespec.core.ExceptionHandler;
 import br.com.pinter.tqrespec.core.GameProcessMonitor;
 import br.com.pinter.tqrespec.core.GuiceModule;
 import br.com.pinter.tqrespec.core.InjectionContext;
+import br.com.pinter.tqrespec.gui.IconHelper;
 import br.com.pinter.tqrespec.gui.MainController;
 import br.com.pinter.tqrespec.gui.ResizeListener;
 import br.com.pinter.tqrespec.tqdata.Db;
@@ -153,6 +154,8 @@ public class Main extends Application {
     public void prepareMainStage(Stage primaryStage) {
         Font.loadFont(getClass().getResourceAsStream("/fxml/albertus-mt.ttf"), 16);
         Font.loadFont(getClass().getResourceAsStream("/fxml/albertus-mt-light.ttf"), 16);
+        Font.loadFont(getClass().getResourceAsStream("/fxml/fa5-free-solid-900.ttf"), 16);
+
         Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler::unhandled);
 
         Parent root;

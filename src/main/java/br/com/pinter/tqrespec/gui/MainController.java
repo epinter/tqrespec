@@ -173,6 +173,9 @@ public class MainController implements Initializable {
         saveDisabled.bindBidirectional(pointsPaneController.saveDisabledProperty());
         saveDisabled.bindBidirectional(skillsPaneController.saveDisabledProperty());
 
+        saveButton.setGraphic(Icon.FA_SAVE.create());
+        copyButton.setGraphic(Icon.FA_COPY.create());
+
         State.get().gameRunningProperty().addListener((value, oldV, newV) -> {
             if (newV) {
                 Platform.runLater(() -> {
