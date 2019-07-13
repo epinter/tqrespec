@@ -432,6 +432,11 @@ public class MainController implements Initializable {
 
     @FXML
     public void characterSelected(ActionEvent evt) throws Exception {
+        if (State.get().getGameRunning()) {
+            reset();
+            return;
+        }
+
         saveDisabled.set(true);
         copyButton.setDisable(true);
         characterCombo.setDisable(true);
