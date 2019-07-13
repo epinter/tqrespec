@@ -120,6 +120,9 @@ public class MainController implements Initializable {
     @FXML
     public SkillsPaneController skillsPaneController;
 
+    @FXML
+    public Button resetButton;
+
     public BooleanProperty saveDisabled = new SimpleBooleanProperty();
 
     @Override
@@ -173,6 +176,8 @@ public class MainController implements Initializable {
         saveDisabled.bindBidirectional(pointsPaneController.saveDisabledProperty());
         saveDisabled.bindBidirectional(skillsPaneController.saveDisabledProperty());
 
+        //set icons
+        resetButton.setGraphic(Icon.FA_UNDO.create(1.4));
         saveButton.setGraphic(Icon.FA_SAVE.create());
         copyButton.setGraphic(Icon.FA_COPY.create());
 
@@ -288,6 +293,11 @@ public class MainController implements Initializable {
         }
     }
 
+    @FXML
+    public void resetButtonClicked(ActionEvent event) {
+        reset();
+    }
+
     public void reset() {
         pointsPaneController.clearProperties();
         skillsPaneController.resetSkilltabControls();
@@ -299,6 +309,8 @@ public class MainController implements Initializable {
         addCharactersToCombo();
         characterCombo.setDisable(false);
         setAllControlsDisable(true);
+        skillsPaneController.resetSkilltabControls();
+        pointsPaneController.clearProperties();
     }
 
     @FXML

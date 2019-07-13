@@ -237,6 +237,24 @@
     -fx-effect: dropshadow( one-pass-box , black , 0, 0.0 , 0 , 2 );
 }
 
+.tq-resetbutton {
+    -fx-cursor: hand;
+    -fx-background: none;
+    -fx-border-width: 0;
+    -fx-background-image: none;
+    -fx-background-color:transparent;
+}
+
+.tq-resetbutton > .tq-icon-graphic {
+    -fx-fill: #f6d35b;
+}
+
+.tq-resetbutton:pressed > .tq-icon-graphic {
+    -fx-fill: #000000;
+    -fx-background-color:red;
+    -fx-effect: none;
+}
+
 .tq-label {
 	-fx-text-fill: #ffffff;
 	-fx-font-size: 1.4em;
