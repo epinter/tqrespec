@@ -131,8 +131,14 @@ public class SkillsPaneController implements Initializable {
         currentSecondMasteryLevel = new SimpleStringProperty();
 
         freeSkillPointsLabel.textProperty().bind(
-                Bindings.createStringBinding(() -> Util.getUIMessage("skills.availableSkillPoints",
-                        currentSkillPoints.getValue()),
+                Bindings.createStringBinding(() -> {
+                            if (currentSkillPoints != null && currentSkillPoints.getValue() != null) {
+                                return Util.getUIMessage("skills.availableSkillPoints",
+                                        currentSkillPoints.getValue());
+                            } else {
+                                return "";
+                            }
+                        },
                         currentSkillPoints
                 )
         );
@@ -155,6 +161,12 @@ public class SkillsPaneController implements Initializable {
     }
 
     public void resetSkilltabControls() {
+        if (currentFirstMasteryLevel != null)
+            currentFirstMasteryLevel.setValue(null);
+        if (currentSecondMasteryLevel != null)
+            currentSecondMasteryLevel.setValue(null);
+        if (currentSkillPoints != null)
+            currentSkillPoints.setValue(null);
         firstMasteryLabel.setText(null);
         firstMasteryListView.getItems().clear();
         secondMasteryLabel.setText(null);
