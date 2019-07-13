@@ -191,7 +191,6 @@
     -fx-color: #ffd993;
 }
 
-/* ------- ARROW* ------- */
 .tq-charactercombo:hover > .arrow-button > .arrow{
     -fx-background-insets: 1 0 -1 0, 0;
     -fx-background-color: #f6f0d0;
@@ -230,6 +229,13 @@
     -fx-font-family: 'Albertus MT';
 }
 /************/
+
+.tq-icon-defaultstyle-fa {
+    -fx-font-style: normal;
+    -fx-font-weight: 900;
+    -fx-fill: #FFFFFF;
+    -fx-effect: dropshadow( one-pass-box , black , 0, 0.0 , 0 , 2 );
+}
 
 .tq-label {
 	-fx-text-fill: #ffffff;

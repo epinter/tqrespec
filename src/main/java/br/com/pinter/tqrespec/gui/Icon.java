@@ -1401,6 +1401,11 @@ public enum Icon {
     public Text create() {
         return IconHelper.createIcon(this);
     }
+
+    public Text create(double sizeEm) {
+        return IconHelper.createIcon(this,sizeEm);
+    }
+
     @Override
     public String toString() {
         return c.toString();
