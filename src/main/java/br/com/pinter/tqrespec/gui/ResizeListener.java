@@ -91,12 +91,12 @@ public class ResizeListener implements EventHandler<MouseEvent> {
                                     || stage.getWidth() >= stage.getMinWidth())) {
                 if (resizeH) {
                     double newW = t.getX() + dx;
-                    if (newW > stage.getMaxWidth()) return;
+                    if (newW > stage.getMaxWidth() || newW < stage.getMinWidth()) return;
                     stage.setWidth(newW);
                     stage.setHeight(stage.getWidth() * (stage.getMinHeight() / stage.getMinWidth()));
                 } else if (resizeV) {
                     double newH = t.getY() + dy;
-                    if (newH > stage.getMaxHeight()) return;
+                    if (newH > stage.getMaxHeight() || newH < stage.getMinHeight()) return;
                     stage.setHeight(newH);
                     stage.setWidth(stage.getHeight() * (stage.getMinWidth() / stage.getMinHeight()));
                 }
