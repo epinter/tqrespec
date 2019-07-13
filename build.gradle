@@ -42,6 +42,10 @@ if (file('src/main/java/module-info.java').exists()) {
     mainClassName = "br.com.pinter.tqrespec.Main"
 }
 
+if(project.hasProperty('buildVersion')) {
+    project.version = project.properties['buildVersion']
+}
+
 repositories {
     mavenCentral()
 }
