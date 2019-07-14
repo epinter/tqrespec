@@ -23,16 +23,6 @@ package br.com.pinter.tqrespec.util;
 import java.nio.file.Paths;
 
 public class Constants {
-    public static final int STR_ATTR_STEP = 4;
-    public static final int STR_ATTR_MIN = 50;
-    public static final int INT_ATTR_STEP = 4;
-    public static final int INT_ATTR_MIN = 50;
-    public static final int DEX_ATTR_STEP = 4;
-    public static final int DEX_ATTR_MIN = 50;
-    public static final int LIFE_ATTR_STEP = 40;
-    public static final int LIFE_ATTR_MIN = 300;
-    public static final int MANA_ATTR_STEP = 40;
-    public static final int MANA_ATTR_MIN = 300;
     public static final String INITIAL_FONT_SIZE = "1";
     public static final String BACKUP_DIRECTORY = Paths.get("SaveData", "TQRespec Backup").toString();
     public static final String VERSION_CHECK_URL = "https://epinter.github.io/version/tqrespec";

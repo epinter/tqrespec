@@ -93,6 +93,17 @@ public class AttributesPaneController implements Initializable {
 
     private BooleanProperty saveDisabled = new SimpleBooleanProperty();
 
+    private int strStep;
+    private int strMin;
+    private int intStep;
+    private int intMin;
+    private int dexStep;
+    private int dexMin;
+    private int lifeStep;
+    private int lifeMin;
+    private int manaStep;
+    private int manaMin;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -127,12 +138,12 @@ public class AttributesPaneController implements Initializable {
     }
 
     private void setStrField(int value) {
-        if (value < 50) {
-            currentAvail.set(currentAvail.get() - ((Constants.STR_ATTR_MIN - value) / Constants.STR_ATTR_STEP));
-            value = 50;
+        if (value < strMin && (value - strMin) % strStep == 0) {
+            currentAvail.set(currentAvail.get() - ((strMin - value) / strStep));
+            value = strMin;
         }
         currentStr = new SimpleIntegerProperty(value);
-        AttrIntegerSpinnerValueFactory strFactory = new AttrIntegerSpinnerValueFactory(50, currentStr.get(), currentStr.get(), Constants.STR_ATTR_STEP, currentAvail);
+        AttrIntegerSpinnerValueFactory strFactory = new AttrIntegerSpinnerValueFactory(strMin, currentStr.get(), currentStr.get(), strStep, currentAvail);
         //noinspection unchecked
         strSpinner.setValueFactory(strFactory);
         //noinspection unchecked
@@ -143,12 +154,12 @@ public class AttributesPaneController implements Initializable {
     }
 
     private void setIntField(int value) {
-        if (value < 50 && (value - 50) % Constants.INT_ATTR_STEP == 0) {
-            currentAvail.set(currentAvail.get() - ((Constants.INT_ATTR_MIN - value) / Constants.INT_ATTR_STEP));
-            value = 50;
+        if (value < intMin && (value - intMin) % intStep == 0) {
+            currentAvail.set(currentAvail.get() - ((intMin - value) / intStep));
+            value = intMin;
         }
         currentInt = new SimpleIntegerProperty(value);
-        AttrIntegerSpinnerValueFactory intFactory = new AttrIntegerSpinnerValueFactory(50, currentInt.get(), currentInt.get(), Constants.INT_ATTR_STEP, currentAvail);
+        AttrIntegerSpinnerValueFactory intFactory = new AttrIntegerSpinnerValueFactory(intMin, currentInt.get(), currentInt.get(), intStep, currentAvail);
         //noinspection unchecked
         intSpinner.setValueFactory(intFactory);
         //noinspection unchecked
@@ -157,12 +168,12 @@ public class AttributesPaneController implements Initializable {
     }
 
     private void setDexField(int value) {
-        if (value < 50 && (value - 50) % Constants.DEX_ATTR_STEP == 0) {
-            currentAvail.set(currentAvail.get() - ((Constants.DEX_ATTR_MIN - value) / Constants.DEX_ATTR_STEP));
-            value = 50;
+        if (value < dexMin && (value - dexMin) % dexStep == 0) {
+            currentAvail.set(currentAvail.get() - ((dexMin - value) / dexStep));
+            value = dexMin;
         }
         currentDex = new SimpleIntegerProperty(value);
-        AttrIntegerSpinnerValueFactory dexFactory = new AttrIntegerSpinnerValueFactory(50, currentDex.get(), currentDex.get(), Constants.DEX_ATTR_STEP, currentAvail);
+        AttrIntegerSpinnerValueFactory dexFactory = new AttrIntegerSpinnerValueFactory(dexMin, currentDex.get(), currentDex.get(), dexStep, currentAvail);
         //noinspection unchecked
         dexSpinner.setValueFactory(dexFactory);
         //noinspection unchecked
@@ -171,12 +182,12 @@ public class AttributesPaneController implements Initializable {
     }
 
     private void setLifeField(int value) {
-        if (value < 300 && (value - 300) % Constants.LIFE_ATTR_STEP == 0) {
-            currentAvail.set(currentAvail.get() - ((Constants.LIFE_ATTR_MIN - value) / Constants.LIFE_ATTR_STEP));
-            value = 300;
+        if (value < lifeMin && (value - lifeMin) % lifeStep == 0) {
+            currentAvail.set(currentAvail.get() - ((lifeMin - value) / lifeStep));
+            value = lifeMin;
         }
         currentLife = new SimpleIntegerProperty(value);
-        AttrIntegerSpinnerValueFactory lifeFactory = new AttrIntegerSpinnerValueFactory(Constants.LIFE_ATTR_MIN, currentLife.get(), currentLife.get(), Constants.LIFE_ATTR_STEP, currentAvail);
+        AttrIntegerSpinnerValueFactory lifeFactory = new AttrIntegerSpinnerValueFactory(lifeMin, currentLife.get(), currentLife.get(), lifeStep, currentAvail);
         //noinspection unchecked
         lifeSpinner.setValueFactory(lifeFactory);
         //noinspection unchecked
@@ -185,12 +196,12 @@ public class AttributesPaneController implements Initializable {
     }
 
     private void setManaField(int value) {
-        if (value < 300 && (value - 300) % Constants.MANA_ATTR_STEP == 0) {
-            currentAvail.set(currentAvail.get() - ((Constants.MANA_ATTR_MIN - value) / Constants.MANA_ATTR_STEP));
-            value = 300;
+        if (value < manaMin && (value - manaMin) % manaStep == 0) {
+            currentAvail.set(currentAvail.get() - ((manaMin - value) / manaStep));
+            value = manaMin;
         }
         currentMana = new SimpleIntegerProperty(value);
-        AttrIntegerSpinnerValueFactory manaFactory = new AttrIntegerSpinnerValueFactory(Constants.MANA_ATTR_MIN, currentMana.get(), currentMana.get(), Constants.MANA_ATTR_STEP, currentAvail);
+        AttrIntegerSpinnerValueFactory manaFactory = new AttrIntegerSpinnerValueFactory(manaMin, currentMana.get(), currentMana.get(), manaStep, currentAvail);
         //noinspection unchecked
         manaSpinner.setValueFactory(manaFactory);
         //noinspection unchecked
@@ -202,58 +213,58 @@ public class AttributesPaneController implements Initializable {
         if (newValue > oldValue && currentAvail.get() > 0) {
             int diff = newValue - oldValue;
             if (attr.equals("str")) {
-                if (diff < Constants.STR_ATTR_STEP) return;
+                if (diff < strStep) return;
                 currentStr.set(newValue);
-                currentAvail.set(currentAvail.get() - (diff / Constants.STR_ATTR_STEP));
+                currentAvail.set(currentAvail.get() - (diff / strStep));
             }
             if (attr.equals("int")) {
-                if (diff < Constants.INT_ATTR_STEP) return;
+                if (diff < intStep) return;
                 currentInt.set(newValue);
-                currentAvail.set(currentAvail.get() - (diff / Constants.INT_ATTR_STEP));
+                currentAvail.set(currentAvail.get() - (diff / intStep));
 
             }
             if (attr.equals("dex")) {
-                if (diff < Constants.DEX_ATTR_STEP) return;
+                if (diff < dexStep) return;
                 currentDex.set(newValue);
-                currentAvail.set(currentAvail.get() - (diff / Constants.DEX_ATTR_STEP));
+                currentAvail.set(currentAvail.get() - (diff / dexStep));
             }
             if (attr.equals("life")) {
-                if (diff < Constants.LIFE_ATTR_STEP) return;
+                if (diff < lifeStep) return;
                 currentLife.set(newValue);
-                currentAvail.set(currentAvail.get() - (diff / Constants.LIFE_ATTR_STEP));
+                currentAvail.set(currentAvail.get() - (diff / lifeStep));
             }
             if (attr.equals("mana")) {
-                if (diff < Constants.MANA_ATTR_STEP) return;
+                if (diff < manaStep) return;
                 currentMana.set(newValue);
-                currentAvail.set(currentAvail.get() - (diff / Constants.MANA_ATTR_STEP));
+                currentAvail.set(currentAvail.get() - (diff / manaStep));
             }
         }
         if (newValue < oldValue) {
             int diff = oldValue - newValue;
             if (attr.equals("str")) {
-                if (diff < Constants.STR_ATTR_STEP) return;
+                if (diff < strStep) return;
                 currentStr.set(newValue);
-                currentAvail.set(currentAvail.get() + (diff / Constants.STR_ATTR_STEP));
+                currentAvail.set(currentAvail.get() + (diff / strStep));
             }
             if (attr.equals("int")) {
-                if (diff < Constants.INT_ATTR_STEP) return;
+                if (diff < intStep) return;
                 currentInt.set(newValue);
-                currentAvail.set(currentAvail.get() + (diff / Constants.INT_ATTR_STEP));
+                currentAvail.set(currentAvail.get() + (diff / intStep));
             }
             if (attr.equals("dex")) {
-                if (diff < Constants.DEX_ATTR_STEP) return;
+                if (diff < dexStep) return;
                 currentDex.set(newValue);
-                currentAvail.set(currentAvail.get() + (diff / Constants.DEX_ATTR_STEP));
+                currentAvail.set(currentAvail.get() + (diff / dexStep));
             }
             if (attr.equals("life")) {
-                if (diff < Constants.LIFE_ATTR_STEP) return;
+                if (diff < lifeStep) return;
                 currentLife.set(newValue);
-                currentAvail.set(currentAvail.get() + (diff / Constants.LIFE_ATTR_STEP));
+                currentAvail.set(currentAvail.get() + (diff / lifeStep));
             }
             if (attr.equals("mana")) {
-                if (diff < Constants.MANA_ATTR_STEP) return;
+                if (diff < manaStep) return;
                 currentMana.set(newValue);
-                currentAvail.set(currentAvail.get() + (diff / Constants.MANA_ATTR_STEP));
+                currentAvail.set(currentAvail.get() + (diff / manaStep));
             }
         }
         if (currentAvail.get() > 0) {
@@ -351,6 +362,17 @@ public class AttributesPaneController implements Initializable {
     }
 
     public void loadCharHandler() {
+        strStep = db.player().getPlayerLevels().getStrengthIncrement();
+        strMin = Math.round(db.player().getPc().getCharacterStrength());
+        intStep = db.player().getPlayerLevels().getIntelligenceIncrement();
+        intMin = Math.round(db.player().getPc().getCharacterIntelligence());
+        dexStep = db.player().getPlayerLevels().getDexterityIncrement();
+        dexMin = Math.round(db.player().getPc().getCharacterDexterity());
+        lifeStep = db.player().getPlayerLevels().getLifeIncrement();
+        lifeMin = Math.round(db.player().getPc().getCharacterLife());
+        manaStep = db.player().getPlayerLevels().getManaIncrement();
+        manaMin = Math.round(db.player().getPc().getCharacterMana());
+
         clearProperties();
         int str = playerData.getStr();
         int inl = playerData.getInt();

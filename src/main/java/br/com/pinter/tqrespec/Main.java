@@ -99,6 +99,7 @@ public class Main extends Application {
                 db.skills().preload();
                 //preload text
                 notifyPreloader(new Preloader.ProgressNotification(0.9));
+                db.player().preload();
                 txt.preload();
 
                 try {

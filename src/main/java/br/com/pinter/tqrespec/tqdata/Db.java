@@ -21,6 +21,7 @@
 package br.com.pinter.tqrespec.tqdata;
 
 import br.com.pinter.tqdatabase.Database;
+import br.com.pinter.tqdatabase.Player;
 import br.com.pinter.tqdatabase.Skills;
 import com.google.inject.Singleton;
 
@@ -44,6 +45,11 @@ public class Db {
     public Skills skills() {
         initialize();
         return db.skills();
+    }
+
+    public Player player() {
+        initialize();
+        return db.player();
     }
 
     public void preloadAll() {
