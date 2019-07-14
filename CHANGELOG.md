@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.7.0] - 2019-07-14
+### Added
+- Mastery removal feature ([#5](https://github.com/epinter/tqrespec/issues/5))
+- Reset button
+- Added feature to run without game installed, reads gamedata from a directory ([#9](https://github.com/epinter/tqrespec/issues/9))
+- Block TQRespec usage when game is running ([#7](https://github.com/epinter/tqrespec/issues/7))
+- Added icons to buttons
+
+### Changed
+- Parsing process rewritten
+- Before loading character, verify that every data in savegame is known, aborts if not
+
+### Fixed
+- Don't crash if Steam is not installed
+- Fixed minor bug on window resize 
+
 ## [0.6.1] - 2019-07-06
 ### Fixed
 - Fixed GOG library detection
@@ -63,3 +79,11 @@
 ## [0.1.1] - 2018-01-07
 ### Added
 - Initial testing version, core classes, without GUI
+
+[unreleased]: https://github.com/epinter/tqrespec/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/epinter/tqrespec/compare/v0.6.1...v0.7.0
+[0.6.1]: https://github.com/epinter/tqrespec/compare/v0.6.0...v0.6.1
+[0.6.0]: https://github.com/epinter/tqrespec/compare/v0.2.1...v0.6.0
+[0.2.1]: https://github.com/epinter/tqrespec/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/epinter/tqrespec/compare/v0.1.2...v0.2.0
+[0.1.2]: https://github.com/epinter/tqrespec/compare/v0.1.1...v0.1.2

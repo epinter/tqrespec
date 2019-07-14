@@ -22,10 +22,25 @@ This software requires **Microsoft Windows 64-bit** (tested with Windows 7, 8, 8
 
 #### ***Before you start***
 
-Keep in mind that this software make modifications to your save game (more specifically the file Player.chr). You shouldn't run this software while the game is running, you can corrupt your save game. So, always close the game before opening TQRespec.
+Keep in mind that this software make modifications to your save game (more specifically the file Player.chr). You shouldn't modify your characters while the game is running, you can corrupt your save game. ***YOU SHOULD ALWAYS KEEP A FULL BACKUP OF YOUR SAVE GAME FOLDER*** (Documents/My Games/Titan Quest - Immortal Throne).
 
 ![TQRespec Screenshot 1](https://raw.githubusercontent.com/epinter/tqrespec/master/assets/screenshot_attributes.png "Attributes")
 ![TQRespec Screenshot 2](https://raw.githubusercontent.com/epinter/tqrespec/master/assets/screenshot_skills.png "Skills")
+
+#### ***Running without the game installed***
+
+This application uses game data. If you want to run it on a PC that doesn't have the game installed, make sure you have a 'gamedata' directory with Database and Text resources inside it. The structure should look like this:
+
+~~~
+TQRespec/app
+TQRespec/runtime
+TQRespec/gamedata/Database
+TQRespec/gamedata/Text
+TQRespec/TQRespec.exe
+~~~
+
+Where Database and Text folders (with its contents) are copied from the game.
+The savegame needs to be at the same location as the game uses (Documents/My Games/...).
 
 #### ***Use it!***
 
@@ -37,7 +52,9 @@ There are five attributes available to change (Health, Energy, Strength, Intelli
 
 #### ***Skills***
 
-Now if you change to Skills tab, you will see two lists with the skills of your character. Below this lists, there are two buttons for each. The first button "Reclaim All Skills Points" will remove all points allocated on skills on that mastery and make the points available to use in game. The button "Reclaim Mastery Points" permits you to reduce the mastery level. If you have a mastery on level 24 and 7 skills with points allocated, you can click on first button to have the points from the 7 skills back to you, then on the other button to have 23 points back from the mastery, so you will have the mastery with just 1 point allocated.
+Now if you change to Skills tab, you will see two lists with the skills of your character. Below this lists, there are two buttons for each. The first button "Reclaim All Skills Points" will remove all points allocated on skills on that mastery and make the points available to use in game. The button "Mastery" permits you to reduce the mastery level to 1 or remove the mastery completely.
+
+If you have a mastery on level 24 and 7 skills with points allocated, you can click on "Reclaim All Skills Points" to have the points from the 7 skills back to you. Then you click on "Mastery / Reclaim" to have 23 points back from the mastery, so you will have the mastery with just 1 point allocated, or you can click on "Mastery / Remove" to have all 24 points from mastery.
 
 #### ***Copy your character***
 
