@@ -103,8 +103,8 @@ public class SkillsPaneController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        reclaimSkillsFirstButton.setGraphic(Icon.FA_UNDO.create());
-        reclaimSkillsSecondButton.setGraphic(Icon.FA_UNDO.create());
+        reclaimSkillsFirstButton.setGraphic(Icon.FA_RECYCLE.create());
+        reclaimSkillsSecondButton.setGraphic(Icon.FA_RECYCLE.create());
         firstMasteryButton.setGraphic(Icon.FA_HAT_WIZARD.create());
         secondMasteryButton.setGraphic(Icon.FA_HAT_WIZARD.create());
         reclaimMasteryFirstItem.setGraphic(Icon.FA_ANGLE_DOUBLE_DOWN.create());
