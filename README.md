@@ -1,5 +1,6 @@
 # TQ Respec
 
+[![Steam](https://img.shields.io/badge/steam-guide-red.svg)](https://steamcommunity.com/sharedfiles/filedetails/?id=1262483108)
 [![Latest Release](https://img.shields.io/github/release/epinter/tqrespec.svg)](https://github.com/epinter/tqrespec/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/epinter/tqrespec/total.svg)](https://github.com/epinter/tqrespec/releases/latest)
 [![Release Date](https://img.shields.io/github/release-date/epinter/tqrespec.svg)](https://github.com/epinter/tqrespec/releases/latest)
