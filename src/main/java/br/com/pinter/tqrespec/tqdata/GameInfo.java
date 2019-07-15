@@ -207,6 +207,42 @@ public class GameInfo {
         return null;
     }
 
+    private Path getGameMicrosoftStorePath() {
+        String regexGameName = Constants.REGEX_REGISTRY_PACKAGE;
+        String[] pkgList = new String[0];
+        String pkgKeyPath = "Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\CurrentVersion\\" +
+                "AppModel\\Repository\\Packages";
+        try {
+            pkgList = Advapi32Util.registryGetKeys(WinReg.HKEY_CURRENT_USER,
+                    pkgKeyPath);
+            for (String pkg : pkgList) {
+                String pkgDisplayName = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER,
+                        String.format("%s\\%s", pkgKeyPath, pkg), "DisplayName");
+                if (pkgDisplayName.matches(regexGameName)) {
+                    try {
+                        if (DBG) System.err.println("Package: displayname found -- " + regexGameName);
+                        String pkgInstalled = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER,
+                                String.format("%s\\%s", pkgKeyPath, pkg), "PackageRootFolder");
+                        Path pkgInstalledPath = Paths.get(pkgInstalled).toAbsolutePath();
+                        if (gamePathExists(pkgInstalledPath)) {
+                            return pkgInstalledPath;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    if (DBG)
+                        System.err.println("Installed: displayname not found --- " + regexGameName + "---" + pkgDisplayName);
+                }
+            }
+        } catch (Exception e) {
+            if (DBG) e.printStackTrace();
+        }
+
+
+        return null;
+    }
+
     private Path getGameSteamApiBasedPath() {
         try {
             String steamPath = Advapi32Util.registryGetStringValue(
@@ -216,14 +252,14 @@ public class GameInfo {
             if (gamePathExists(steamGamePath)) {
                 return steamGamePath;
             } else {
-                if(DBG) System.err.println("GameSteamApiBasedPath: not found at "+steamGamePath);
+                if (DBG) System.err.println("GameSteamApiBasedPath: not found at " + steamGamePath);
             }
 
             Path steamGameParentPath = Paths.get(steamPath).getParent().toAbsolutePath();
             if (gamePathExists(steamGameParentPath)) {
                 return steamGameParentPath;
             } else {
-                if(DBG) System.err.println("GameSteamApiBasedPath: not found at "+steamGameParentPath);
+                if (DBG) System.err.println("GameSteamApiBasedPath: not found at " + steamGameParentPath);
             }
         } catch (Exception e) {
             if (DBG) e.printStackTrace();
@@ -248,6 +284,12 @@ public class GameInfo {
         if (gogPath != null && gamePathExists(gogPath)) {
             if (DBG) System.err.println("Gog: found");
             return gogPath.toString();
+        }
+
+        Path microsoftStorePath = getGameMicrosoftStorePath();
+        if(microsoftStorePath!=null && gamePathExists(microsoftStorePath)) {
+            if(DBG) System.err.println("Package: found");
+            return microsoftStorePath.toString();
         }
 
         Path installedPathFallback = getGameInstalledPath(Constants.REGEX_REGISTRY_INSTALL_FALLBACK);

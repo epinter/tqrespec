@@ -24,6 +24,7 @@ import java.nio.file.Paths;
 
 public class Constants {
     public static final String REGEX_REGISTRY_INSTALL = "Titan Quest.*Anniversary.*";
+    public static final String REGEX_REGISTRY_PACKAGE = "(?i:Titan Quest.*)";
     public static final String REGEX_REGISTRY_INSTALL_FALLBACK = "Titan Quest.*";
     public static final String GAME_DIRECTORY_STEAM = "Titan Quest Anniversary Edition";
     public static final String INITIAL_FONT_SIZE = "1";
