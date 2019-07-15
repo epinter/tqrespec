@@ -67,21 +67,44 @@ public class GameInfo {
         return String.format("%d.%d", major, minor);
     }
 
-    private String getGameSteamLibraryPath() {
+    private boolean gamePathExists(Path path) {
+        Path databasePath = Paths.get(path.toString(), "Database");
+        if (Files.exists(databasePath) && Files.isDirectory(databasePath)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private Path getGameSteamPath() {
+        Path steamLibraryPath = getSteamLibraryPath();
+        if (steamLibraryPath != null) {
+            Path gamePath = Paths.get(steamLibraryPath.toString(), "common",
+                    Constants.GAME_DIRECTORY_STEAM).toAbsolutePath();
+            if(gamePathExists(gamePath)) {
+                return gamePath;
+            }
+        }
+        return null;
+    }
+
+    private Path getSteamLibraryPath() {
         try {
             String steamPath = Advapi32Util.registryGetStringValue(
                     WinReg.HKEY_CURRENT_USER, "SOFTWARE\\Valve\\Steam", "SteamPath");
 
-            Path steamappsMainPath = Paths.get(steamPath, "SteamApps", "common", "Titan Quest Anniversary Edition");
-            if (Files.exists(steamappsMainPath) && Files.isDirectory(steamappsMainPath)) {
-                return steamappsMainPath.toAbsolutePath().toString();
+            Path steamappsPath = Paths.get(steamPath, "SteamApps").toAbsolutePath();
+            Path steamGamePath = Paths.get(steamappsPath.toString(), "common",
+                    Constants.GAME_DIRECTORY_STEAM).toAbsolutePath();
+            if (gamePathExists(steamGamePath)) {
+                return steamappsPath;
             }
 
             Pattern regexOuter = Pattern.compile(".*LibraryFolders.*\\{(.*)}.*", Pattern.DOTALL);
             Pattern regexInner = Pattern.compile("\\s*\"\\d\"\\s+\"([^\"]+)\".*");
 
             ArrayList<String> libraryFolderList = new ArrayList<>();
-            String steamConfig = Files.readString(Paths.get(steamPath, "SteamApps", "libraryfolders.vdf"));
+            String steamConfig = Files.readString(Paths.get(steamappsPath.toString(), "libraryfolders.vdf"));
 
             Matcher outer = regexOuter.matcher(steamConfig);
             if (outer.find()) {
@@ -95,9 +118,11 @@ public class GameInfo {
             }
 
             for (String libraryFolder : libraryFolderList) {
-                Path steamappsPath = Paths.get(libraryFolder, "SteamApps", "common", "Titan Quest Anniversary Edition");
-                if (Files.exists(steamappsPath) && Files.isDirectory(steamappsPath)) {
-                    return steamappsPath.toAbsolutePath().toString();
+                Path libraryPath = Paths.get(libraryFolder, "SteamApps").toAbsolutePath();
+                Path libraryGamePath = Paths.get(libraryPath.toString(), "common",
+                        Constants.GAME_DIRECTORY_STEAM).toAbsolutePath();
+                if (gamePathExists(libraryGamePath)) {
+                    return libraryPath;
                 }
             }
         } catch (Exception e) {
@@ -106,36 +131,49 @@ public class GameInfo {
         return null;
     }
 
-    private String getGameGogPath() {
+    private Path getGameGogPath() {
         try {
             String gog64bit = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE,
                     "SOFTWARE\\GOG.com\\Games\\1196955511", "PATH");
             if (StringUtils.isNotEmpty(gog64bit)) {
-                return gog64bit;
+                Path gog64bitPath = Paths.get(gog64bit).toAbsolutePath();
+                if (gamePathExists(gog64bitPath)) {
+                    return gog64bitPath;
+                }
             }
         } catch (Exception e) {
         }
 
         try {
-            return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE,
+            String gog32bit = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE,
                     "SOFTWARE\\Wow6432Node\\GOG.com\\Games\\1196955511", "PATH");
+            Path gog32bitPath = Paths.get(gog32bit).toAbsolutePath();
+            if (gamePathExists(gog32bitPath)) {
+                return gog32bitPath;
+            }
         } catch (Exception e) {
             return null;
         }
-
+        return null;
     }
 
-    private String getGameDiscPath() {
+    private Path getGameDiscPath() {
         try {
-            return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE,
+            String disc = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE,
                     "SOFTWARE\\Iron Lore\\Titan Quest Immortal Throne", "Install Location");
+            if (StringUtils.isNotBlank(disc)) {
+                Path discPath = Paths.get(disc).toAbsolutePath();
+                if (gamePathExists(discPath)) {
+                    return discPath;
+                }
+            }
         } catch (Exception e) {
             return null;
         }
+        return null;
     }
 
-    private String getGameInstalledPath() {
-        String regexGameName = "Titan Quest.*Anniversary Edition";
+    private Path getGameInstalledPath(String regexGameName) {
         String[] installedApps = new String[0];
         try {
             installedApps = Advapi32Util.registryGetKeys(WinReg.HKEY_LOCAL_MACHINE,
@@ -150,60 +188,57 @@ public class GameInfo {
                         "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\" + app, "DisplayName");
                 if (appDisplayName.matches(regexGameName)) {
                     if (DBG) System.err.println("Installed: displayname found -- " + regexGameName);
-                    return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE,
+                    String installed = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE,
                             "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\" + app, "InstallLocation");
+                    Path installedPath = Paths.get(installed).toAbsolutePath();
+                    if (gamePathExists(installedPath)) {
+                        return installedPath;
+                    }
                 } else {
                     if (DBG)
                         System.err.println("Installed: displayname not found --- " + regexGameName + "---" + appDisplayName);
                 }
-            } catch (Win32Exception e) {
+            } catch (Exception e) {
                 if (DBG) e.printStackTrace();
             }
         return null;
     }
 
     private String detectGamePath() {
-        String installed = this.getGameInstalledPath();
-        if (StringUtils.isNotEmpty(installed)) {
-            Path installedPath = Paths.get(installed);
-            if (Files.exists(installedPath)) {
-                if (DBG) System.err.println("Installed: found");
-                return installedPath.toAbsolutePath().toString();
-            }
+        Path installedPath = getGameInstalledPath(Constants.REGEX_REGISTRY_INSTALL);
+        if (installedPath != null && gamePathExists(installedPath)) {
+            if (DBG) System.err.println("Installed: found");
+            return installedPath.toString();
         }
 
-        String steamLibrary = this.getGameSteamLibraryPath();
-        if (StringUtils.isNotEmpty(steamLibrary)) {
-            Path steamLibraryPath = Paths.get(steamLibrary);
-            if (Files.exists(steamLibraryPath)) {
-                if (DBG) System.err.println("SteamLibrary: found");
-                return steamLibraryPath.toAbsolutePath().toString();
-            }
+        Path gameSteam = getGameSteamPath();
+        if (gameSteam != null && gamePathExists(gameSteam)) {
+            if (DBG) System.err.println("SteamLibrary: found");
+            return gameSteam.toString();
         }
 
-        String gog = this.getGameGogPath();
-        if (StringUtils.isNotEmpty(gog)) {
-            Path gogPath = Paths.get(gog);
-            if (Files.exists(gogPath)) {
-                if (DBG) System.err.println("Gog: found");
-                return gogPath.toAbsolutePath().toString();
-            }
+        Path gogPath = getGameGogPath();
+        if (gogPath != null && gamePathExists(gogPath)) {
+            if (DBG) System.err.println("Gog: found");
+            return gogPath.toString();
         }
 
+        Path installedPathFallback = getGameInstalledPath(Constants.REGEX_REGISTRY_INSTALL_FALLBACK);
+        if (installedPathFallback != null && gamePathExists(installedPathFallback)) {
+            if (DBG) System.err.println("Installed: found");
+            return installedPathFallback.toString();
+        }
 
-        String disc = this.getGameDiscPath();
-        if (StringUtils.isNotEmpty(disc)) {
-            Path discPath = Paths.get(this.getGameDiscPath());
-            if (Files.exists(discPath)) {
-                if (DBG) System.err.println("Disc: found");
-                return discPath.toAbsolutePath().toString();
-            }
+        Path discPath = getGameDiscPath();
+        if (discPath != null && gamePathExists(discPath)) {
+            if (DBG) System.err.println("Disc: found");
+            return discPath.toString();
         }
         return null;
     }
 
     public String getGamePath() throws FileNotFoundException {
-        if (DBG || !SystemUtils.IS_OS_WINDOWS) {
+        if (!SystemUtils.IS_OS_WINDOWS) {
             return Constants.DEV_GAMEDATA;
         }
 
@@ -212,9 +247,9 @@ public class GameInfo {
         }
 
         if (StringUtils.isEmpty(gamePath)) {
-            if (Files.exists(Paths.get(Constants.DEV_GAMEDATA))) {
+            if (gamePathExists(Paths.get(Constants.DEV_GAMEDATA))) {
                 gamePath = Constants.DEV_GAMEDATA;
-            } else if (Files.exists(Paths.get(Constants.PARENT_GAMEDATA))) {
+            } else if (gamePathExists(Paths.get(Constants.PARENT_GAMEDATA))) {
                 gamePath = Constants.PARENT_GAMEDATA;
             } else {
                 throw new FileNotFoundException("Game path not detected");
@@ -228,9 +263,10 @@ public class GameInfo {
         String userHome = System.getProperty("user.home");
         String subdirectory = File.separator + Paths.get("My Games", "Titan Quest - Immortal Throne").toString();
 
-        if (DBG || !SystemUtils.IS_OS_WINDOWS) return Constants.DEV_GAMEDATA;
+        if (DBG || !SystemUtils.IS_OS_WINDOWS) {
+            System.err.println("SavePath: user.home is " + userHome);
+        }
 
-        if (DBG) System.err.println("SavePath: user.home is " + userHome);
         String saveDirectory;
         try {
             saveDirectory = Shell32Util.getFolderPath(ShlObj.CSIDL_MYDOCUMENTS);
@@ -247,7 +283,7 @@ public class GameInfo {
     }
 
     public String getSaveDataMainPath() {
-        if (DBG || !SystemUtils.IS_OS_WINDOWS) return Paths.get(Constants.DEV_GAMEDATA, "SaveData", "Main").toString();
+        if (!SystemUtils.IS_OS_WINDOWS) return Paths.get(Constants.DEV_GAMEDATA, "SaveData", "Main").toString();
         String savePath = getSavePath();
         if (StringUtils.isNotEmpty(savePath)) {
             return Paths.get(savePath, "SaveData", "Main").toString();
@@ -256,7 +292,7 @@ public class GameInfo {
     }
 
     public String getSaveDataUserPath() {
-        if (DBG || !SystemUtils.IS_OS_WINDOWS) return Paths.get(Constants.DEV_GAMEDATA, "SaveData", "User").toString();
+        if (!SystemUtils.IS_OS_WINDOWS) return Paths.get(Constants.DEV_GAMEDATA, "SaveData", "User").toString();
         String savePath = getSavePath();
         if (StringUtils.isNotEmpty(savePath)) {
             return Paths.get(savePath, "SaveData", "User").toString();

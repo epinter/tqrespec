@@ -23,6 +23,9 @@ package br.com.pinter.tqrespec.util;
 import java.nio.file.Paths;
 
 public class Constants {
+    public static final String REGEX_REGISTRY_INSTALL = "Titan Quest.*Anniversary.*";
+    public static final String REGEX_REGISTRY_INSTALL_FALLBACK = "Titan Quest.*";
+    public static final String GAME_DIRECTORY_STEAM = "Titan Quest Anniversary Edition";
     public static final String INITIAL_FONT_SIZE = "1";
     public static final String BACKUP_DIRECTORY = Paths.get("SaveData", "TQRespec Backup").toString();
     public static final String VERSION_CHECK_URL = "https://epinter.github.io/version/tqrespec";
