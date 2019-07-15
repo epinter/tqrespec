@@ -21,7 +21,10 @@
 package br.com.pinter.tqrespec.tqdata;
 
 import br.com.pinter.tqrespec.util.Constants;
-import com.sun.jna.platform.win32.*;
+import com.sun.jna.platform.win32.Advapi32Util;
+import com.sun.jna.platform.win32.Shell32Util;
+import com.sun.jna.platform.win32.ShlObj;
+import com.sun.jna.platform.win32.WinReg;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -81,7 +84,7 @@ public class GameInfo {
         if (steamLibraryPath != null) {
             Path gamePath = Paths.get(steamLibraryPath.toString(), "common",
                     Constants.GAME_DIRECTORY_STEAM).toAbsolutePath();
-            if(gamePathExists(gamePath)) {
+            if (gamePathExists(gamePath)) {
                 return gamePath;
             }
         }
@@ -204,6 +207,30 @@ public class GameInfo {
         return null;
     }
 
+    private Path getGameSteamApiBasedPath() {
+        try {
+            String steamPath = Advapi32Util.registryGetStringValue(
+                    WinReg.HKEY_CURRENT_USER, "SOFTWARE\\Valve\\Steam", "SteamPath");
+
+            Path steamGamePath = Paths.get(steamPath).toAbsolutePath();
+            if (gamePathExists(steamGamePath)) {
+                return steamGamePath;
+            } else {
+                if(DBG) System.err.println("GameSteamApiBasedPath: not found at "+steamGamePath);
+            }
+
+            Path steamGameParentPath = Paths.get(steamPath).getParent().toAbsolutePath();
+            if (gamePathExists(steamGameParentPath)) {
+                return steamGameParentPath;
+            } else {
+                if(DBG) System.err.println("GameSteamApiBasedPath: not found at "+steamGameParentPath);
+            }
+        } catch (Exception e) {
+            if (DBG) e.printStackTrace();
+        }
+        return null;
+    }
+
     private String detectGamePath() {
         Path installedPath = getGameInstalledPath(Constants.REGEX_REGISTRY_INSTALL);
         if (installedPath != null && gamePathExists(installedPath)) {
@@ -227,6 +254,12 @@ public class GameInfo {
         if (installedPathFallback != null && gamePathExists(installedPathFallback)) {
             if (DBG) System.err.println("Installed: found");
             return installedPathFallback.toString();
+        }
+
+        Path alternativeSteamBasedPath = getGameSteamApiBasedPath();
+        if (alternativeSteamBasedPath != null && gamePathExists(alternativeSteamBasedPath)) {
+            if (DBG) System.err.println("'Alternative' installation: found");
+            return alternativeSteamBasedPath.toString();
         }
 
         Path discPath = getGameDiscPath();
