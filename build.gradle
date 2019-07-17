@@ -110,6 +110,7 @@ if (moduleInfoPresent) {
         inputs.property("moduleName", moduleName)
         doFirst {
             jvmArgs = [
+                    '-XX:+UseSerialGC','-XX:MinHeapFreeRatio=10','-XX:MaxHeapFreeRatio=15',
                     '--add-reads', 'br.com.pinter.tqrespec=ALL-UNNAMED',
                     '--add-opens', 'javafx.base/com.sun.javafx.reflect=ALL-UNNAMED',
                     '--add-opens', 'br.com.pinter.tqrespec/br.com.pinter.tqrespec=ALL-UNNAMED',
@@ -129,8 +130,9 @@ if (moduleInfoPresent) {
     run {
         doFirst {
             jvmArgs = [
+                    '-XX:+UseSerialGC','-XX:MinHeapFreeRatio=10','-XX:MaxHeapFreeRatio=15',
                     '--module-path', javafxSdkLibDir,
-                    '--add-modules', 'javafx.base,javafx.fxml,javafx.graphics,javafx.controls'
+                    '--add-modules', 'javafx.base,javafx.fxml,javafx.graphics,javafx.controls',
             ]
         }
     }
@@ -262,7 +264,9 @@ task appimage(type: Exec) {
                 '--input', new File(buildDir, '/appimage-files'),
                 '--description', 'The respec tool for Titan Quest game',
                 '--class', "br.com.pinter.tqrespec.Main",
-                '--jvm-args', '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED ' +
+                '--jvm-args',
+                '-XX:+UseSerialGC -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=15 ' +
+                '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED ' +
                 '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED ' +
                 '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec=ALL-UNNAMED ' +
                 '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.core=ALL-UNNAMED ' +
@@ -291,7 +295,9 @@ task appimage(type: Exec) {
                 '--vendor', 'Emerson Pinter',
                 '--description', 'The respec tool for Titan Quest game',
                 '--class', mainClassName,
-                '--jvm-args', '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED'
+                '--jvm-args',
+                '-XX:+UseSerialGC -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=15 ' +
+                '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED'
     }
     doLast {
         copy {
