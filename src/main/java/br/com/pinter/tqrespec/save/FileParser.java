@@ -324,7 +324,11 @@ abstract class FileParser {
         } catch (IOException e) {
             e.printStackTrace();
         } catch (BufferUnderflowException e) {
-            throw new RuntimeException(String.format("Error parsing string. Invalid data(strlen=%d,buf=%s,position=%d).", len, new String(Objects.requireNonNull(buf)), offset), e.getCause());
+            String bufStr = null;
+            if(buf != null && buf.length < 50) {
+                bufStr = new String(buf);
+            }
+            throw new RuntimeException(String.format("Error parsing string. Invalid data(strlen=%d,buf=%s,position=%d).", len, bufStr, offset),e.getCause());
         }
         return null;
     }
