@@ -24,14 +24,40 @@ import java.util.prefs.Preferences;
 
 @SuppressWarnings("unused")
 public class Settings {
+
+    enum Options {
+        LAST_DETECTED_GAMEPATH("last_detectedgamepath"),
+        ALWAYS_FULL_BACKUP("always_fullbackup"),
+        ;
+
+        private String key;
+
+        Options(String key) {
+            this.key = key;
+        }
+
+        public String getKey() {
+            return key;
+        }
+    }
+
+    public static void setLastDetectedGamePath(String lastDetectedGamePath) {
+        Preferences prefs = Preferences.userNodeForPackage(Settings.class);
+        prefs.put(Options.LAST_DETECTED_GAMEPATH.getKey(), lastDetectedGamePath);
+    }
+
+    public static String getLastDetectedGamePath() {
+        Preferences prefs = Preferences.userNodeForPackage(Settings.class);
+        return prefs.get(Options.LAST_DETECTED_GAMEPATH.getKey(),null);
+    }
+
     public static void setAlwaysFullBackup(boolean alwaysFullBackup) {
         Preferences prefs = Preferences.userNodeForPackage(Settings.class);
-        prefs.putBoolean("always_fullbackup", alwaysFullBackup);
+        prefs.putBoolean(Options.ALWAYS_FULL_BACKUP.getKey(), alwaysFullBackup);
     }
 
     public static boolean getAlwaysFullBackup() {
         Preferences prefs = Preferences.userNodeForPackage(Settings.class);
-
-        return prefs.getBoolean("always_fullbackup", false);
+        return prefs.getBoolean(Options.ALWAYS_FULL_BACKUP.getKey(), false);
     }
 }

@@ -20,6 +20,7 @@
 
 package br.com.pinter.tqrespec.tqdata;
 
+import br.com.pinter.tqrespec.Settings;
 import br.com.pinter.tqrespec.util.Constants;
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.Shell32Util;
@@ -287,8 +288,8 @@ public class GameInfo {
         }
 
         Path microsoftStorePath = getGameMicrosoftStorePath();
-        if(microsoftStorePath!=null && gamePathExists(microsoftStorePath)) {
-            if(DBG) System.err.println("Package: found");
+        if (microsoftStorePath != null && gamePathExists(microsoftStorePath)) {
+            if (DBG) System.err.println("Package: found");
             return microsoftStorePath.toString();
         }
 
@@ -312,13 +313,27 @@ public class GameInfo {
         return null;
     }
 
+    private void saveDetectedGamePath(String saveGamePath) {
+        if (StringUtils.isNotBlank(saveGamePath)) {
+            Settings.setLastDetectedGamePath(saveGamePath);
+        }
+    }
+
     public String getGamePath() throws FileNotFoundException {
         if (!SystemUtils.IS_OS_WINDOWS) {
             return Constants.DEV_GAMEDATA;
         }
 
+        String lastUsed = Settings.getLastDetectedGamePath();
+        if (StringUtils.isNotBlank(lastUsed)
+                && gamePathExists(Paths.get(lastUsed))) {
+            gamePath = lastUsed;
+            return gamePath;
+        }
+
         if (StringUtils.isEmpty(gamePath)) {
             gamePath = detectGamePath();
+            saveDetectedGamePath(gamePath);
         }
 
         if (StringUtils.isEmpty(gamePath)) {
