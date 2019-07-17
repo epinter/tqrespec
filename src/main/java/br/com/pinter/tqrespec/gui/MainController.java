@@ -341,6 +341,7 @@ public class MainController implements Initializable {
             public void handleEvent(WorkerStateEvent workerStateEvent) {
                 if ((int) copyCharTask.getValue() == 2) {
                     playerData.reset();
+                    reset();
                     setAllControlsDisable(false);
                     addCharactersToCombo();
                     if (characterCombo.getItems().contains(targetPlayerName)) {
