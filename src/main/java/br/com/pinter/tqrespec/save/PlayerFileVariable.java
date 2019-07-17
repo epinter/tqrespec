@@ -77,7 +77,7 @@ public enum PlayerFileVariable implements IFileVariable {
     itemAttached("itemAttached", VariableType.Integer, FileBlockType.PlayerHotSlot),
     alternate("alternate", VariableType.Integer, FileBlockType.PlayerHotSlot),
     isItemSkill("isItemSkill", VariableType.Integer, FileBlockType.PlayerHotSlot),
-    itemName("itemName", VariableType.Integer, FileBlockType.PlayerHotSlot),
+    itemName("itemName", VariableType.String, FileBlockType.PlayerHotSlot),
     scrollName("scrollName", VariableType.String, FileBlockType.PlayerHotSlot),
     bitmapUpName("bitmapUpName", VariableType.String, FileBlockType.PlayerHotSlot),
     bitmapDownName("bitmapDownName", VariableType.String, FileBlockType.PlayerHotSlot),
