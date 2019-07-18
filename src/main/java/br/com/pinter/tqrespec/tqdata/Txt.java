@@ -21,13 +21,19 @@
 package br.com.pinter.tqrespec.tqdata;
 
 import br.com.pinter.tqdatabase.Text;
+import br.com.pinter.tqrespec.logging.Log;
+import br.com.pinter.tqrespec.util.Constants;
 import com.google.inject.Singleton;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Singleton
 public class Txt {
+    private static final Logger logger = Log.getLogger();
+
     private Text text;
 
     public void initialize() {
@@ -36,7 +42,7 @@ public class Txt {
                 text = new Text(GameInfo.getInstance().getGamePath() + "/Text");
             }
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
             throw new RuntimeException("Error loading text resource.");
         }
     }

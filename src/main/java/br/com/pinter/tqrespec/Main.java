@@ -26,6 +26,7 @@ import br.com.pinter.tqrespec.core.GuiceModule;
 import br.com.pinter.tqrespec.core.InjectionContext;
 import br.com.pinter.tqrespec.gui.MainController;
 import br.com.pinter.tqrespec.gui.ResizeListener;
+import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.tqdata.Db;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.tqdata.Txt;
@@ -51,11 +52,15 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Main extends Application {
     @Inject
@@ -67,8 +72,11 @@ public class Main extends Application {
     @Inject
     private FXMLLoader fxmlLoader;
 
+    private static final Logger logger = Log.getLogger();
+
     public static void main(String... args) {
         System.setProperty("javafx.preloader", "br.com.pinter.tqrespec.gui.AppPreloader");
+        Log.setupGlobalLogging();
         launch(args);
     }
 
@@ -105,7 +113,7 @@ public class Main extends Application {
                 try {
                     new Thread(new GameProcessMonitor(GameInfo.getInstance().getGamePath())).start();
                 } catch (FileNotFoundException e) {
-                    e.printStackTrace();
+                    logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
                 }
 
                 return null;
@@ -115,10 +123,7 @@ public class Main extends Application {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("Error loading application");
-            StringWriter stringWriter = new StringWriter();
-            PrintWriter printWriter = new PrintWriter(stringWriter);
-            e.getSource().getException().printStackTrace(printWriter);
-            TextArea textArea = new TextArea(stringWriter.toString());
+            TextArea textArea = new TextArea(ExceptionUtils.getStackTrace(e.getSource().getException()));
             textArea.setMaxWidth(Double.MAX_VALUE);
             textArea.setMaxHeight(Double.MAX_VALUE);
             alert.getDialogPane().setExpandableContent(textArea);
@@ -141,11 +146,7 @@ public class Main extends Application {
         //close stderr before initialize guice, we want to hide java warning about reflection
         System.err.close();
         prepareInjectionContext();
-        try {
-            System.setErr(new PrintStream(new FileOutputStream(
-                    new File(System.getProperty("java.io.tmpdir"), "tqrespec.log"))));
-        } catch (Exception ignored) {
-        }
+
         notifyPreloader(new Preloader.ProgressNotification(0.1));
         prepareMainStage(primaryStage);
         load(primaryStage);
@@ -164,7 +165,7 @@ public class Main extends Application {
             fxmlLoader.setLocation(getClass().getResource("/fxml/main.fxml"));
             root = fxmlLoader.load();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
             return;
         }
 

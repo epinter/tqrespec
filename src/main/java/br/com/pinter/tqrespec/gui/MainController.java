@@ -23,6 +23,7 @@ package br.com.pinter.tqrespec.gui;
 import br.com.pinter.tqrespec.core.EventHandlerWithException;
 import br.com.pinter.tqrespec.core.TaskWithException;
 import br.com.pinter.tqrespec.core.WorkerThread;
+import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.PlayerData;
 import br.com.pinter.tqrespec.save.PlayerWriter;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
@@ -64,9 +65,13 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @SuppressWarnings({"RedundantThrows", "unused"})
 public class MainController implements Initializable {
+    private static final Logger logger = Log.getLogger();
+
     private static final boolean DBG = false;
 
     @Inject
@@ -202,7 +207,7 @@ public class MainController implements Initializable {
             characterCombo.getItems().setAll(GameInfo.getInstance().getPlayerListMain());
             characterCombo.getItems().sort(String::compareTo);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
         }
     }
 
@@ -226,7 +231,7 @@ public class MainController implements Initializable {
                 root = fxmlLoaderAbout.getRoot();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
             return;
         }
 
@@ -383,7 +388,7 @@ public class MainController implements Initializable {
         TaskWithException<Integer> backupSaveGameTask = new TaskWithException<>() {
             @Override
             protected Integer call() throws Exception {
-                if (DBG) System.out.println("starting backup task");
+                if (DBG) logger.info("starting backup task");
                 setAllControlsDisable(true);
                 return playerWriter.backupCurrent() ? 2 : 0;
             }
@@ -400,13 +405,13 @@ public class MainController implements Initializable {
         backupSaveGameTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandlerWithException<>() {
             @Override
             public void handleEvent(WorkerStateEvent workerStateEvent) {
-                if (DBG) System.out.println("starting backup listener");
+                if (DBG) logger.info("starting backup listener");
 
                 if ((int) backupSaveGameTask.getValue() == 2) {
-                    if (DBG) System.out.println("backupcreated==" + backupCreated.get());
+                    if (DBG) logger.info("backupcreated==" + backupCreated.get());
                     new WorkerThread(saveGameTask).start();
                 } else {
-                    if (DBG) System.out.println("backupcreated==+=" + backupCreated.get());
+                    if (DBG) logger.info("backupcreated==+=" + backupCreated.get());
                     Util.showError(Util.getUIMessage("alert.errorbackup_header"),
                             Util.getUIMessage("alert.errorbackup_content", Constants.BACKUP_DIRECTORY));
                     setAllControlsDisable(false);
@@ -423,7 +428,7 @@ public class MainController implements Initializable {
                     Util.showError(Util.getUIMessage("alert.errorsaving_header"),
                             Util.getUIMessage("alert.errorsaving_content", Constants.BACKUP_DIRECTORY));
                 } else {
-                    if (DBG) System.out.println("character saved==" + saveGameTask.getValue());
+                    if (DBG) logger.info("character saved==" + saveGameTask.getValue());
                 }
                 setAllControlsDisable(false);
 

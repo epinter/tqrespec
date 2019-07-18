@@ -20,16 +20,22 @@
 
 package br.com.pinter.tqrespec.util;
 
+import br.com.pinter.tqrespec.logging.Log;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @SuppressWarnings({"WeakerAccess", "CanBeFinal", "unused"})
 public class Version implements Comparable<Version> {
     private static final boolean DBG = false;
+    private static final Logger logger = Log.getLogger();
+
     private String version;
     private String urlPage;
     private String url1;
@@ -86,14 +92,14 @@ public class Version implements Comparable<Version> {
                     for (Object o : prop.keySet()) {
                         String k = (String) o;
                         String v = prop.getProperty(k);
-                        System.out.println(k + "=" + v);
+                        logger.info(k + "=" + v);
                     }
                 }
                 lastCheck = this.compareTo(new Version(currentVersion));
                 return lastCheck;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
         }
         return -2;
     }

@@ -7,6 +7,7 @@ module br.com.pinter.tqrespec {
     requires java.base;
     requires jdk.zipfs;
     requires java.desktop;
+    requires java.logging;
     requires static org.apache.commons.lang3;
     requires br.com.pinter.tqdatabase;
     requires static com.google.guice;

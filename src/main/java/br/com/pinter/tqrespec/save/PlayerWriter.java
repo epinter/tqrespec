@@ -22,6 +22,7 @@ package br.com.pinter.tqrespec.save;
 
 import br.com.pinter.tqrespec.Settings;
 import br.com.pinter.tqrespec.gui.State;
+import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
@@ -37,8 +38,11 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class PlayerWriter {
+    private static final Logger logger = Log.getLogger();
     @Inject
     private PlayerData playerData;
 
@@ -100,7 +104,7 @@ public class PlayerWriter {
                 }
                 return true;
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
                 return false;
             }
         }
@@ -126,7 +130,7 @@ public class PlayerWriter {
             return true;
         } catch (IOException e) {
             State.get().setSaveInProgress(false);
-            e.printStackTrace();
+            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
             throw e;
         }
     }

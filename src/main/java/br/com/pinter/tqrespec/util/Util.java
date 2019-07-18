@@ -21,6 +21,7 @@
 package br.com.pinter.tqrespec.util;
 
 import br.com.pinter.tqrespec.gui.State;
+import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -38,19 +39,15 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 @SuppressWarnings("ALL")
 public class Util {
-    public static void log(Object message) {
-        System.err.println(message);
-    }
-
-    public static void log(String fmt, Object... args) {
-        System.err.printf(fmt, args);
-    }
+    private static final Logger logger = Log.getLogger();
 
     public static String getBuildVersion() {
         String implementationVersion = Util.class.getPackage().getImplementationVersion();
@@ -151,14 +148,14 @@ public class Util {
             public FileVisitResult preVisitDirectory(Object dir, BasicFileAttributes attrs) {
                 Path targetDir = target.resolve(source.relativize((Path) dir));
 
-                if (DBG) System.err.println(String.format("PREDIR: src:'%s' dst:'%s'", dir, targetDir));
+                if (DBG) logger.info(String.format("PREDIR: src:'%s' dst:'%s'", dir, targetDir));
 
                 try {
                     Files.copy((Path) dir, targetDir, COPY_ATTRIBUTES);
                 } catch (DirectoryNotEmptyException ignored) {
                 } catch (IOException e) {
                     //noinspection ConstantConditions
-                    if (DBG) System.err.println(String.format("Unable to create directory '%s'", targetDir));
+                    if (DBG) logger.info(String.format("Unable to create directory '%s'", targetDir));
                     return FileVisitResult.TERMINATE;
                 }
 
@@ -172,16 +169,16 @@ public class Util {
                     Files.copy((Path) file, targetFile, replace ? new CopyOption[]{COPY_ATTRIBUTES, REPLACE_EXISTING}
                             : new CopyOption[]{COPY_ATTRIBUTES});
                 } catch (IOException e) {
-                    if (DBG) System.err.println(String.format("Unable to create file '%s'", targetFile));
+                    if (DBG) logger.info(String.format("Unable to create file '%s'", targetFile));
                     return FileVisitResult.TERMINATE;
                 }
-                if (DBG) System.err.println(String.format("FILE: src:'%s' dst:'%s'", file, targetFile));
+                if (DBG) logger.info(String.format("FILE: src:'%s' dst:'%s'", file, targetFile));
                 return FileVisitResult.CONTINUE;
             }
 
             @Override
             public FileVisitResult visitFileFailed(Object file, IOException exc) {
-                if (DBG) System.err.println(String.format("VISITFAIL: %s %s", file, exc));
+                if (DBG) logger.info(String.format("VISITFAIL: %s %s", file, exc));
                 return FileVisitResult.TERMINATE;
             }
 
@@ -189,14 +186,14 @@ public class Util {
             public FileVisitResult postVisitDirectory(Object dir, IOException exc) {
                 Path targetDir = target.resolve(source.relativize((Path) dir));
 
-                if (DBG) System.err.println(String.format("POSTDIR: src:'%s' dst:'%s'", dir, targetDir));
+                if (DBG) logger.info(String.format("POSTDIR: src:'%s' dst:'%s'", dir, targetDir));
 
                 if (exc == null) {
                     try {
                         FileTime fileTime = Files.getLastModifiedTime((Path) dir);
                         Files.setLastModifiedTime(targetDir, fileTime);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
                         return FileVisitResult.TERMINATE;
                     }
                 }
@@ -207,7 +204,7 @@ public class Util {
         try {
             Files.walkFileTree(source, fileVisitor);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
         }
     }
 
@@ -231,7 +228,7 @@ public class Util {
                     try {
                         Thread.sleep(2000);
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
                     }
                     Util.tryToCloseApplication();
                     return null;

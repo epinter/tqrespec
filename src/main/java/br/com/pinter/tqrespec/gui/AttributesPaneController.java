@@ -20,10 +20,10 @@
 
 package br.com.pinter.tqrespec.gui;
 
+import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.PlayerData;
 import br.com.pinter.tqrespec.tqdata.Db;
 import br.com.pinter.tqrespec.tqdata.Txt;
-import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
 import com.google.inject.Inject;
 import javafx.beans.property.BooleanProperty;
@@ -39,9 +39,12 @@ import javafx.util.converter.NumberStringConverter;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 public class AttributesPaneController implements Initializable {
+    private static final Logger logger = Log.getLogger();
     private static final boolean DBG = false;
+
     @Inject
     private Db db;
 
@@ -331,7 +334,7 @@ public class AttributesPaneController implements Initializable {
     }
 
     public void saveCharHandler() throws Exception {
-        if (DBG) System.out.println("starting savegame task");
+        if (DBG) logger.info("starting savegame task");
 
         int strOld = playerData.getStr();
         int intOld = playerData.getInt();
@@ -358,7 +361,7 @@ public class AttributesPaneController implements Initializable {
         if (modifierOld != currentAvail.get() && currentAvail.get() >= 0) {
             playerData.setModifierPoints(currentAvail.get());
         }
-        if (DBG) System.out.println("returning savegame task");
+        if (DBG) logger.info("returning savegame task");
     }
 
     public void loadCharHandler() {

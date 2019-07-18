@@ -6,7 +6,9 @@ package br.com.pinter.tqrespec.save;
 
 import br.com.pinter.tqrespec.core.GuiceModule;
 import br.com.pinter.tqrespec.core.InjectionContext;
+import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
+import br.com.pinter.tqrespec.util.Constants;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,16 +22,19 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Hashtable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(GameInfo.class)
 @PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "org.w3c.*", "com.sun.org.apache.xalan.*"})
 public class PlayerParserTest {
+    private static final Logger logger = Log.getLogger();
+
+
 //    @Rule
 //    public WeldInitiator weld = WeldInitiator.from(
 //            SaveData.class,
@@ -52,7 +57,7 @@ public class PlayerParserTest {
     public void setUp() throws IOException {
         injectionContext.initialize();
 
-        if(!new File("src/test/resources/_savegame/Player.chr").exists()) {
+        if (!new File("src/test/resources/_savegame/Player.chr").exists()) {
             throw new IOException("File src/test/resources/_savegame/Player.chr is missing," +
                     " copy the savegame to execute the tests");
         }
@@ -70,7 +75,7 @@ public class PlayerParserTest {
         try {
             playerParser.readPlayerChr();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
             fail("parseAllBlocks: readPlayerChr() failed");
         }
 
@@ -80,7 +85,7 @@ public class PlayerParserTest {
             playerParser.buildBlocksTable();
             playerParser.prepareForParse();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
         }
 
         playerParser.parseAllBlocks();
@@ -98,7 +103,7 @@ public class PlayerParserTest {
             saveData.setHeaderInfo(playerParser.getHeaderInfo());
             saveData.setVariableLocation(playerParser.getVariableLocation());
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
         }
 
         int varLocation = saveData.getVariableLocation().get("str").get(0);
@@ -116,7 +121,7 @@ public class PlayerParserTest {
         try {
             playerParser.parse();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
         }
         playerParser.prepareBufferForRead();
         assertEquals(playerParser.getBuffer().position(), 0);
@@ -127,7 +132,7 @@ public class PlayerParserTest {
         try {
             playerParser.parse();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
         }
         assertNotNull(playerParser.getBuffer());
         assertTrue(playerParser.getBuffer().capacity() > 0);
@@ -138,7 +143,7 @@ public class PlayerParserTest {
         try {
             playerParser.parse();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
         }
         ConcurrentHashMap<String, ArrayList<Integer>> variableLocation = playerParser.getVariableLocation();
         assertNotNull(variableLocation);
@@ -150,7 +155,7 @@ public class PlayerParserTest {
         try {
             playerParser.parse();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
             fail();
         }
     }
@@ -164,7 +169,7 @@ public class PlayerParserTest {
             playerParser.prepareForParse();
             playerParser.prepareBufferForRead();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
         }
 
         HeaderInfo headerInfo = playerParser.parseHeader();

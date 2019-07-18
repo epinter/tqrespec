@@ -4,6 +4,8 @@
 
 package br.com.pinter.tqrespec.gui;
 
+import br.com.pinter.tqrespec.logging.Log;
+import br.com.pinter.tqrespec.util.Constants;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -20,7 +22,12 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class Toast {
+    private static final Logger logger = Log.getLogger();
+
     private Toast(Stage stage, String header, String content, int delay) {
         Stage toast = new Stage();
         toast.setResizable(false);
@@ -88,7 +95,7 @@ public class Toast {
                     try {
                         Thread.sleep(delay);
                     } catch (InterruptedException ex) {
-                        ex.printStackTrace();
+                        logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, ex);
                     }
 
                     Timeline fadeOut = new Timeline();

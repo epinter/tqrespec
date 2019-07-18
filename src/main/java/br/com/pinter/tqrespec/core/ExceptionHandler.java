@@ -20,6 +20,8 @@
 
 package br.com.pinter.tqrespec.core;
 
+import br.com.pinter.tqrespec.logging.Log;
+import br.com.pinter.tqrespec.util.Constants;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -30,11 +32,15 @@ import javafx.stage.Modality;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @SuppressWarnings("unused")
 public class ExceptionHandler {
+    private static final Logger logger = Log.getLogger();
+
     public static void unhandled(Thread t, Throwable e) {
-        e.printStackTrace();
+        logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
 
         if (Platform.isFxApplicationThread()) {
             ExceptionHandler.showAlert(t, e);

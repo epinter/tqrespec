@@ -48,7 +48,7 @@ public class Settings {
 
     public static String getLastDetectedGamePath() {
         Preferences prefs = Preferences.userNodeForPackage(Settings.class);
-        return prefs.get(Options.LAST_DETECTED_GAMEPATH.getKey(),null);
+        return prefs.get(Options.LAST_DETECTED_GAMEPATH.getKey(), null);
     }
 
     public static void setAlwaysFullBackup(boolean alwaysFullBackup) {

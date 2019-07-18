@@ -21,6 +21,7 @@
 package br.com.pinter.tqrespec.save;
 
 import br.com.pinter.tqrespec.gui.State;
+import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.util.Util;
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,8 +33,10 @@ import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.logging.Logger;
 
 final class PlayerParser extends FileParser {
+    private static final Logger logger = Log.getLogger();
     private final static boolean DBG = false;
     private String player = null;
     private boolean customQuest = false;
@@ -65,7 +68,7 @@ final class PlayerParser extends FileParser {
             if (name.equals(BEGIN_BLOCK)) {
                 BlockInfo b = getBlockInfo().get(keyOffset);
                 if (DBG) {
-                    Util.log("ignoring block offset: " + keyOffset);
+                    logger.info("ignoring block offset: " + keyOffset);
                 }
                 getBuffer().position(b.getEnd() + 1);
                 continue;
@@ -83,7 +86,7 @@ final class PlayerParser extends FileParser {
                     if (e.type() == VariableType.Integer) {
                         int value = (int) variableInfo.getValue();
 
-                        if (DBG) Util.log(String.format("name=%s; value=%s", name, value));
+                        if (DBG) logger.info(String.format("name=%s; value=%s", name, value));
                         if (name.equals(PlayerFileVariable.headerVersion.var()))
                             headerInfo.setHeaderVersion(value);
                         if (name.equals(PlayerFileVariable.playerVersion.var()))
@@ -94,7 +97,7 @@ final class PlayerParser extends FileParser {
 
                     if (e.type() == VariableType.String) {
                         String value = (String) variableInfo.getValue();
-                        if (DBG) Util.log(String.format("name=%s; value=%s", name, value));
+                        if (DBG) logger.info(String.format("name=%s; value=%s", name, value));
                         if (name.equals(PlayerFileVariable.playerCharacterClass.var()))
                             headerInfo.setPlayerCharacterClass(value);
                         if (name.equals(PlayerFileVariable.playerClassTag.var())) {
@@ -103,7 +106,7 @@ final class PlayerParser extends FileParser {
                     }
                     if (e.type() == VariableType.Stream) {
                         byte[] value = (byte[]) variableInfo.getValue();
-                        if (DBG) Util.log(String.format("name=%s; value=%s", name, new String(value)));
+                        if (DBG) logger.info(String.format("name=%s; value=%s", name, new String(value)));
                     }
                 }
 
@@ -133,7 +136,7 @@ final class PlayerParser extends FileParser {
         if (this.getBuffer() == null || this.getBuffer().capacity() <= 50) {
             throw new IOException("Can't read Player.chr from player " + this.player);
         }
-        if (DBG) Util.log(String.format("File '%s' loaded, size=%d",
+        if (DBG) logger.info(String.format("File '%s' loaded, size=%d",
                 this.player, this.getBuffer().capacity()));
 
         headerInfo = parseHeader();
@@ -170,7 +173,7 @@ final class PlayerParser extends FileParser {
         File playerChr = new File(Util.playerChr(player, customQuest).toString());
 
         if (!playerChr.exists()) {
-            Util.log("File '%s' doesn't exists\n", playerChr.toString());
+            logger.info(String.format("File '%s' doesn't exists", playerChr.toString()));
             return;
         }
 
@@ -183,7 +186,7 @@ final class PlayerParser extends FileParser {
         }
         in.close();
 
-        if (DBG) Util.log("File read to buffer: " + this.getBuffer());
+        if (DBG) logger.info("File read to buffer: " + this.getBuffer());
 
     }
 
@@ -199,7 +202,7 @@ final class PlayerParser extends FileParser {
             String name = readString();
 
             if (StringUtils.isEmpty(name)) {
-                Util.log(String.format("empty name at block %d pos %d (BEGIN_BLOCK_SIZE=%d, END_BLOCK_SIZE=%d, block_start=%s block_end=%d",
+                logger.info(String.format("empty name at block %d pos %d (BEGIN_BLOCK_SIZE=%d, END_BLOCK_SIZE=%d, block_start=%s block_end=%d",
                         block.getStart(), keyOffset, BEGIN_BLOCK_SIZE, END_BLOCK_SIZE, block.getStart(), block.getEnd()));
                 continue;
             }
@@ -275,15 +278,15 @@ final class PlayerParser extends FileParser {
             ret.put(mana.getName(), mana);
             putVarIndex(mana.getName(), block.getStart());
             if (DBG)
-                Util.log(String.format("blockStart: %d; variableInfo: %s;", block.getStart(), ret.get("str").toString()));
+                logger.info(String.format("blockStart: %d; variableInfo: %s;", block.getStart(), ret.get("str").toString()));
             if (DBG)
-                Util.log(String.format("blockStart: %d; variableInfo: %s;", block.getStart(), ret.get("dex").toString()));
+                logger.info(String.format("blockStart: %d; variableInfo: %s;", block.getStart(), ret.get("dex").toString()));
             if (DBG)
-                Util.log(String.format("blockStart: %d; variableInfo: %s;", block.getStart(), ret.get("int").toString()));
+                logger.info(String.format("blockStart: %d; variableInfo: %s;", block.getStart(), ret.get("int").toString()));
             if (DBG)
-                Util.log(String.format("blockStart: %d; variableInfo: %s;", block.getStart(), ret.get("life").toString()));
+                logger.info(String.format("blockStart: %d; variableInfo: %s;", block.getStart(), ret.get("life").toString()));
             if (DBG)
-                Util.log(String.format("blockStart: %d; variableInfo: %s;", block.getStart(), ret.get("mana").toString()));
+                logger.info(String.format("blockStart: %d; variableInfo: %s;", block.getStart(), ret.get("mana").toString()));
         }
         return ret;
     }

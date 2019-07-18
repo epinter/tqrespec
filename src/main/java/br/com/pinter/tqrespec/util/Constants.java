@@ -20,6 +20,7 @@
 
 package br.com.pinter.tqrespec.util;
 
+import java.io.File;
 import java.nio.file.Paths;
 
 public class Constants {
@@ -33,7 +34,8 @@ public class Constants {
     public static final String DEV_GAMEDATA = Paths.get(System.getProperty("user.dir"), "gamedata").toString();
     public static final String PARENT_GAMEDATA = Paths.get(Paths.get(System.getProperty("user.dir")).getParent().toString(), "gamedata").toString();
     public static final int PROCESS_SCAN_INTERVAL_MS = 3000;
-
+    public static final String LOGFILE = new File(System.getProperty("java.io.tmpdir"), "tqrespec.log").getAbsolutePath();
+    public static final String ERROR_MSG_EXCEPTION = "Error: ";
     public static class Save {
         public static final String SKILL_NAME = "skillName";
         public static final String SKILL_ENABLED = "skillEnabled";
