@@ -68,9 +68,10 @@ public class PlayerWriter {
         }
         if (backupDirectory.canWrite()) {
             URI zipUri = URI.create("jar:" + destPlayerZip.toURI().toString());
-            try (FileSystem zipFs = FileSystems.newFileSystem(zipUri, new HashMap<String, String>() {{
-                put("create", "true");
-            }})) {
+            HashMap<String, String> zipCreateOptions = new HashMap<>();
+            zipCreateOptions.put("create", "true");
+
+            try (FileSystem zipFs = FileSystems.newFileSystem(zipUri, zipCreateOptions)) {
                 final Path root = zipFs.getPath("/");
                 if (fullBackup || Settings.getAlwaysFullBackup()) {
                     Files.walkFileTree(player.getParent(), new SimpleFileVisitor<>() {

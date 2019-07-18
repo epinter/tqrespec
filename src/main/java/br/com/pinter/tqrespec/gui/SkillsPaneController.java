@@ -94,7 +94,7 @@ public class SkillsPaneController implements Initializable {
     private MenuButton secondMasteryButton;
 
     private SimpleStringProperty currentSkillPoints = null;
-    private BooleanProperty saveDisabled = new SimpleBooleanProperty();
+    private final BooleanProperty saveDisabled = new SimpleBooleanProperty();
     private SimpleStringProperty currentFirstMasteryLevel = null;
     private SimpleStringProperty currentSecondMasteryLevel = null;
 

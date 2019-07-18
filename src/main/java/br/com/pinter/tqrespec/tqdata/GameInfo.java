@@ -50,16 +50,22 @@ public class GameInfo {
 
     private static GameInfo instance = null;
 
+    private static final Object lock = new Object();
+
     private String gamePath = null;
 
     private GameInfo() {
     }
 
     public static GameInfo getInstance() {
-        if (instance == null) {
-            synchronized (GameInfo.class) {
-                if (instance == null)
-                    instance = new GameInfo();
+        GameInfo c = instance;
+        if (c == null) {
+            synchronized (lock) {
+                c = instance;
+                if (c == null) {
+                    c = new GameInfo();
+                    instance = c;
+                }
             }
         }
         return instance;

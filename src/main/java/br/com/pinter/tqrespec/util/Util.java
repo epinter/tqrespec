@@ -216,7 +216,12 @@ public class Util {
     }
 
     public static boolean recordPathEquals(String r1, String r2) {
-        return Util.normalizeRecordPath(r1).equals(Util.normalizeRecordPath(r2));
+        String normalizedR1 = Util.normalizeRecordPath(r1);
+        String normalizedR2 = Util.normalizeRecordPath(r2);
+        if (normalizedR1 == null && normalizedR2 != null) {
+            return false;
+        }
+        return normalizedR1.equals(normalizedR2);
     }
 
     public static void closeApplication() {
@@ -229,6 +234,7 @@ public class Util {
                         Thread.sleep(2000);
                     } catch (InterruptedException e) {
                         logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+                        Thread.currentThread().interrupt();
                     }
                     Util.tryToCloseApplication();
                     return null;

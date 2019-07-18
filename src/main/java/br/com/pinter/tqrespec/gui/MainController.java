@@ -111,7 +111,7 @@ public class MainController implements Initializable {
     private double dragY;
     private boolean isMoving = false;
 
-    public static BooleanProperty mainFormInitialized = new SimpleBooleanProperty();
+    public static final BooleanProperty mainFormInitialized = new SimpleBooleanProperty();
 
     @FXML
     public GridPane pointsPane;
@@ -128,7 +128,7 @@ public class MainController implements Initializable {
     @FXML
     public Button resetButton;
 
-    public BooleanProperty saveDisabled = new SimpleBooleanProperty();
+    public final BooleanProperty saveDisabled = new SimpleBooleanProperty();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {

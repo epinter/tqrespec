@@ -94,7 +94,7 @@ public class AttributesPaneController implements Initializable {
     private SimpleIntegerProperty currentMana = null;
     private SimpleIntegerProperty currentAvail = null;
 
-    private BooleanProperty saveDisabled = new SimpleBooleanProperty();
+    private final BooleanProperty saveDisabled = new SimpleBooleanProperty();
 
     private int strStep;
     private int strMin;

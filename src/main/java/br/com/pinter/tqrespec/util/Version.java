@@ -25,8 +25,10 @@ import br.com.pinter.tqrespec.logging.Log;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -73,12 +75,14 @@ public class Version implements Comparable<Version> {
 
     @SuppressWarnings("UnusedReturnValue")
     public int checkNewerVersion(String urlPropFile) {
-        URL url;
-        Reader reader;
+        URL url = null;
         try {
             url = new URL(urlPropFile);
-            InputStream in = url.openStream();
-            reader = new InputStreamReader(in, StandardCharsets.UTF_8);
+        } catch (MalformedURLException e) {
+            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+        }
+
+        try(InputStreamReader reader = new InputStreamReader(Objects.requireNonNull(url).openStream(),StandardCharsets.UTF_8)) {
             Properties prop = new Properties();
             prop.load(reader);
             reader.close();
