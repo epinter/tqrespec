@@ -101,6 +101,7 @@ gradlew run
 
 #### ***Startup***
 This software can fail to start if the game is not detected. Game is detected searching for Uninstall information from Windows, and data from your Steam installation. If you can't start, get the error message inside the "Show details" and open an issue. Or maybe you can find some help in the discussion at Steam Guides.
+If your game path is not detected, you still can run TQRespec copying the game data, to do so follow the instructions [Running without the game installed](https://github.com/epinter/tqrespec#running-without-the-game-installed).
 
 
 #### ***Errors and reporting***

@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.7.1] - 2019-07-18
+### Added
+- Detect 'alternative' types of game installation, based on steam
+- Detect game installation from Microsoft Store ([#11](https://github.com/epinter/tqrespec/issues/11))
+
+### Changed
+- Properly reset UI after character copy
+- Attributes increments and minimum are read from database, not hardcoded anymore
+- Improved path detection, skips invalid directories
+- Save and use last successfull used game installation path (if valid)
+- Memory usage optimization
+
+### Fixed
+- Fixed out of memory bug when parsing invalid string
+- Fixed parsing of characters with itemName value ([#13](https://github.com/epinter/tqrespec/issues/13))
+
 ## [0.7.0] - 2019-07-14
 ### Added
 - Mastery removal feature ([#5](https://github.com/epinter/tqrespec/issues/5))
@@ -80,7 +96,8 @@
 ### Added
 - Initial testing version, core classes, without GUI
 
-[unreleased]: https://github.com/epinter/tqrespec/compare/v0.7.0...HEAD
+[unreleased]: https://github.com/epinter/tqrespec/compare/v0.7.1...HEAD
+[0.7.1]: https://github.com/epinter/tqrespec/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/epinter/tqrespec/compare/v0.6.1...v0.7.0
 [0.6.1]: https://github.com/epinter/tqrespec/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/epinter/tqrespec/compare/v0.2.1...v0.6.0
