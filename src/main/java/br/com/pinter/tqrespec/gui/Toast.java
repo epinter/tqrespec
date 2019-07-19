@@ -78,17 +78,13 @@ public class Toast {
         toast.setX(stage.getX() + ((stage.getWidth() - toast.getWidth()) / 2));
         toast.setY(stage.getY() + ((stage.getHeight() - toast.getHeight()) / 2));
 
-        stage.xProperty().addListener(((observableValue, number, newValue) -> {
-            toast.setX(newValue.doubleValue() + ((stage.getWidth() - toast.getWidth()) / 2));
-        }));
-        stage.yProperty().addListener(((observableValue, number, newValue) -> {
-            toast.setY(newValue.doubleValue() + ((stage.getHeight() - toast.getHeight()) / 2));
-        }));
+        stage.xProperty().addListener(((observableValue, number, newValue) -> toast.setX(newValue.doubleValue() + ((stage.getWidth() - toast.getWidth()) / 2))));
+        stage.yProperty().addListener(((observableValue, number, newValue) -> toast.setY(newValue.doubleValue() + ((stage.getHeight() - toast.getHeight()) / 2))));
 
         Timeline fadeIn = new Timeline();
         KeyFrame keyFrameFadeIn = new KeyFrame(Duration.millis(700), new KeyValue(root.opacityProperty(), 1));
         fadeIn.getKeyFrames().add(keyFrameFadeIn);
-        fadeIn.setOnFinished((e) -> {
+        fadeIn.setOnFinished(e -> {
             Task fadeOutTask = new Task() {
                 @Override
                 protected Object call() throws Exception {
@@ -96,12 +92,13 @@ public class Toast {
                         Thread.sleep(delay);
                     } catch (InterruptedException ex) {
                         logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, ex);
+                        Thread.currentThread().interrupt();
                     }
 
                     Timeline fadeOut = new Timeline();
                     KeyFrame keyFrameFadeOut = new KeyFrame(Duration.millis(700), new KeyValue(root.opacityProperty(), 0));
                     fadeOut.getKeyFrames().add(keyFrameFadeOut);
-                    fadeOut.setOnFinished((t) -> toast.close());
+                    fadeOut.setOnFinished(t -> toast.close());
                     fadeOut.play();
                     return null;
                 }

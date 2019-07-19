@@ -60,7 +60,7 @@ public class InjectionContext {
         @Provides
         FXMLLoader producer() {
             FXMLLoader fxmlLoader = new FXMLLoader();
-            fxmlLoader.setControllerFactory(aClass -> getInstance(aClass));
+            fxmlLoader.setControllerFactory(InjectionContext.this::getInstance);
             return fxmlLoader;
         }
     }

@@ -37,7 +37,7 @@ import java.util.logging.Logger;
 
 final class PlayerParser extends FileParser {
     private static final Logger logger = Log.getLogger();
-    private final static boolean DBG = false;
+    private static final boolean DBG = false;
     private String player = null;
     private boolean customQuest = false;
     private HeaderInfo headerInfo = new HeaderInfo();
@@ -63,14 +63,16 @@ final class PlayerParser extends FileParser {
             int keyOffset = getBuffer().position();
 
             String name = readString();
-            if (StringUtils.isEmpty(name)) continue;
 
-            if (name.equals(BEGIN_BLOCK)) {
+            if (BEGIN_BLOCK.equals(name)) {
                 BlockInfo b = getBlockInfo().get(keyOffset);
                 if (DBG) {
                     logger.info("ignoring block offset: " + keyOffset);
                 }
                 getBuffer().position(b.getEnd() + 1);
+            }
+
+            if (BEGIN_BLOCK.equals(name) || StringUtils.isBlank(name)) {
                 continue;
             }
 
@@ -177,14 +179,14 @@ final class PlayerParser extends FileParser {
             return;
         }
 
-        FileChannel in = new FileInputStream(playerChr).getChannel();
-        setBuffer(ByteBuffer.allocate((int) in.size()));
-        this.getBuffer().order(ByteOrder.LITTLE_ENDIAN);
+        try (FileChannel in = new FileInputStream(playerChr).getChannel()) {
+            setBuffer(ByteBuffer.allocate((int) in.size()));
+            this.getBuffer().order(ByteOrder.LITTLE_ENDIAN);
 
-        while (true) {
-            if (in.read(this.getBuffer()) <= 0) break;
+            while (true) {
+                if (in.read(this.getBuffer()) <= 0) break;
+            }
         }
-        in.close();
 
         if (DBG) logger.info("File read to buffer: " + this.getBuffer());
 
@@ -204,16 +206,15 @@ final class PlayerParser extends FileParser {
             if (StringUtils.isEmpty(name)) {
                 logger.info(String.format("empty name at block %d pos %d (BEGIN_BLOCK_SIZE=%d, END_BLOCK_SIZE=%d, block_start=%s block_end=%d",
                         block.getStart(), keyOffset, BEGIN_BLOCK_SIZE, END_BLOCK_SIZE, block.getStart(), block.getEnd()));
-                continue;
             }
 
-            if (name.equals(BEGIN_BLOCK)) {
+            if (BEGIN_BLOCK.equals(name)) {
                 //ignore all child blocks, will be parsed by main loop in parseAllBlocks
                 BlockInfo subBlock = getBlockInfo().get(keyOffset);
                 getBuffer().position(subBlock.getEnd() + 1);
-                continue;
             }
-            if (name.equals(END_BLOCK)) {
+
+            if (StringUtils.isEmpty(name) || name.equals(END_BLOCK) || name.equals(BEGIN_BLOCK)) {
                 continue;
             }
 

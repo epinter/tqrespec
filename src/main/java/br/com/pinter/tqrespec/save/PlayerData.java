@@ -34,10 +34,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -131,17 +128,10 @@ public class PlayerData {
             if (v.startsWith(Database.Variables.PREFIX_SKILL_NAME)) {
                 for (int blockOffset : saveData.getVariableLocation().get(v)) {
                     int parent = saveData.getBlockInfo().get(blockOffset).getParentOffset();
-                    if (parent >= 0) {
-                        if (!saveData.getBlockInfo().get(parent).getVariables().containsKey("max")) {
-                            continue;
-                        }
-                    } else {
-                        continue;
-                    }
                     BlockInfo b = saveData.getBlockInfo().get(blockOffset);
-                    if (changes.get(b.getStart()) != null
-                            && changes.get(b.getStart()).length == 0) {
-                        //new block size is zero, was removed, ignore
+                    if (parent < 0 || !saveData.getBlockInfo().get(parent).getVariables().containsKey("max")
+                        || (changes.get(b.getStart()) != null && changes.get(b.getStart()).length == 0)) {
+                            //new block size is zero (was removed) or no parent
                         continue;
                     }
 
@@ -176,7 +166,7 @@ public class PlayerData {
         return changes.getInt(statsBlock.getStart(), "skillPoints");
     }
 
-    public LinkedHashMap<String, PlayerSkill> getPlayerSkills() {
+    public Map<String, PlayerSkill> getPlayerSkills() {
         boolean update = false;
 
         for (PlayerSkill b : playerSkills.values()) {
@@ -239,13 +229,13 @@ public class PlayerData {
             throw new IllegalStateException("Error removing mastery. Not a mastery.");
         }
         List<Skill> currentSkillsInMastery = getPlayerSkillsFromMastery(mastery);
-        if (currentSkillsInMastery.size() > 0) {
+        if (!currentSkillsInMastery.isEmpty()) {
             throw new IllegalStateException("Mastery have skills, aborting.");
         }
 
         int currentSkillPoints = changes.getInt("skillPoints");
         int currentSkillLevel = changes.getInt(blockStart, "skillLevel");
-        BlockInfo masteryToRemove = saveData.getBlockInfo().get(blockStart);
+
         if (currentSkillLevel > 0) {
             changes.setInt("skillPoints", currentSkillPoints + currentSkillLevel);
             changes.removeBlock(blockStart);

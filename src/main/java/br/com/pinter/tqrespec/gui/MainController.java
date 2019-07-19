@@ -211,7 +211,7 @@ public class MainController implements Initializable {
         }
     }
 
-    private void windowShownHandler() throws Exception {
+    private void windowShownHandler() {
         assert characterCombo == null : "fx:id=\"characterCombo\" not found in FXML.";
         addCharactersToCombo();
     }
@@ -291,11 +291,7 @@ public class MainController implements Initializable {
         }
         copyCharInput.setText(newStr.toString());
         copyCharInput.positionCaret(caret);
-        if (copyCharInput.getText().length() > 0) {
-            copyButton.setDisable(false);
-        } else {
-            copyButton.setDisable(true);
-        }
+        copyButton.setDisable(copyCharInput.getText().isBlank());
     }
 
     @FXML
@@ -383,7 +379,6 @@ public class MainController implements Initializable {
             return;
         }
         SimpleIntegerProperty backupCreated = new SimpleIntegerProperty();
-        SimpleIntegerProperty characterSaved = new SimpleIntegerProperty();
 
         TaskWithException<Integer> backupSaveGameTask = new TaskWithException<>() {
             @Override
@@ -449,7 +444,7 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    public void characterSelected(ActionEvent evt) throws Exception {
+    public void characterSelected(ActionEvent evt) {
         if (State.get().getGameRunning()) {
             reset();
             return;

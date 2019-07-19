@@ -6,6 +6,7 @@ package br.com.pinter.tqrespec.core;
 
 import br.com.pinter.tqrespec.gui.State;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
@@ -14,6 +15,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static br.com.pinter.tqrespec.util.Constants.PROCESS_SCAN_INTERVAL_MS;
 
 public class GameProcessMonitor implements Runnable {
+    private int interrupted = 0;
+
     private String directory;
 
     public GameProcessMonitor(String directory) {
@@ -21,10 +24,13 @@ public class GameProcessMonitor implements Runnable {
     }
 
     private void monitor() {
-        long lastPid = -1;
         AtomicBoolean foundRunning = new AtomicBoolean(false);
         while (true) {
             try {
+                if(interrupted > 5000) {
+                    break;
+                }
+
                 foundRunning.set(false);
                 ProcessHandle.allProcesses().forEach(p -> {
                     String command = p.info().command().orElse(null);
@@ -39,7 +45,9 @@ public class GameProcessMonitor implements Runnable {
                 });
                 State.get().setGameRunning(foundRunning.get());
                 Thread.sleep(PROCESS_SCAN_INTERVAL_MS);
-            } catch (Exception ignored) {
+            } catch (InterruptedException ignored) {
+                //ignored
+                interrupted++;
             }
         }
     }

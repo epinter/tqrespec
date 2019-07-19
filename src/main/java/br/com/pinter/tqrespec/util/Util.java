@@ -24,7 +24,6 @@ import br.com.pinter.tqrespec.gui.State;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
 import javafx.application.Platform;
-import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 import javafx.stage.Modality;
 
@@ -45,9 +44,10 @@ import java.util.logging.Logger;
 import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
-@SuppressWarnings("ALL")
+@SuppressWarnings("ConstantConditions")
 public class Util {
     private static final Logger logger = Log.getLogger();
+    private static final boolean DBG = false;
 
     public static String getBuildVersion() {
         String implementationVersion = Util.class.getPackage().getImplementationVersion();
@@ -72,14 +72,15 @@ public class Util {
     }
 
     private static Attributes readManifest() {
-        Manifest manifest = null;
+        Manifest manifest;
         try {
             FileSystem fs = FileSystems.getFileSystem(URI.create("jrt:/"));
             InputStream stream = Files.newInputStream(
                     fs.getPath("modules", Util.class.getModule().getName(), "META-INF/MANIFEST.MF"));
             manifest = new Manifest(stream);
             return manifest.getMainAttributes();
-        } catch (IOException e) {
+        } catch (IOException ignored) {
+            //ignored
         }
         return null;
     }
@@ -136,25 +137,23 @@ public class Util {
         return false;
     }
 
-    @SuppressWarnings("unchecked")
     public static void copyDirectoryRecurse(Path source, Path target, boolean replace) throws FileAlreadyExistsException {
-        boolean DBG = false;
         if (!replace && Files.exists(target)) {
             throw new FileAlreadyExistsException(target.toString() + " already exists");
         }
-        FileVisitor fileVisitor = new FileVisitor() {
+
+        FileVisitor<Path> fileVisitor = new FileVisitor<>() {
             @SuppressWarnings("ConstantConditions")
             @Override
-            public FileVisitResult preVisitDirectory(Object dir, BasicFileAttributes attrs) {
-                Path targetDir = target.resolve(source.relativize((Path) dir));
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
+                Path targetDir = target.resolve(source.relativize(dir));
 
                 if (DBG) logger.info(String.format("PREDIR: src:'%s' dst:'%s'", dir, targetDir));
 
                 try {
-                    Files.copy((Path) dir, targetDir, COPY_ATTRIBUTES);
+                    Files.copy(dir, targetDir, COPY_ATTRIBUTES);
                 } catch (DirectoryNotEmptyException ignored) {
                 } catch (IOException e) {
-                    //noinspection ConstantConditions
                     if (DBG) logger.info(String.format("Unable to create directory '%s'", targetDir));
                     return FileVisitResult.TERMINATE;
                 }
@@ -163,10 +162,10 @@ public class Util {
             }
 
             @Override
-            public FileVisitResult visitFile(Object file, BasicFileAttributes attrs) {
-                Path targetFile = target.resolve(source.relativize((Path) file));
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                Path targetFile = target.resolve(source.relativize(file));
                 try {
-                    Files.copy((Path) file, targetFile, replace ? new CopyOption[]{COPY_ATTRIBUTES, REPLACE_EXISTING}
+                    Files.copy(file, targetFile, replace ? new CopyOption[]{COPY_ATTRIBUTES, REPLACE_EXISTING}
                             : new CopyOption[]{COPY_ATTRIBUTES});
                 } catch (IOException e) {
                     if (DBG) logger.info(String.format("Unable to create file '%s'", targetFile));
@@ -177,20 +176,20 @@ public class Util {
             }
 
             @Override
-            public FileVisitResult visitFileFailed(Object file, IOException exc) {
+            public FileVisitResult visitFileFailed(Path file, IOException exc) {
                 if (DBG) logger.info(String.format("VISITFAIL: %s %s", file, exc));
                 return FileVisitResult.TERMINATE;
             }
 
             @Override
-            public FileVisitResult postVisitDirectory(Object dir, IOException exc) {
-                Path targetDir = target.resolve(source.relativize((Path) dir));
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
+                Path targetDir = target.resolve(source.relativize(dir));
 
                 if (DBG) logger.info(String.format("POSTDIR: src:'%s' dst:'%s'", dir, targetDir));
 
                 if (exc == null) {
                     try {
-                        FileTime fileTime = Files.getLastModifiedTime((Path) dir);
+                        FileTime fileTime = Files.getLastModifiedTime(dir);
                         Files.setLastModifiedTime(targetDir, fileTime);
                     } catch (IOException e) {
                         logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
@@ -215,31 +214,9 @@ public class Util {
         return recordId.toUpperCase().replace("/", "\\");
     }
 
-    public static boolean recordPathEquals(String r1, String r2) {
-        String normalizedR1 = Util.normalizeRecordPath(r1);
-        String normalizedR2 = Util.normalizeRecordPath(r2);
-        if (normalizedR1 == null && normalizedR2 != null) {
-            return false;
-        }
-        return normalizedR1.equals(normalizedR2);
-    }
-
     public static void closeApplication() {
         if (!Util.tryToCloseApplication()) {
             Util.showWarning(Util.getUIMessage("alert.saveinprogress_header"), Util.getUIMessage("alert.saveinprogress_content"));
-            Task tryAgain = new Task() {
-                @Override
-                protected Object call() {
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
-                        Thread.currentThread().interrupt();
-                    }
-                    Util.tryToCloseApplication();
-                    return null;
-                }
-            };
         }
     }
 

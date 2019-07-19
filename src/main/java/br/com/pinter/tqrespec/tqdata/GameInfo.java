@@ -84,11 +84,7 @@ public class GameInfo {
 
     private boolean gamePathExists(Path path) {
         Path databasePath = Paths.get(path.toString(), "Database");
-        if (Files.exists(databasePath) && Files.isDirectory(databasePath)) {
-            return true;
-        }
-
-        return false;
+        return Files.exists(databasePath) && Files.isDirectory(databasePath);
     }
 
     private Path getGameSteamPath() {

@@ -26,7 +26,7 @@ public abstract class TaskWithException<T> extends Task<T> {
 
     public TaskWithException() {
         super();
-        this.setOnFailed((WorkerStateEvent) -> {
+        this.setOnFailed(workerStateEvent -> {
             throw new RuntimeException(this.getException());
         });
     }

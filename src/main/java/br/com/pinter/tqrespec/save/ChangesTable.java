@@ -37,7 +37,24 @@ class ChangesTable extends Hashtable<Integer, byte[]> implements DeepCloneable {
 
     ChangesTable() {
         super();
-        this.valuesLengthIndex = new Hashtable<Integer, Integer>();
+        this.valuesLengthIndex = new Hashtable<>();
+    }
+
+    @Override
+    public synchronized boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if(!(obj instanceof ChangesTable)) {
+            return false;
+        }
+
+        ChangesTable other = (ChangesTable) obj;
+        if(this.valuesLengthIndex == ((ChangesTable) obj).valuesLengthIndex) {
+            return true;
+        }
+        return super.equals(obj);
     }
 
     Hashtable<Integer, Integer> getValuesLengthIndex() {
@@ -165,7 +182,7 @@ class ChangesTable extends Hashtable<Integer, byte[]> implements DeepCloneable {
                 }
             }
         }
-        return (Float[]) ret.toArray();
+        return ret.toArray(new Float[0]);
     }
 
     void setInt(int blockStart, String variable, int value) throws Exception {
@@ -252,7 +269,7 @@ class ChangesTable extends Hashtable<Integer, byte[]> implements DeepCloneable {
                 }
             }
         }
-        return (Integer[]) ret.toArray();
+        return ret.toArray(new Integer[0]);
     }
 
     void removeBlock(int offset) {

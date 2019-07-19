@@ -23,15 +23,19 @@ package br.com.pinter.tqrespec.gui;
 import javafx.beans.property.SimpleBooleanProperty;
 
 public class State {
+    private static final Object lock = new Object();
     private static State instance = null;
     private SimpleBooleanProperty saveInProgress = new SimpleBooleanProperty(false);
     private SimpleBooleanProperty gameRunning = new SimpleBooleanProperty(false);
 
     public static State get() {
-        if (instance == null) {
-            synchronized (State.class) {
-                if (instance == null) {
-                    instance = new State();
+        State c = instance;
+        if (c == null) {
+            synchronized (lock) {
+                c = instance;
+                if (c == null) {
+                    c = new State();
+                    instance = c;
                 }
             }
         }

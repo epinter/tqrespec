@@ -37,17 +37,17 @@ import java.util.logging.Logger;
 abstract class FileParser {
     private static final Logger logger = Log.getLogger();
 
-    private final static boolean DBG = false;
-    private byte[] beginBlock = new byte[]{0x0B, 0x00, 0x00, 0x00, 0x62, 0x65, 0x67, 0x69, 0x6E, 0x5F, 0x62, 0x6C, 0x6F, 0x63, 0x6B};
-    private byte[] endBlock = new byte[]{0x09, 0x00, 0x00, 0x00, 0x65, 0x6E, 0x64, 0x5F, 0x62, 0x6C, 0x6F, 0x63, 0x6B};
+    private static final boolean DBG = false;
+    private static final byte[] BEGIN_BLOCK_BYTES = new byte[]{0x0B, 0x00, 0x00, 0x00, 0x62, 0x65, 0x67, 0x69, 0x6E, 0x5F, 0x62, 0x6C, 0x6F, 0x63, 0x6B};
+    private static final byte[] END_BLOCK_BYTES = new byte[]{0x09, 0x00, 0x00, 0x00, 0x65, 0x6E, 0x64, 0x5F, 0x62, 0x6C, 0x6F, 0x63, 0x6B};
     private ConcurrentHashMap<Integer, BlockInfo> blockInfoTable = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, ArrayList<Integer>> variableLocation = new ConcurrentHashMap<>();
     private List<Integer> blocksIgnore = new ArrayList<>();
     private ByteBuffer buffer = null;
-    final int BEGIN_BLOCK_SIZE = beginBlock.length + 4;
-    final int END_BLOCK_SIZE = endBlock.length + 4;
-    final String BEGIN_BLOCK = "begin_block";
-    final String END_BLOCK = "end_block";
+    static final int BEGIN_BLOCK_SIZE = BEGIN_BLOCK_BYTES.length + 4;
+    static final int END_BLOCK_SIZE = END_BLOCK_BYTES.length + 4;
+    static final String BEGIN_BLOCK = "begin_block";
+    static final String END_BLOCK = "end_block";
 
 
     ConcurrentHashMap<Integer, BlockInfo> getBlockInfo() {
@@ -150,24 +150,24 @@ abstract class FileParser {
             Byte b = getBuffer().get(i);
 
             if (DBG) {
-                if (foundBegin < beginBlock.length && foundEnd < endBlock.length) {
+                if (foundBegin < BEGIN_BLOCK_BYTES.length && foundEnd < END_BLOCK_BYTES.length) {
                     logger.info(String.format("position:%d foundBegin:%d foundEnd:%d, str-begin:%s str-end:%s byte:%s",
-                            i, foundBegin, foundEnd, Character.toString(beginBlock[foundBegin]), Character.toString(endBlock[foundEnd]),
+                            i, foundBegin, foundEnd, Character.toString(BEGIN_BLOCK_BYTES[foundBegin]), Character.toString(END_BLOCK_BYTES[foundEnd]),
                             new String(new byte[]{b})));
                 } else {
                     logger.info(String.format("position:%d foundBegin:%d foundEnd:%d, byte:%s", i, foundBegin, foundEnd, new String(new byte[]{b})));
                 }
             }
 
-            if (foundBegin > 0 && !b.equals(beginBlock[foundBegin])) {
+            if (foundBegin > 0 && !b.equals(BEGIN_BLOCK_BYTES[foundBegin])) {
                 foundBegin = 0;
             }
 
-            if (foundEnd > 0 && !b.equals(endBlock[foundEnd])) {
+            if (foundEnd > 0 && !b.equals(END_BLOCK_BYTES[foundEnd])) {
                 foundEnd = 0;
             }
 
-            if (b.equals(beginBlock[foundBegin]) && ++foundBegin == beginBlock.length) {
+            if (b.equals(BEGIN_BLOCK_BYTES[foundBegin]) && ++foundBegin == BEGIN_BLOCK_BYTES.length) {
                 int blockTagOffset = i - (foundBegin - 1);
                 queueBegin.add(blockTagOffset);
                 lastBegin = blockTagOffset;
@@ -176,7 +176,7 @@ abstract class FileParser {
                 foundBegin = 0;
             }
 
-            if (b.equals(endBlock[foundEnd]) && ++foundEnd == endBlock.length) {
+            if (b.equals(END_BLOCK_BYTES[foundEnd]) && ++foundEnd == END_BLOCK_BYTES.length) {
                 //discard 4 bytes after end_block
                 int blockEnd = i + 4;
                 int blockStart = -1;
@@ -197,7 +197,7 @@ abstract class FileParser {
             }
 
         }
-        if (queueBegin.size() > 0) {
+        if (!queueBegin.isEmpty()) {
             logger.info(queueBegin.toString());
             throw new RuntimeException(String.format("BUG: Error building map: '%s' data block(s) not closed", queueBegin.size()));
         }

@@ -22,9 +22,7 @@ package br.com.pinter.tqrespec.util;
 
 import br.com.pinter.tqrespec.logging.Log;
 
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -82,10 +80,9 @@ public class Version implements Comparable<Version> {
             logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
         }
 
-        try(InputStreamReader reader = new InputStreamReader(Objects.requireNonNull(url).openStream(),StandardCharsets.UTF_8)) {
+        try (InputStreamReader reader = new InputStreamReader(Objects.requireNonNull(url).openStream(), StandardCharsets.UTF_8)) {
             Properties prop = new Properties();
             prop.load(reader);
-            reader.close();
             if (prop.getProperty("current_version") != null && prop.getProperty("module") != null && prop.getProperty("module").equals("tqrespec")) {
                 String currentVersion = prop.getProperty("current_version");
                 this.urlPage = prop.getProperty("urlpage");
@@ -129,6 +126,15 @@ public class Version implements Comparable<Version> {
                 return 1;
         }
         return 0;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == this) {
+            return true;
+        }
+        Version other = (Version) obj;
+        return other.getVersion().equals(this.getVersion());
     }
 }
 

@@ -179,11 +179,9 @@ public class SkillsPaneController implements Initializable {
     protected void disableControls(boolean disable) {
         firstMasteryListView.setDisable(disable);
         secondMasteryListView.setDisable(disable);
-        if (!disable && firstMasteryListView.getItems().size() > 0) {
-            reclaimSkillsFirstButton.setDisable(false);
-        } else {
-            reclaimSkillsFirstButton.setDisable(true);
-        }
+
+        reclaimSkillsFirstButton.setDisable(disable || firstMasteryListView.getItems().isEmpty());
+
         if (playerData.isCharacterLoaded() && (!disable && firstMasteryLevel > 0) && firstMasteryListView.getItems().size() == 0) {
             if (firstMasteryLevel > 1) {
                 reclaimMasteryFirstItem.setDisable(false);
@@ -195,12 +193,9 @@ public class SkillsPaneController implements Initializable {
             firstMasteryButton.setDisable(true);
         }
 
-        if (!disable && secondMasteryListView.getItems().size() > 0) {
-            reclaimSkillsSecondButton.setDisable(false);
-        } else {
-            reclaimSkillsSecondButton.setDisable(true);
-        }
-        if (playerData.isCharacterLoaded() && (!disable && secondMasteryLevel > 0) && secondMasteryListView.getItems().size() == 0) {
+        reclaimSkillsSecondButton.setDisable(disable || secondMasteryListView.getItems().isEmpty());
+
+        if (playerData.isCharacterLoaded() && (!disable && secondMasteryLevel > 0) && secondMasteryListView.getItems().isEmpty()) {
             if (secondMasteryLevel > 1) {
                 reclaimMasterySecondItem.setDisable(false);
             }
@@ -211,19 +206,8 @@ public class SkillsPaneController implements Initializable {
             secondMasteryButton.setDisable(true);
         }
 
-        if (reclaimMasteryFirstItem.isDisable() && removeMasteryFirstItem.isDisable()) {
-            firstMasteryButton.setDisable(true);
-        } else {
-            firstMasteryButton.setDisable(false);
-        }
-
-        if (reclaimMasterySecondItem.isDisable() && removeMasterySecondItem.isDisable()) {
-            secondMasteryButton.setDisable(true);
-        } else {
-            secondMasteryButton.setDisable(false);
-        }
-
-
+        firstMasteryButton.setDisable(reclaimMasteryFirstItem.isDisable() && removeMasteryFirstItem.isDisable());
+        secondMasteryButton.setDisable(reclaimMasterySecondItem.isDisable() && removeMasterySecondItem.isDisable());
     }
 
     protected void updateMasteries() {
@@ -248,7 +232,7 @@ public class SkillsPaneController implements Initializable {
     private int getMasteryLevel(int i) {
         List<Skill> masteries = playerData.getPlayerMasteries();
 
-        if (!(masteries.size() == 1 && i > 0) && masteries.size() > 0) {
+        if (!(masteries.size() == 1 && i > 0) && !masteries.isEmpty()) {
             PlayerSkill sb = playerData.getPlayerSkills().get(masteries.get(i).getRecordPath());
             return playerData.getMasteryLevel(sb);
         } else {
@@ -276,7 +260,7 @@ public class SkillsPaneController implements Initializable {
 
         Skill mastery = null;
 
-        if (!(playerData.getPlayerMasteries().size() == 1 && i > 0) && playerData.getPlayerMasteries().size() > 0) {
+        if (!(playerData.getPlayerMasteries().size() == 1 && i > 0) && !playerData.getPlayerMasteries().isEmpty()) {
             mastery = playerData.getPlayerMasteries().get(i);
             masteryLabel.setText(
                     String.format("%s (%d)",
@@ -330,7 +314,7 @@ public class SkillsPaneController implements Initializable {
         PlayerSkill sb = playerData.getPlayerSkills().get(mastery.getRecordPath());
 
         List<Skill> list = playerData.getPlayerSkillsFromMastery(mastery);
-        if (list.size() > 0) {
+        if (!list.isEmpty()) {
             Util.showInformation(Util.getUIMessage("skills.removeSkillsBefore"), null);
             return;
         }
@@ -345,7 +329,7 @@ public class SkillsPaneController implements Initializable {
         PlayerSkill sb = playerData.getPlayerSkills().get(mastery.getRecordPath());
 
         List<Skill> list = playerData.getPlayerSkillsFromMastery(mastery);
-        if (list.size() > 0) {
+        if (!list.isEmpty()) {
             Util.showInformation(Util.getUIMessage("skills.removeSkillsBefore"), null);
             return;
         }
@@ -374,7 +358,7 @@ public class SkillsPaneController implements Initializable {
         PlayerSkill sb = playerData.getPlayerSkills().get(mastery.getRecordPath());
 
         List<Skill> list = playerData.getPlayerSkillsFromMastery(mastery);
-        if (list.size() > 0) {
+        if (!list.isEmpty()) {
             Util.showInformation(Util.getUIMessage("skills.removeSkillsBefore"), null);
             return;
         }
@@ -389,7 +373,7 @@ public class SkillsPaneController implements Initializable {
         PlayerSkill sb = playerData.getPlayerSkills().get(mastery.getRecordPath());
 
         List<Skill> list = playerData.getPlayerSkillsFromMastery(mastery);
-        if (list.size() > 0) {
+        if (!list.isEmpty()) {
             Util.showInformation(Util.getUIMessage("skills.removeSkillsBefore"), null);
             return;
         }

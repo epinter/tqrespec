@@ -146,29 +146,29 @@ public class PlayerWriter {
         Collections.sort(changedOffsets);
 
         File out = new File(filename);
-        FileChannel outChannel = new FileOutputStream(out).getChannel();
+        try (FileChannel outChannel = new FileOutputStream(out).getChannel()) {
 
-        for (int offset : changedOffsets) {
-            int rawCount = offset - playerData.getBuffer().position();
-            playerData.getBuffer().limit(rawCount +
-                    playerData.getBuffer().position()
-            );
-            outChannel.write(playerData.getBuffer());
-            playerData.getBuffer().limit(playerData.getBuffer().capacity());
-            byte[] c = changesTable.get(offset);
-            outChannel.write(ByteBuffer.wrap(c));
-            int previousValueLength = changesTable.getValuesLengthIndex().get(offset);
-            playerData.getBuffer().position(
-                    playerData.getBuffer().position() + previousValueLength);
+            for (int offset : changedOffsets) {
+                int rawCount = offset - playerData.getBuffer().position();
+                playerData.getBuffer().limit(rawCount +
+                        playerData.getBuffer().position()
+                );
+                outChannel.write(playerData.getBuffer());
+                playerData.getBuffer().limit(playerData.getBuffer().capacity());
+                byte[] c = changesTable.get(offset);
+                outChannel.write(ByteBuffer.wrap(c));
+                int previousValueLength = changesTable.getValuesLengthIndex().get(offset);
+                playerData.getBuffer().position(
+                        playerData.getBuffer().position() + previousValueLength);
+            }
+
+            while (true) {
+                if (outChannel.write(playerData.getBuffer()) <= 0) break;
+            }
+
+            playerData.getBuffer().rewind();
+            outChannel.force(false);
         }
-
-        while (true) {
-            if (outChannel.write(playerData.getBuffer()) <= 0) break;
-        }
-
-        playerData.getBuffer().rewind();
-        outChannel.force(false);
-        outChannel.close();
     }
 
     public void copyCurrentSave(String toPlayerName) throws IOException {

@@ -24,24 +24,25 @@ import com.google.inject.Singleton;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 public class SaveData implements Serializable {
-    private ConcurrentHashMap<Integer, BlockInfo> blockInfo = null;
+    private Map<Integer, BlockInfo> blockInfo = null;
     private HeaderInfo headerInfo = null;
-    private ConcurrentHashMap<String, ArrayList<Integer>> variableLocation = null;
+    private Map<String, ArrayList<Integer>> variableLocation = null;
 
     public SaveData() {
         variableLocation = new ConcurrentHashMap<>();
         blockInfo = new ConcurrentHashMap<>();
     }
 
-    public ConcurrentHashMap<Integer, BlockInfo> getBlockInfo() {
+    public Map<Integer, BlockInfo> getBlockInfo() {
         return blockInfo;
     }
 
-    public void setBlockInfo(ConcurrentHashMap<Integer, BlockInfo> blockInfo) {
+    public void setBlockInfo(Map<Integer, BlockInfo> blockInfo) {
         this.blockInfo = blockInfo;
     }
 
@@ -53,11 +54,11 @@ public class SaveData implements Serializable {
         this.headerInfo = headerInfo;
     }
 
-    public ConcurrentHashMap<String, ArrayList<Integer>> getVariableLocation() {
+    public Map<String, ArrayList<Integer>> getVariableLocation() {
         return variableLocation;
     }
 
-    public void setVariableLocation(ConcurrentHashMap<String, ArrayList<Integer>> variableLocation) {
+    public void setVariableLocation(Map<String, ArrayList<Integer>> variableLocation) {
         this.variableLocation = variableLocation;
     }
 
