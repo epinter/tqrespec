@@ -20,6 +20,7 @@
 
 package br.com.pinter.tqrespec.save;
 
+import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.util.Constants;
 
@@ -27,7 +28,6 @@ import java.io.IOException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,7 +37,6 @@ import java.util.logging.Logger;
 abstract class FileParser {
     private static final Logger logger = Log.getLogger();
 
-    private static final boolean DBG = false;
     private static final byte[] BEGIN_BLOCK_BYTES = new byte[]{0x0B, 0x00, 0x00, 0x00, 0x62, 0x65, 0x67, 0x69, 0x6E, 0x5F, 0x62, 0x6C, 0x6F, 0x63, 0x6B};
     private static final byte[] END_BLOCK_BYTES = new byte[]{0x09, 0x00, 0x00, 0x00, 0x65, 0x6E, 0x64, 0x5F, 0x62, 0x6C, 0x6F, 0x63, 0x6B};
     private ConcurrentHashMap<Integer, BlockInfo> blockInfoTable = new ConcurrentHashMap<>();
@@ -48,6 +47,7 @@ abstract class FileParser {
     static final int END_BLOCK_SIZE = END_BLOCK_BYTES.length + 4;
     static final String BEGIN_BLOCK = "begin_block";
     static final String END_BLOCK = "end_block";
+    private static final String BUG_VARIABLESIZE_ERROR_MSG = "BUG: variable size != 0";
 
 
     ConcurrentHashMap<Integer, BlockInfo> getBlockInfo() {
@@ -86,11 +86,15 @@ abstract class FileParser {
         this.getVariableLocation().get(varName).add(blockStart);
     }
 
-    void parse() throws Exception {
-        fillBuffer();
-        buildBlocksTable();
-        prepareForParse();
-        parseAllBlocks();
+    void parse() {
+        try {
+            fillBuffer();
+            buildBlocksTable();
+            prepareForParse();
+            parseAllBlocks();
+        } catch (Exception e) {
+            throw new UnhandledRuntimeException(e);
+        }
     }
 
     /**
@@ -98,16 +102,16 @@ abstract class FileParser {
      * Before this method, {@link FileParser#buildBlocksTable()} is executed. So start, end and size of all blocks are
      * available.
      *
-     * @throws Exception
+     * @throws IOException
      */
-    abstract void prepareForParse() throws Exception;
+    abstract void prepareForParse() throws IOException, IncompatibleSavegameException;
 
     /**
      * This method should load whole file (raw data) into the bytebuffer.
      *
-     * @throws Exception
+     * @throws IOException
      */
-    abstract void fillBuffer() throws Exception;
+    abstract void fillBuffer() throws IOException;
 
     /**
      * This method is called to parse a block, and should return a table of variables found inside the block.
@@ -116,7 +120,7 @@ abstract class FileParser {
      *         the block the method should parse.
      * @return a table with all variables found
      */
-    abstract Hashtable<String, VariableInfo> parseBlock(BlockInfo blockInfo);
+    abstract ConcurrentHashMap<String, VariableInfo> parseBlock(BlockInfo blockInfo);
 
     /**
      * All blocks mapped by {@link FileParser#buildBlocksTable()} are parsed with {@link FileParser#parseBlock(BlockInfo)}.
@@ -130,9 +134,6 @@ abstract class FileParser {
             }
 
             blockInfoTable.get(block.getStart()).setVariables(parseBlock(block));
-
-            if (DBG)
-                logger.info(block.toString());
         }
     }
 
@@ -149,13 +150,16 @@ abstract class FileParser {
         for (int i = 0; i < getBuffer().capacity(); i++) {
             Byte b = getBuffer().get(i);
 
-            if (DBG) {
+            if (Log.isDebugEnabled()) {
+                int logFoundBegin = foundBegin;
+                int logFoundEnd = foundEnd;
+                int logPos = i;
                 if (foundBegin < BEGIN_BLOCK_BYTES.length && foundEnd < END_BLOCK_BYTES.length) {
-                    logger.info(String.format("position:%d foundBegin:%d foundEnd:%d, str-begin:%s str-end:%s byte:%s",
-                            i, foundBegin, foundEnd, Character.toString(BEGIN_BLOCK_BYTES[foundBegin]), Character.toString(END_BLOCK_BYTES[foundEnd]),
+                    logger.log(Level.INFO, () -> String.format("position:%d foundBegin:%d foundEnd:%d, str-begin:%s str-end:%s byte:%s",
+                            logPos, logFoundBegin, logFoundEnd, Character.toString(BEGIN_BLOCK_BYTES[logFoundBegin]), Character.toString(END_BLOCK_BYTES[logFoundEnd]),
                             new String(new byte[]{b})));
                 } else {
-                    logger.info(String.format("position:%d foundBegin:%d foundEnd:%d, byte:%s", i, foundBegin, foundEnd, new String(new byte[]{b})));
+                    logger.info(() -> String.format("position:%d foundBegin:%d foundEnd:%d, byte:%s", logPos, logFoundBegin, logFoundEnd, new String(new byte[]{b})));
                 }
             }
 
@@ -171,8 +175,9 @@ abstract class FileParser {
                 int blockTagOffset = i - (foundBegin - 1);
                 queueBegin.add(blockTagOffset);
                 lastBegin = blockTagOffset;
-                if (DBG)
-                    logger.info(String.format("adding begin-block %s to queue", blockTagOffset));
+                if (Log.isDebugEnabled()) {
+                    logger.info(() -> String.format("adding begin-block %s to queue", blockTagOffset));
+                }
                 foundBegin = 0;
             }
 
@@ -191,15 +196,17 @@ abstract class FileParser {
                     block.setParentOffset(queueBegin.peekLast());
                 }
                 blockInfoTable.put(blockStart, block);
-                if (DBG)
-                    logger.info(String.format("adding end-block %s to queue, (start=%d,end=%d)", blockEnd, blockStart, blockEnd));
+                if (Log.isDebugEnabled()) {
+                    int logBlockStart = blockStart;
+                    logger.info(() -> String.format("adding end-block %s to queue, (start=%d,end=%d)", blockEnd, logBlockStart, blockEnd));
+                }
                 foundEnd = 0;
             }
 
         }
         if (!queueBegin.isEmpty()) {
-            logger.info(queueBegin.toString());
-            throw new RuntimeException(String.format("BUG: Error building map: '%s' data block(s) not closed", queueBegin.size()));
+            logger.info(queueBegin::toString);
+            throw new UnhandledRuntimeException(String.format("BUG: Error building map: '%s' data block(s) not closed", queueBegin.size()));
         }
     }
 
@@ -209,7 +216,7 @@ abstract class FileParser {
 
     void readString(VariableInfo variableInfo, boolean utf16le) {
         if (variableInfo.getValSize() != -1) {
-            logger.severe("BUG: variable size != 0");
+            logger.severe(BUG_VARIABLESIZE_ERROR_MSG);
             return;
         }
         int valOffset = getBuffer().position();
@@ -237,7 +244,7 @@ abstract class FileParser {
 
     void readInt(VariableInfo variableInfo) {
         if (variableInfo.getValSize() != -1) {
-            logger.severe("BUG: variable size != 0");
+            logger.severe(BUG_VARIABLESIZE_ERROR_MSG);
             return;
         }
         int valOffset = getBuffer().position();
@@ -250,7 +257,7 @@ abstract class FileParser {
 
     void readFloat(VariableInfo variableInfo) {
         if (variableInfo.getValSize() != -1) {
-            logger.severe("BUG: variable size != 0");
+            logger.severe(BUG_VARIABLESIZE_ERROR_MSG);
             return;
         }
         int valOffset = getBuffer().position();
@@ -263,7 +270,7 @@ abstract class FileParser {
 
     void readUid(VariableInfo variableInfo) {
         if (variableInfo.getValSize() != -1) {
-            logger.severe("BUG: variable size != 0");
+            logger.severe(BUG_VARIABLESIZE_ERROR_MSG);
             return;
         }
         int valOffset = getBuffer().position();
@@ -285,7 +292,7 @@ abstract class FileParser {
 
     void readStream(VariableInfo variableInfo) {
         if (variableInfo.getValSize() != -1) {
-            logger.severe("BUG: variable size != 0");
+            logger.severe(BUG_VARIABLESIZE_ERROR_MSG);
             return;
         }
         int valOffset = getBuffer().position();
@@ -301,7 +308,7 @@ abstract class FileParser {
     byte[] readStream() {
         int len = getBuffer().getInt();
         if (len <= 0) {
-            return null;
+            return new byte[0];
         }
         byte[] buf = new byte[len];
 
@@ -337,7 +344,7 @@ abstract class FileParser {
             if (buf != null && buf.length < 50) {
                 bufStr = new String(buf);
             }
-            throw new RuntimeException(String.format("Error parsing string. Invalid data(strlen=%d,buf=%s,position=%d).", len, bufStr, offset), e.getCause());
+            throw new UnhandledRuntimeException(String.format("Error parsing string. Invalid data(strlen=%d,buf=%s,position=%d).", len, bufStr, offset), e.getCause());
         }
         return null;
     }
@@ -367,6 +374,7 @@ abstract class FileParser {
                         String.format("%s__%s", name, fileBlock.name()));
                 type = fileVariableMultiple.type();
             } catch (Exception ignored) {
+                //ignored
             }
         }
 

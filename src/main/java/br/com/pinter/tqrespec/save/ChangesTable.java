@@ -20,55 +20,56 @@
 
 package br.com.pinter.tqrespec.save;
 
+import br.com.pinter.tqrespec.util.Util;
 import com.google.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 @SuppressWarnings("unused")
-class ChangesTable extends Hashtable<Integer, byte[]> implements DeepCloneable {
+class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements DeepCloneable {
     @Inject
     private SaveData saveData;
 
-    private Hashtable<Integer, Integer> valuesLengthIndex = null;
+    private static final String ALERT_INVALIDDATA = "alert.changesinvaliddata";
+    private static final String MULTIPLE_BLOCKS_ERROR = "Variable is defined on multiple blocks, aborting";
+    private Map<Integer, Integer> valuesLengthIndex = new ConcurrentHashMap<>();
 
     ChangesTable() {
         super();
-        this.valuesLengthIndex = new Hashtable<>();
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        ChangesTable that = (ChangesTable) o;
+        return Objects.equals(valuesLengthIndex, that.valuesLengthIndex);
     }
 
     @Override
-    public synchronized boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-
-        if(!(obj instanceof ChangesTable)) {
-            return false;
-        }
-
-        ChangesTable other = (ChangesTable) obj;
-        if(this.valuesLengthIndex == ((ChangesTable) obj).valuesLengthIndex) {
-            return true;
-        }
-        return super.equals(obj);
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), valuesLengthIndex);
     }
 
-    Hashtable<Integer, Integer> getValuesLengthIndex() {
+    Map<Integer, Integer> getValuesLengthIndex() {
         return valuesLengthIndex;
     }
 
     String getString(String variable) {
         if (saveData.getVariableLocation().get(variable) != null) {
             int block = saveData.getVariableLocation().get(variable).get(0);
-            if (saveData.getBlockInfo().get(block) != null) {
-                if (saveData.getBlockInfo().get(block).getVariables().get(variable).getVariableType()
-                        == VariableType.String) {
-                    return (String) saveData.getBlockInfo().get(block).getVariables().get(variable).getValue();
-                }
+            if (saveData.getBlockInfo().get(block) != null
+                    && saveData.getBlockInfo().get(block).getVariables().get(variable).getVariableType()
+                    == VariableType.String) {
+                return (String) saveData.getBlockInfo().get(block).getVariables().get(variable).getValue();
             }
         }
         return null;
@@ -81,30 +82,32 @@ class ChangesTable extends Hashtable<Integer, byte[]> implements DeepCloneable {
     void setString(String variable, String value, boolean utf16le) {
         if (saveData.getVariableLocation().get(variable) != null) {
             if (saveData.getVariableLocation().get(variable).size() > 1) {
-                throw new IllegalStateException("Variable is defined on multiple blocks, aborting");
+                throw new IllegalStateException(MULTIPLE_BLOCKS_ERROR);
             }
             int block = saveData.getVariableLocation().get(variable).get(0);
-            if (saveData.getBlockInfo().get(block) != null) {
-                if (saveData.getBlockInfo().get(block).getVariables().get(variable).getVariableType()
-                        == VariableType.String) {
-                    VariableInfo variableInfo = saveData.getBlockInfo().get(block).getVariables().get(variable);
-                    byte[] str;
-                    if (utf16le) {
-                        //encode string to the format the game uses, a wide character with second byte always 0
-                        str = encodeString(value, true);
-                    } else {
-                        str = encodeString(value, false);
-                    }
-                    byte[] len = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(value.length()).array();
-                    byte[] data = new byte[4 + str.length];
-                    System.arraycopy(len, 0, data, 0, len.length);
-                    System.arraycopy(str, 0, data, len.length, str.length);
-
-                    this.put(variableInfo.getValOffset(), data);
-                    this.valuesLengthIndex.put(variableInfo.getValOffset(), 4 + (variableInfo.getValSize() * (utf16le ? 2 : 1)));
+            if (saveData.getBlockInfo().get(block) != null
+                    && saveData.getBlockInfo().get(block).getVariables().get(variable).getVariableType()
+                    == VariableType.String) {
+                VariableInfo variableInfo = saveData.getBlockInfo().get(block).getVariables().get(variable);
+                byte[] str;
+                if (utf16le) {
+                    //encode string to the format the game uses, a wide character with second byte always 0
+                    str = encodeString(value, true);
+                } else {
+                    str = encodeString(value, false);
                 }
+                byte[] len = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(value.length()).array();
+                byte[] data = new byte[4 + str.length];
+                System.arraycopy(len, 0, data, 0, len.length);
+                System.arraycopy(str, 0, data, len.length, str.length);
+
+                this.put(variableInfo.getValOffset(), data);
+                this.valuesLengthIndex.put(variableInfo.getValOffset(), 4 + (variableInfo.getValSize() * (utf16le ? 2 : 1)));
             }
+        } else {
+            throw new IllegalArgumentException(Util.getUIMessage(ALERT_INVALIDDATA, variable));
         }
+
     }
 
     private byte[] encodeString(String str, boolean wide) {
@@ -129,10 +132,10 @@ class ChangesTable extends Hashtable<Integer, byte[]> implements DeepCloneable {
         return buffer.array();
     }
 
-    void setFloat(String variable, float value) throws Exception {
+    void setFloat(String variable, float value) {
         if (saveData.getVariableLocation().get(variable) != null) {
             if (saveData.getVariableLocation().get(variable).size() > 1) {
-                throw new Exception("Variable is defined on multiple blocks, aborting");
+                throw new IllegalStateException(MULTIPLE_BLOCKS_ERROR);
             }
             int block = saveData.getVariableLocation().get(variable).get(0);
             if (saveData.getBlockInfo().get(block) != null) {
@@ -145,26 +148,26 @@ class ChangesTable extends Hashtable<Integer, byte[]> implements DeepCloneable {
                         this.valuesLengthIndex.put(variableInfo.getValOffset(), variableInfo.getValSize());
                     }
                 } else {
-                    throw new Exception(String.format("Variable '%s' is not a float", variable));
+                    throw new NumberFormatException(String.format("Variable '%s' is not a float", variable));
                 }
             }
+        } else {
+            throw new IllegalArgumentException(Util.getUIMessage(ALERT_INVALIDDATA, variable));
         }
     }
 
     float getFloat(String variable) {
         if (saveData.getVariableLocation().get(variable) != null) {
             int block = saveData.getVariableLocation().get(variable).get(0);
-            if (saveData.getBlockInfo().get(block) != null) {
-                if (saveData.getBlockInfo().get(block).getVariables().get(variable).getVariableType()
-                        == VariableType.Float) {
-                    VariableInfo v = saveData.getBlockInfo().get(block).getVariables().get(variable);
-                    if (this.get(v.getValOffset()) != null) {
-                        return ByteBuffer.wrap(this.get(v.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getFloat();
-                    } else {
-                        return (Float) v.getValue();
-                    }
+            if (saveData.getBlockInfo().get(block) != null
+                    && saveData.getBlockInfo().get(block).getVariables().get(variable).getVariableType()
+                    == VariableType.Float) {
+                VariableInfo v = saveData.getBlockInfo().get(block).getVariables().get(variable);
+                if (this.get(v.getValOffset()) != null) {
+                    return ByteBuffer.wrap(this.get(v.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getFloat();
+                } else {
+                    return (Float) v.getValue();
                 }
-
             }
         }
         return -1;
@@ -185,7 +188,7 @@ class ChangesTable extends Hashtable<Integer, byte[]> implements DeepCloneable {
         return ret.toArray(new Float[0]);
     }
 
-    void setInt(int blockStart, String variable, int value) throws Exception {
+    void setInt(int blockStart, String variable, int value) {
         if (saveData.getBlockInfo().get(blockStart) != null) {
             if (saveData.getBlockInfo().get(blockStart).getVariables().get(variable).getVariableType()
                     == VariableType.Integer) {
@@ -196,15 +199,17 @@ class ChangesTable extends Hashtable<Integer, byte[]> implements DeepCloneable {
                     this.valuesLengthIndex.put(variableInfo.getValOffset(), variableInfo.getValSize());
                 }
             } else {
-                throw new Exception(String.format("Variable '%s' is not an int", variable));
+                throw new NumberFormatException(String.format("Variable '%s' is not an int", variable));
             }
+        } else {
+            throw new IllegalArgumentException(Util.getUIMessage(ALERT_INVALIDDATA, variable));
         }
     }
 
-    void setInt(String variable, int value) throws Exception {
+    void setInt(String variable, int value) {
         if (saveData.getVariableLocation().get(variable) != null) {
             if (saveData.getVariableLocation().get(variable).size() > 1) {
-                throw new Exception("Variable is defined on multiple blocks, aborting");
+                throw new IllegalStateException(MULTIPLE_BLOCKS_ERROR);
             }
             int block = saveData.getVariableLocation().get(variable).get(0);
             if (saveData.getBlockInfo().get(block) != null) {
@@ -217,22 +222,23 @@ class ChangesTable extends Hashtable<Integer, byte[]> implements DeepCloneable {
                         this.valuesLengthIndex.put(variableInfo.getValOffset(), variableInfo.getValSize());
                     }
                 } else {
-                    throw new Exception(String.format("Variable '%s' is not an int", variable));
+                    throw new NumberFormatException(String.format("Variable '%s' is not an int", variable));
                 }
             }
+        } else {
+            throw new IllegalArgumentException(Util.getUIMessage(ALERT_INVALIDDATA, variable));
         }
     }
 
     Integer getInt(int blockStart, String variable) {
-        if (saveData.getBlockInfo().get(blockStart) != null) {
-            if (saveData.getBlockInfo().get(blockStart).getVariables().get(variable).getVariableType()
-                    == VariableType.Integer) {
-                VariableInfo v = saveData.getBlockInfo().get(blockStart).getVariables().get(variable);
-                if (this.get(v.getValOffset()) != null) {
-                    return ByteBuffer.wrap(this.get(v.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getInt();
-                } else {
-                    return (Integer) v.getValue();
-                }
+        if (saveData.getBlockInfo().get(blockStart) != null
+                && saveData.getBlockInfo().get(blockStart).getVariables().get(variable).getVariableType()
+                == VariableType.Integer) {
+            VariableInfo v = saveData.getBlockInfo().get(blockStart).getVariables().get(variable);
+            if (this.get(v.getValOffset()) != null) {
+                return ByteBuffer.wrap(this.get(v.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getInt();
+            } else {
+                return (Integer) v.getValue();
             }
         }
         return -1;
@@ -241,17 +247,15 @@ class ChangesTable extends Hashtable<Integer, byte[]> implements DeepCloneable {
     Integer getInt(String variable) {
         if (saveData.getVariableLocation().get(variable) != null) {
             int block = saveData.getVariableLocation().get(variable).get(0);
-            if (saveData.getBlockInfo().get(block) != null) {
-                if (saveData.getBlockInfo().get(block).getVariables().get(variable).getVariableType()
-                        == VariableType.Integer) {
-                    VariableInfo v = saveData.getBlockInfo().get(block).getVariables().get(variable);
-                    if (this.get(v.getValOffset()) != null) {
-                        return ByteBuffer.wrap(this.get(v.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getInt();
-                    } else {
-                        return (Integer) v.getValue();
-                    }
+            if (saveData.getBlockInfo().get(block) != null
+                    && saveData.getBlockInfo().get(block).getVariables().get(variable).getVariableType()
+                    == VariableType.Integer) {
+                VariableInfo v = saveData.getBlockInfo().get(block).getVariables().get(variable);
+                if (this.get(v.getValOffset()) != null) {
+                    return ByteBuffer.wrap(this.get(v.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getInt();
+                } else {
+                    return (Integer) v.getValue();
                 }
-
             }
         }
         return -1;

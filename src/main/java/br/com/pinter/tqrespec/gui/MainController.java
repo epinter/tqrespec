@@ -20,8 +20,9 @@
 
 package br.com.pinter.tqrespec.gui;
 
-import br.com.pinter.tqrespec.core.EventHandlerWithException;
-import br.com.pinter.tqrespec.core.TaskWithException;
+import br.com.pinter.tqrespec.core.MyEventHandler;
+import br.com.pinter.tqrespec.core.MyTask;
+import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.core.WorkerThread;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.PlayerData;
@@ -62,17 +63,16 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@SuppressWarnings({"RedundantThrows", "unused"})
+@SuppressWarnings("unused")
 public class MainController implements Initializable {
     private static final Logger logger = Log.getLogger();
-
-    private static final boolean DBG = false;
 
     @Inject
     private FXMLLoader fxmlLoaderAbout;
@@ -134,9 +134,9 @@ public class MainController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         mainFormTitle.setText(String.format("%s v%s", Util.getBuildTitle(), Util.getBuildVersion()));
         mainFormInitialized.addListener(((observable, oldValue, newValue) -> {
-            TaskWithException windowShownTask = new TaskWithException() {
+            MyTask windowShownTask = new MyTask() {
                 @Override
-                protected Void call() throws Exception {
+                protected Void call() {
                     windowShownHandler();
                     return null;
                 }
@@ -146,7 +146,7 @@ public class MainController implements Initializable {
 
         Task<Version> taskCheckVersion = new Task<>() {
             @Override
-            protected Version call() throws Exception {
+            protected Version call() {
                 Version version = new Version(Util.getBuildVersion());
                 version.checkNewerVersion(Constants.VERSION_CHECK_URL);
                 //new version available (-1 our version is less than remote, 0 equal, 1 greater, -2 error checking
@@ -160,9 +160,14 @@ public class MainController implements Initializable {
                 versionCheck.setOnAction(event -> {
                     final Task<Void> openUrl = new Task<>() {
                         @Override
-                        public Void call() throws Exception {
-                            if (StringUtils.isNotEmpty(version.getUrlPage()))
-                                hostServices.showDocument(new URI(version.getUrlPage()).toString());
+                        public Void call() {
+                            if (StringUtils.isNotEmpty(version.getUrlPage())) {
+                                try {
+                                    hostServices.showDocument(new URI(version.getUrlPage()).toString());
+                                } catch (URISyntaxException e) {
+                                    //ignored
+                                }
+                            }
                             return null;
                         }
                     };
@@ -216,10 +221,12 @@ public class MainController implements Initializable {
         addCharactersToCombo();
     }
 
+    @FXML
     public void close(MouseEvent evt) {
         Util.closeApplication();
     }
 
+    @FXML
     public void openAboutWindow(MouseEvent evt) {
         Parent root;
         try {
@@ -322,7 +329,7 @@ public class MainController implements Initializable {
         String targetPlayerName = copyCharInput.getText();
         setAllControlsDisable(true);
 
-        TaskWithException<Integer> copyCharTask = new TaskWithException<>() {
+        MyTask<Integer> copyCharTask = new MyTask<>() {
             @Override
             protected Integer call() {
                 try {
@@ -337,7 +344,7 @@ public class MainController implements Initializable {
         };
 
         //noinspection Convert2Lambda
-        copyCharTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandlerWithException<>() {
+        copyCharTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new MyEventHandler<>() {
             @Override
             public void handleEvent(WorkerStateEvent workerStateEvent) {
                 if ((int) copyCharTask.getValue() == 2) {
@@ -380,33 +387,41 @@ public class MainController implements Initializable {
         }
         SimpleIntegerProperty backupCreated = new SimpleIntegerProperty();
 
-        TaskWithException<Integer> backupSaveGameTask = new TaskWithException<>() {
+        MyTask<Integer> backupSaveGameTask = new MyTask<>() {
             @Override
-            protected Integer call() throws Exception {
-                if (DBG) logger.info("starting backup task");
+            protected Integer call() {
+                if (Log.isDebugEnabled()) logger.info("starting backup task");
                 setAllControlsDisable(true);
-                return playerWriter.backupCurrent() ? 2 : 0;
+                try {
+                    return playerWriter.backupCurrent() ? 2 : 0;
+                } catch (IOException e) {
+                    throw new UnhandledRuntimeException("Error starting backup",e);
+                }
             }
         };
-        TaskWithException<Integer> saveGameTask = new TaskWithException<>() {
+        MyTask<Integer> saveGameTask = new MyTask<>() {
             @Override
-            protected Integer call() throws Exception {
-                pointsPaneController.saveCharHandler();
-                return playerWriter.saveCurrent() ? 2 : 0;
+            protected Integer call() {
+                try {
+                    pointsPaneController.saveCharHandler();
+                    return playerWriter.saveCurrent() ? 2 : 0;
+                } catch (Exception e) {
+                    throw new UnhandledRuntimeException("Error saving character", e);
+                }
             }
         };
 
         //noinspection Convert2Lambda
-        backupSaveGameTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandlerWithException<>() {
+        backupSaveGameTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new MyEventHandler<>() {
             @Override
             public void handleEvent(WorkerStateEvent workerStateEvent) {
-                if (DBG) logger.info("starting backup listener");
+                if (Log.isDebugEnabled()) logger.info("starting backup listener");
 
                 if ((int) backupSaveGameTask.getValue() == 2) {
-                    if (DBG) logger.info("backupcreated==" + backupCreated.get());
+                    if (Log.isDebugEnabled()) logger.info("backupcreated==" + backupCreated.get());
                     new WorkerThread(saveGameTask).start();
                 } else {
-                    if (DBG) logger.info("backupcreated==+=" + backupCreated.get());
+                    if (Log.isDebugEnabled()) logger.info("backupcreated==+=" + backupCreated.get());
                     Util.showError(Util.getUIMessage("alert.errorbackup_header"),
                             Util.getUIMessage("alert.errorbackup_content", Constants.BACKUP_DIRECTORY));
                     setAllControlsDisable(false);
@@ -416,14 +431,14 @@ public class MainController implements Initializable {
         });
 
         //noinspection Convert2Lambda
-        saveGameTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandlerWithException<>() {
+        saveGameTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new MyEventHandler<>() {
             @Override
             public void handleEvent(WorkerStateEvent workerStateEvent) {
                 if ((int) saveGameTask.getValue() != 2) {
                     Util.showError(Util.getUIMessage("alert.errorsaving_header"),
                             Util.getUIMessage("alert.errorsaving_content", Constants.BACKUP_DIRECTORY));
                 } else {
-                    if (DBG) logger.info("character saved==" + saveGameTask.getValue());
+                    if (Log.isDebugEnabled()) logger.info("character saved==" + saveGameTask.getValue());
                 }
                 setAllControlsDisable(false);
 
@@ -462,15 +477,15 @@ public class MainController implements Initializable {
 
         pointsPaneController.setSpinnersDisable(false);
 
-        TaskWithException<Boolean> loadTask = new TaskWithException<>() {
+        MyTask<Boolean> loadTask = new MyTask<>() {
             @Override
-            protected Boolean call() throws Exception {
+            protected Boolean call() {
                 return playerData.loadPlayer(playerName);
             }
         };
 
         //noinspection Convert2Lambda
-        loadTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandlerWithException<>() {
+        loadTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new MyEventHandler<>() {
             @Override
             public void handleEvent(WorkerStateEvent workerStateEvent) {
                 pointsPaneController.loadCharHandler();
@@ -483,7 +498,7 @@ public class MainController implements Initializable {
         });
 
         //noinspection Convert2Lambda
-        loadTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandlerWithException<>() {
+        loadTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new MyEventHandler<>() {
             @Override
             public void handleEvent(WorkerStateEvent workerStateEvent) {
                 skillsPaneController.loadCharEventHandler();

@@ -22,15 +22,15 @@ package br.com.pinter.tqrespec.core;
 
 import javafx.concurrent.Task;
 
-public abstract class TaskWithException<T> extends Task<T> {
+public abstract class MyTask<T> extends Task<T> {
 
-    public TaskWithException() {
+    public MyTask() {
         super();
         this.setOnFailed(workerStateEvent -> {
-            throw new RuntimeException(this.getException());
+            throw new UnhandledRuntimeException(this.getException());
         });
     }
 
     @Override
-    protected abstract T call() throws Exception;
+    protected abstract T call();
 }

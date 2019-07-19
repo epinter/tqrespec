@@ -23,6 +23,7 @@ package br.com.pinter.tqrespec.tqdata;
 import br.com.pinter.tqdatabase.Database;
 import br.com.pinter.tqdatabase.Player;
 import br.com.pinter.tqdatabase.Skills;
+import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.util.Constants;
 import com.google.inject.Singleton;
@@ -35,31 +36,32 @@ import java.util.logging.Logger;
 public class Db {
     private static final Logger logger = Log.getLogger();
 
-    private Database db;
+    private Database database;
 
     public void initialize() {
         try {
-            if (db == null) {
-                db = new Database(String.format("%s/Database/database.arz", GameInfo.getInstance().getGamePath()));
+            if (database == null) {
+                database = new Database(String.format("%s/Database/database.arz", GameInfo.getInstance().getGamePath()));
             }
         } catch (IOException e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
-            throw new RuntimeException("Error loading database.", e);
+            if (Log.isDebugEnabled())
+                logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            throw new UnhandledRuntimeException("Error loading database.", e);
         }
     }
 
     public Skills skills() {
         initialize();
-        return db.skills();
+        return database.skills();
     }
 
     public Player player() {
         initialize();
-        return db.player();
+        return database.player();
     }
 
     public void preloadAll() {
         initialize();
-        db.preloadAll();
+        database.preloadAll();
     }
 }

@@ -56,6 +56,8 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -142,9 +144,14 @@ public class Main extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         //close stderr before initialize guice, we want to hide java warning about reflection
-        System.err.close();
+        System.setErr(new PrintStream(new OutputStream() {
+            @Override
+            public void write(int b) {
+                //ignored
+            }
+        }));
         prepareInjectionContext();
 
         notifyPreloader(new Preloader.ProgressNotification(0.1));

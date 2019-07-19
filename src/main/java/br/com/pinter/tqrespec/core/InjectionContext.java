@@ -55,6 +55,7 @@ public class InjectionContext {
     private class FXMLProvider extends AbstractModule {
         @Override
         protected void configure() {
+            //ignored
         }
 
         @Provides

@@ -51,6 +51,7 @@ public class AboutController implements Initializable {
         aboutVersion.setText(Util.getUIMessage("about.version", Util.getBuildVersion()));
     }
 
+    @FXML
     public void closeAboutWindow(MouseEvent evt) {
         Stage stage = (Stage) rootelement.getScene().getWindow();
         stage.close();

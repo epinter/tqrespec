@@ -21,6 +21,7 @@
 package br.com.pinter.tqrespec.tqdata;
 
 import br.com.pinter.tqrespec.Settings;
+import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.util.Constants;
 import com.sun.jna.platform.win32.Advapi32Util;
@@ -53,6 +54,10 @@ public class GameInfo {
     private static final Object lock = new Object();
 
     private String gamePath = null;
+
+    private static final String STEAM_COMMON = "common";
+
+    private static final String SAVEDATA_DIRNAME = "SaveData";
 
     private GameInfo() {
     }
@@ -90,10 +95,10 @@ public class GameInfo {
     private Path getGameSteamPath() {
         Path steamLibraryPath = getSteamLibraryPath();
         if (steamLibraryPath != null) {
-            Path gamePath = Paths.get(steamLibraryPath.toString(), "common",
+            Path steamGamePath = Paths.get(steamLibraryPath.toString(), STEAM_COMMON,
                     Constants.GAME_DIRECTORY_STEAM).toAbsolutePath();
-            if (gamePathExists(gamePath)) {
-                return gamePath;
+            if (gamePathExists(steamGamePath)) {
+                return steamGamePath;
             }
         }
         return null;
@@ -105,7 +110,7 @@ public class GameInfo {
                     WinReg.HKEY_CURRENT_USER, "SOFTWARE\\Valve\\Steam", "SteamPath");
 
             Path steamappsPath = Paths.get(steamPath, "SteamApps").toAbsolutePath();
-            Path steamGamePath = Paths.get(steamappsPath.toString(), "common",
+            Path steamGamePath = Paths.get(steamappsPath.toString(), STEAM_COMMON,
                     Constants.GAME_DIRECTORY_STEAM).toAbsolutePath();
             if (gamePathExists(steamGamePath)) {
                 return steamappsPath;
@@ -130,14 +135,14 @@ public class GameInfo {
 
             for (String libraryFolder : libraryFolderList) {
                 Path libraryPath = Paths.get(libraryFolder, "SteamApps").toAbsolutePath();
-                Path libraryGamePath = Paths.get(libraryPath.toString(), "common",
+                Path libraryGamePath = Paths.get(libraryPath.toString(), STEAM_COMMON,
                         Constants.GAME_DIRECTORY_STEAM).toAbsolutePath();
                 if (gamePathExists(libraryGamePath)) {
                     return libraryPath;
                 }
             }
         } catch (Exception e) {
-            if (DBG)
+            if (Log.isDebugEnabled())
                 logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
 
         }
@@ -155,7 +160,7 @@ public class GameInfo {
                 }
             }
         } catch (Exception e) {
-            if (DBG)
+            if (Log.isDebugEnabled())
                 logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
         }
 
@@ -194,7 +199,7 @@ public class GameInfo {
             installedApps = Advapi32Util.registryGetKeys(WinReg.HKEY_LOCAL_MACHINE,
                     "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall");
         } catch (Exception e) {
-            if (DBG)
+            if (Log.isDebugEnabled())
                 logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
         }
 
@@ -203,7 +208,7 @@ public class GameInfo {
                 String appDisplayName = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE,
                         "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\" + app, "DisplayName");
                 if (appDisplayName.matches(regexGameName)) {
-                    if (DBG) logger.info("Installed: displayname found -- " + regexGameName);
+                    if (Log.isDebugEnabled()) logger.info(() -> "Installed: displayname found -- " + regexGameName);
                     String installed = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE,
                             "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\" + app, "InstallLocation");
                     Path installedPath = Paths.get(installed).toAbsolutePath();
@@ -211,11 +216,11 @@ public class GameInfo {
                         return installedPath;
                     }
                 } else {
-                    if (DBG)
-                        logger.info("Installed: displayname not found --- " + regexGameName + "---" + appDisplayName);
+                    if (Log.isDebugEnabled())
+                        logger.info(() -> "Installed: displayname not found --- " + regexGameName + "---" + appDisplayName);
                 }
             } catch (Exception e) {
-                if (DBG)
+                if (Log.isDebugEnabled())
                     logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
             }
         return null;
@@ -229,31 +234,31 @@ public class GameInfo {
         try {
             pkgList = Advapi32Util.registryGetKeys(WinReg.HKEY_CURRENT_USER,
                     pkgKeyPath);
-            for (String pkg : pkgList) {
-                String pkgDisplayName = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER,
-                        String.format("%s\\%s", pkgKeyPath, pkg), "DisplayName");
-                if (pkgDisplayName.matches(regexGameName)) {
-                    try {
-                        if (DBG) logger.info("Package: displayname found -- " + regexGameName);
-                        String pkgInstalled = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER,
-                                String.format("%s\\%s", pkgKeyPath, pkg), "PackageRootFolder");
-                        Path pkgInstalledPath = Paths.get(pkgInstalled).toAbsolutePath();
-                        if (gamePathExists(pkgInstalledPath)) {
-                            return pkgInstalledPath;
-                        }
-                    } catch (Exception e) {
-                        logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
-                    }
-                } else {
-                    if (DBG)
-                        logger.info("Installed: displayname not found --- " + regexGameName + "---" + pkgDisplayName);
-                }
-            }
         } catch (Exception e) {
-            if (DBG)
-                logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            return null;
         }
 
+        for (String pkg : pkgList) {
+            String pkgDisplayName = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER,
+                    String.format("%s\\%s", pkgKeyPath, pkg), "DisplayName");
+            if (pkgDisplayName.matches(regexGameName)) {
+                try {
+                    if (Log.isDebugEnabled()) logger.info(() -> "Package: displayname found -- " + regexGameName);
+                    String pkgInstalled = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER,
+                            String.format("%s\\%s", pkgKeyPath, pkg), "PackageRootFolder");
+                    Path pkgInstalledPath = Paths.get(pkgInstalled).toAbsolutePath();
+                    if (gamePathExists(pkgInstalledPath)) {
+                        return pkgInstalledPath;
+                    }
+                } catch (Exception e) {
+                    logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+                }
+            } else {
+                if (Log.isDebugEnabled())
+                    logger.info(() -> "Package: displayname not found --- " + regexGameName + "---" + pkgDisplayName);
+            }
+        }
 
         return null;
     }
@@ -267,17 +272,18 @@ public class GameInfo {
             if (gamePathExists(steamGamePath)) {
                 return steamGamePath;
             } else {
-                if (DBG) logger.info("GameSteamApiBasedPath: not found at " + steamGamePath);
+                if (Log.isDebugEnabled()) logger.info(() -> "GameSteamApiBasedPath: not found at " + steamGamePath);
             }
 
             Path steamGameParentPath = Paths.get(steamPath).getParent().toAbsolutePath();
             if (gamePathExists(steamGameParentPath)) {
                 return steamGameParentPath;
             } else {
-                if (DBG) logger.info("GameSteamApiBasedPath: not found at " + steamGameParentPath);
+                if (Log.isDebugEnabled())
+                    logger.info(() -> "GameSteamApiBasedPath: not found at " + steamGameParentPath);
             }
         } catch (Exception e) {
-            if (DBG)
+            if (Log.isDebugEnabled())
                 logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
         }
         return null;
@@ -286,43 +292,43 @@ public class GameInfo {
     private String detectGamePath() {
         Path installedPath = getGameInstalledPath(Constants.REGEX_REGISTRY_INSTALL);
         if (installedPath != null && gamePathExists(installedPath)) {
-            if (DBG) logger.info("Installed: found");
+            if (Log.isDebugEnabled()) logger.info("Installed: found");
             return installedPath.toString();
         }
 
         Path gameSteam = getGameSteamPath();
         if (gameSteam != null && gamePathExists(gameSteam)) {
-            if (DBG) logger.info("SteamLibrary: found");
+            if (Log.isDebugEnabled()) logger.info("SteamLibrary: found");
             return gameSteam.toString();
         }
 
         Path gogPath = getGameGogPath();
         if (gogPath != null && gamePathExists(gogPath)) {
-            if (DBG) logger.info("Gog: found");
+            if (Log.isDebugEnabled()) logger.info("Gog: found");
             return gogPath.toString();
         }
 
         Path microsoftStorePath = getGameMicrosoftStorePath();
         if (microsoftStorePath != null && gamePathExists(microsoftStorePath)) {
-            if (DBG) logger.info("Package: found");
+            if (Log.isDebugEnabled()) logger.info("Package: found");
             return microsoftStorePath.toString();
         }
 
         Path installedPathFallback = getGameInstalledPath(Constants.REGEX_REGISTRY_INSTALL_FALLBACK);
         if (installedPathFallback != null && gamePathExists(installedPathFallback)) {
-            if (DBG) logger.info("Installed: found");
+            if (Log.isDebugEnabled()) logger.info("Installed: found");
             return installedPathFallback.toString();
         }
 
         Path alternativeSteamBasedPath = getGameSteamApiBasedPath();
         if (alternativeSteamBasedPath != null && gamePathExists(alternativeSteamBasedPath)) {
-            if (DBG) logger.info("'Alternative' installation: found");
+            if (Log.isDebugEnabled()) logger.info("'Alternative' installation: found");
             return alternativeSteamBasedPath.toString();
         }
 
         Path discPath = getGameDiscPath();
         if (discPath != null && gamePathExists(discPath)) {
-            if (DBG) logger.info("Disc: found");
+            if (Log.isDebugEnabled()) logger.info("Disc: found");
             return discPath.toString();
         }
         return null;
@@ -369,7 +375,8 @@ public class GameInfo {
         String subdirectory = File.separator + Paths.get("My Games", "Titan Quest - Immortal Throne").toString();
 
         if (DBG || !SystemUtils.IS_OS_WINDOWS) {
-            logger.info("SavePath: user.home is " + userHome);
+            logger.info(() -> "SavePath: user.home is " + userHome);
+            return Constants.DEV_GAMEDATA;
         }
 
         String saveDirectory;
@@ -381,31 +388,31 @@ public class GameInfo {
 
         Path savePath = Paths.get(saveDirectory + subdirectory);
         if (Files.exists(savePath)) {
-            if (DBG) logger.info("SavePath: found");
+            if (Log.isDebugEnabled()) logger.info("SavePath: found");
             return savePath.toAbsolutePath().toString();
         }
         return null;
     }
 
     public String getSaveDataMainPath() {
-        if (!SystemUtils.IS_OS_WINDOWS) return Paths.get(Constants.DEV_GAMEDATA, "SaveData", "Main").toString();
+        if (!SystemUtils.IS_OS_WINDOWS) return Paths.get(Constants.DEV_GAMEDATA, SAVEDATA_DIRNAME, "Main").toString();
         String savePath = getSavePath();
         if (StringUtils.isNotEmpty(savePath)) {
-            return Paths.get(savePath, "SaveData", "Main").toString();
+            return Paths.get(savePath, SAVEDATA_DIRNAME, "Main").toString();
         }
         return null;
     }
 
     public String getSaveDataUserPath() {
-        if (!SystemUtils.IS_OS_WINDOWS) return Paths.get(Constants.DEV_GAMEDATA, "SaveData", "User").toString();
+        if (!SystemUtils.IS_OS_WINDOWS) return Paths.get(Constants.DEV_GAMEDATA, SAVEDATA_DIRNAME, "User").toString();
         String savePath = getSavePath();
         if (StringUtils.isNotEmpty(savePath)) {
-            return Paths.get(savePath, "SaveData", "User").toString();
+            return Paths.get(savePath, SAVEDATA_DIRNAME, "User").toString();
         }
         return null;
     }
 
-    public String[] getPlayerListMain() throws Exception {
+    public String[] getPlayerListMain() {
         String savePath = this.getSaveDataMainPath();
         File directory = new File(savePath);
         ArrayList<String> playerList = new ArrayList<>();
@@ -414,7 +421,7 @@ public class GameInfo {
                 playerList.add(player.getName().replaceAll("^_", ""));
             }
         } else {
-            throw new Exception("No player found");
+            throw new UnhandledRuntimeException("No player found");
         }
         String[] ret = new String[playerList.size()];
         playerList.toArray(ret);

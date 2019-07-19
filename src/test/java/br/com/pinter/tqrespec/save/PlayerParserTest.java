@@ -110,7 +110,7 @@ public class PlayerParserTest {
         assertTrue(varLocation > 0);
         BlockInfo blockInfo = saveData.getBlockInfo().get(varLocation);
         assertNotNull(blockInfo);
-        assertEquals(blockInfo.getVariables().get("str").getVariableType(), VariableType.Float);
+        assertEquals(VariableType.Float, blockInfo.getVariables().get("str").getVariableType());
         Float str = (Float) blockInfo.getVariables().get("str").getValue();
         assertNotNull(str);
         assertTrue(str > 0.0);
@@ -124,7 +124,7 @@ public class PlayerParserTest {
             logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
         }
         playerParser.prepareBufferForRead();
-        assertEquals(playerParser.getBuffer().position(), 0);
+        assertEquals(0,playerParser.getBuffer().position());
     }
 
     @Test

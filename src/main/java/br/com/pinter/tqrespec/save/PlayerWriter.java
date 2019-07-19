@@ -21,6 +21,7 @@
 package br.com.pinter.tqrespec.save;
 
 import br.com.pinter.tqrespec.Settings;
+import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.gui.State;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
@@ -46,9 +47,6 @@ public class PlayerWriter {
     @Inject
     private PlayerData playerData;
 
-    public PlayerWriter() {
-    }
-
     @SuppressWarnings("SameParameterValue")
     private boolean backupSaveGame(String fileName, String playerName, boolean fullBackup) throws IOException {
         File backupDirectory = new File(GameInfo.getInstance().getSavePath(), Constants.BACKUP_DIRECTORY);
@@ -61,11 +59,11 @@ public class PlayerWriter {
         if (destPlayerZip.exists() && destPlayerZip.length() > 1) {
             return true;
         }
-        if (!backupDirectory.exists()) {
-            if (!backupDirectory.mkdir()) {
-                throw new IOException("Unable to create backup directory");
-            }
+
+        if (!backupDirectory.exists() && !backupDirectory.mkdir()) {
+            throw new IOException("Unable to create backup directory");
         }
+
         if (backupDirectory.canWrite()) {
             URI zipUri = URI.create("jar:" + destPlayerZip.toURI().toString());
             HashMap<String, String> zipCreateOptions = new HashMap<>();
@@ -131,8 +129,7 @@ public class PlayerWriter {
             return true;
         } catch (IOException e) {
             State.get().setSaveInProgress(false);
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
-            throw e;
+            throw new UnhandledRuntimeException("Error saving character",e);
         }
     }
 

@@ -21,6 +21,7 @@
 package br.com.pinter.tqrespec.tqdata;
 
 import br.com.pinter.tqdatabase.Text;
+import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.util.Constants;
 import com.google.inject.Singleton;
@@ -43,7 +44,7 @@ public class Txt {
             }
         } catch (FileNotFoundException e) {
             logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
-            throw new RuntimeException("Error loading text resource.");
+            throw new UnhandledRuntimeException("Error loading text resource.");
         }
     }
 
@@ -61,7 +62,7 @@ public class Txt {
         try {
             text.preload();
         } catch (IOException e) {
-            throw new RuntimeException("Error loading text resource", e);
+            throw new UnhandledRuntimeException("Error loading text resource", e);
         }
 
     }

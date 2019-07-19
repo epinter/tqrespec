@@ -22,6 +22,7 @@ package br.com.pinter.tqrespec.save;
 
 import br.com.pinter.tqdatabase.Database;
 import br.com.pinter.tqdatabase.models.Skill;
+import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.gui.State;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.tqdata.Db;
@@ -55,7 +56,6 @@ public class PlayerData {
     @Inject
     private ChangesTable changes;
 
-    private static PlayerData instance = null;
     private String playerName = null;
     private ByteBuffer buffer = null;
     private boolean customQuest = false;
@@ -116,8 +116,9 @@ public class PlayerData {
             prepareSkillsList();
         } catch (Exception e) {
             reset();
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
-            throw new RuntimeException(e);
+            if (Log.isDebugEnabled())
+                logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            throw new UnhandledRuntimeException("Error loading character", e);
         }
         return true;
     }
@@ -130,8 +131,8 @@ public class PlayerData {
                     int parent = saveData.getBlockInfo().get(blockOffset).getParentOffset();
                     BlockInfo b = saveData.getBlockInfo().get(blockOffset);
                     if (parent < 0 || !saveData.getBlockInfo().get(parent).getVariables().containsKey("max")
-                        || (changes.get(b.getStart()) != null && changes.get(b.getStart()).length == 0)) {
-                            //new block size is zero (was removed) or no parent
+                            || (changes.get(b.getStart()) != null && changes.get(b.getStart()).length == 0)) {
+                        //new block size is zero (was removed) or no parent
                         continue;
                     }
 
@@ -161,9 +162,9 @@ public class PlayerData {
     public int getAvailableSkillPoints() {
         if (!isCharacterLoaded()) return 0;
 
-        int block = saveData.getVariableLocation().get("skillPoints").get(0);
+        int block = saveData.getVariableLocation().get(Constants.Save.SKILL_POINTS).get(0);
         BlockInfo statsBlock = saveData.getBlockInfo().get(block);
-        return changes.getInt(statsBlock.getStart(), "skillPoints");
+        return changes.getInt(statsBlock.getStart(), Constants.Save.SKILL_POINTS);
     }
 
     public Map<String, PlayerSkill> getPlayerSkills() {
@@ -191,15 +192,15 @@ public class PlayerData {
             throw new IllegalStateException("Error reclaiming points. Skill detected.");
         }
         BlockInfo sk = saveData.getBlockInfo().get(blockStart);
-        VariableInfo varSkillLevel = sk.getVariables().get("skillLevel");
+        VariableInfo varSkillLevel = sk.getVariables().get(Constants.Save.SKILL_LEVEL);
 
         if (varSkillLevel.getVariableType() == VariableType.Integer) {
-            return changes.getInt(blockStart, "skillLevel");
+            return changes.getInt(blockStart, Constants.Save.SKILL_LEVEL);
         }
         return -1;
     }
 
-    public void reclaimSkillPoints(PlayerSkill sb) throws Exception {
+    public void reclaimSkillPoints(PlayerSkill sb) {
         int blockStart = sb.getBlockStart();
         Skill skill = db.skills().getSkill(sb.getSkillName(), false);
         if (skill.isMastery()) {
@@ -207,11 +208,11 @@ public class PlayerData {
         }
 
         BlockInfo skillToRemove = saveData.getBlockInfo().get(blockStart);
-        VariableInfo varSkillLevel = skillToRemove.getVariables().get("skillLevel");
+        VariableInfo varSkillLevel = skillToRemove.getVariables().get(Constants.Save.SKILL_LEVEL);
         if (varSkillLevel.getVariableType() == VariableType.Integer) {
-            int currentSkillPoints = changes.getInt("skillPoints");
+            int currentSkillPoints = changes.getInt(Constants.Save.SKILL_POINTS);
             int currentSkillLevel = (int) varSkillLevel.getValue();
-            changes.setInt("skillPoints", currentSkillPoints + currentSkillLevel);
+            changes.setInt(Constants.Save.SKILL_POINTS, currentSkillPoints + currentSkillLevel);
             changes.removeBlock(blockStart);
             changes.setInt("max", changes.getInt("max") - 1);
 
@@ -222,7 +223,7 @@ public class PlayerData {
         }
     }
 
-    public void removeMastery(PlayerSkill sb) throws Exception {
+    public void removeMastery(PlayerSkill sb) {
         int blockStart = sb.getBlockStart();
         Skill mastery = db.skills().getSkill(sb.getSkillName(), false);
         if (!mastery.isMastery()) {
@@ -233,11 +234,11 @@ public class PlayerData {
             throw new IllegalStateException("Mastery have skills, aborting.");
         }
 
-        int currentSkillPoints = changes.getInt("skillPoints");
-        int currentSkillLevel = changes.getInt(blockStart, "skillLevel");
+        int currentSkillPoints = changes.getInt(Constants.Save.SKILL_POINTS);
+        int currentSkillLevel = changes.getInt(blockStart, Constants.Save.SKILL_LEVEL);
 
         if (currentSkillLevel > 0) {
-            changes.setInt("skillPoints", currentSkillPoints + currentSkillLevel);
+            changes.setInt(Constants.Save.SKILL_POINTS, currentSkillPoints + currentSkillLevel);
             changes.removeBlock(blockStart);
             changes.setInt("max", changes.getInt("max") - 1);
         }
@@ -248,18 +249,18 @@ public class PlayerData {
         }
     }
 
-    public void reclaimMasteryPoints(PlayerSkill sb) throws Exception {
+    public void reclaimMasteryPoints(PlayerSkill sb) {
         int blockStart = sb.getBlockStart();
         Skill mastery = db.skills().getSkill(sb.getSkillName(), false);
         if (!mastery.isMastery()) {
             throw new IllegalStateException("Error reclaiming points. Not a mastery.");
         }
 
-        int currentSkillPoints = changes.getInt("skillPoints");
-        int currentSkillLevel = changes.getInt(blockStart, "skillLevel");
+        int currentSkillPoints = changes.getInt(Constants.Save.SKILL_POINTS);
+        int currentSkillLevel = changes.getInt(blockStart, Constants.Save.SKILL_LEVEL);
         if (currentSkillLevel > 1) {
-            changes.setInt("skillPoints", currentSkillPoints + (currentSkillLevel - 1));
-            changes.setInt(blockStart, "skillLevel", 1);
+            changes.setInt(Constants.Save.SKILL_POINTS, currentSkillPoints + (currentSkillLevel - 1));
+            changes.setInt(blockStart, Constants.Save.SKILL_LEVEL, 1);
             prepareSkillsList();
         }
     }
@@ -290,7 +291,7 @@ public class PlayerData {
         return Math.round(changes.getFloat("str"));
     }
 
-    public void setStr(int val) throws Exception {
+    public void setStr(int val) {
         changes.setFloat("str", val);
     }
 
@@ -298,7 +299,7 @@ public class PlayerData {
         return Math.round(changes.getFloat("int"));
     }
 
-    public void setInt(int val) throws Exception {
+    public void setInt(int val) {
         changes.setFloat("int", val);
     }
 
@@ -306,7 +307,7 @@ public class PlayerData {
         return Math.round(changes.getFloat("dex"));
     }
 
-    public void setDex(int val) throws Exception {
+    public void setDex(int val) {
         changes.setFloat("dex", val);
     }
 
@@ -314,7 +315,7 @@ public class PlayerData {
         return Math.round(changes.getFloat("life"));
     }
 
-    public void setLife(int val) throws Exception {
+    public void setLife(int val) {
         changes.setFloat("life", val);
     }
 
@@ -322,7 +323,7 @@ public class PlayerData {
         return Math.round(changes.getFloat("mana"));
     }
 
-    public void setMana(int val) throws Exception {
+    public void setMana(int val) {
         changes.setFloat("mana", val);
     }
 
@@ -330,7 +331,7 @@ public class PlayerData {
         return Math.round(changes.getInt("modifierPoints"));
     }
 
-    public void setModifierPoints(int val) throws Exception {
+    public void setModifierPoints(int val) {
         changes.setInt("modifierPoints", val);
     }
 

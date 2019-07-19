@@ -8,15 +8,15 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 
 @FunctionalInterface
-public interface EventHandlerWithException<T extends Event> extends EventHandler<T> {
+public interface MyEventHandler<T extends Event> extends EventHandler<T> {
     @Override
     default void handle(T t) {
         try {
             handleEvent(t);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new UnhandledRuntimeException(e);
         }
     }
 
-    void handleEvent(T t) throws Exception;
+    void handleEvent(T t);
 }

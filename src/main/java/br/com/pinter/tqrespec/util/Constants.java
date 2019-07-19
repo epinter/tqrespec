@@ -24,6 +24,8 @@ import java.io.File;
 import java.nio.file.Paths;
 
 public class Constants {
+    private Constants() {
+    }
     public static final String REGEX_REGISTRY_INSTALL = "Titan Quest.*Anniversary.*";
     public static final String REGEX_REGISTRY_PACKAGE = "(?i:Titan Quest.*)";
     public static final String REGEX_REGISTRY_INSTALL_FALLBACK = "Titan Quest.*";
@@ -37,11 +39,14 @@ public class Constants {
     public static final String LOGFILE = new File(System.getProperty("java.io.tmpdir"), "tqrespec.log").getAbsolutePath();
     public static final String ERROR_MSG_EXCEPTION = "Error: ";
     public static class Save {
+        private Save() {
+        }
         public static final String SKILL_NAME = "skillName";
         public static final String SKILL_ENABLED = "skillEnabled";
         public static final String SKILL_ACTIVE = "skillActive";
         public static final String SKILL_SUB_LEVEL = "skillSubLevel";
         public static final String SKILL_TRANSITION = "skillTransition";
         public static final String SKILL_LEVEL = "skillLevel";
+        public static final String SKILL_POINTS = "skillPoints";
     }
 }

@@ -21,7 +21,8 @@
 package br.com.pinter.tqrespec.save;
 
 import java.io.Serializable;
-import java.util.Hashtable;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @SuppressWarnings("unused")
 public class BlockInfo implements Serializable {
@@ -29,7 +30,7 @@ public class BlockInfo implements Serializable {
     private int start = -1;
     private int end = -1;
     private int size = -1;
-    private Hashtable<String, VariableInfo> variables = null;
+    private Map<String, VariableInfo> variables = new ConcurrentHashMap<>();
     private int parentOffset = -1;
 
     public String getTag() {
@@ -72,11 +73,11 @@ public class BlockInfo implements Serializable {
         this.parentOffset = parentOffset;
     }
 
-    Hashtable<String, VariableInfo> getVariables() {
+    Map<String, VariableInfo> getVariables() {
         return variables;
     }
 
-    void setVariables(Hashtable<String, VariableInfo> variables) {
+    void setVariables(Map<String, VariableInfo> variables) {
         this.variables = variables;
     }
 

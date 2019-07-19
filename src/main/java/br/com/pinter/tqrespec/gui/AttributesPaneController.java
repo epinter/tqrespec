@@ -43,7 +43,6 @@ import java.util.logging.Logger;
 
 public class AttributesPaneController implements Initializable {
     private static final Logger logger = Log.getLogger();
-    private static final boolean DBG = false;
 
     @Inject
     private Db db;
@@ -109,7 +108,7 @@ public class AttributesPaneController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
+        //ignored
     }
 
     public boolean isSaveDisabled() {
@@ -333,8 +332,8 @@ public class AttributesPaneController implements Initializable {
         manaSpinner.setValueFactory(null);
     }
 
-    public void saveCharHandler() throws Exception {
-        if (DBG) logger.info("starting savegame task");
+    public void saveCharHandler() {
+        if (Log.isDebugEnabled()) logger.info("starting savegame task");
 
         int strOld = playerData.getStr();
         int intOld = playerData.getInt();
@@ -361,7 +360,7 @@ public class AttributesPaneController implements Initializable {
         if (modifierOld != currentAvail.get() && currentAvail.get() >= 0) {
             playerData.setModifierPoints(currentAvail.get());
         }
-        if (DBG) logger.info("returning savegame task");
+        if (Log.isDebugEnabled()) logger.info("returning savegame task");
     }
 
     public void loadCharHandler() {

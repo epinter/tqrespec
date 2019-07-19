@@ -29,9 +29,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 public class SaveData implements Serializable {
-    private Map<Integer, BlockInfo> blockInfo = null;
+    private Map<Integer, BlockInfo> blockInfo;
     private HeaderInfo headerInfo = null;
-    private Map<String, ArrayList<Integer>> variableLocation = null;
+    private Map<String, ArrayList<Integer>> variableLocation;
 
     public SaveData() {
         variableLocation = new ConcurrentHashMap<>();

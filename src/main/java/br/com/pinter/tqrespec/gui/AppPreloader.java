@@ -61,7 +61,7 @@ public class AppPreloader extends Preloader {
     }
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
         this.stage = stage;
         this.stage.getIcons().addAll(new Image("icon/icon64.png"), new Image("icon/icon32.png"), new Image("icon/icon16.png"));
         this.stage.setScene(createPreloaderScene());

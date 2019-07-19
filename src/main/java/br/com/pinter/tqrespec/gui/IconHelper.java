@@ -7,6 +7,8 @@ package br.com.pinter.tqrespec.gui;
 import javafx.scene.text.Text;
 
 public class IconHelper {
+    private IconHelper() {
+    }
 
     public static Text createIcon(Icon icon) {
         return createIcon(icon, 1.0);

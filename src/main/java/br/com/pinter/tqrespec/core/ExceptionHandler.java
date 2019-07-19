@@ -35,10 +35,13 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@SuppressWarnings("unused")
 public class ExceptionHandler {
     private static final Logger logger = Log.getLogger();
 
+    private ExceptionHandler() {
+    }
+
+    @SuppressWarnings("unused")
     public static void unhandled(Thread t, Throwable e) {
         logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
 
@@ -47,12 +50,14 @@ public class ExceptionHandler {
         }
     }
 
+    @SuppressWarnings("unused")
     private static void showAlert(Thread t, Throwable e) {
         String header = ExceptionUtils.getRootCause(e).toString();
         if (header == null) {
             header = e.toString();
         }
         header = header.replaceAll("^java.lang.RuntimeException: (.*)", "$1");
+        header = header.replaceAll("^br.com.pinter.tqrespec.core.UnhandledRuntimeException: (.*)", "$1");
 
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.initModality(Modality.APPLICATION_MODAL);

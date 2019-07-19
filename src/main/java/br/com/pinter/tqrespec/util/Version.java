@@ -33,10 +33,9 @@ import java.util.logging.Logger;
 
 @SuppressWarnings({"WeakerAccess", "CanBeFinal", "unused"})
 public class Version implements Comparable<Version> {
-    private static final boolean DBG = false;
     private static final Logger logger = Log.getLogger();
 
-    private String version;
+    private String versionNumber;
     private String urlPage;
     private String url1;
     private String url2;
@@ -44,7 +43,7 @@ public class Version implements Comparable<Version> {
     private int lastCheck = -2;
 
     public String getVersion() {
-        return version;
+        return versionNumber;
     }
 
     public String getUrlPage() {
@@ -64,7 +63,7 @@ public class Version implements Comparable<Version> {
     }
 
     public Version(String version) {
-        this.version = version;
+        this.versionNumber = version;
     }
 
     public int getLastCheck() {
@@ -89,11 +88,11 @@ public class Version implements Comparable<Version> {
                 this.url1 = prop.getProperty("url1");
                 this.url2 = prop.getProperty("url2");
                 this.url3 = prop.getProperty("url3");
-                if (DBG) {
+                if (Log.isDebugEnabled()) {
                     for (Object o : prop.keySet()) {
                         String k = (String) o;
                         String v = prop.getProperty(k);
-                        logger.info(k + "=" + v);
+                        logger.info(() -> k + "=" + v);
                     }
                 }
                 lastCheck = this.compareTo(new Version(currentVersion));
@@ -129,12 +128,21 @@ public class Version implements Comparable<Version> {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if(obj == this) {
-            return true;
-        }
-        Version other = (Version) obj;
-        return other.getVersion().equals(this.getVersion());
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Version version1 = (Version) o;
+        return lastCheck == version1.lastCheck &&
+                versionNumber.equals(version1.versionNumber) &&
+                Objects.equals(urlPage, version1.urlPage) &&
+                Objects.equals(url1, version1.url1) &&
+                Objects.equals(url2, version1.url2) &&
+                Objects.equals(url3, version1.url3);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(versionNumber,urlPage,url1,url2,url3,lastCheck);
     }
 }
 

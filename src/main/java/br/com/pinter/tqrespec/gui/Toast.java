@@ -87,7 +87,7 @@ public class Toast {
         fadeIn.setOnFinished(e -> {
             Task fadeOutTask = new Task() {
                 @Override
-                protected Object call() throws Exception {
+                protected Object call() {
                     try {
                         Thread.sleep(delay);
                     } catch (InterruptedException ex) {

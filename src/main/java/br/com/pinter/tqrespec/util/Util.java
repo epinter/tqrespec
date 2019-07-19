@@ -47,7 +47,9 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 @SuppressWarnings("ConstantConditions")
 public class Util {
     private static final Logger logger = Log.getLogger();
-    private static final boolean DBG = false;
+
+    private Util() {
+    }
 
     public static String getBuildVersion() {
         String implementationVersion = Util.class.getPackage().getImplementationVersion();
@@ -128,15 +130,6 @@ public class Util {
         return message;
     }
 
-    private static boolean tryToCloseApplication() {
-        if (State.get().getSaveInProgress() != null && !State.get().getSaveInProgress()
-                || State.get().getSaveInProgress() == null) {
-            Platform.exit();
-            System.exit(0);
-        }
-        return false;
-    }
-
     public static void copyDirectoryRecurse(Path source, Path target, boolean replace) throws FileAlreadyExistsException {
         if (!replace && Files.exists(target)) {
             throw new FileAlreadyExistsException(target.toString() + " already exists");
@@ -148,13 +141,12 @@ public class Util {
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
                 Path targetDir = target.resolve(source.relativize(dir));
 
-                if (DBG) logger.info(String.format("PREDIR: src:'%s' dst:'%s'", dir, targetDir));
-
                 try {
                     Files.copy(dir, targetDir, COPY_ATTRIBUTES);
                 } catch (DirectoryNotEmptyException ignored) {
+                    //ignore
                 } catch (IOException e) {
-                    if (DBG) logger.info(String.format("Unable to create directory '%s'", targetDir));
+                    logger.info(() -> String.format("Unable to create directory '%s'", targetDir));
                     return FileVisitResult.TERMINATE;
                 }
 
@@ -168,24 +160,20 @@ public class Util {
                     Files.copy(file, targetFile, replace ? new CopyOption[]{COPY_ATTRIBUTES, REPLACE_EXISTING}
                             : new CopyOption[]{COPY_ATTRIBUTES});
                 } catch (IOException e) {
-                    if (DBG) logger.info(String.format("Unable to create file '%s'", targetFile));
+                    logger.info(() -> String.format("Unable to create file '%s'", targetFile));
                     return FileVisitResult.TERMINATE;
                 }
-                if (DBG) logger.info(String.format("FILE: src:'%s' dst:'%s'", file, targetFile));
                 return FileVisitResult.CONTINUE;
             }
 
             @Override
             public FileVisitResult visitFileFailed(Path file, IOException exc) {
-                if (DBG) logger.info(String.format("VISITFAIL: %s %s", file, exc));
                 return FileVisitResult.TERMINATE;
             }
 
             @Override
             public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
                 Path targetDir = target.resolve(source.relativize(dir));
-
-                if (DBG) logger.info(String.format("POSTDIR: src:'%s' dst:'%s'", dir, targetDir));
 
                 if (exc == null) {
                     try {
@@ -215,9 +203,13 @@ public class Util {
     }
 
     public static void closeApplication() {
-        if (!Util.tryToCloseApplication()) {
-            Util.showWarning(Util.getUIMessage("alert.saveinprogress_header"), Util.getUIMessage("alert.saveinprogress_content"));
+        if (State.get().getSaveInProgress() != null && !State.get().getSaveInProgress()
+                || State.get().getSaveInProgress() == null) {
+            Platform.exit();
+            System.exit(0);
         }
+
+        Util.showWarning(Util.getUIMessage("alert.saveinprogress_header"), Util.getUIMessage("alert.saveinprogress_content"));
     }
 
     public static Path playerChr(String playerName, boolean customQuest) {

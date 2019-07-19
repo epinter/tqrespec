@@ -6,7 +6,6 @@ package br.com.pinter.tqrespec.core;
 
 import br.com.pinter.tqrespec.gui.State;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
@@ -27,7 +26,7 @@ public class GameProcessMonitor implements Runnable {
         AtomicBoolean foundRunning = new AtomicBoolean(false);
         while (true) {
             try {
-                if(interrupted > 5000) {
+                if (interrupted > 5000) {
                     break;
                 }
 
@@ -48,6 +47,7 @@ public class GameProcessMonitor implements Runnable {
             } catch (InterruptedException ignored) {
                 //ignored
                 interrupted++;
+                Thread.currentThread().interrupt();
             }
         }
     }

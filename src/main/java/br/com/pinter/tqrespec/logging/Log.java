@@ -4,16 +4,22 @@
 
 package br.com.pinter.tqrespec.logging;
 
-import br.com.pinter.tqrespec.core.UnhandledException;
+import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.util.Constants;
 
 import java.io.IOException;
-import java.util.logging.FileHandler;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
+import java.util.logging.*;
 
 public class Log {
+    private static boolean debugEnabled = false;
+
+    private Log() {
+    }
+
+    public static boolean isDebugEnabled() {
+        return debugEnabled;
+    }
+
     public static Logger getLogger() {
         return LogManager.getLogManager().getLogger(Logger.GLOBAL_LOGGER_NAME);
     }
@@ -25,7 +31,7 @@ public class Log {
             fileHandler = new FileHandler(Constants.LOGFILE, false);
             fileHandler.setFormatter(new SimpleFormatter());
         } catch (IOException e) {
-            throw new UnhandledException(e);
+            throw new UnhandledRuntimeException(e);
         }
         setupLogger.setUseParentHandlers(false);
         setupLogger.addHandler(fileHandler);
