@@ -36,7 +36,6 @@ import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
@@ -156,27 +155,25 @@ public class MainController implements Initializable {
 
         taskCheckVersion.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, (WorkerStateEvent e) -> {
             Version version = taskCheckVersion.getValue();
-            if (version != null && version.getLastCheck() == -1) {
-                versionCheck.setOnAction(event -> {
-                    final Task<Void> openUrl = new Task<>() {
-                        @Override
-                        public Void call() {
-                            if (StringUtils.isNotEmpty(version.getUrlPage())) {
-                                try {
-                                    hostServices.showDocument(new URI(version.getUrlPage()).toString());
-                                } catch (URISyntaxException e) {
-                                    //ignored
-                                }
-                            }
-                            return null;
-                        }
-                    };
-                    new Thread(openUrl).start();
-                });
-                versionCheck.setText(Util.getUIMessage("about.newversion"));
-            } else {
+            if (version == null || version.getLastCheck() != -1 || StringUtils.isEmpty(version.getUrlPage())) {
                 versionCheck.setDisable(true);
+                return;
             }
+            versionCheck.setOnAction(event -> {
+                final Task<Void> openUrl = new Task<>() {
+                    @Override
+                    public Void call() {
+                        try {
+                            hostServices.showDocument(new URI(version.getUrlPage()).toString());
+                        } catch (URISyntaxException e) {
+                            //ignored
+                        }
+                        return null;
+                    }
+                };
+                new Thread(openUrl).start();
+            });
+            versionCheck.setText(Util.getUIMessage("about.newversion"));
         });
         //initialize properties and bind them to respective properties in the tab controllers
         saveDisabled.setValue(saveButton.isDisable());
@@ -385,17 +382,15 @@ public class MainController implements Initializable {
         if (gameRunningAlert()) {
             return;
         }
-        SimpleIntegerProperty backupCreated = new SimpleIntegerProperty();
 
         MyTask<Integer> backupSaveGameTask = new MyTask<>() {
             @Override
             protected Integer call() {
-                if (Log.isDebugEnabled()) logger.info("starting backup task");
                 setAllControlsDisable(true);
                 try {
                     return playerWriter.backupCurrent() ? 2 : 0;
                 } catch (IOException e) {
-                    throw new UnhandledRuntimeException("Error starting backup",e);
+                    throw new UnhandledRuntimeException("Error starting backup", e);
                 }
             }
         };
@@ -415,17 +410,12 @@ public class MainController implements Initializable {
         backupSaveGameTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new MyEventHandler<>() {
             @Override
             public void handleEvent(WorkerStateEvent workerStateEvent) {
-                if (Log.isDebugEnabled()) logger.info("starting backup listener");
-
                 if ((int) backupSaveGameTask.getValue() == 2) {
-                    if (Log.isDebugEnabled()) logger.info("backupcreated==" + backupCreated.get());
                     new WorkerThread(saveGameTask).start();
                 } else {
-                    if (Log.isDebugEnabled()) logger.info("backupcreated==+=" + backupCreated.get());
                     Util.showError(Util.getUIMessage("alert.errorbackup_header"),
                             Util.getUIMessage("alert.errorbackup_content", Constants.BACKUP_DIRECTORY));
                     setAllControlsDisable(false);
-
                 }
             }
         });
@@ -437,8 +427,6 @@ public class MainController implements Initializable {
                 if ((int) saveGameTask.getValue() != 2) {
                     Util.showError(Util.getUIMessage("alert.errorsaving_header"),
                             Util.getUIMessage("alert.errorsaving_content", Constants.BACKUP_DIRECTORY));
-                } else {
-                    if (Log.isDebugEnabled()) logger.info("character saved==" + saveGameTask.getValue());
                 }
                 setAllControlsDisable(false);
 

@@ -92,7 +92,7 @@ public class Version implements Comparable<Version> {
                     for (Object o : prop.keySet()) {
                         String k = (String) o;
                         String v = prop.getProperty(k);
-                        logger.info(() -> k + "=" + v);
+                        logger.fine(() -> k + "=" + v);
                     }
                 }
                 lastCheck = this.compareTo(new Version(currentVersion));

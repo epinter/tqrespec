@@ -66,9 +66,7 @@ final class PlayerParser extends FileParser {
 
             if (BEGIN_BLOCK.equals(name)) {
                 BlockInfo b = getBlockInfo().get(keyOffset);
-                if (Log.isDebugEnabled()) {
-                    logger.info(() -> "ignoring block offset: " + keyOffset);
-                }
+                logger.fine(() -> "ignoring block offset: " + keyOffset);
                 getBuffer().position(b.getEnd() + 1);
             }
 
@@ -81,39 +79,34 @@ final class PlayerParser extends FileParser {
             variableInfo.setName(name);
             variableInfo.setVariableType(VariableType.Unknown);
 
-            String logMsg = "name=%s; value=%s";
-            for (PlayerFileVariable e : PlayerFileVariable.values()) {
-                if (e.var().equals(name) && e.location() == FileBlockType.PlayerHeader) {
-                    readVar(name, variableInfo);
+            String logFmt = "name=%s; value=%s";
 
-                    if (e.type() == VariableType.Integer) {
-                        int value = (int) variableInfo.getValue();
+            PlayerFileVariable e = PlayerFileVariable.valueOf(name);
 
-                        if (Log.isDebugEnabled()) logger.info(() -> String.format(logMsg, name, value));
-                        if (name.equals(PlayerFileVariable.headerVersion.var()))
-                            h.setHeaderVersion(value);
-                        if (name.equals(PlayerFileVariable.playerVersion.var()))
-                            h.setPlayerVersion(value);
-                        if (name.equals(PlayerFileVariable.playerLevel.var()))
-                            h.setPlayerLevel(value);
-                    }
+            if (e.var().equals(name) && e.location() == FileBlockType.PlayerHeader) {
+                readVar(name, variableInfo);
 
-                    if (e.type() == VariableType.String) {
-                        String value = (String) variableInfo.getValue();
-                        if (Log.isDebugEnabled()) logger.info(() -> String.format(logMsg, name, value));
-                        if (name.equals(PlayerFileVariable.playerCharacterClass.var()))
-                            h.setPlayerCharacterClass(value);
-                        if (name.equals(PlayerFileVariable.playerClassTag.var())) {
-                            h.setPlayerClassTag(value);
-                        }
-                    }
-                    if (e.type() == VariableType.Stream) {
-                        byte[] value = (byte[]) variableInfo.getValue();
-                        if (Log.isDebugEnabled())
-                            logger.info(() -> String.format(logMsg, name, new String(value)));
-                    }
+                String valueLog = null;
+
+                if (e.type() == VariableType.Integer) {
+                    int valueInt = (int) variableInfo.getValue();
+                    valueLog = String.valueOf(valueInt);
+                    readIntegerFromHeader(h,name,valueInt);
                 }
 
+                if (e.type() == VariableType.String) {
+                    String valueString = (String) variableInfo.getValue();
+                    valueLog = valueString;
+                    readStringFromHeader(h,name,valueString);
+                }
+
+                if (e.type() == VariableType.Stream) {
+                    byte[] value = (byte[]) variableInfo.getValue();
+                    valueLog = new String(value);
+                }
+
+                String logMsg = String.format(logFmt, name, valueLog);
+                logger.fine(logMsg);
             }
 
             if (variableInfo.getVariableType() == VariableType.Unknown) {
@@ -124,6 +117,23 @@ final class PlayerParser extends FileParser {
         }
         getBlockInfo().put(block.getStart(), block);
         return h;
+    }
+
+    private void readIntegerFromHeader(HeaderInfo h, String name, int valueInt) {
+        if (name.equals(PlayerFileVariable.valueOf("headerVersion").var()))
+            h.setHeaderVersion(valueInt);
+        if (name.equals(PlayerFileVariable.valueOf("playerVersion").var()))
+            h.setPlayerVersion(valueInt);
+        if (name.equals(PlayerFileVariable.valueOf("playerLevel").var()))
+            h.setPlayerLevel(valueInt);
+    }
+
+    private void readStringFromHeader(HeaderInfo h, String name, String valueString) {
+        if (name.equals(PlayerFileVariable.valueOf("playerCharacterClass").var()))
+            h.setPlayerCharacterClass(valueString);
+        if (name.equals(PlayerFileVariable.valueOf("playerClassTag").var())) {
+            h.setPlayerClassTag(valueString);
+        }
     }
 
     @Override
@@ -140,8 +150,7 @@ final class PlayerParser extends FileParser {
         if (this.getBuffer() == null || this.getBuffer().capacity() <= 50) {
             throw new IOException("Can't read Player.chr from player " + this.player);
         }
-        if (Log.isDebugEnabled()) logger.info(() -> String.format("File '%s' loaded, size=%d",
-                this.player, this.getBuffer().capacity()));
+        logger.fine(() -> String.format("File '%s' loaded, size=%d", this.player, this.getBuffer().capacity()));
 
         headerInfo = parseHeader();
 
@@ -190,8 +199,7 @@ final class PlayerParser extends FileParser {
             }
         }
 
-        if (Log.isDebugEnabled()) logger.info("File read to buffer: " + this.getBuffer());
-
+        logger.fine("File read to buffer: " + this.getBuffer());
     }
 
     @Override
@@ -281,16 +289,12 @@ final class PlayerParser extends FileParser {
             ret.put(mana.getName(), mana);
             putVarIndex(mana.getName(), block.getStart());
             String logMsg = "blockStart: %d; variableInfo: %s;";
-            if (Log.isDebugEnabled())
-                logger.info(() -> String.format(logMsg, block.getStart(), ret.get("str").toString()));
-            if (Log.isDebugEnabled())
-                logger.info(() -> String.format(logMsg, block.getStart(), ret.get("dex").toString()));
-            if (Log.isDebugEnabled())
-                logger.info(() -> String.format(logMsg, block.getStart(), ret.get("int").toString()));
-            if (Log.isDebugEnabled())
-                logger.info(() -> String.format(logMsg, block.getStart(), ret.get("life").toString()));
-            if (Log.isDebugEnabled())
-                logger.info(() -> String.format(logMsg, block.getStart(), ret.get("mana").toString()));
+
+            logger.fine(() -> String.format(logMsg, block.getStart(), ret.get("str").toString()));
+            logger.fine(() -> String.format(logMsg, block.getStart(), ret.get("dex").toString()));
+            logger.fine(() -> String.format(logMsg, block.getStart(), ret.get("int").toString()));
+            logger.fine(() -> String.format(logMsg, block.getStart(), ret.get("life").toString()));
+            logger.fine(() -> String.format(logMsg, block.getStart(), ret.get("mana").toString()));
         }
         return ret;
     }

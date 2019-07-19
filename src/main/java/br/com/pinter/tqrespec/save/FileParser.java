@@ -150,18 +150,11 @@ abstract class FileParser {
         for (int i = 0; i < getBuffer().capacity(); i++) {
             Byte b = getBuffer().get(i);
 
-            if (Log.isDebugEnabled()) {
-                int logFoundBegin = foundBegin;
-                int logFoundEnd = foundEnd;
-                int logPos = i;
-                if (foundBegin < BEGIN_BLOCK_BYTES.length && foundEnd < END_BLOCK_BYTES.length) {
-                    logger.log(Level.INFO, () -> String.format("position:%d foundBegin:%d foundEnd:%d, str-begin:%s str-end:%s byte:%s",
-                            logPos, logFoundBegin, logFoundEnd, Character.toString(BEGIN_BLOCK_BYTES[logFoundBegin]), Character.toString(END_BLOCK_BYTES[logFoundEnd]),
-                            new String(new byte[]{b})));
-                } else {
-                    logger.info(() -> String.format("position:%d foundBegin:%d foundEnd:%d, byte:%s", logPos, logFoundBegin, logFoundEnd, new String(new byte[]{b})));
-                }
-            }
+            int logFoundBegin = foundBegin;
+            int logFoundEnd = foundEnd;
+            int logPos = i;
+            logger.finer(() -> String.format("position:%d foundBegin:%d foundEnd:%d, byte:%s",
+                    logPos, logFoundBegin, logFoundEnd, new String(new byte[]{b})));
 
             if (foundBegin > 0 && !b.equals(BEGIN_BLOCK_BYTES[foundBegin])) {
                 foundBegin = 0;
@@ -175,10 +168,8 @@ abstract class FileParser {
                 int blockTagOffset = i - (foundBegin - 1);
                 queueBegin.add(blockTagOffset);
                 lastBegin = blockTagOffset;
-                if (Log.isDebugEnabled()) {
-                    logger.info(() -> String.format("adding begin-block %s to queue", blockTagOffset));
-                }
                 foundBegin = 0;
+                logger.finer(() -> String.format("adding begin-block %s to queue", blockTagOffset));
             }
 
             if (b.equals(END_BLOCK_BYTES[foundEnd]) && ++foundEnd == END_BLOCK_BYTES.length) {
@@ -196,11 +187,10 @@ abstract class FileParser {
                     block.setParentOffset(queueBegin.peekLast());
                 }
                 blockInfoTable.put(blockStart, block);
-                if (Log.isDebugEnabled()) {
-                    int logBlockStart = blockStart;
-                    logger.info(() -> String.format("adding end-block %s to queue, (start=%d,end=%d)", blockEnd, logBlockStart, blockEnd));
-                }
                 foundEnd = 0;
+                int logBlockStart = blockStart;
+                logger.finer(() -> String.format("adding end-block %s to queue, (start=%d,end=%d)", blockEnd, logBlockStart, blockEnd));
+
             }
 
         }

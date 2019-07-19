@@ -48,11 +48,12 @@ public class PlayerWriter {
     private PlayerData playerData;
 
     @SuppressWarnings("SameParameterValue")
-    private boolean backupSaveGame(String fileName, String playerName, boolean fullBackup) throws IOException {
+    private boolean backupSaveGame(String fileName, String playerName) throws IOException {
         File backupDirectory = new File(GameInfo.getInstance().getSavePath(), Constants.BACKUP_DIRECTORY);
         Path player = Paths.get(fileName);
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HH");
         String ts = df.format(new Date());
+        boolean fullBackup = Settings.getAlwaysFullBackup();
         File destPlayerZip = new File(backupDirectory, String.format("%s%s_%s.zip", playerName, fullBackup ? "-fullbackup" : "", ts));
 
         //doesn't overwrite previous backup
@@ -71,7 +72,7 @@ public class PlayerWriter {
 
             try (FileSystem zipFs = FileSystems.newFileSystem(zipUri, zipCreateOptions)) {
                 final Path root = zipFs.getPath("/");
-                if (fullBackup || Settings.getAlwaysFullBackup()) {
+                if (fullBackup) {
                     Files.walkFileTree(player.getParent(), new SimpleFileVisitor<>() {
                         @Override
                         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
@@ -89,9 +90,7 @@ public class PlayerWriter {
                             Path subPath = dir.subpath(player.getParent().getNameCount() - 1, dir.getNameCount());
 
                             final Path createDir = zipFs.getPath(root.toString(), subPath.toString());
-                            if (Files.notExists(createDir)) {
-                                Files.createDirectories(createDir);
-                            }
+                            Files.createDirectories(createDir);
                             return FileVisitResult.CONTINUE;
                         }
                     });
@@ -114,7 +113,7 @@ public class PlayerWriter {
     public boolean backupCurrent() throws IOException {
         String playerChr = playerData.getPlayerChr().toString();
         String playerName = playerData.getPlayerName();
-        return this.backupSaveGame(playerChr, playerName, false);
+        return this.backupSaveGame(playerChr, playerName);
     }
 
     public boolean saveCurrent() throws IOException {

@@ -142,9 +142,7 @@ public class GameInfo {
                 }
             }
         } catch (Exception e) {
-            if (Log.isDebugEnabled())
-                logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
-
+            logger.log(Level.FINE, Constants.ERROR_MSG_EXCEPTION, e);
         }
         return null;
     }
@@ -160,8 +158,7 @@ public class GameInfo {
                 }
             }
         } catch (Exception e) {
-            if (Log.isDebugEnabled())
-                logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(Level.FINE, Constants.ERROR_MSG_EXCEPTION, e);
         }
 
         try {
@@ -199,8 +196,7 @@ public class GameInfo {
             installedApps = Advapi32Util.registryGetKeys(WinReg.HKEY_LOCAL_MACHINE,
                     "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall");
         } catch (Exception e) {
-            if (Log.isDebugEnabled())
-                logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(Level.FINE, Constants.ERROR_MSG_EXCEPTION, e);
         }
 
         for (String app : installedApps)
@@ -208,7 +204,7 @@ public class GameInfo {
                 String appDisplayName = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE,
                         "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\" + app, "DisplayName");
                 if (appDisplayName.matches(regexGameName)) {
-                    if (Log.isDebugEnabled()) logger.info(() -> "Installed: displayname found -- " + regexGameName);
+                    logger.fine(() -> "Installed: displayname found -- " + regexGameName);
                     String installed = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE,
                             "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\" + app, "InstallLocation");
                     Path installedPath = Paths.get(installed).toAbsolutePath();
@@ -216,12 +212,10 @@ public class GameInfo {
                         return installedPath;
                     }
                 } else {
-                    if (Log.isDebugEnabled())
-                        logger.info(() -> "Installed: displayname not found --- " + regexGameName + "---" + appDisplayName);
+                    logger.fine(() -> "Installed: displayname not found --- " + regexGameName + "---" + appDisplayName);
                 }
             } catch (Exception e) {
-                if (Log.isDebugEnabled())
-                    logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+                logger.log(Level.FINE, Constants.ERROR_MSG_EXCEPTION, e);
             }
         return null;
     }
@@ -244,7 +238,7 @@ public class GameInfo {
                     String.format("%s\\%s", pkgKeyPath, pkg), "DisplayName");
             if (pkgDisplayName.matches(regexGameName)) {
                 try {
-                    if (Log.isDebugEnabled()) logger.info(() -> "Package: displayname found -- " + regexGameName);
+                    logger.fine(() -> "Package: displayname found -- " + regexGameName);
                     String pkgInstalled = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER,
                             String.format("%s\\%s", pkgKeyPath, pkg), "PackageRootFolder");
                     Path pkgInstalledPath = Paths.get(pkgInstalled).toAbsolutePath();
@@ -255,8 +249,7 @@ public class GameInfo {
                     logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
                 }
             } else {
-                if (Log.isDebugEnabled())
-                    logger.info(() -> "Package: displayname not found --- " + regexGameName + "---" + pkgDisplayName);
+                logger.fine(() -> "Package: displayname not found --- " + regexGameName + "---" + pkgDisplayName);
             }
         }
 
@@ -272,19 +265,17 @@ public class GameInfo {
             if (gamePathExists(steamGamePath)) {
                 return steamGamePath;
             } else {
-                if (Log.isDebugEnabled()) logger.info(() -> "GameSteamApiBasedPath: not found at " + steamGamePath);
+                logger.fine(() -> "GameSteamApiBasedPath: not found at " + steamGamePath);
             }
 
             Path steamGameParentPath = Paths.get(steamPath).getParent().toAbsolutePath();
             if (gamePathExists(steamGameParentPath)) {
                 return steamGameParentPath;
             } else {
-                if (Log.isDebugEnabled())
-                    logger.info(() -> "GameSteamApiBasedPath: not found at " + steamGameParentPath);
+                logger.fine(() -> "GameSteamApiBasedPath: not found at " + steamGameParentPath);
             }
         } catch (Exception e) {
-            if (Log.isDebugEnabled())
-                logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(Level.FINE, Constants.ERROR_MSG_EXCEPTION, e);
         }
         return null;
     }
@@ -292,43 +283,43 @@ public class GameInfo {
     private String detectGamePath() {
         Path installedPath = getGameInstalledPath(Constants.REGEX_REGISTRY_INSTALL);
         if (installedPath != null && gamePathExists(installedPath)) {
-            if (Log.isDebugEnabled()) logger.info("Installed: found");
+            logger.fine("Installed: found");
             return installedPath.toString();
         }
 
         Path gameSteam = getGameSteamPath();
         if (gameSteam != null && gamePathExists(gameSteam)) {
-            if (Log.isDebugEnabled()) logger.info("SteamLibrary: found");
+            logger.fine("SteamLibrary: found");
             return gameSteam.toString();
         }
 
         Path gogPath = getGameGogPath();
         if (gogPath != null && gamePathExists(gogPath)) {
-            if (Log.isDebugEnabled()) logger.info("Gog: found");
+            logger.fine("Gog: found");
             return gogPath.toString();
         }
 
         Path microsoftStorePath = getGameMicrosoftStorePath();
         if (microsoftStorePath != null && gamePathExists(microsoftStorePath)) {
-            if (Log.isDebugEnabled()) logger.info("Package: found");
+            logger.fine("Package: found");
             return microsoftStorePath.toString();
         }
 
         Path installedPathFallback = getGameInstalledPath(Constants.REGEX_REGISTRY_INSTALL_FALLBACK);
         if (installedPathFallback != null && gamePathExists(installedPathFallback)) {
-            if (Log.isDebugEnabled()) logger.info("Installed: found");
+            logger.fine("Installed: found");
             return installedPathFallback.toString();
         }
 
         Path alternativeSteamBasedPath = getGameSteamApiBasedPath();
         if (alternativeSteamBasedPath != null && gamePathExists(alternativeSteamBasedPath)) {
-            if (Log.isDebugEnabled()) logger.info("'Alternative' installation: found");
+            logger.fine("'Alternative' installation: found");
             return alternativeSteamBasedPath.toString();
         }
 
         Path discPath = getGameDiscPath();
         if (discPath != null && gamePathExists(discPath)) {
-            if (Log.isDebugEnabled()) logger.info("Disc: found");
+            logger.fine("Disc: found");
             return discPath.toString();
         }
         return null;
@@ -388,7 +379,7 @@ public class GameInfo {
 
         Path savePath = Paths.get(saveDirectory + subdirectory);
         if (Files.exists(savePath)) {
-            if (Log.isDebugEnabled()) logger.info("SavePath: found");
+            logger.fine("SavePath: found");
             return savePath.toAbsolutePath().toString();
         }
         return null;

@@ -86,12 +86,12 @@ public class AttributesPaneController implements Initializable {
     @FXML
     private Label difficultyText;
 
-    private SimpleIntegerProperty currentStr = null;
-    private SimpleIntegerProperty currentInt = null;
-    private SimpleIntegerProperty currentDex = null;
-    private SimpleIntegerProperty currentLife = null;
-    private SimpleIntegerProperty currentMana = null;
-    private SimpleIntegerProperty currentAvail = null;
+    private SimpleIntegerProperty currentStr = new SimpleIntegerProperty();
+    private SimpleIntegerProperty currentInt = new SimpleIntegerProperty();
+    private SimpleIntegerProperty currentDex = new SimpleIntegerProperty();
+    private SimpleIntegerProperty currentLife = new SimpleIntegerProperty();
+    private SimpleIntegerProperty currentMana = new SimpleIntegerProperty();
+    private SimpleIntegerProperty currentAvail = new SimpleIntegerProperty();
 
     private final BooleanProperty saveDisabled = new SimpleBooleanProperty();
 
@@ -150,7 +150,7 @@ public class AttributesPaneController implements Initializable {
         strSpinner.setValueFactory(strFactory);
         //noinspection unchecked
         strSpinner.getValueFactory().valueProperty().bindBidirectional(currentStr);
-        currentStr.addListener(((observable, oldValue, newValue) -> attributesChanged("str", (int) oldValue, (int) newValue)));
+        currentStr.addListener(((observable, oldValue, newValue) -> attributesChanged((int) oldValue, (int) newValue, strStep, currentStr)));
 
 
     }
@@ -166,7 +166,7 @@ public class AttributesPaneController implements Initializable {
         intSpinner.setValueFactory(intFactory);
         //noinspection unchecked
         intSpinner.getValueFactory().valueProperty().bindBidirectional(currentInt);
-        currentInt.addListener(((observable, oldValue, newValue) -> attributesChanged("int", (int) oldValue, (int) newValue)));
+        currentInt.addListener(((observable, oldValue, newValue) -> attributesChanged((int) oldValue, (int) newValue, intStep, currentInt)));
     }
 
     private void setDexField(int value) {
@@ -180,7 +180,7 @@ public class AttributesPaneController implements Initializable {
         dexSpinner.setValueFactory(dexFactory);
         //noinspection unchecked
         dexSpinner.getValueFactory().valueProperty().bindBidirectional(currentDex);
-        currentDex.addListener(((observable, oldValue, newValue) -> attributesChanged("dex", (int) oldValue, (int) newValue)));
+        currentDex.addListener(((observable, oldValue, newValue) -> attributesChanged((int) oldValue, (int) newValue, dexStep, currentDex)));
     }
 
     private void setLifeField(int value) {
@@ -194,7 +194,7 @@ public class AttributesPaneController implements Initializable {
         lifeSpinner.setValueFactory(lifeFactory);
         //noinspection unchecked
         lifeSpinner.getValueFactory().valueProperty().bindBidirectional(currentLife);
-        currentLife.addListener(((observable, oldValue, newValue) -> attributesChanged("life", (int) oldValue, (int) newValue)));
+        currentLife.addListener(((observable, oldValue, newValue) -> attributesChanged((int) oldValue, (int) newValue, lifeStep, currentLife)));
     }
 
     private void setManaField(int value) {
@@ -208,66 +208,22 @@ public class AttributesPaneController implements Initializable {
         manaSpinner.setValueFactory(manaFactory);
         //noinspection unchecked
         manaSpinner.getValueFactory().valueProperty().bindBidirectional(currentMana);
-        currentMana.addListener(((observable, oldValue, newValue) -> attributesChanged("mana", (int) oldValue, (int) newValue)));
+        currentMana.addListener(((observable, oldValue, newValue) -> attributesChanged((int) oldValue, (int) newValue, manaStep, currentMana)));
     }
 
-    private void attributesChanged(String attr, int oldValue, int newValue) {
+    private void attributesChanged(int oldValue, int newValue, int step, SimpleIntegerProperty currentAttr) {
         if (newValue > oldValue && currentAvail.get() > 0) {
             int diff = newValue - oldValue;
-            if (attr.equals("str")) {
-                if (diff < strStep) return;
-                currentStr.set(newValue);
-                currentAvail.set(currentAvail.get() - (diff / strStep));
-            }
-            if (attr.equals("int")) {
-                if (diff < intStep) return;
-                currentInt.set(newValue);
-                currentAvail.set(currentAvail.get() - (diff / intStep));
-
-            }
-            if (attr.equals("dex")) {
-                if (diff < dexStep) return;
-                currentDex.set(newValue);
-                currentAvail.set(currentAvail.get() - (diff / dexStep));
-            }
-            if (attr.equals("life")) {
-                if (diff < lifeStep) return;
-                currentLife.set(newValue);
-                currentAvail.set(currentAvail.get() - (diff / lifeStep));
-            }
-            if (attr.equals("mana")) {
-                if (diff < manaStep) return;
-                currentMana.set(newValue);
-                currentAvail.set(currentAvail.get() - (diff / manaStep));
-            }
+            if (diff < step) return;
+            currentAttr.set(newValue);
+            currentAvail.set(currentAvail.get() - (diff / step));
         }
+
         if (newValue < oldValue) {
             int diff = oldValue - newValue;
-            if (attr.equals("str")) {
-                if (diff < strStep) return;
-                currentStr.set(newValue);
-                currentAvail.set(currentAvail.get() + (diff / strStep));
-            }
-            if (attr.equals("int")) {
-                if (diff < intStep) return;
-                currentInt.set(newValue);
-                currentAvail.set(currentAvail.get() + (diff / intStep));
-            }
-            if (attr.equals("dex")) {
-                if (diff < dexStep) return;
-                currentDex.set(newValue);
-                currentAvail.set(currentAvail.get() + (diff / dexStep));
-            }
-            if (attr.equals("life")) {
-                if (diff < lifeStep) return;
-                currentLife.set(newValue);
-                currentAvail.set(currentAvail.get() + (diff / lifeStep));
-            }
-            if (attr.equals("mana")) {
-                if (diff < manaStep) return;
-                currentMana.set(newValue);
-                currentAvail.set(currentAvail.get() + (diff / manaStep));
-            }
+            if (diff < step) return;
+            currentAttr.set(newValue);
+            currentAvail.set(currentAvail.get() + (diff / step));
         }
         if (currentAvail.get() > 0) {
             saveDisabled.set(false);
@@ -281,28 +237,17 @@ public class AttributesPaneController implements Initializable {
     }
 
     public void clearProperties() {
-        if (currentAvail != null)
-            currentAvail.setValue(null);
-        if (currentStr != null)
-            currentStr.setValue(null);
-        if (currentInt != null)
-            currentInt.setValue(null);
-        if (currentDex != null)
-            currentDex.setValue(null);
-        if (currentLife != null)
-            currentLife.setValue(null);
-        if (currentMana != null)
-            currentMana.setValue(null);
-        if (experienceText != null)
-            experienceText.setText("");
-        if (charLevelText != null)
-            charLevelText.setText("");
-        if (goldText != null)
-            goldText.setText("");
-        if (charClassText != null)
-            charClassText.setText("");
-        if (difficultyText != null)
-            difficultyText.setText("");
+        currentAvail.setValue(null);
+        currentStr.setValue(null);
+        currentInt.setValue(null);
+        currentDex.setValue(null);
+        currentLife.setValue(null);
+        currentMana.setValue(null);
+        experienceText.setText("");
+        charLevelText.setText("");
+        goldText.setText("");
+        charClassText.setText("");
+        difficultyText.setText("");
         if (availPointsText.textProperty().isBound())
             availPointsText.textProperty().unbindBidirectional(currentAvail);
         if (strSpinner.getValueFactory() != null && strSpinner.getValueFactory().valueProperty().isBound())
@@ -333,7 +278,7 @@ public class AttributesPaneController implements Initializable {
     }
 
     public void saveCharHandler() {
-        if (Log.isDebugEnabled()) logger.info("starting savegame task");
+        logger.fine("starting savegame task");
 
         int strOld = playerData.getStr();
         int intOld = playerData.getInt();
@@ -360,7 +305,7 @@ public class AttributesPaneController implements Initializable {
         if (modifierOld != currentAvail.get() && currentAvail.get() >= 0) {
             playerData.setModifierPoints(currentAvail.get());
         }
-        if (Log.isDebugEnabled()) logger.info("returning savegame task");
+        logger.fine("returning savegame task");
     }
 
     public void loadCharHandler() {

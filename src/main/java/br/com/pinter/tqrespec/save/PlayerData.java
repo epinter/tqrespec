@@ -24,7 +24,6 @@ import br.com.pinter.tqdatabase.Database;
 import br.com.pinter.tqdatabase.models.Skill;
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.gui.State;
-import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.tqdata.Db;
 import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Constants;
@@ -36,14 +35,10 @@ import org.apache.commons.lang3.StringUtils;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @SuppressWarnings("unused")
 @Singleton
 public class PlayerData {
-    private static final Logger logger = Log.getLogger();
-
     @Inject
     private Db db;
 
@@ -116,8 +111,6 @@ public class PlayerData {
             prepareSkillsList();
         } catch (Exception e) {
             reset();
-            if (Log.isDebugEnabled())
-                logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
             throw new UnhandledRuntimeException("Error loading character", e);
         }
         return true;
