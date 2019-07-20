@@ -4,140 +4,148 @@
 
 package br.com.pinter.tqrespec.save;
 
-public enum PlayerFileVariable implements IFileVariable {
-    //header
-    headerVersion("headerVersion", VariableType.Integer, FileBlockType.PlayerHeader),
-    playerCharacterClass("playerCharacterClass", VariableType.String, FileBlockType.PlayerHeader),
-    uniqueId("uniqueId", VariableType.UID, FileBlockType.PlayerHeader),
-    streamData("streamData", VariableType.Stream, FileBlockType.PlayerHeader),
-    playerClassTag("playerClassTag", VariableType.String, FileBlockType.PlayerHeader),
-    playerVersion("playerVersion", VariableType.Integer, FileBlockType.PlayerHeader),
-    playerLevel("playerLevel", VariableType.Integer, FileBlockType.PlayerHeader),
-    controllerStreamed("controllerStreamed", VariableType.Integer, FileBlockType.PlayerHeader),
-    description("description", VariableType.Stream, FileBlockType.PlayerHeader),
+import java.util.HashMap;
 
-    playerTexture("playerTexture", VariableType.String, FileBlockType.PlayerMain),
-    myPlayerName("myPlayerName", VariableType.StringUtf16le, FileBlockType.PlayerMain),
-    isInMainQuest("isInMainQuest", VariableType.Integer, FileBlockType.PlayerMain),
-    disableAutoPopV2("disableAutoPopV2", VariableType.Integer, FileBlockType.PlayerMain),
-    numTutorialPagesV2("numTutorialPagesV2", VariableType.Integer, FileBlockType.PlayerMain),
-    currentPageV2("currentPageV2", VariableType.Integer, FileBlockType.PlayerMain),
-    teleportUIDsSize("teleportUIDsSize", VariableType.Integer, FileBlockType.PlayerMain),
-    markerUIDsSize("markerUIDsSize", VariableType.Integer, FileBlockType.PlayerMain),
-    respawnUIDsSize("respawnUIDsSize", VariableType.Integer, FileBlockType.PlayerMain),
-    versionCheckRespawnInfo("versionCheckRespawnInfo", VariableType.Integer, FileBlockType.PlayerMain),
-    versionCheckTeleportInfo("versionCheckTeleportInfo", VariableType.Integer, FileBlockType.PlayerMain),
-    versionCheckMovementInfo("versionCheckMovementInfo", VariableType.Integer, FileBlockType.PlayerMain),
-    compassState("compassState", VariableType.Integer, FileBlockType.PlayerMain),
-    skillWindowShowHelp("skillWindowShowHelp", VariableType.Integer, FileBlockType.PlayerMain),
-    alternateConfig("alternateConfig", VariableType.Integer, FileBlockType.PlayerMain),
-    alternateConfigEnabled("alternateConfigEnabled", VariableType.Integer, FileBlockType.PlayerMain),
-    itemsFoundOverLifetimeUniqueTotal("itemsFoundOverLifetimeUniqueTotal", VariableType.Integer, FileBlockType.PlayerMain),
-    itemsFoundOverLifetimeRandomizedTotal("itemsFoundOverLifetimeRandomizedTotal", VariableType.Integer, FileBlockType.PlayerMain),
-    hasBeenInGame("hasBeenInGame", VariableType.Integer, FileBlockType.PlayerMain),
-    versionRespawnPoint("versionRespawnPoint", VariableType.Integer, FileBlockType.PlayerMain),
-    money("money", VariableType.Integer, FileBlockType.PlayerMain),
-    teleportUID("teleportUID", VariableType.UID, FileBlockType.PlayerMain),
-    respawnUID("respawnUID", VariableType.UID, FileBlockType.PlayerMain),
-    markerUID("markerUID", VariableType.UID, FileBlockType.PlayerMain),
-    strategicMovementRespawnPoint("strategicMovementRespawnPoint[i]", VariableType.UID, FileBlockType.PlayerMain),
-
-    skillName("skillName", VariableType.String, FileBlockType.Body),//PlayerSkills + PlayerHotSlot
-    skillActive("skillActive", VariableType.Integer, FileBlockType.PlayerSkills),
-    skillLevel("skillLevel", VariableType.Integer, FileBlockType.PlayerSkills),
-    skillEnabled("skillEnabled", VariableType.Integer, FileBlockType.PlayerSkills),
-    skillSubLevel("skillSubLevel", VariableType.Integer, FileBlockType.PlayerSkills),
-    skillTransition("skillTransition", VariableType.Integer, FileBlockType.PlayerSkills),
-    max("max", VariableType.Integer, FileBlockType.PlayerSkills),
-    masteriesAllowed("masteriesAllowed", VariableType.Integer, FileBlockType.PlayerSkills),
-    skillReclamationPointsUsed("skillReclamationPointsUsed", VariableType.Integer, FileBlockType.PlayerSkills),
-
-    defaultText("defaultText", VariableType.StringUtf16le, FileBlockType.Body),
-    itemPositionsSavedAsGridCoords("itemPositionsSavedAsGridCoords", VariableType.Integer, FileBlockType.PlayerInventory),
-    numberOfSacks("numberOfSacks", VariableType.Integer, FileBlockType.PlayerInventory),
-    currentlyFocusedSackNumber("currentlyFocusedSackNumber", VariableType.Integer, FileBlockType.PlayerInventory),
-    currentlySelectedSackNumber("currentlySelectedSackNumber", VariableType.Integer, FileBlockType.PlayerInventory),
-    tempBool("tempBool", VariableType.Integer, FileBlockType.PlayerInventory),
-    size("size", VariableType.Integer, FileBlockType.PlayerInventory),
-    seed("seed", VariableType.Integer, FileBlockType.PlayerInventory),
-    var1("var1", VariableType.Integer, FileBlockType.PlayerInventory),
-    var2("var2", VariableType.Integer, FileBlockType.PlayerInventory),
-    pointX("pointX", VariableType.Integer, FileBlockType.PlayerInventory),
-    pointY("pointY", VariableType.Integer, FileBlockType.PlayerInventory),
-    baseName("baseName", VariableType.String, FileBlockType.PlayerInventory),
-    prefixName("prefixName", VariableType.String, FileBlockType.PlayerInventory),
-    suffixName("suffixName", VariableType.String, FileBlockType.PlayerInventory),
-    relicName("relicName", VariableType.String, FileBlockType.PlayerInventory),
-    relicBonus("relicBonus", VariableType.String, FileBlockType.PlayerInventory),
-    relicName2("relicName2", VariableType.String, FileBlockType.PlayerInventory),
-    relicBonus2("relicBonus2", VariableType.String, FileBlockType.PlayerInventory),
-    useAlternate("useAlternate", VariableType.Integer, FileBlockType.PlayerInventory),
-    equipmentCtrlIOStreamVersion("equipmentCtrlIOStreamVersion", VariableType.Integer, FileBlockType.PlayerInventory),
-    storedType("storedType", VariableType.Integer, FileBlockType.PlayerHotSlot),
-    itemAttached("itemAttached", VariableType.Integer, FileBlockType.PlayerHotSlot),
-    alternate("alternate", VariableType.Integer, FileBlockType.PlayerHotSlot),
-    isItemSkill("isItemSkill", VariableType.Integer, FileBlockType.PlayerHotSlot),
-    itemName("itemName", VariableType.String, FileBlockType.PlayerHotSlot),
-    scrollName("scrollName", VariableType.String, FileBlockType.PlayerHotSlot),
-    bitmapUpName("bitmapUpName", VariableType.String, FileBlockType.PlayerHotSlot),
-    bitmapDownName("bitmapDownName", VariableType.String, FileBlockType.PlayerHotSlot),
-    storedDefaultType("storedDefaultType", VariableType.Integer, FileBlockType.PlayerHotSlot),
-
-    equipmentSelection("equipmentSelection", VariableType.Integer, FileBlockType.PlayerUiSkill),
-    skillActive1("skillActive1", VariableType.Integer, FileBlockType.PlayerUiSkill),
-    skillActive2("skillActive2", VariableType.Integer, FileBlockType.PlayerUiSkill),
-    skillActive3("skillActive3", VariableType.Integer, FileBlockType.PlayerUiSkill),
-    skillActive4("skillActive4", VariableType.Integer, FileBlockType.PlayerUiSkill),
-    skillActive5("skillActive5", VariableType.Integer, FileBlockType.PlayerUiSkill),
-    primarySkill1("primarySkill11", VariableType.Integer, FileBlockType.PlayerUiSkill),
-    primarySkill2("primarySkill12", VariableType.Integer, FileBlockType.PlayerUiSkill),
-    primarySkill3("primarySkill13", VariableType.Integer, FileBlockType.PlayerUiSkill),
-    primarySkill4("primarySkill14", VariableType.Integer, FileBlockType.PlayerUiSkill),
-    primarySkill5("primarySkill15", VariableType.Integer, FileBlockType.PlayerUiSkill),
-    secondarySkill("secondarySkill", VariableType.Integer, FileBlockType.PlayerUiSkill),
-    secondarySkill1("secondarySkill11", VariableType.Integer, FileBlockType.PlayerUiSkill),
-    secondarySkill2("secondarySkill12", VariableType.Integer, FileBlockType.PlayerUiSkill),
-    secondarySkill3("secondarySkill13", VariableType.Integer, FileBlockType.PlayerUiSkill),
-    secondarySkill4("secondarySkill14", VariableType.Integer, FileBlockType.PlayerUiSkill),
-    secondarySkill5("secondarySkill15", VariableType.Integer, FileBlockType.PlayerUiSkill),
-    skillWindowSelection("skillWindowSelection", VariableType.Integer, FileBlockType.PlayerUiSkill),
-    skillSettingValid("skillSettingValid", VariableType.Integer, FileBlockType.PlayerUiSkill),
-
-    modifierPoints("modifierPoints", VariableType.Integer, FileBlockType.PlayerLevelPoints),
-    skillPoints("skillPoints", VariableType.Integer, FileBlockType.PlayerLevelPoints),
-    currentStats_experiencePoints("currentStats.experiencePoints", VariableType.Integer, FileBlockType.PlayerLevelPoints),
-    currentStats_charLevel("currentStats.charLevel", VariableType.Integer, FileBlockType.PlayerLevelPoints),
-
-    playTimeInSeconds("playTimeInSeconds", VariableType.Integer, FileBlockType.PlayerStats),
-    greatestMonsterKilledName("greatestMonsterKilledName", VariableType.StringUtf16le, FileBlockType.PlayerStats),
-    numberOfDeaths("numberOfDeaths", VariableType.Integer, FileBlockType.PlayerStats),
-    numberOfKills("numberOfKills", VariableType.Integer, FileBlockType.PlayerStats),
-    experienceFromKills("experienceFromKills", VariableType.Integer, FileBlockType.PlayerStats),
-    healthPotionsUsed("healthPotionsUsed", VariableType.Integer, FileBlockType.PlayerStats),
-    manaPotionsUsed("manaPotionsUsed", VariableType.Integer, FileBlockType.PlayerStats),
-    maxLevel("maxLevel", VariableType.Integer, FileBlockType.PlayerStats),
-    numHitsReceived("numHitsReceived", VariableType.Integer, FileBlockType.PlayerStats),
-    numHitsInflicted("numHitsInflicted", VariableType.Integer, FileBlockType.PlayerStats),
-    greatestDamageInflicted("greatestDamageInflicted", VariableType.Integer, FileBlockType.PlayerStats),
-    greatestMonsterKilledLevel("(*greatestMonsterKilledLevel)[i]", VariableType.Integer, FileBlockType.PlayerStats),
-    greatestMonsterKilledLifeAndMana("(*greatestMonsterKilledLifeAndMana)[i]", VariableType.Integer, FileBlockType.PlayerStats),
-    criticalHitsInflicted("criticalHitsInflicted", VariableType.Integer, FileBlockType.PlayerStats),
-    criticalHitsReceived("criticalHitsReceived", VariableType.Integer, FileBlockType.PlayerStats),
-
-    //repeated variables with different types, should be named (name)__(blockname)
-    temp("temp", VariableType.Unknown, FileBlockType.Multiple),
-    temp__PlayerAttributes("temp", VariableType.Float, FileBlockType.PlayerAttributes),
-    temp__PlayerMain("temp", VariableType.Integer, FileBlockType.PlayerMain),
-    ;
+public class PlayerFileVariable implements IFileVariable {
+    private static HashMap<String, PlayerFileVariable> map = new HashMap<>();
 
     private final FileBlockType location;
     private final String var;
     private final VariableType type;
 
-    PlayerFileVariable(String variable, VariableType type, FileBlockType location) {
+    static {
+        map.put("headerVersion", new PlayerFileVariable("headerVersion", VariableType.INTEGER, FileBlockType.PLAYER_HEADER));
+        map.put("playerCharacterClass", new PlayerFileVariable("playerCharacterClass", VariableType.STRING, FileBlockType.PLAYER_HEADER));
+        map.put("uniqueId", new PlayerFileVariable("uniqueId", VariableType.UID, FileBlockType.PLAYER_HEADER));
+        map.put("streamData", new PlayerFileVariable("streamData", VariableType.STREAM, FileBlockType.PLAYER_HEADER));
+        map.put("playerClassTag", new PlayerFileVariable("playerClassTag", VariableType.STRING, FileBlockType.PLAYER_HEADER));
+        map.put("playerVersion", new PlayerFileVariable("playerVersion", VariableType.INTEGER, FileBlockType.PLAYER_HEADER));
+        map.put("playerLevel", new PlayerFileVariable("playerLevel", VariableType.INTEGER, FileBlockType.PLAYER_HEADER));
+        map.put("controllerStreamed", new PlayerFileVariable("controllerStreamed", VariableType.INTEGER, FileBlockType.PLAYER_HEADER));
+        map.put("description", new PlayerFileVariable("description", VariableType.STREAM, FileBlockType.PLAYER_HEADER));
+
+        map.put("playerTexture", new PlayerFileVariable("playerTexture", VariableType.STRING, FileBlockType.PLAYER_MAIN));
+        map.put("myPlayerName", new PlayerFileVariable("myPlayerName", VariableType.STRING_UTF_16_LE, FileBlockType.PLAYER_MAIN));
+        map.put("isInMainQuest", new PlayerFileVariable("isInMainQuest", VariableType.INTEGER, FileBlockType.PLAYER_MAIN));
+        map.put("disableAutoPopV2", new PlayerFileVariable("disableAutoPopV2", VariableType.INTEGER, FileBlockType.PLAYER_MAIN));
+        map.put("numTutorialPagesV2", new PlayerFileVariable("numTutorialPagesV2", VariableType.INTEGER, FileBlockType.PLAYER_MAIN));
+        map.put("currentPageV2", new PlayerFileVariable("currentPageV2", VariableType.INTEGER, FileBlockType.PLAYER_MAIN));
+        map.put("teleportUIDsSize", new PlayerFileVariable("teleportUIDsSize", VariableType.INTEGER, FileBlockType.PLAYER_MAIN));
+        map.put("markerUIDsSize", new PlayerFileVariable("markerUIDsSize", VariableType.INTEGER, FileBlockType.PLAYER_MAIN));
+        map.put("respawnUIDsSize", new PlayerFileVariable("respawnUIDsSize", VariableType.INTEGER, FileBlockType.PLAYER_MAIN));
+        map.put("versionCheckRespawnInfo", new PlayerFileVariable("versionCheckRespawnInfo", VariableType.INTEGER, FileBlockType.PLAYER_MAIN));
+        map.put("versionCheckTeleportInfo", new PlayerFileVariable("versionCheckTeleportInfo", VariableType.INTEGER, FileBlockType.PLAYER_MAIN));
+        map.put("versionCheckMovementInfo", new PlayerFileVariable("versionCheckMovementInfo", VariableType.INTEGER, FileBlockType.PLAYER_MAIN));
+        map.put("compassState", new PlayerFileVariable("compassState", VariableType.INTEGER, FileBlockType.PLAYER_MAIN));
+        map.put("skillWindowShowHelp", new PlayerFileVariable("skillWindowShowHelp", VariableType.INTEGER, FileBlockType.PLAYER_MAIN));
+        map.put("alternateConfig", new PlayerFileVariable("alternateConfig", VariableType.INTEGER, FileBlockType.PLAYER_MAIN));
+        map.put("alternateConfigEnabled", new PlayerFileVariable("alternateConfigEnabled", VariableType.INTEGER, FileBlockType.PLAYER_MAIN));
+        map.put("itemsFoundOverLifetimeUniqueTotal", new PlayerFileVariable("itemsFoundOverLifetimeUniqueTotal", VariableType.INTEGER, FileBlockType.PLAYER_MAIN));
+        map.put("itemsFoundOverLifetimeRandomizedTotal", new PlayerFileVariable("itemsFoundOverLifetimeRandomizedTotal", VariableType.INTEGER, FileBlockType.PLAYER_MAIN));
+        map.put("hasBeenInGame", new PlayerFileVariable("hasBeenInGame", VariableType.INTEGER, FileBlockType.PLAYER_MAIN));
+        map.put("versionRespawnPoint", new PlayerFileVariable("versionRespawnPoint", VariableType.INTEGER, FileBlockType.PLAYER_MAIN));
+        map.put("money", new PlayerFileVariable("money", VariableType.INTEGER, FileBlockType.PLAYER_MAIN));
+        map.put("teleportUID", new PlayerFileVariable("teleportUID", VariableType.UID, FileBlockType.PLAYER_MAIN));
+        map.put("respawnUID", new PlayerFileVariable("respawnUID", VariableType.UID, FileBlockType.PLAYER_MAIN));
+        map.put("markerUID", new PlayerFileVariable("markerUID", VariableType.UID, FileBlockType.PLAYER_MAIN));
+        map.put("strategicMovementRespawnPoint", new PlayerFileVariable("strategicMovementRespawnPoint[i]", VariableType.UID, FileBlockType.PLAYER_MAIN));
+
+        map.put("skillName", new PlayerFileVariable("skillName", VariableType.STRING, FileBlockType.BODY));//PLAYER_SKILLS + PLAYER_HOT_SLOT
+        map.put("skillActive", new PlayerFileVariable("skillActive", VariableType.INTEGER, FileBlockType.PLAYER_SKILLS));
+        map.put("skillLevel", new PlayerFileVariable("skillLevel", VariableType.INTEGER, FileBlockType.PLAYER_SKILLS));
+        map.put("skillEnabled", new PlayerFileVariable("skillEnabled", VariableType.INTEGER, FileBlockType.PLAYER_SKILLS));
+        map.put("skillSubLevel", new PlayerFileVariable("skillSubLevel", VariableType.INTEGER, FileBlockType.PLAYER_SKILLS));
+        map.put("skillTransition", new PlayerFileVariable("skillTransition", VariableType.INTEGER, FileBlockType.PLAYER_SKILLS));
+        map.put("max", new PlayerFileVariable("max", VariableType.INTEGER, FileBlockType.PLAYER_SKILLS));
+        map.put("masteriesAllowed", new PlayerFileVariable("masteriesAllowed", VariableType.INTEGER, FileBlockType.PLAYER_SKILLS));
+        map.put("skillReclamationPointsUsed", new PlayerFileVariable("skillReclamationPointsUsed", VariableType.INTEGER, FileBlockType.PLAYER_SKILLS));
+
+        map.put("defaultText", new PlayerFileVariable("defaultText", VariableType.STRING_UTF_16_LE, FileBlockType.BODY));
+        map.put("itemPositionsSavedAsGridCoords", new PlayerFileVariable("itemPositionsSavedAsGridCoords", VariableType.INTEGER, FileBlockType.PLAYER_INVENTORY));
+        map.put("numberOfSacks", new PlayerFileVariable("numberOfSacks", VariableType.INTEGER, FileBlockType.PLAYER_INVENTORY));
+        map.put("currentlyFocusedSackNumber", new PlayerFileVariable("currentlyFocusedSackNumber", VariableType.INTEGER, FileBlockType.PLAYER_INVENTORY));
+        map.put("currentlySelectedSackNumber", new PlayerFileVariable("currentlySelectedSackNumber", VariableType.INTEGER, FileBlockType.PLAYER_INVENTORY));
+        map.put("tempBool", new PlayerFileVariable("tempBool", VariableType.INTEGER, FileBlockType.PLAYER_INVENTORY));
+        map.put("size", new PlayerFileVariable("size", VariableType.INTEGER, FileBlockType.PLAYER_INVENTORY));
+        map.put("seed", new PlayerFileVariable("seed", VariableType.INTEGER, FileBlockType.PLAYER_INVENTORY));
+        map.put("var1", new PlayerFileVariable("var1", VariableType.INTEGER, FileBlockType.PLAYER_INVENTORY));
+        map.put("var2", new PlayerFileVariable("var2", VariableType.INTEGER, FileBlockType.PLAYER_INVENTORY));
+        map.put("pointX", new PlayerFileVariable("pointX", VariableType.INTEGER, FileBlockType.PLAYER_INVENTORY));
+        map.put("pointY", new PlayerFileVariable("pointY", VariableType.INTEGER, FileBlockType.PLAYER_INVENTORY));
+        map.put("baseName", new PlayerFileVariable("baseName", VariableType.STRING, FileBlockType.PLAYER_INVENTORY));
+        map.put("prefixName", new PlayerFileVariable("prefixName", VariableType.STRING, FileBlockType.PLAYER_INVENTORY));
+        map.put("suffixName", new PlayerFileVariable("suffixName", VariableType.STRING, FileBlockType.PLAYER_INVENTORY));
+        map.put("relicName", new PlayerFileVariable("relicName", VariableType.STRING, FileBlockType.PLAYER_INVENTORY));
+        map.put("relicBonus", new PlayerFileVariable("relicBonus", VariableType.STRING, FileBlockType.PLAYER_INVENTORY));
+        map.put("relicName2", new PlayerFileVariable("relicName2", VariableType.STRING, FileBlockType.PLAYER_INVENTORY));
+        map.put("relicBonus2", new PlayerFileVariable("relicBonus2", VariableType.STRING, FileBlockType.PLAYER_INVENTORY));
+        map.put("useAlternate", new PlayerFileVariable("useAlternate", VariableType.INTEGER, FileBlockType.PLAYER_INVENTORY));
+        map.put("equipmentCtrlIOStreamVersion", new PlayerFileVariable("equipmentCtrlIOStreamVersion", VariableType.INTEGER, FileBlockType.PLAYER_INVENTORY));
+        map.put("storedType", new PlayerFileVariable("storedType", VariableType.INTEGER, FileBlockType.PLAYER_HOT_SLOT));
+        map.put("itemAttached", new PlayerFileVariable("itemAttached", VariableType.INTEGER, FileBlockType.PLAYER_HOT_SLOT));
+        map.put("alternate", new PlayerFileVariable("alternate", VariableType.INTEGER, FileBlockType.PLAYER_HOT_SLOT));
+        map.put("isItemSkill", new PlayerFileVariable("isItemSkill", VariableType.INTEGER, FileBlockType.PLAYER_HOT_SLOT));
+        map.put("itemName", new PlayerFileVariable("itemName", VariableType.STRING, FileBlockType.PLAYER_HOT_SLOT));
+        map.put("scrollName", new PlayerFileVariable("scrollName", VariableType.STRING, FileBlockType.PLAYER_HOT_SLOT));
+        map.put("bitmapUpName", new PlayerFileVariable("bitmapUpName", VariableType.STRING, FileBlockType.PLAYER_HOT_SLOT));
+        map.put("bitmapDownName", new PlayerFileVariable("bitmapDownName", VariableType.STRING, FileBlockType.PLAYER_HOT_SLOT));
+        map.put("storedDefaultType", new PlayerFileVariable("storedDefaultType", VariableType.INTEGER, FileBlockType.PLAYER_HOT_SLOT));
+
+        map.put("equipmentSelection", new PlayerFileVariable("equipmentSelection", VariableType.INTEGER, FileBlockType.PLAYER_UI_SKILL));
+        map.put("skillActive1", new PlayerFileVariable("skillActive1", VariableType.INTEGER, FileBlockType.PLAYER_UI_SKILL));
+        map.put("skillActive2", new PlayerFileVariable("skillActive2", VariableType.INTEGER, FileBlockType.PLAYER_UI_SKILL));
+        map.put("skillActive3", new PlayerFileVariable("skillActive3", VariableType.INTEGER, FileBlockType.PLAYER_UI_SKILL));
+        map.put("skillActive4", new PlayerFileVariable("skillActive4", VariableType.INTEGER, FileBlockType.PLAYER_UI_SKILL));
+        map.put("skillActive5", new PlayerFileVariable("skillActive5", VariableType.INTEGER, FileBlockType.PLAYER_UI_SKILL));
+        map.put("primarySkill1", new PlayerFileVariable("primarySkill11", VariableType.INTEGER, FileBlockType.PLAYER_UI_SKILL));
+        map.put("primarySkill2", new PlayerFileVariable("primarySkill12", VariableType.INTEGER, FileBlockType.PLAYER_UI_SKILL));
+        map.put("primarySkill3", new PlayerFileVariable("primarySkill13", VariableType.INTEGER, FileBlockType.PLAYER_UI_SKILL));
+        map.put("primarySkill4", new PlayerFileVariable("primarySkill14", VariableType.INTEGER, FileBlockType.PLAYER_UI_SKILL));
+        map.put("primarySkill5", new PlayerFileVariable("primarySkill15", VariableType.INTEGER, FileBlockType.PLAYER_UI_SKILL));
+        map.put("secondarySkill", new PlayerFileVariable("secondarySkill", VariableType.INTEGER, FileBlockType.PLAYER_UI_SKILL));
+        map.put("secondarySkill1", new PlayerFileVariable("secondarySkill11", VariableType.INTEGER, FileBlockType.PLAYER_UI_SKILL));
+        map.put("secondarySkill2", new PlayerFileVariable("secondarySkill12", VariableType.INTEGER, FileBlockType.PLAYER_UI_SKILL));
+        map.put("secondarySkill3", new PlayerFileVariable("secondarySkill13", VariableType.INTEGER, FileBlockType.PLAYER_UI_SKILL));
+        map.put("secondarySkill4", new PlayerFileVariable("secondarySkill14", VariableType.INTEGER, FileBlockType.PLAYER_UI_SKILL));
+        map.put("secondarySkill5", new PlayerFileVariable("secondarySkill15", VariableType.INTEGER, FileBlockType.PLAYER_UI_SKILL));
+        map.put("skillWindowSelection", new PlayerFileVariable("skillWindowSelection", VariableType.INTEGER, FileBlockType.PLAYER_UI_SKILL));
+        map.put("skillSettingValid", new PlayerFileVariable("skillSettingValid", VariableType.INTEGER, FileBlockType.PLAYER_UI_SKILL));
+
+        map.put("modifierPoints", new PlayerFileVariable("modifierPoints", VariableType.INTEGER, FileBlockType.PLAYER_LEVEL_POINTS));
+        map.put("skillPoints", new PlayerFileVariable("skillPoints", VariableType.INTEGER, FileBlockType.PLAYER_LEVEL_POINTS));
+        map.put("currentStats_experiencePoints", new PlayerFileVariable("currentStats.experiencePoints", VariableType.INTEGER, FileBlockType.PLAYER_LEVEL_POINTS));
+        map.put("currentStats_charLevel", new PlayerFileVariable("currentStats.charLevel", VariableType.INTEGER, FileBlockType.PLAYER_LEVEL_POINTS));
+
+        map.put("playTimeInSeconds", new PlayerFileVariable("playTimeInSeconds", VariableType.INTEGER, FileBlockType.PLAYER_STATS));
+        map.put("greatestMonsterKilledName", new PlayerFileVariable("greatestMonsterKilledName", VariableType.STRING_UTF_16_LE, FileBlockType.PLAYER_STATS));
+        map.put("numberOfDeaths", new PlayerFileVariable("numberOfDeaths", VariableType.INTEGER, FileBlockType.PLAYER_STATS));
+        map.put("numberOfKills", new PlayerFileVariable("numberOfKills", VariableType.INTEGER, FileBlockType.PLAYER_STATS));
+        map.put("experienceFromKills", new PlayerFileVariable("experienceFromKills", VariableType.INTEGER, FileBlockType.PLAYER_STATS));
+        map.put("healthPotionsUsed", new PlayerFileVariable("healthPotionsUsed", VariableType.INTEGER, FileBlockType.PLAYER_STATS));
+        map.put("manaPotionsUsed", new PlayerFileVariable("manaPotionsUsed", VariableType.INTEGER, FileBlockType.PLAYER_STATS));
+        map.put("maxLevel", new PlayerFileVariable("maxLevel", VariableType.INTEGER, FileBlockType.PLAYER_STATS));
+        map.put("numHitsReceived", new PlayerFileVariable("numHitsReceived", VariableType.INTEGER, FileBlockType.PLAYER_STATS));
+        map.put("numHitsInflicted", new PlayerFileVariable("numHitsInflicted", VariableType.INTEGER, FileBlockType.PLAYER_STATS));
+        map.put("greatestDamageInflicted", new PlayerFileVariable("greatestDamageInflicted", VariableType.INTEGER, FileBlockType.PLAYER_STATS));
+        map.put("greatestMonsterKilledLevel", new PlayerFileVariable("(*greatestMonsterKilledLevel)[i]", VariableType.INTEGER, FileBlockType.PLAYER_STATS));
+        map.put("greatestMonsterKilledLifeAndMana", new PlayerFileVariable("(*greatestMonsterKilledLifeAndMana)[i]", VariableType.INTEGER, FileBlockType.PLAYER_STATS));
+        map.put("criticalHitsInflicted", new PlayerFileVariable("criticalHitsInflicted", VariableType.INTEGER, FileBlockType.PLAYER_STATS));
+        map.put("criticalHitsReceived", new PlayerFileVariable("criticalHitsReceived", VariableType.INTEGER, FileBlockType.PLAYER_STATS));
+
+        //repeated variables with different types, should be named (name)__(blockname)
+        map.put("temp", new PlayerFileVariable("temp", VariableType.UNKNOWN, FileBlockType.MULTIPLE));
+        map.put("temp__"+FileBlockType.PLAYER_ATTRIBUTES, new PlayerFileVariable("temp", VariableType.FLOAT, FileBlockType.PLAYER_ATTRIBUTES));
+        map.put("temp__"+FileBlockType.PLAYER_MAIN, new PlayerFileVariable("temp", VariableType.INTEGER, FileBlockType.PLAYER_MAIN));
+    }
+
+    private PlayerFileVariable(String variable, VariableType type, FileBlockType location) {
         this.var = variable;
         this.type = type;
         this.location = location;
+    }
+
+    static PlayerFileVariable valueOf(String var) {
+        return map.get(var);
     }
 
     @Override

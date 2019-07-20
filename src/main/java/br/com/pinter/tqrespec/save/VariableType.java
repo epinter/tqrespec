@@ -5,11 +5,11 @@
 package br.com.pinter.tqrespec.save;
 
 public enum VariableType {
-    Unknown,
-    String,
-    Integer,
-    Float,
-    StringUtf16le,
+    UNKNOWN,
+    STRING,
+    INTEGER,
+    FLOAT,
+    STRING_UTF_16_LE,
     UID,
-    Stream,
+    STREAM,
 }

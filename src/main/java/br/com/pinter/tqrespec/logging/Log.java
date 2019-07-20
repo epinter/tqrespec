@@ -33,7 +33,7 @@ public class Log {
         } catch (IOException e) {
             throw new UnhandledRuntimeException(e);
         }
-        if(debugEnabled) {
+        if (debugEnabled) {
             setupLogger.setLevel(Level.FINE);
         }
         setupLogger.setUseParentHandlers(false);

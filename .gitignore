@@ -18,6 +18,7 @@ hs_err_pid*
 .idea/dictionaries
 .idea/encodings.xml
 .idea/vcs.xml
+.idea/artifacts/
 
 # Sensitive or high-churn files:
 .idea/**/dataSources/

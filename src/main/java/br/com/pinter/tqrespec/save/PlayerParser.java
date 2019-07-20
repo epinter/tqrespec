@@ -77,30 +77,30 @@ final class PlayerParser extends FileParser {
             VariableInfo variableInfo = new VariableInfo();
             variableInfo.setKeyOffset(keyOffset);
             variableInfo.setName(name);
-            variableInfo.setVariableType(VariableType.Unknown);
+            variableInfo.setVariableType(VariableType.UNKNOWN);
 
             String logFmt = "name=%s; value=%s";
 
             PlayerFileVariable e = PlayerFileVariable.valueOf(name);
 
-            if (e.var().equals(name) && e.location() == FileBlockType.PlayerHeader) {
+            if (e.var().equals(name) && e.location() == FileBlockType.PLAYER_HEADER) {
                 readVar(name, variableInfo);
 
                 String valueLog = null;
 
-                if (e.type() == VariableType.Integer) {
+                if (e.type() == VariableType.INTEGER) {
                     int valueInt = (int) variableInfo.getValue();
                     valueLog = String.valueOf(valueInt);
                     readIntegerFromHeader(h,name,valueInt);
                 }
 
-                if (e.type() == VariableType.String) {
+                if (e.type() == VariableType.STRING) {
                     String valueString = (String) variableInfo.getValue();
                     valueLog = valueString;
                     readStringFromHeader(h,name,valueString);
                 }
 
-                if (e.type() == VariableType.Stream) {
+                if (e.type() == VariableType.STREAM) {
                     byte[] value = (byte[]) variableInfo.getValue();
                     valueLog = new String(value);
                 }
@@ -109,7 +109,7 @@ final class PlayerParser extends FileParser {
                 logger.fine(logMsg);
             }
 
-            if (variableInfo.getVariableType() == VariableType.Unknown) {
+            if (variableInfo.getVariableType() == VariableType.UNKNOWN) {
                 throw new IllegalStateException(String.format("An invalid variable (%s) was found in header, aborting."
                         , name));
             }
@@ -205,7 +205,7 @@ final class PlayerParser extends FileParser {
     @Override
     ConcurrentHashMap<String, VariableInfo> parseBlock(BlockInfo block) {
         ConcurrentHashMap<String, VariableInfo> ret = new ConcurrentHashMap<>();
-        FileBlockType fileBlock = FileBlockType.Body;
+        FileBlockType fileBlock = FileBlockType.BODY;
         this.getBuffer().position(block.getStart() + BEGIN_BLOCK_SIZE);
         ArrayList<VariableInfo> temp = new ArrayList<>();
 
@@ -231,9 +231,9 @@ final class PlayerParser extends FileParser {
             IFileVariable fileVariable;
             try {
                 fileVariable = PlayerFileVariable.valueOf(filterFileVariableName(name));
-                if (fileVariable.location() != FileBlockType.Body
-                        && fileVariable.location() != FileBlockType.Unknown
-                        && fileVariable.location() != FileBlockType.Multiple) {
+                if (fileVariable.location() != FileBlockType.BODY
+                        && fileVariable.location() != FileBlockType.UNKNOWN
+                        && fileVariable.location() != FileBlockType.MULTIPLE) {
                     fileBlock = fileVariable.location();
                 }
             } catch (Exception e) {
@@ -242,8 +242,8 @@ final class PlayerParser extends FileParser {
             }
 
             //prepare fileblock for special var 'temp'(attributes)
-            if (name.equals("temp") && fileBlock == FileBlockType.Body) {
-                fileBlock = FileBlockType.PlayerAttributes;
+            if (name.equals("temp") && fileBlock == FileBlockType.BODY) {
+                fileBlock = FileBlockType.PLAYER_ATTRIBUTES;
             }
 
             VariableInfo variableInfo = readVar(name, fileBlock);
@@ -297,5 +297,10 @@ final class PlayerParser extends FileParser {
             logger.fine(() -> String.format(logMsg, block.getStart(), ret.get("mana").toString()));
         }
         return ret;
+    }
+
+    @Override
+    IFileVariable getFileVariable(String var) {
+        return PlayerFileVariable.valueOf(var);
     }
 }

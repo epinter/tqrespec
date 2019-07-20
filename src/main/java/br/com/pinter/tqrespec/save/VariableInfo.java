@@ -67,15 +67,15 @@ public class VariableInfo implements Serializable {
     }
 
     public Object getValue() {
-        if (variableType == VariableType.Integer)
+        if (variableType == VariableType.INTEGER)
             return valueInteger;
-        if (variableType == VariableType.String || variableType == VariableType.StringUtf16le)
+        if (variableType == VariableType.STRING || variableType == VariableType.STRING_UTF_16_LE)
             return valueString;
-        if (variableType == VariableType.Float)
+        if (variableType == VariableType.FLOAT)
             return valueFloat;
         if (variableType == VariableType.UID)
             return valueByteArray;
-        if (variableType == VariableType.Stream)
+        if (variableType == VariableType.STREAM)
             return valueByteArray;
         return null;
     }

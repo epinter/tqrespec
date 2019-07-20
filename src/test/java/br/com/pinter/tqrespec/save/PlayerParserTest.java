@@ -110,7 +110,7 @@ public class PlayerParserTest {
         assertTrue(varLocation > 0);
         BlockInfo blockInfo = saveData.getBlockInfo().get(varLocation);
         assertNotNull(blockInfo);
-        assertEquals(VariableType.Float, blockInfo.getVariables().get("str").getVariableType());
+        assertEquals(VariableType.FLOAT, blockInfo.getVariables().get("str").getVariableType());
         Float str = (Float) blockInfo.getVariables().get("str").getValue();
         assertNotNull(str);
         assertTrue(str > 0.0);

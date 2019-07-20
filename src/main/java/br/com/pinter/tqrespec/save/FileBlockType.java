@@ -6,17 +6,17 @@ package br.com.pinter.tqrespec.save;
 
 public enum FileBlockType {
     //generic types
-    Unknown,
-    Body,
-    Multiple,
+    UNKNOWN,
+    BODY,
+    MULTIPLE,
     //player file types
-    PlayerHeader,
-    PlayerMain,
-    PlayerAttributes,
-    PlayerStats,
-    PlayerInventory,
-    PlayerHotSlot,
-    PlayerSkills,
-    PlayerUiSkill,
-    PlayerLevelPoints
+    PLAYER_HEADER,
+    PLAYER_MAIN,
+    PLAYER_ATTRIBUTES,
+    PLAYER_STATS,
+    PLAYER_INVENTORY,
+    PLAYER_HOT_SLOT,
+    PLAYER_SKILLS,
+    PLAYER_UI_SKILL,
+    PLAYER_LEVEL_POINTS
 }

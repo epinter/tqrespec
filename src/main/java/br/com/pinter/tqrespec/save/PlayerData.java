@@ -187,7 +187,7 @@ public class PlayerData {
         BlockInfo sk = saveData.getBlockInfo().get(blockStart);
         VariableInfo varSkillLevel = sk.getVariables().get(Constants.Save.SKILL_LEVEL);
 
-        if (varSkillLevel.getVariableType() == VariableType.Integer) {
+        if (varSkillLevel.getVariableType() == VariableType.INTEGER) {
             return changes.getInt(blockStart, Constants.Save.SKILL_LEVEL);
         }
         return -1;
@@ -202,7 +202,7 @@ public class PlayerData {
 
         BlockInfo skillToRemove = saveData.getBlockInfo().get(blockStart);
         VariableInfo varSkillLevel = skillToRemove.getVariables().get(Constants.Save.SKILL_LEVEL);
-        if (varSkillLevel.getVariableType() == VariableType.Integer) {
+        if (varSkillLevel.getVariableType() == VariableType.INTEGER) {
             int currentSkillPoints = changes.getInt(Constants.Save.SKILL_POINTS);
             int currentSkillLevel = (int) varSkillLevel.getValue();
             changes.setInt(Constants.Save.SKILL_POINTS, currentSkillPoints + currentSkillLevel);

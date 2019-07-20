@@ -21,8 +21,8 @@
 package br.com.pinter.tqrespec.save;
 
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
-import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.util.Constants;
+import br.com.pinter.tqrespec.logging.Log;
 
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
@@ -116,8 +116,7 @@ abstract class FileParser {
     /**
      * This method is called to parse a block, and should return a table of variables found inside the block.
      *
-     * @param blockInfo
-     *         the block the method should parse.
+     * @param blockInfo the block the method should parse.
      * @return a table with all variables found
      */
     abstract ConcurrentHashMap<String, VariableInfo> parseBlock(BlockInfo blockInfo);
@@ -213,7 +212,7 @@ abstract class FileParser {
 
         try {
             int len = getBuffer().getInt();
-            variableInfo.setVariableType(VariableType.String);
+            variableInfo.setVariableType(VariableType.STRING);
             variableInfo.setValSize(len);
             if (len <= 0) {
                 return;
@@ -240,7 +239,7 @@ abstract class FileParser {
         int valOffset = getBuffer().position();
 
         variableInfo.setValue(getBuffer().getInt());
-        variableInfo.setVariableType(VariableType.Integer);
+        variableInfo.setVariableType(VariableType.INTEGER);
         variableInfo.setValSize(4);
         variableInfo.setValOffset(valOffset);
     }
@@ -253,7 +252,7 @@ abstract class FileParser {
         int valOffset = getBuffer().position();
 
         variableInfo.setValue(getBuffer().getFloat());
-        variableInfo.setVariableType(VariableType.Float);
+        variableInfo.setVariableType(VariableType.FLOAT);
         variableInfo.setValSize(4);
         variableInfo.setValOffset(valOffset);
     }
@@ -290,7 +289,7 @@ abstract class FileParser {
         byte[] buf = readStream();
 
         variableInfo.setValue(buf);
-        variableInfo.setVariableType(VariableType.Stream);
+        variableInfo.setVariableType(VariableType.STREAM);
         variableInfo.setValSize(buf.length);
         variableInfo.setValOffset(valOffset);
     }
@@ -339,12 +338,14 @@ abstract class FileParser {
         return null;
     }
 
+    abstract IFileVariable getFileVariable(String var);
+
     VariableInfo readVar(String name) {
-        return readVar(name, new VariableInfo(), FileBlockType.Unknown);
+        return readVar(name, new VariableInfo(), FileBlockType.UNKNOWN);
     }
 
     VariableInfo readVar(String name, VariableInfo variableInfo) {
-        return readVar(name, variableInfo, FileBlockType.Unknown);
+        return readVar(name, variableInfo, FileBlockType.UNKNOWN);
     }
 
     VariableInfo readVar(String name, FileBlockType fileBlock) {
@@ -355,31 +356,31 @@ abstract class FileParser {
         String varId = filterFileVariableName(name);
 
         VariableType type = null;
-        PlayerFileVariable fileVariable = PlayerFileVariable.valueOf(varId);
-        type = PlayerFileVariable.valueOf(varId).type();
+        IFileVariable fileVariable = getFileVariable(varId);
+        type = getFileVariable(varId).type();
 
-        if (type == VariableType.Unknown && fileVariable.location() == FileBlockType.Multiple) {
+        if (type == VariableType.UNKNOWN && fileVariable.location() == FileBlockType.MULTIPLE) {
             try {
-                PlayerFileVariable fileVariableMultiple = PlayerFileVariable.valueOf(
+                IFileVariable fileVariableMultiple = getFileVariable(
                         String.format("%s__%s", name, fileBlock.name()));
                 type = fileVariableMultiple.type();
-            } catch (Exception ignored) {
-                //ignored
+            } catch (Exception e) {
+                logger.log(Level.FINE, e, () -> String.format("Variable definition for '%s' not found.", varId));
             }
         }
 
 
-        if (type == VariableType.Integer) {
+        if (type == VariableType.INTEGER) {
             readInt(variableInfo);
-        } else if (type == VariableType.Float) {
+        } else if (type == VariableType.FLOAT) {
             readFloat(variableInfo);
-        } else if (type == VariableType.String) {
+        } else if (type == VariableType.STRING) {
             readString(variableInfo);
-        } else if (type == VariableType.StringUtf16le) {
+        } else if (type == VariableType.STRING_UTF_16_LE) {
             readString(variableInfo, true);
         } else if (type == VariableType.UID) {
             readUid(variableInfo);
-        } else if (type == VariableType.Stream) {
+        } else if (type == VariableType.STREAM) {
             readStream(variableInfo);
         } else {
             throw new IllegalArgumentException(String.format("Variable type undefined for '%s'.", name));
