@@ -42,6 +42,9 @@ public class State {
         return instance;
     }
 
+    private State() {
+    }
+
     public Boolean getSaveInProgress() {
         return saveInProgress.getValue();
     }

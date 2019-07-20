@@ -35,7 +35,7 @@ public class Toast {
         toast.initStyle(StageStyle.TRANSPARENT);
 
         StackPane root = new StackPane();
-        root.getStylesheets().add("/fxml/main.css");
+        root.getStylesheets().add(Constants.UI.MAIN_CSS);
 
         Label msg = new Label();
         Label msg2 = new Label();
@@ -53,12 +53,12 @@ public class Toast {
 
         msg.setWrapText(true);
         msg.setText(header);
-        msg.getStyleClass().add("tq-toast-header");
+        msg.getStyleClass().add(Constants.UI.TOAST_HEADER_STYLE);
 
 
         msg2.setAlignment(Pos.BOTTOM_LEFT);
         msg2.setTextAlignment(TextAlignment.CENTER);
-        msg2.getStyleClass().add("tq-toast-content");
+        msg2.getStyleClass().add(Constants.UI.TOAST_CONTENT_STYLE);
         msg2.setText(content);
         msg2.setWrapText(true);
 

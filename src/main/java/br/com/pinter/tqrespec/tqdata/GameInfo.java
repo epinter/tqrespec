@@ -47,17 +47,11 @@ import java.util.regex.Pattern;
 public class GameInfo {
     private static final Logger logger = Log.getLogger();
 
-    private static final boolean DBG = false;
-
     private static GameInfo instance = null;
 
     private static final Object lock = new Object();
 
     private String gamePath = null;
-
-    private static final String STEAM_COMMON = "common";
-
-    private static final String SAVEDATA_DIRNAME = "SaveData";
 
     private GameInfo() {
     }
@@ -95,8 +89,7 @@ public class GameInfo {
     private Path getGameSteamPath() {
         Path steamLibraryPath = getSteamLibraryPath();
         if (steamLibraryPath != null) {
-            Path steamGamePath = Paths.get(steamLibraryPath.toString(), STEAM_COMMON,
-                    Constants.GAME_DIRECTORY_STEAM).toAbsolutePath();
+            Path steamGamePath = Paths.get(steamLibraryPath.toString(), Constants.GAME_DIRECTORY_STEAM).toAbsolutePath();
             if (gamePathExists(steamGamePath)) {
                 return steamGamePath;
             }
@@ -110,8 +103,7 @@ public class GameInfo {
                     WinReg.HKEY_CURRENT_USER, "SOFTWARE\\Valve\\Steam", "SteamPath");
 
             Path steamappsPath = Paths.get(steamPath, "SteamApps").toAbsolutePath();
-            Path steamGamePath = Paths.get(steamappsPath.toString(), STEAM_COMMON,
-                    Constants.GAME_DIRECTORY_STEAM).toAbsolutePath();
+            Path steamGamePath = Paths.get(steamappsPath.toString(), Constants.GAME_DIRECTORY_STEAM).toAbsolutePath();
             if (gamePathExists(steamGamePath)) {
                 return steamappsPath;
             }
@@ -135,8 +127,7 @@ public class GameInfo {
 
             for (String libraryFolder : libraryFolderList) {
                 Path libraryPath = Paths.get(libraryFolder, "SteamApps").toAbsolutePath();
-                Path libraryGamePath = Paths.get(libraryPath.toString(), STEAM_COMMON,
-                        Constants.GAME_DIRECTORY_STEAM).toAbsolutePath();
+                Path libraryGamePath = Paths.get(libraryPath.toString(), Constants.GAME_DIRECTORY_STEAM).toAbsolutePath();
                 if (gamePathExists(libraryGamePath)) {
                     return libraryPath;
                 }
@@ -222,7 +213,7 @@ public class GameInfo {
 
     private Path getGameMicrosoftStorePath() {
         String regexGameName = Constants.REGEX_REGISTRY_PACKAGE;
-        String[] pkgList = new String[0];
+        String[] pkgList;
         String pkgKeyPath = "Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\CurrentVersion\\" +
                 "AppModel\\Repository\\Packages";
         try {
@@ -363,10 +354,9 @@ public class GameInfo {
 
     public String getSavePath() {
         String userHome = System.getProperty("user.home");
-        String subdirectory = File.separator + Paths.get("My Games", "Titan Quest - Immortal Throne").toString();
+        logger.fine(() -> "SavePath: user.home is " + userHome);
 
-        if (DBG || !SystemUtils.IS_OS_WINDOWS) {
-            logger.info(() -> "SavePath: user.home is " + userHome);
+        if (!SystemUtils.IS_OS_WINDOWS) {
             return Constants.DEV_GAMEDATA;
         }
 
@@ -377,7 +367,7 @@ public class GameInfo {
             saveDirectory = userHome;
         }
 
-        Path savePath = Paths.get(saveDirectory + subdirectory);
+        Path savePath = Paths.get(saveDirectory, Constants.SAVEGAME_SUBDIR);
         if (Files.exists(savePath)) {
             logger.fine("SavePath: found");
             return savePath.toAbsolutePath().toString();
@@ -386,19 +376,19 @@ public class GameInfo {
     }
 
     public String getSaveDataMainPath() {
-        if (!SystemUtils.IS_OS_WINDOWS) return Paths.get(Constants.DEV_GAMEDATA, SAVEDATA_DIRNAME, "Main").toString();
+        if (!SystemUtils.IS_OS_WINDOWS) return Paths.get(Constants.DEV_GAMEDATA, Constants.SAVEGAME_MAIN).toString();
         String savePath = getSavePath();
         if (StringUtils.isNotEmpty(savePath)) {
-            return Paths.get(savePath, SAVEDATA_DIRNAME, "Main").toString();
+            return Paths.get(savePath, Constants.SAVEGAME_MAIN).toString();
         }
         return null;
     }
 
     public String getSaveDataUserPath() {
-        if (!SystemUtils.IS_OS_WINDOWS) return Paths.get(Constants.DEV_GAMEDATA, SAVEDATA_DIRNAME, "User").toString();
+        if (!SystemUtils.IS_OS_WINDOWS) return Paths.get(Constants.DEV_GAMEDATA, Constants.SAVEGAME_USER).toString();
         String savePath = getSavePath();
         if (StringUtils.isNotEmpty(savePath)) {
-            return Paths.get(savePath, SAVEDATA_DIRNAME, "User").toString();
+            return Paths.get(savePath, Constants.SAVEGAME_USER).toString();
         }
         return null;
     }

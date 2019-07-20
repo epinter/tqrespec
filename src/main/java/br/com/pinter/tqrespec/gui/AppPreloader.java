@@ -20,6 +20,7 @@
 
 package br.com.pinter.tqrespec.gui;
 
+import br.com.pinter.tqrespec.util.Constants;
 import javafx.application.Preloader;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -39,22 +40,22 @@ public class AppPreloader extends Preloader {
 
     private Scene createPreloaderScene() {
         BorderPane pane = new BorderPane();
-        Scene scene = new Scene(pane, 370, 210);
-        pane.getStylesheets().add("/fxml/preloader.css");
-        pane.getStyleClass().add("bg-container");
+        Scene scene = new Scene(pane, Constants.UI.PRELOADER_WIDTH, Constants.UI.PRELOADER_HEIGHT);
+        pane.getStylesheets().add(Constants.UI.PRELOADER_CSS);
+        pane.getStyleClass().add(Constants.UI.PRELOADER_PANE_STYLE);
 
         bar = new ProgressBar(0.1);
-        bar.getStyleClass().add("bar");
+        bar.getStyleClass().add(Constants.UI.PRELOADER_BAR_STYLE);
         pane.setCenter(bar);
 
         Label title = new Label();
-        title.setText("TQRespec");
-        title.getStyleClass().add("tq-bigtitle");
+        title.setText(Constants.APPNAME);
+        title.getStyleClass().add(Constants.UI.PRELOADER_TITLE_STYLE);
         pane.setTop(title);
         BorderPane.setAlignment(title, Pos.CENTER);
 
         ProgressIndicator indicator = new ProgressIndicator();
-        indicator.getStyleClass().add("indicator");
+        indicator.getStyleClass().add(Constants.UI.PRELOADER_INDICATOR_STYLE);
         pane.setBottom(indicator);
 
         return scene;

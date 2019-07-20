@@ -26,21 +26,28 @@ import java.nio.file.Paths;
 public class Constants {
     private Constants() {
     }
+
+    public static final String APPNAME = "TQRespec";
     public static final String REGEX_REGISTRY_INSTALL = "Titan Quest.*Anniversary.*";
     public static final String REGEX_REGISTRY_PACKAGE = "(?i:Titan Quest.*)";
     public static final String REGEX_REGISTRY_INSTALL_FALLBACK = "Titan Quest.*";
-    public static final String GAME_DIRECTORY_STEAM = "Titan Quest Anniversary Edition";
+    public static final String SAVEGAME_SUBDIR = Paths.get("My Games", "Titan Quest - Immortal Throne").toString();
+    public static final String GAME_DIRECTORY_STEAM = Paths.get("common", "Titan Quest Anniversary Edition").toString();
     public static final String INITIAL_FONT_SIZE = "1";
     public static final String BACKUP_DIRECTORY = Paths.get("SaveData", "TQRespec Backup").toString();
+    public static final String SAVEGAME_MAIN = Paths.get("SaveData", "Main").toString();
+    public static final String SAVEGAME_USER = Paths.get("SaveData", "User").toString();
     public static final String VERSION_CHECK_URL = "https://epinter.github.io/version/tqrespec";
     public static final String DEV_GAMEDATA = Paths.get(System.getProperty("user.dir"), "gamedata").toString();
     public static final String PARENT_GAMEDATA = Paths.get(Paths.get(System.getProperty("user.dir")).getParent().toString(), "gamedata").toString();
     public static final int PROCESS_SCAN_INTERVAL_MS = 3000;
     public static final String LOGFILE = new File(System.getProperty("java.io.tmpdir"), "tqrespec.log").getAbsolutePath();
     public static final String ERROR_MSG_EXCEPTION = "Error: ";
+
     public static class Save {
         private Save() {
         }
+
         public static final String SKILL_NAME = "skillName";
         public static final String SKILL_ENABLED = "skillEnabled";
         public static final String SKILL_ACTIVE = "skillActive";
@@ -48,5 +55,23 @@ public class Constants {
         public static final String SKILL_TRANSITION = "skillTransition";
         public static final String SKILL_LEVEL = "skillLevel";
         public static final String SKILL_POINTS = "skillPoints";
+    }
+
+    public static class UI {
+        private UI() {
+        }
+
+        public static final String MAIN_FXML = "/fxml/main.fxml";
+        public static final String ABOUT_FXML = "/fxml/about.fxml";
+        public static final String MAIN_CSS = "/fxml/main.css";
+        public static final String PRELOADER_CSS = "/fxml/preloader.css";
+        public static final String PRELOADER_PANE_STYLE = "bg-container";
+        public static final String PRELOADER_TITLE_STYLE = "tq-bigtitle";
+        public static final String PRELOADER_INDICATOR_STYLE = "indicator";
+        public static final String PRELOADER_BAR_STYLE = "bar";
+        public static final int PRELOADER_WIDTH = 370;
+        public static final int PRELOADER_HEIGHT = 210;
+        public static final String TOAST_HEADER_STYLE = "tq-toast-header";
+        public static final String TOAST_CONTENT_STYLE = "tq-toast-content";
     }
 }

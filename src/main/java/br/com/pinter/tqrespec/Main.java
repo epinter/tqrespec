@@ -162,7 +162,7 @@ public class Main extends Application {
         Parent root;
         try {
             fxmlLoader.setResources(ResourceBundle.getBundle("i18n.UI"));
-            fxmlLoader.setLocation(getClass().getResource("/fxml/main.fxml"));
+            fxmlLoader.setLocation(getClass().getResource(Constants.UI.MAIN_FXML));
             root = fxmlLoader.load();
         } catch (IOException e) {
             logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
