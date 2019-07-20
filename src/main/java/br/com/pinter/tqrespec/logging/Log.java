@@ -8,6 +8,8 @@ import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.util.Constants;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.logging.*;
 
 public class Log {
@@ -38,5 +40,27 @@ public class Log {
         }
         setupLogger.setUseParentHandlers(false);
         setupLogger.addHandler(fileHandler);
+
+        System.setOut(Log.redirectPrintStreamToLog(Level.INFO));
+        System.setErr(Log.redirectPrintStreamToLog(Level.SEVERE));
+    }
+
+    public static PrintStream redirectPrintStreamToLog(Level level) {
+        return new PrintStream(new OutputStream() {
+            private StringBuilder stringBuilder = new StringBuilder();
+            @Override
+            public void write(int b) throws IOException {
+                char c = (char) b;
+
+                if(c == '\r' || c == '\n') {
+                    if(stringBuilder.length() > 0) {
+                        getLogger().log(level,() -> stringBuilder.toString());
+                        stringBuilder = new StringBuilder();
+                    }
+                } else {
+                    stringBuilder.append(c);
+                }
+            }
+        });
     }
 }

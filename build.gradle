@@ -118,6 +118,7 @@ if (moduleInfoPresent) {
                     '--add-opens', 'br.com.pinter.tqrespec/br.com.pinter.tqrespec.tqdata=ALL-UNNAMED',
                     '--add-opens', 'br.com.pinter.tqrespec/br.com.pinter.tqrespec.gui=ALL-UNNAMED',
                     '--add-opens', 'br.com.pinter.tqrespec/br.com.pinter.tqrespec.save=ALL-UNNAMED',
+                    '--add-opens','java.base/java.lang=ALL-UNNAMED',
                     '--module-path', classpath.asPath,
                     '--class-path', classpath.asPath,
                     '--module', mainClassName,
@@ -273,6 +274,7 @@ task appimage(type: Exec) {
                 '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.tqdata=ALL-UNNAMED ' +
                 '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.gui=ALL-UNNAMED ' +
                 '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.save=ALL-UNNAMED ' +
+                '--add-opens java.base/java.lang=ALL-UNNAMED ' +
                 '--add-reads br.com.pinter.tqrespec=ALL-UNNAMED'
     } else {
         commandLine binjava,
@@ -297,6 +299,7 @@ task appimage(type: Exec) {
                 '--class', mainClassName,
                 '--jvm-args',
                 '-XX:+UseSerialGC -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=15 ' +
+                '--add-opens java.base/java.lang=ALL-UNNAMED ' +
                 '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED'
     }
     doLast {
