@@ -195,13 +195,6 @@ public class Util {
         }
     }
 
-    public static String normalizeRecordPath(String recordId) {
-        if (recordId == null || recordId.isEmpty()) {
-            return null;
-        }
-        return recordId.toUpperCase().replace("/", "\\");
-    }
-
     public static void closeApplication() {
         if (State.get().getSaveInProgress() != null && !State.get().getSaveInProgress()
                 || State.get().getSaveInProgress() == null) {

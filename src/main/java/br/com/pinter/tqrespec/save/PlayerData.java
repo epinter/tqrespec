@@ -139,7 +139,7 @@ public class PlayerData {
                     sb.setBlockStart(b.getStart());
                     if (sb.getSkillName() != null) {
                         synchronized (playerSkills) {
-                            playerSkills.put(Objects.requireNonNull(Util.normalizeRecordPath(sb.getSkillName())),
+                            playerSkills.put(Objects.requireNonNull(Database.normalizeRecordPath(sb.getSkillName())),
                                     sb);
                         }
                     }
