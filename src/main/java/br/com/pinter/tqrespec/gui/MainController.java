@@ -44,22 +44,15 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -225,55 +218,16 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    public void openAboutWindow(MouseEvent evt) {
+    public void openAboutWindow(MouseEvent evt) throws IOException {
         Parent root;
-        try {
-            if (fxmlLoaderAbout.getRoot() == null) {
-                fxmlLoaderAbout.setLocation(getClass().getResource("/fxml/about.fxml"));
-                fxmlLoaderAbout.setResources(ResourceBundle.getBundle("i18n.UI"));
-                root = fxmlLoaderAbout.load();
-            } else {
-                root = fxmlLoaderAbout.getRoot();
-            }
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
-            return;
-        }
-
-        Stage stage = new Stage();
-        //remove default window decoration
-
-        if (SystemUtils.IS_OS_WINDOWS) {
-            stage.initStyle(StageStyle.TRANSPARENT);
+        if (fxmlLoaderAbout.getRoot() == null) {
+            fxmlLoaderAbout.setLocation(getClass().getResource(Constants.UI.ABOUT_FXML));
+            fxmlLoaderAbout.setResources(ResourceBundle.getBundle("i18n.UI"));
+            fxmlLoaderAbout.load();
         } else {
-            stage.initStyle(StageStyle.UNDECORATED);
+            root = fxmlLoaderAbout.getRoot();
+            ((Stage) root.getScene().getWindow()).show();
         }
-
-        //disable maximize
-        stage.resizableProperty().setValue(Boolean.FALSE);
-        stage.getIcons().addAll(new Image("icon/icon64.png"), new Image("icon/icon32.png"), new Image("icon/icon16.png"));
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setTitle(Util.getUIMessage("about.title", Util.getBuildTitle()));
-        Scene scene;
-        if (root.getScene() == null) {
-            scene = new Scene(root);
-        } else {
-            scene = root.getScene();
-        }
-        scene.setFill(Color.TRANSPARENT);
-        stage.setScene(scene);
-        stage.setMinHeight(root.minHeight(-1));
-        stage.setMinWidth(root.minWidth(-1));
-        stage.setMaxHeight(root.maxHeight(-1));
-        stage.setMaxWidth(root.maxWidth(-1));
-
-        stage.addEventHandler(KeyEvent.KEY_PRESSED, (event -> {
-            if (event.getCode() == KeyCode.ESCAPE) {
-                stage.close();
-            }
-        }));
-
-        stage.show();
     }
 
     @FXML

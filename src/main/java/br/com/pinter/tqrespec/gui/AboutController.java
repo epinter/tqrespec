@@ -23,16 +23,22 @@ package br.com.pinter.tqrespec.gui;
 import br.com.pinter.tqrespec.util.Util;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.text.Font;
+import javafx.scene.paint.Color;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
-@SuppressWarnings("unused")
 public class AboutController implements Initializable {
     @FXML
     private AnchorPane rootelement;
@@ -45,14 +51,48 @@ public class AboutController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Font.loadFont(getClass().getResourceAsStream("/fxml/albertus-mt.ttf"), 16);
-        Font.loadFont(getClass().getResourceAsStream("/fxml/albertus-mt-light.ttf"), 16);
+        Scene scene = new Scene(rootelement);
+        Stage stage = new Stage();
+        stage.setScene(scene);
+        scene.setFill(Color.TRANSPARENT);
+        stage.initModality(Modality.APPLICATION_MODAL);
+
+        stage.getIcons().addAll(
+                new Image("icon/icon64.png"),
+                new Image("icon/icon32.png"),
+                new Image("icon/icon16.png"));
+
+
+        //disable maximize
+        stage.resizableProperty().setValue(Boolean.FALSE);
+
+        // min* and max* set to -1 will force javafx to use values defined on root element
+        stage.setMinHeight(rootelement.minHeight(-1));
+        stage.setMinWidth(rootelement.minWidth(-1));
+        stage.setMaxHeight(rootelement.maxHeight(-1));
+        stage.setMaxWidth(rootelement.maxWidth(-1));
+
+        //remove default window decoration
+        if (SystemUtils.IS_OS_WINDOWS) {
+            stage.initStyle(StageStyle.TRANSPARENT);
+        } else {
+            stage.initStyle(StageStyle.UNDECORATED);
+        }
+
+        stage.addEventHandler(KeyEvent.KEY_PRESSED, (event -> {
+            if (event.getCode() == KeyCode.ESCAPE) {
+                stage.close();
+            }
+        }));
+        stage.setTitle(Util.getUIMessage("about.title", Util.getBuildTitle()));
         aboutFormTitle.setText(Util.getUIMessage("about.title", Util.getBuildTitle()));
         aboutVersion.setText(Util.getUIMessage("about.version", Util.getBuildVersion()));
+
+        stage.show();
     }
 
     @FXML
-    public void closeAboutWindow(MouseEvent evt) {
+    public void closeAboutWindow(@SuppressWarnings("unused") MouseEvent evt) {
         Stage stage = (Stage) rootelement.getScene().getWindow();
         stage.close();
     }
