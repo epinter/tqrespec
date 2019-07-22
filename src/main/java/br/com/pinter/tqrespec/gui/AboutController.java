@@ -57,11 +57,7 @@ public class AboutController implements Initializable {
         scene.setFill(Color.TRANSPARENT);
         stage.initModality(Modality.APPLICATION_MODAL);
 
-        stage.getIcons().addAll(
-                new Image("icon/icon64.png"),
-                new Image("icon/icon32.png"),
-                new Image("icon/icon16.png"));
-
+        stage.getIcons().addAll(IconHelper.getAppIcons());
 
         //disable maximize
         stage.resizableProperty().setValue(Boolean.FALSE);

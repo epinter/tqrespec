@@ -21,6 +21,7 @@
 package br.com.pinter.tqrespec.gui;
 
 import br.com.pinter.tqrespec.util.Constants;
+import br.com.pinter.tqrespec.util.Util;
 import javafx.application.Preloader;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -65,8 +66,9 @@ public class AppPreloader extends Preloader {
     @Override
     public void start(Stage stage) {
         this.stage = stage;
-        this.stage.getIcons().addAll(new Image("icon/icon64.png"), new Image("icon/icon32.png"), new Image("icon/icon16.png"));
+        this.stage.getIcons().addAll(IconHelper.getAppIcons());
         this.stage.setScene(createPreloaderScene());
+        this.stage.setTitle(Util.getBuildTitle());
 
         if (SystemUtils.IS_OS_WINDOWS) {
             this.stage.initStyle(StageStyle.TRANSPARENT);

@@ -4,10 +4,20 @@
 
 package br.com.pinter.tqrespec.gui;
 
+import javafx.scene.image.Image;
 import javafx.scene.text.Text;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class IconHelper {
     private IconHelper() {
+    }
+
+    public static List<Image> getAppIcons() {
+        return Arrays.asList(new Image("icon/icon64.png"),
+                new Image("icon/icon32.png"),
+                new Image("icon/icon16.png"));
     }
 
     public static Text createIcon(Icon icon) {

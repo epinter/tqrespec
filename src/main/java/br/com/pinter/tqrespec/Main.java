@@ -24,6 +24,7 @@ import br.com.pinter.tqrespec.core.ExceptionHandler;
 import br.com.pinter.tqrespec.core.GameProcessMonitor;
 import br.com.pinter.tqrespec.core.GuiceModule;
 import br.com.pinter.tqrespec.core.InjectionContext;
+import br.com.pinter.tqrespec.gui.IconHelper;
 import br.com.pinter.tqrespec.gui.MainController;
 import br.com.pinter.tqrespec.gui.ResizeListener;
 import br.com.pinter.tqrespec.logging.Log;
@@ -170,7 +171,7 @@ public class Main extends Application {
         }
 
         primaryStage.setTitle(Util.getBuildTitle());
-        primaryStage.getIcons().addAll(new Image("icon/icon64.png"), new Image("icon/icon32.png"), new Image("icon/icon16.png"));
+        primaryStage.getIcons().addAll(IconHelper.getAppIcons());
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
 
