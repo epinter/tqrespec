@@ -52,6 +52,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.io.FileNotFoundException;
@@ -178,8 +179,7 @@ public class Main extends Application {
         primaryStage.setOnCloseRequest(Event::consume);
 
         //remove default window decoration
-        String osName = System.getProperty("os.name");
-        if (osName != null && osName.startsWith("Windows")) {
+        if (SystemUtils.IS_OS_WINDOWS) {
             primaryStage.initStyle(StageStyle.TRANSPARENT);
         } else {
             primaryStage.initStyle(StageStyle.UNDECORATED);

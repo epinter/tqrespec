@@ -59,6 +59,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -241,8 +242,8 @@ public class MainController implements Initializable {
 
         Stage stage = new Stage();
         //remove default window decoration
-        String osName = System.getProperty("os.name");
-        if (osName != null && osName.startsWith("Windows")) {
+
+        if (SystemUtils.IS_OS_WINDOWS) {
             stage.initStyle(StageStyle.TRANSPARENT);
         } else {
             stage.initStyle(StageStyle.UNDECORATED);

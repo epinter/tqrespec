@@ -30,6 +30,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.apache.commons.lang3.SystemUtils;
 
 @SuppressWarnings("RedundantThrows")
 public class AppPreloader extends Preloader {
@@ -66,8 +67,7 @@ public class AppPreloader extends Preloader {
         this.stage.getIcons().addAll(new Image("icon/icon64.png"), new Image("icon/icon32.png"), new Image("icon/icon16.png"));
         this.stage.setScene(createPreloaderScene());
 
-        String osName = System.getProperty("os.name");
-        if (osName != null && osName.startsWith("Windows")) {
+        if (SystemUtils.IS_OS_WINDOWS) {
             this.stage.initStyle(StageStyle.TRANSPARENT);
         } else {
             this.stage.initStyle(StageStyle.UNDECORATED);
