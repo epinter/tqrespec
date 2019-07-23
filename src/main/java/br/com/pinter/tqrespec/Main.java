@@ -20,10 +20,8 @@
 
 package br.com.pinter.tqrespec;
 
-import br.com.pinter.tqrespec.core.ExceptionHandler;
-import br.com.pinter.tqrespec.core.GameProcessMonitor;
-import br.com.pinter.tqrespec.core.GuiceModule;
-import br.com.pinter.tqrespec.core.InjectionContext;
+import br.com.pinter.tqdatabase.Database;
+import br.com.pinter.tqrespec.core.*;
 import br.com.pinter.tqrespec.gui.IconHelper;
 import br.com.pinter.tqrespec.gui.MainController;
 import br.com.pinter.tqrespec.gui.ResizeListener;
@@ -52,6 +50,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
@@ -60,6 +59,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 
 public class Main extends Application {
     @Inject
@@ -71,7 +71,7 @@ public class Main extends Application {
     @Inject
     private FXMLLoader fxmlLoader;
 
-    private static final System.Logger logger = Log.getLogger(Main.class.getName());
+    private System.Logger logger;
 
     public static void main(String... args) {
         System.setProperty("javafx.preloader", "br.com.pinter.tqrespec.gui.AppPreloader");
@@ -97,6 +97,7 @@ public class Main extends Application {
 
 
     private void load(Stage primaryStage) {
+        logger.log(System.Logger.Level.DEBUG,"preloading data");
         Task<Void> task = new Task<>() {
             @Override
             public Void call() {
@@ -120,6 +121,7 @@ public class Main extends Application {
             }
         };
         task.setOnFailed(e -> {
+            logger.log(System.Logger.Level.ERROR,"Error loading application",e.getSource().getException());
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("Error loading application");
@@ -143,14 +145,19 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        parseCliParams();
+
         prepareInjectionContext();
 
+        logger = Log.getLogger(Main.class.getName());
+        logger.log(System.Logger.Level.DEBUG,State.get().getDebugPrefix());
         notifyPreloader(new Preloader.ProgressNotification(0.1));
         prepareMainStage(primaryStage);
         load(primaryStage);
     }
 
     public void prepareMainStage(Stage primaryStage) {
+        logger.log(System.Logger.Level.DEBUG,"starting application");
         Font.loadFont(getClass().getResourceAsStream("/fxml/albertus-mt.ttf"), 16);
         Font.loadFont(getClass().getResourceAsStream("/fxml/albertus-mt-light.ttf"), 16);
         Font.loadFont(getClass().getResourceAsStream("/fxml/fa5-free-solid-900.ttf"), 16);
@@ -207,5 +214,51 @@ public class Main extends Application {
 
         //handler to prepare controls on startup, the use of initialize and risk of crash
         primaryStage.addEventHandler(WindowEvent.WINDOW_SHOWN, window -> MainController.mainFormInitialized.setValue(true));
+    }
+
+    private void parseCliParams() {
+        String debugParam = getParameters().getNamed().get("debug");
+        int debug = 0;
+        try {
+            if(StringUtils.isNotBlank(debugParam)) {
+                debug = Integer.valueOf(debugParam);
+            }
+        } catch (NumberFormatException ignored) {
+            //ignored
+            return;
+        }
+
+        switch (debug) {
+            case 9:
+                State.get().addDebugPrefix("*", Level.FINER);
+                break;
+            case 8:
+            case 7:
+            case 6:
+            case 5:
+                State.get().addDebugPrefix("*", Level.FINE);
+                State.get().addDebugPrefix(Database.class.getPackageName(), Level.FINER);
+                State.get().addDebugPrefix(Main.class.getPackageName(), Level.FINER);
+                break;
+            case 4:
+                State.get().addDebugPrefix("*", Level.FINE);
+                State.get().addDebugPrefix(Main.class.getPackageName(), Level.FINER);
+                break;
+            case 3:
+                State.get().addDebugPrefix(Main.class.getPackageName(), Level.FINER);
+                State.get().addDebugPrefix(Database.class.getPackageName(), Level.FINE);
+                break;
+            case 2:
+                State.get().addDebugPrefix(Main.class.getPackageName(), Level.FINE);
+                State.get().addDebugPrefix(Database.class.getPackageName(), Level.FINE);
+                break;
+            case 1:
+                State.get().addDebugPrefix(Main.class.getPackageName(), Level.FINE);
+                break;
+            case 0:
+            default:
+                //0 debug disabled
+        }
+
     }
 }

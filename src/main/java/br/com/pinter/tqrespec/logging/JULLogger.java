@@ -4,6 +4,7 @@
 
 package br.com.pinter.tqrespec.logging;
 
+import br.com.pinter.tqrespec.core.State;
 import br.com.pinter.tqrespec.util.Constants;
 import org.apache.commons.lang3.StringUtils;
 
@@ -20,6 +21,27 @@ public class JULLogger implements System.Logger {
     public JULLogger(String name) {
         this.name = name;
         this.logger = Logger.getLogger(name);
+
+        for (String prefix : State.get().getDebugPrefix().keySet()) {
+            if (name.startsWith(prefix)) {
+                java.util.logging.Level levelPrefix = State.get().getDebugPrefix().get(prefix);
+
+                if (levelPrefix != null) {
+                    this.logger.setLevel(levelPrefix);
+                    return;
+                }
+            }
+        }
+
+        if (State.get().getDebugPrefix().containsKey("*")) {
+            //a cli parameter was passed to set debug on all packages, ignore from constant
+            java.util.logging.Level levelPrefix = State.get().getDebugPrefix().get("*");
+
+            if (levelPrefix != null) {
+                this.logger.setLevel(levelPrefix);
+                return;
+            }
+        }
 
         List<String> levels = Arrays.asList(StringUtils.split(Constants.LOGLEVELS, ";"));
         levels.forEach(f -> {
@@ -126,28 +148,8 @@ public class JULLogger implements System.Logger {
 
     @Override
     public void log(Level level, ResourceBundle resourceBundle, String format, Object... params) {
-        if (!isLoggable(level)) {
-            return;
-        }
-
         String msg = MessageFormat.format(format, params);
 
-        switch (level) {
-            case TRACE:
-                logger.log(java.util.logging.Level.FINER, msg);
-                break;
-            case DEBUG:
-                logger.log(java.util.logging.Level.FINE, msg);
-                break;
-            case WARNING:
-                logger.log(java.util.logging.Level.WARNING, msg);
-                break;
-            case ERROR:
-                logger.log(java.util.logging.Level.SEVERE, msg);
-                break;
-            case ALL:
-            default:
-                logger.log(java.util.logging.Level.INFO, msg);
-        }
+        this.log(level,msg);
     }
 }

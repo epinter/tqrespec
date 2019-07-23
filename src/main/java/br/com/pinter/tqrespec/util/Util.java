@@ -20,7 +20,7 @@
 
 package br.com.pinter.tqrespec.util;
 
-import br.com.pinter.tqrespec.gui.State;
+import br.com.pinter.tqrespec.core.State;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
 import javafx.application.Platform;

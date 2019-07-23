@@ -23,7 +23,7 @@ package br.com.pinter.tqrespec.save;
 import br.com.pinter.tqdatabase.Database;
 import br.com.pinter.tqdatabase.models.Skill;
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
-import br.com.pinter.tqrespec.gui.State;
+import br.com.pinter.tqrespec.core.State;
 import br.com.pinter.tqrespec.tqdata.Db;
 import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Constants;

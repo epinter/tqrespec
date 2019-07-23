@@ -18,15 +18,20 @@
     along with TQ Respec.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package br.com.pinter.tqrespec.gui;
+package br.com.pinter.tqrespec.core;
 
 import javafx.beans.property.SimpleBooleanProperty;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
 
 public class State {
     private static final Object lock = new Object();
     private static State instance = null;
-    private SimpleBooleanProperty saveInProgress = new SimpleBooleanProperty(false);
-    private SimpleBooleanProperty gameRunning = new SimpleBooleanProperty(false);
+    private final SimpleBooleanProperty saveInProgress = new SimpleBooleanProperty(false);
+    private final SimpleBooleanProperty gameRunning = new SimpleBooleanProperty(false);
+    private final Map<String, Level> debugPrefix = new HashMap<>();
 
     public static State get() {
         State c = instance;
@@ -67,5 +72,13 @@ public class State {
 
     public SimpleBooleanProperty gameRunningProperty() {
         return gameRunning;
+    }
+
+    public Map<String, Level> getDebugPrefix() {
+        return debugPrefix;
+    }
+
+    public void addDebugPrefix(String prefix, Level level) {
+        getDebugPrefix().put(prefix, level);
     }
 }
