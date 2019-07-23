@@ -39,10 +39,9 @@ import javafx.util.converter.NumberStringConverter;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.util.ResourceBundle;
-import java.util.logging.Logger;
 
 public class AttributesPaneController implements Initializable {
-    private static final Logger logger = Log.getLogger();
+    private static final System.Logger logger = Log.getLogger(AttributesPaneController.class.getName());
 
     @Inject
     private Db db;
@@ -278,7 +277,7 @@ public class AttributesPaneController implements Initializable {
     }
 
     public void saveCharHandler() {
-        logger.fine("starting savegame task");
+        logger.log(System.Logger.Level.DEBUG, "starting savegame task");
 
         int strOld = playerData.getStr();
         int intOld = playerData.getInt();
@@ -305,7 +304,7 @@ public class AttributesPaneController implements Initializable {
         if (modifierOld != currentAvail.get() && currentAvail.get() >= 0) {
             playerData.setModifierPoints(currentAvail.get());
         }
-        logger.fine("returning savegame task");
+        logger.log(System.Logger.Level.DEBUG, "returning savegame task");
     }
 
     public void loadCharHandler() {

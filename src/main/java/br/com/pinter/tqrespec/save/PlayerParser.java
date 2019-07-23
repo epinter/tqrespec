@@ -33,10 +33,9 @@ import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 
 final class PlayerParser extends FileParser {
-    private static final Logger logger = Log.getLogger();
+    private static final System.Logger logger = Log.getLogger(PlayerParser.class.getName());
 
     private String player = null;
     private boolean customQuest = false;
@@ -66,7 +65,7 @@ final class PlayerParser extends FileParser {
 
             if (BEGIN_BLOCK.equals(name)) {
                 BlockInfo b = getBlockInfo().get(keyOffset);
-                logger.fine(() -> "ignoring block offset: " + keyOffset);
+                logger.log(System.Logger.Level.DEBUG, "ignoring block offset: ''{0}''", keyOffset);
                 getBuffer().position(b.getEnd() + 1);
             }
 
@@ -79,7 +78,7 @@ final class PlayerParser extends FileParser {
             variableInfo.setName(name);
             variableInfo.setVariableType(VariableType.UNKNOWN);
 
-            String logFmt = "name=%s; value=%s";
+            String logFmt = "name=%s; value=%s; type=%s";
 
             PlayerFileVariable e = PlayerFileVariable.valueOf(name);
 
@@ -91,22 +90,17 @@ final class PlayerParser extends FileParser {
                 if (e.type() == VariableType.INTEGER) {
                     int valueInt = (int) variableInfo.getValue();
                     valueLog = String.valueOf(valueInt);
-                    readIntegerFromHeader(h,name,valueInt);
+                    readIntegerFromHeader(h, name, valueInt);
                 }
 
                 if (e.type() == VariableType.STRING) {
                     String valueString = (String) variableInfo.getValue();
                     valueLog = valueString;
-                    readStringFromHeader(h,name,valueString);
+                    readStringFromHeader(h, name, valueString);
                 }
 
-                if (e.type() == VariableType.STREAM) {
-                    byte[] value = (byte[]) variableInfo.getValue();
-                    valueLog = new String(value);
-                }
-
-                String logMsg = String.format(logFmt, name, valueLog);
-                logger.fine(logMsg);
+                String logMsg = String.format(logFmt, name, valueLog, e.type());
+                logger.log(System.Logger.Level.DEBUG, logMsg);
             }
 
             if (variableInfo.getVariableType() == VariableType.UNKNOWN) {
@@ -150,7 +144,7 @@ final class PlayerParser extends FileParser {
         if (this.getBuffer() == null || this.getBuffer().capacity() <= 50) {
             throw new IOException("Can't read Player.chr from player " + this.player);
         }
-        logger.fine(() -> String.format("File '%s' loaded, size=%d", this.player, this.getBuffer().capacity()));
+        logger.log(System.Logger.Level.DEBUG, "Character ''{0}'' loaded, size=''{1}''", this.player, this.getBuffer().capacity());
 
         headerInfo = parseHeader();
 
@@ -186,7 +180,7 @@ final class PlayerParser extends FileParser {
         File playerChr = new File(Util.playerChr(player, customQuest).toString());
 
         if (!playerChr.exists()) {
-            logger.info(() -> String.format("File '%s' doesn't exists", playerChr.toString()));
+            logger.log(System.Logger.Level.DEBUG, "File ''{0}'' doesn't exists", playerChr.toString());
             return;
         }
 
@@ -199,7 +193,7 @@ final class PlayerParser extends FileParser {
             }
         }
 
-        logger.fine("File read to buffer: " + this.getBuffer());
+        logger.log(System.Logger.Level.DEBUG, "File ''{0}'' read to buffer: ''{1}''", playerChr, this.getBuffer());
     }
 
     @Override
@@ -214,8 +208,8 @@ final class PlayerParser extends FileParser {
             String name = readString();
 
             if (StringUtils.isEmpty(name)) {
-                logger.info(() -> String.format("empty name at block %d pos %d (BEGIN_BLOCK_SIZE=%d, END_BLOCK_SIZE=%d, block_start=%s block_end=%d",
-                        block.getStart(), keyOffset, BEGIN_BLOCK_SIZE, END_BLOCK_SIZE, block.getStart(), block.getEnd()));
+                logger.log(System.Logger.Level.DEBUG, "empty name at block ''{0}'' pos ''{1}'' (BEGIN_BLOCK_SIZE=''{2}'', END_BLOCK_SIZE=''{3}'', block_start=''{4}'' block_end=''{5}''",
+                        block.getStart(), keyOffset, BEGIN_BLOCK_SIZE, END_BLOCK_SIZE, block.getStart(), block.getEnd());
             }
 
             if (BEGIN_BLOCK.equals(name)) {
@@ -288,13 +282,13 @@ final class PlayerParser extends FileParser {
             putVarIndex(life.getName(), block.getStart());
             ret.put(mana.getName(), mana);
             putVarIndex(mana.getName(), block.getStart());
-            String logMsg = "blockStart: %d; variableInfo: %s;";
+            String logMsg = "blockStart: ''{0}''; variableInfo: ''{1}'';";
 
-            logger.fine(() -> String.format(logMsg, block.getStart(), ret.get("str").toString()));
-            logger.fine(() -> String.format(logMsg, block.getStart(), ret.get("dex").toString()));
-            logger.fine(() -> String.format(logMsg, block.getStart(), ret.get("int").toString()));
-            logger.fine(() -> String.format(logMsg, block.getStart(), ret.get("life").toString()));
-            logger.fine(() -> String.format(logMsg, block.getStart(), ret.get("mana").toString()));
+            logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), ret.get("str").toString());
+            logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), ret.get("dex").toString());
+            logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), ret.get("int").toString());
+            logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), ret.get("life").toString());
+            logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), ret.get("mana").toString());
         }
         return ret;
     }

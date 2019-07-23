@@ -28,22 +28,22 @@ import com.google.inject.Singleton;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Singleton
 public class Txt {
-    private static final Logger logger = Log.getLogger();
+    private static final System.Logger logger = Log.getLogger(Txt.class.getName());
 
     private Text text;
 
     public void initialize() {
         try {
             if (text == null) {
-                text = new Text(GameInfo.getInstance().getGamePath() + "/Text");
+                String path = GameInfo.getInstance().getGamePath() + "/Text";
+                logger.log(System.Logger.Level.DEBUG, "loading text from ''{0}''", path);
+                text = new Text(path);
             }
         } catch (FileNotFoundException e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             throw new UnhandledRuntimeException("Error loading text resource.");
         }
     }

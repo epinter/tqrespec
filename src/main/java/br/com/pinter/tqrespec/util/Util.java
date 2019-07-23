@@ -38,15 +38,13 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 @SuppressWarnings("ConstantConditions")
 public class Util {
-    private static final Logger logger = Log.getLogger();
+    private static final System.Logger logger = Log.getLogger(Util.class.getName());
 
     private Util() {
     }
@@ -146,7 +144,7 @@ public class Util {
                 } catch (DirectoryNotEmptyException ignored) {
                     //ignore
                 } catch (IOException e) {
-                    logger.info(() -> String.format("Unable to create directory '%s'", targetDir));
+                    logger.log(System.Logger.Level.ERROR, "Unable to create directory ''{0}''", targetDir);
                     return FileVisitResult.TERMINATE;
                 }
 
@@ -160,7 +158,7 @@ public class Util {
                     Files.copy(file, targetFile, replace ? new CopyOption[]{COPY_ATTRIBUTES, REPLACE_EXISTING}
                             : new CopyOption[]{COPY_ATTRIBUTES});
                 } catch (IOException e) {
-                    logger.info(() -> String.format("Unable to create file '%s'", targetFile));
+                    logger.log(System.Logger.Level.ERROR, "Unable to create file ''{0}''", targetFile);
                     return FileVisitResult.TERMINATE;
                 }
                 return FileVisitResult.CONTINUE;
@@ -180,7 +178,7 @@ public class Util {
                         FileTime fileTime = Files.getLastModifiedTime(dir);
                         Files.setLastModifiedTime(targetDir, fileTime);
                     } catch (IOException e) {
-                        logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+                        logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
                         return FileVisitResult.TERMINATE;
                     }
                 }
@@ -191,7 +189,7 @@ public class Util {
         try {
             Files.walkFileTree(source, fileVisitor);
         } catch (IOException e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
         }
     }
 

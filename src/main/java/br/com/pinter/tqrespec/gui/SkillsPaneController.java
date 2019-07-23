@@ -314,7 +314,7 @@ public class SkillsPaneController implements Initializable {
         Skill mastery = playerData.getPlayerMasteries().get(0);
         PlayerSkill sb = playerData.getPlayerSkills().get(mastery.getRecordPath());
 
-        if(!isMasteryEmpty(mastery)) {
+        if (!isMasteryEmpty(mastery)) {
             return;
         }
 
@@ -328,7 +328,7 @@ public class SkillsPaneController implements Initializable {
         Skill mastery = playerData.getPlayerMasteries().get(1);
         PlayerSkill sb = playerData.getPlayerSkills().get(mastery.getRecordPath());
 
-        if(!isMasteryEmpty(mastery)) {
+        if (!isMasteryEmpty(mastery)) {
             return;
         }
 
@@ -358,7 +358,7 @@ public class SkillsPaneController implements Initializable {
         Skill mastery = playerData.getPlayerMasteries().get(0);
         PlayerSkill sb = playerData.getPlayerSkills().get(mastery.getRecordPath());
 
-        if(!isMasteryEmpty(mastery)) {
+        if (!isMasteryEmpty(mastery)) {
             return;
         }
 
@@ -372,7 +372,7 @@ public class SkillsPaneController implements Initializable {
         Skill mastery = playerData.getPlayerMasteries().get(1);
         PlayerSkill sb = playerData.getPlayerSkills().get(mastery.getRecordPath());
 
-        if(!isMasteryEmpty(mastery)) {
+        if (!isMasteryEmpty(mastery)) {
             return;
         }
 

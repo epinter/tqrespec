@@ -1,3 +1,5 @@
+import br.com.pinter.tqrespec.logging.JULLoggerFinder;
+
 module br.com.pinter.tqrespec {
     requires javafx.base;
     requires javafx.fxml;
@@ -8,6 +10,7 @@ module br.com.pinter.tqrespec {
     requires jdk.zipfs;
     requires java.desktop;
     requires java.logging;
+    provides System.LoggerFinder with JULLoggerFinder;
     requires static org.apache.commons.lang3;
     requires br.com.pinter.tqdatabase;
     requires static com.google.guice;

@@ -32,18 +32,16 @@ import javafx.stage.Modality;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class ExceptionHandler {
-    private static final Logger logger = Log.getLogger();
+    private static final System.Logger logger = Log.getLogger(ExceptionHandler.class.getName());
 
     private ExceptionHandler() {
     }
 
     @SuppressWarnings("unused")
     public static void unhandled(Thread t, Throwable e) {
-        logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+        logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
 
         if (Platform.isFxApplicationThread()) {
             ExceptionHandler.showAlert(t, e);

@@ -28,12 +28,10 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @SuppressWarnings({"WeakerAccess", "CanBeFinal", "unused"})
 public class Version implements Comparable<Version> {
-    private static final Logger logger = Log.getLogger();
+    private static final System.Logger logger = Log.getLogger(Version.class.getName());
 
     private String versionNumber;
     private String urlPage;
@@ -76,30 +74,26 @@ public class Version implements Comparable<Version> {
         try {
             url = new URL(urlPropFile);
         } catch (MalformedURLException e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
         }
 
         try (InputStreamReader reader = new InputStreamReader(Objects.requireNonNull(url).openStream(), StandardCharsets.UTF_8)) {
             Properties prop = new Properties();
             prop.load(reader);
-            if (prop.getProperty("current_version") != null && prop.getProperty("module") != null && prop.getProperty("module").equals("tqrespec")) {
+            if (prop.getProperty("current_version") != null
+                    && Objects.requireNonNullElse(prop.getProperty("module"), "").equals("tqrespec")) {
                 String currentVersion = prop.getProperty("current_version");
                 this.urlPage = prop.getProperty("urlpage");
                 this.url1 = prop.getProperty("url1");
                 this.url2 = prop.getProperty("url2");
                 this.url3 = prop.getProperty("url3");
-                if (Log.isDebugEnabled()) {
-                    for (Object o : prop.keySet()) {
-                        String k = (String) o;
-                        String v = prop.getProperty(k);
-                        logger.fine(() -> k + "=" + v);
-                    }
-                }
+                logger.log(System.Logger.Level.DEBUG, "module: ''{0}'', current_version: ''{1}'', urlPage: ''{2}'', " +
+                        "url1: ''{3}'', url2: ''{4}'', url3: ''{5}''", prop.getProperty("module"), currentVersion, urlPage, url1, url2, url3);
                 lastCheck = this.compareTo(new Version(currentVersion));
                 return lastCheck;
             }
         } catch (Exception e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
         }
         return -2;
     }
@@ -142,7 +136,7 @@ public class Version implements Comparable<Version> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(versionNumber,urlPage,url1,url2,url3,lastCheck);
+        return Objects.hash(versionNumber, urlPage, url1, url2, url3, lastCheck);
     }
 }
 

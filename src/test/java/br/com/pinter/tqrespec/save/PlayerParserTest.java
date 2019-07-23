@@ -32,7 +32,7 @@ import static org.junit.Assert.*;
 @PrepareForTest(GameInfo.class)
 @PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "org.w3c.*", "com.sun.org.apache.xalan.*"})
 public class PlayerParserTest {
-    private static final Logger logger = Log.getLogger();
+    private static final System.Logger logger = Log.getLogger(PlayerParserTest.class.getName());
 
 
 //    @Rule
@@ -75,7 +75,7 @@ public class PlayerParserTest {
         try {
             playerParser.readPlayerChr();
         } catch (Exception e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             fail("parseAllBlocks: readPlayerChr() failed");
         }
 
@@ -85,7 +85,7 @@ public class PlayerParserTest {
             playerParser.buildBlocksTable();
             playerParser.prepareForParse();
         } catch (Exception e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
         }
 
         playerParser.parseAllBlocks();
@@ -103,7 +103,7 @@ public class PlayerParserTest {
             saveData.setHeaderInfo(playerParser.getHeaderInfo());
             saveData.setVariableLocation(playerParser.getVariableLocation());
         } catch (Exception e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
         }
 
         int varLocation = saveData.getVariableLocation().get("str").get(0);
@@ -121,7 +121,7 @@ public class PlayerParserTest {
         try {
             playerParser.parse();
         } catch (Exception e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
         }
         playerParser.prepareBufferForRead();
         assertEquals(0,playerParser.getBuffer().position());
@@ -132,7 +132,7 @@ public class PlayerParserTest {
         try {
             playerParser.parse();
         } catch (Exception e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
         }
         assertNotNull(playerParser.getBuffer());
         assertTrue(playerParser.getBuffer().capacity() > 0);
@@ -143,7 +143,7 @@ public class PlayerParserTest {
         try {
             playerParser.parse();
         } catch (Exception e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
         }
         ConcurrentHashMap<String, ArrayList<Integer>> variableLocation = playerParser.getVariableLocation();
         assertNotNull(variableLocation);
@@ -155,7 +155,7 @@ public class PlayerParserTest {
         try {
             playerParser.parse();
         } catch (Exception e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             fail();
         }
     }
@@ -169,7 +169,7 @@ public class PlayerParserTest {
             playerParser.prepareForParse();
             playerParser.prepareBufferForRead();
         } catch (Exception e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
         }
 
         HeaderInfo headerInfo = playerParser.parseHeader();

@@ -134,8 +134,8 @@ public class PlayerFileVariable implements IFileVariable {
 
         //repeated variables with different types, should be named (name)__(blockname)
         map.put("temp", new PlayerFileVariable("temp", VariableType.UNKNOWN, FileBlockType.MULTIPLE));
-        map.put("temp__"+FileBlockType.PLAYER_ATTRIBUTES, new PlayerFileVariable("temp", VariableType.FLOAT, FileBlockType.PLAYER_ATTRIBUTES));
-        map.put("temp__"+FileBlockType.PLAYER_MAIN, new PlayerFileVariable("temp", VariableType.INTEGER, FileBlockType.PLAYER_MAIN));
+        map.put("temp__" + FileBlockType.PLAYER_ATTRIBUTES, new PlayerFileVariable("temp", VariableType.FLOAT, FileBlockType.PLAYER_ATTRIBUTES));
+        map.put("temp__" + FileBlockType.PLAYER_MAIN, new PlayerFileVariable("temp", VariableType.INTEGER, FileBlockType.PLAYER_MAIN));
     }
 
     private PlayerFileVariable(String variable, VariableType type, FileBlockType location) {

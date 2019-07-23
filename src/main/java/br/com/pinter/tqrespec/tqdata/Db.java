@@ -24,18 +24,22 @@ import br.com.pinter.tqdatabase.Database;
 import br.com.pinter.tqdatabase.Player;
 import br.com.pinter.tqdatabase.Skills;
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
+import br.com.pinter.tqrespec.logging.Log;
 import com.google.inject.Singleton;
 
 import java.io.IOException;
 
 @Singleton
 public class Db {
+    private static final System.Logger logger = Log.getLogger(Db.class.getName());
     private Database database;
 
     public void initialize() {
         try {
             if (database == null) {
-                database = new Database(String.format("%s/Database/database.arz", GameInfo.getInstance().getGamePath()));
+                String path = String.format("%s/Database/database.arz", GameInfo.getInstance().getGamePath());
+                logger.log(System.Logger.Level.DEBUG, "loading database from ''{0}''", path);
+                database = new Database(path);
             }
         } catch (IOException e) {
             throw new UnhandledRuntimeException("Error loading database.", e);

@@ -28,20 +28,20 @@ public class Constants {
     }
 
     public static final String APPNAME = "TQRespec";
+    public static final String LOGFILE = new File(System.getProperty("java.io.tmpdir"), "tqrespec.log").getAbsolutePath();
+    public static final String LOGLEVELS = "br.com.pinter.tqrespec=INFO;br.com.pinter.tqdatabase=INFO";
     public static final String REGEX_REGISTRY_INSTALL = "Titan Quest.*Anniversary.*";
     public static final String REGEX_REGISTRY_PACKAGE = "(?i:Titan Quest.*)";
     public static final String REGEX_REGISTRY_INSTALL_FALLBACK = "Titan Quest.*";
     public static final String SAVEGAME_SUBDIR = Paths.get("My Games", "Titan Quest - Immortal Throne").toString();
     public static final String GAME_DIRECTORY_STEAM = Paths.get("common", "Titan Quest Anniversary Edition").toString();
     public static final String INITIAL_FONT_SIZE = "1";
-    public static final String BACKUP_DIRECTORY = Paths.get("SaveData", "TQRespec Backup").toString();
-    public static final String SAVEGAME_MAIN = Paths.get("SaveData", "Main").toString();
-    public static final String SAVEGAME_USER = Paths.get("SaveData", "User").toString();
+    public static final String SAVEDATA = "SaveData";
+    public static final String BACKUP_DIRECTORY = Paths.get(SAVEDATA, "TQRespec Backup").toString();
     public static final String VERSION_CHECK_URL = "https://epinter.github.io/version/tqrespec";
     public static final String DEV_GAMEDATA = Paths.get(System.getProperty("user.dir"), "gamedata").toString();
     public static final String PARENT_GAMEDATA = Paths.get(Paths.get(System.getProperty("user.dir")).getParent().toString(), "gamedata").toString();
     public static final int PROCESS_SCAN_INTERVAL_MS = 3000;
-    public static final String LOGFILE = new File(System.getProperty("java.io.tmpdir"), "tqrespec.log").getAbsolutePath();
     public static final String ERROR_MSG_EXCEPTION = "Error: ";
 
     public static class Save {

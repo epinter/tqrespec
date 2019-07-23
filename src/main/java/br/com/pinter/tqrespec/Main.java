@@ -46,7 +46,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextArea;
-import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Font;
@@ -61,8 +60,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Main extends Application {
     @Inject
@@ -74,7 +71,7 @@ public class Main extends Application {
     @Inject
     private FXMLLoader fxmlLoader;
 
-    private static final Logger logger = Log.getLogger();
+    private static final System.Logger logger = Log.getLogger(Main.class.getName());
 
     public static void main(String... args) {
         System.setProperty("javafx.preloader", "br.com.pinter.tqrespec.gui.AppPreloader");
@@ -116,7 +113,7 @@ public class Main extends Application {
                 try {
                     new Thread(new GameProcessMonitor(GameInfo.getInstance().getGamePath())).start();
                 } catch (FileNotFoundException e) {
-                    logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+                    logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
                 }
 
                 return null;
@@ -166,7 +163,7 @@ public class Main extends Application {
             fxmlLoader.setLocation(getClass().getResource(Constants.UI.MAIN_FXML));
             root = fxmlLoader.load();
         } catch (IOException e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             return;
         }
 

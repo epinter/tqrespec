@@ -60,12 +60,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @SuppressWarnings("unused")
 public class MainController implements Initializable {
-    private static final Logger logger = Log.getLogger();
+    private static final System.Logger logger = Log.getLogger(MainController.class.getName());
 
     @Inject
     private FXMLLoader fxmlLoaderAbout;
@@ -203,7 +201,7 @@ public class MainController implements Initializable {
             characterCombo.getItems().setAll(GameInfo.getInstance().getPlayerListMain());
             characterCombo.getItems().sort(String::compareTo);
         } catch (Exception e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
         }
     }
 

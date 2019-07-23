@@ -87,6 +87,7 @@ public class ResizeListener implements EventHandler<MouseEvent> {
         dx = stage.getWidth() - t.getX();
         dy = stage.getHeight() - t.getY();
     }
+
     private void mouseMoved(MouseEvent t) {
         double border = 10;
         if (t.getX() < border && t.getY() > stage.getScene().getHeight() - border) {

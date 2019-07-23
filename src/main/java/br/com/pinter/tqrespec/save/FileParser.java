@@ -21,8 +21,8 @@
 package br.com.pinter.tqrespec.save;
 
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
-import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.logging.Log;
+import br.com.pinter.tqrespec.util.Constants;
 
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
@@ -31,11 +31,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 abstract class FileParser {
-    private static final Logger logger = Log.getLogger();
+    private static final System.Logger logger = Log.getLogger(FileParser.class.getName());
 
     private static final byte[] BEGIN_BLOCK_BYTES = new byte[]{0x0B, 0x00, 0x00, 0x00, 0x62, 0x65, 0x67, 0x69, 0x6E, 0x5F, 0x62, 0x6C, 0x6F, 0x63, 0x6B};
     private static final byte[] END_BLOCK_BYTES = new byte[]{0x09, 0x00, 0x00, 0x00, 0x65, 0x6E, 0x64, 0x5F, 0x62, 0x6C, 0x6F, 0x63, 0x6B};
@@ -116,7 +114,8 @@ abstract class FileParser {
     /**
      * This method is called to parse a block, and should return a table of variables found inside the block.
      *
-     * @param blockInfo the block the method should parse.
+     * @param blockInfo
+     *         the block the method should parse.
      * @return a table with all variables found
      */
     abstract ConcurrentHashMap<String, VariableInfo> parseBlock(BlockInfo blockInfo);
@@ -133,6 +132,8 @@ abstract class FileParser {
             }
 
             blockInfoTable.get(block.getStart()).setVariables(parseBlock(block));
+
+            logger.log(System.Logger.Level.TRACE, "''{0}''", block);
         }
     }
 
@@ -149,12 +150,6 @@ abstract class FileParser {
         for (int i = 0; i < getBuffer().capacity(); i++) {
             Byte b = getBuffer().get(i);
 
-            int logFoundBegin = foundBegin;
-            int logFoundEnd = foundEnd;
-            int logPos = i;
-            logger.finer(() -> String.format("position:%d foundBegin:%d foundEnd:%d, byte:%s",
-                    logPos, logFoundBegin, logFoundEnd, new String(new byte[]{b})));
-
             if (foundBegin > 0 && !b.equals(BEGIN_BLOCK_BYTES[foundBegin])) {
                 foundBegin = 0;
             }
@@ -168,7 +163,7 @@ abstract class FileParser {
                 queueBegin.add(blockTagOffset);
                 lastBegin = blockTagOffset;
                 foundBegin = 0;
-                logger.finer(() -> String.format("adding begin-block %s to queue", blockTagOffset));
+                logger.log(System.Logger.Level.TRACE, "adding begin-block ''{0}'' to queue", blockTagOffset);
             }
 
             if (b.equals(END_BLOCK_BYTES[foundEnd]) && ++foundEnd == END_BLOCK_BYTES.length) {
@@ -188,13 +183,12 @@ abstract class FileParser {
                 blockInfoTable.put(blockStart, block);
                 foundEnd = 0;
                 int logBlockStart = blockStart;
-                logger.finer(() -> String.format("adding end-block %s to queue, (start=%d,end=%d)", blockEnd, logBlockStart, blockEnd));
-
+                logger.log(System.Logger.Level.TRACE, "adding end-block ''{0}'' to queue, (start=''{1}'',end=''{2}'')", blockEnd, logBlockStart, blockEnd);
             }
 
         }
         if (!queueBegin.isEmpty()) {
-            logger.info(queueBegin::toString);
+            logger.log(System.Logger.Level.ERROR, queueBegin::toString);
             throw new UnhandledRuntimeException(String.format("BUG: Error building map: '%s' data block(s) not closed", queueBegin.size()));
         }
     }
@@ -205,7 +199,7 @@ abstract class FileParser {
 
     void readString(VariableInfo variableInfo, boolean utf16le) {
         if (variableInfo.getValSize() != -1) {
-            logger.severe(BUG_VARIABLESIZE_ERROR_MSG);
+            logger.log(System.Logger.Level.ERROR, BUG_VARIABLESIZE_ERROR_MSG);
             return;
         }
         int valOffset = getBuffer().position();
@@ -227,13 +221,13 @@ abstract class FileParser {
             variableInfo.setValue(new String(buf, utf16le ? "UTF-16LE" : "UTF-8"));
             variableInfo.setValOffset(valOffset);
         } catch (IOException e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
         }
     }
 
     void readInt(VariableInfo variableInfo) {
         if (variableInfo.getValSize() != -1) {
-            logger.severe(BUG_VARIABLESIZE_ERROR_MSG);
+            logger.log(System.Logger.Level.ERROR, BUG_VARIABLESIZE_ERROR_MSG);
             return;
         }
         int valOffset = getBuffer().position();
@@ -246,7 +240,7 @@ abstract class FileParser {
 
     void readFloat(VariableInfo variableInfo) {
         if (variableInfo.getValSize() != -1) {
-            logger.severe(BUG_VARIABLESIZE_ERROR_MSG);
+            logger.log(System.Logger.Level.ERROR, BUG_VARIABLESIZE_ERROR_MSG);
             return;
         }
         int valOffset = getBuffer().position();
@@ -259,7 +253,7 @@ abstract class FileParser {
 
     void readUid(VariableInfo variableInfo) {
         if (variableInfo.getValSize() != -1) {
-            logger.severe(BUG_VARIABLESIZE_ERROR_MSG);
+            logger.log(System.Logger.Level.ERROR, BUG_VARIABLESIZE_ERROR_MSG);
             return;
         }
         int valOffset = getBuffer().position();
@@ -281,7 +275,7 @@ abstract class FileParser {
 
     void readStream(VariableInfo variableInfo) {
         if (variableInfo.getValSize() != -1) {
-            logger.severe(BUG_VARIABLESIZE_ERROR_MSG);
+            logger.log(System.Logger.Level.ERROR, BUG_VARIABLESIZE_ERROR_MSG);
             return;
         }
         int valOffset = getBuffer().position();
@@ -327,7 +321,7 @@ abstract class FileParser {
             getBuffer().get(buf, 0, len);
             return new String(buf, utf16le ? "UTF-16LE" : "UTF-8");
         } catch (IOException e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
         } catch (BufferUnderflowException e) {
             String bufStr = null;
             if (buf != null && buf.length < 50) {
@@ -365,7 +359,7 @@ abstract class FileParser {
                         String.format("%s__%s", name, fileBlock.name()));
                 type = fileVariableMultiple.type();
             } catch (Exception e) {
-                logger.log(Level.FINE, e, () -> String.format("Variable definition for '%s' not found.", varId));
+                logger.log(System.Logger.Level.DEBUG, "Variable definition for ''{0}'' not found.", varId);
             }
         }
 

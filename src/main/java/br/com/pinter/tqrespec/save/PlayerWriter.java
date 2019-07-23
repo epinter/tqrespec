@@ -39,11 +39,9 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class PlayerWriter {
-    private static final Logger logger = Log.getLogger();
+    private static final System.Logger logger = Log.getLogger(PlayerWriter.class.getName());
     @Inject
     private PlayerData playerData;
 
@@ -102,7 +100,7 @@ public class PlayerWriter {
                 }
                 return true;
             } catch (IOException e) {
-                logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+                logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
                 return false;
             }
         }
@@ -128,7 +126,7 @@ public class PlayerWriter {
             return true;
         } catch (IOException e) {
             State.get().setSaveInProgress(false);
-            throw new UnhandledRuntimeException("Error saving character",e);
+            throw new UnhandledRuntimeException("Error saving character", e);
         }
     }
 
