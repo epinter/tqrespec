@@ -22,13 +22,12 @@ package br.com.pinter.tqrespec.save;
 
 import br.com.pinter.tqdatabase.Database;
 import br.com.pinter.tqdatabase.models.Skill;
-import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.core.State;
+import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.tqdata.Db;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Constants;
-import br.com.pinter.tqrespec.util.Util;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
@@ -105,12 +104,17 @@ public class PlayerData {
     }
 
     public boolean loadPlayer(String playerName) {
+        if (State.get().getSaveInProgress() != null && State.get().getSaveInProgress()) {
+            return false;
+        }
+
         try {
             reset();
             this.playerName = playerName;
             PlayerParser playerParser = new PlayerParser(
-                    new File(gameInfo.playerChr(playerName,customQuest).toString()),
+                    new File(gameInfo.playerChr(playerName, customQuest).toString()),
                     playerName);
+
             buffer = playerParser.loadPlayer();
             saveData.setBlockInfo(playerParser.getBlockInfo());
             saveData.setHeaderInfo(playerParser.getHeaderInfo());

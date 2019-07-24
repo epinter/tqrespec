@@ -20,7 +20,6 @@
 
 package br.com.pinter.tqrespec.save;
 
-import br.com.pinter.tqrespec.core.State;
 import br.com.pinter.tqrespec.logging.Log;
 import org.apache.commons.lang3.StringUtils;
 
@@ -159,10 +158,6 @@ final class PlayerParser extends FileParser {
     }
 
     ByteBuffer loadPlayer() {
-        if (State.get().getSaveInProgress() != null && State.get().getSaveInProgress()) {
-            return null;
-        }
-
         parse();
         return getBuffer();
     }
