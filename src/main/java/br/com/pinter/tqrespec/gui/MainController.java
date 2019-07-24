@@ -74,6 +74,9 @@ public class MainController implements Initializable {
     @Inject
     private HostServices hostServices;
 
+    @Inject
+    private GameInfo gameInfo;
+
     @FXML
     private VBox rootelement;
 
@@ -195,7 +198,7 @@ public class MainController implements Initializable {
     private void addCharactersToCombo() {
         try {
             characterCombo.getSelectionModel().clearSelection();
-            characterCombo.getItems().setAll(GameInfo.getInstance().getPlayerListMain());
+            characterCombo.getItems().setAll(gameInfo.getPlayerListMain());
             characterCombo.getItems().sort(String::compareTo);
         } catch (Exception e) {
             logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);

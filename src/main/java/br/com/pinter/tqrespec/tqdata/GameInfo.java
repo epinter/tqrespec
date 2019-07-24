@@ -24,6 +24,7 @@ import br.com.pinter.tqrespec.Settings;
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.util.Constants;
+import com.google.inject.Singleton;
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.Shell32Util;
 import com.sun.jna.platform.win32.ShlObj;
@@ -41,32 +42,10 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
+@Singleton
 public class GameInfo {
-    private static final System.Logger logger = Log.getLogger(GameInfo.class.getName());
-
-    private static GameInfo instance = null;
-
-    private static final Object lock = new Object();
-
+    private final System.Logger logger = Log.getLogger(GameInfo.class.getName());
     private String gamePath = null;
-
-    private GameInfo() {
-    }
-
-    public static GameInfo getInstance() {
-        GameInfo c = instance;
-        if (c == null) {
-            synchronized (lock) {
-                c = instance;
-                if (c == null) {
-                    c = new GameInfo();
-                    instance = c;
-                }
-            }
-        }
-        return instance;
-    }
 
     @SuppressWarnings("unused")
     public String getWindowsVersion() {
@@ -411,4 +390,18 @@ public class GameInfo {
         playerList.toArray(ret);
         return ret;
     }
+
+
+    public Path playerChr(String playerName, boolean customQuest) {
+        String path;
+
+        if (customQuest) {
+            path = getSaveDataUserPath();
+        } else {
+            path = getSaveDataMainPath();
+        }
+
+        return Paths.get(path, "_" + playerName, "Player.chr");
+    }
+
 }

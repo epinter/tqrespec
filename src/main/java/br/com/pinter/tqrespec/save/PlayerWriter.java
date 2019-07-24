@@ -45,9 +45,12 @@ public class PlayerWriter {
     @Inject
     private PlayerData playerData;
 
+    @Inject
+    private GameInfo gameInfo;
+
     @SuppressWarnings("SameParameterValue")
     private boolean backupSaveGame(String fileName, String playerName) throws IOException {
-        File backupDirectory = new File(GameInfo.getInstance().getSavePath(), Constants.BACKUP_DIRECTORY);
+        File backupDirectory = new File(gameInfo.getSavePath(), Constants.BACKUP_DIRECTORY);
         Path player = Paths.get(fileName);
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HH");
         String ts = df.format(new Date());
@@ -169,9 +172,9 @@ public class PlayerWriter {
         State.get().setSaveInProgress(true);
         String path;
         if (playerData.isCustomQuest()) {
-            path = GameInfo.getInstance().getSaveDataUserPath();
+            path = gameInfo.getSaveDataUserPath();
         } else {
-            path = GameInfo.getInstance().getSaveDataMainPath();
+            path = gameInfo.getSaveDataMainPath();
         }
 
         String fromPlayerName = playerData.getPlayerName();

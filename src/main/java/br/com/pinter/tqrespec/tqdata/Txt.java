@@ -24,6 +24,7 @@ import br.com.pinter.tqdatabase.Text;
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.util.Constants;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import java.io.FileNotFoundException;
@@ -33,12 +34,15 @@ import java.io.IOException;
 public class Txt {
     private static final System.Logger logger = Log.getLogger(Txt.class.getName());
 
+    @Inject
+    private GameInfo gameInfo;
+
     private Text text;
 
     public void initialize() {
         try {
             if (text == null) {
-                String path = GameInfo.getInstance().getGamePath() + "/Text";
+                String path = gameInfo.getGamePath() + "/Text";
                 logger.log(System.Logger.Level.DEBUG, "loading text from ''{0}''", path);
                 text = new Text(path);
             }

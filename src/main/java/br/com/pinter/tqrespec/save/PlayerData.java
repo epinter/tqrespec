@@ -25,6 +25,7 @@ import br.com.pinter.tqdatabase.models.Skill;
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.core.State;
 import br.com.pinter.tqrespec.tqdata.Db;
+import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
@@ -32,6 +33,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.*;
@@ -50,6 +52,9 @@ public class PlayerData {
 
     @Inject
     private ChangesTable changes;
+
+    @Inject
+    private GameInfo gameInfo;
 
     private String playerName = null;
     private ByteBuffer buffer = null;
@@ -96,15 +101,17 @@ public class PlayerData {
     }
 
     public Path getPlayerChr() {
-        return Util.playerChr(playerName, customQuest);
+        return gameInfo.playerChr(playerName, customQuest);
     }
 
     public boolean loadPlayer(String playerName) {
         try {
             reset();
-            PlayerParser playerParser = new PlayerParser();
             this.playerName = playerName;
-            buffer = playerParser.loadPlayer(playerName, customQuest);
+            PlayerParser playerParser = new PlayerParser(
+                    new File(gameInfo.playerChr(playerName,customQuest).toString()),
+                    playerName);
+            buffer = playerParser.loadPlayer();
             saveData.setBlockInfo(playerParser.getBlockInfo());
             saveData.setHeaderInfo(playerParser.getHeaderInfo());
             saveData.setVariableLocation(playerParser.getVariableLocation());

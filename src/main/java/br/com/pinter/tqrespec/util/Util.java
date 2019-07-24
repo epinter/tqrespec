@@ -22,7 +22,6 @@ package br.com.pinter.tqrespec.util;
 
 import br.com.pinter.tqrespec.core.State;
 import br.com.pinter.tqrespec.logging.Log;
-import br.com.pinter.tqrespec.tqdata.GameInfo;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.stage.Modality;
@@ -42,7 +41,6 @@ import java.util.jar.Manifest;
 import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
-@SuppressWarnings("ConstantConditions")
 public class Util {
     private static final System.Logger logger = Log.getLogger(Util.class.getName());
 
@@ -134,7 +132,6 @@ public class Util {
         }
 
         FileVisitor<Path> fileVisitor = new FileVisitor<>() {
-            @SuppressWarnings("ConstantConditions")
             @Override
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
                 Path targetDir = target.resolve(source.relativize(dir));
@@ -201,18 +198,5 @@ public class Util {
         }
 
         Util.showWarning(Util.getUIMessage("alert.saveinprogress_header"), Util.getUIMessage("alert.saveinprogress_content"));
-    }
-
-    public static Path playerChr(String playerName, boolean customQuest) {
-        String path;
-
-        if (customQuest) {
-            path = GameInfo.getInstance().getSaveDataUserPath();
-        } else {
-            path = GameInfo.getInstance().getSaveDataMainPath();
-        }
-
-
-        return Paths.get(path, "_" + playerName, "Player.chr");
     }
 }

@@ -37,12 +37,13 @@ import java.util.concurrent.ConcurrentHashMap;
 final class PlayerParser extends FileParser {
     private static final System.Logger logger = Log.getLogger(PlayerParser.class.getName());
 
-    private String player = null;
-    private boolean customQuest = false;
+    private final String player;
     private HeaderInfo headerInfo = new HeaderInfo();
+    private final File playerChr;
 
-    void setPlayer(String player) {
-        this.player = player;
+    PlayerParser(File playerChr, String playerName) {
+        this.playerChr = playerChr;
+        this.player = playerName;
     }
 
     HeaderInfo getHeaderInfo() {
@@ -158,12 +159,11 @@ final class PlayerParser extends FileParser {
         }
     }
 
-    ByteBuffer loadPlayer(String playerName, boolean customQuest) {
+    ByteBuffer loadPlayer() {
         if (State.get().getSaveInProgress() != null && State.get().getSaveInProgress()) {
             return null;
         }
-        this.customQuest = customQuest;
-        this.player = playerName;
+
         parse();
         return getBuffer();
     }
@@ -176,8 +176,6 @@ final class PlayerParser extends FileParser {
 
     void readPlayerChr() throws IOException {
         reset();
-
-        File playerChr = new File(Util.playerChr(player, customQuest).toString());
 
         if (!playerChr.exists()) {
             logger.log(System.Logger.Level.DEBUG, "File ''{0}'' doesn't exists", playerChr.toString());

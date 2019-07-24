@@ -71,6 +71,9 @@ public class Main extends Application {
     @Inject
     private FXMLLoader fxmlLoader;
 
+    @Inject
+    private GameInfo gameInfo;
+
     private System.Logger logger;
 
     public static void main(String... args) {
@@ -112,7 +115,7 @@ public class Main extends Application {
                 txt.preload();
 
                 try {
-                    new Thread(new GameProcessMonitor(GameInfo.getInstance().getGamePath())).start();
+                    new Thread(new GameProcessMonitor(gameInfo.getGamePath())).start();
                 } catch (FileNotFoundException e) {
                     logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
                 }
