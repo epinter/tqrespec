@@ -134,7 +134,18 @@ abstract class FileParser {
 
             blockInfoTable.get(block.getStart()).setVariables(parseBlock(block));
 
+            setParentType(block);
+
             logger.log(System.Logger.Level.TRACE, "''{0}''", block);
+        }
+    }
+
+    private void setParentType(BlockInfo block) {
+        BlockInfo parentBlock = blockInfoTable.get(block.getParentOffset());
+        if (parentBlock != null && parentBlock.getVariables().isEmpty()
+                && parentBlock.getBlockType() == FileBlockType.BODY) {
+            parentBlock.setBlockType(block.getBlockType());
+            setParentType(parentBlock);
         }
     }
 

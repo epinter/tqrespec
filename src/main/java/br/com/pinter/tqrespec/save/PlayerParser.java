@@ -22,7 +22,6 @@ package br.com.pinter.tqrespec.save;
 
 import br.com.pinter.tqrespec.core.State;
 import br.com.pinter.tqrespec.logging.Log;
-import br.com.pinter.tqrespec.util.Util;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -280,6 +279,8 @@ final class PlayerParser extends FileParser {
             logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), ret.get("life").toString());
             logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), ret.get("mana").toString());
         }
+
+        block.setBlockType(fileBlock);
         return ret;
     }
 

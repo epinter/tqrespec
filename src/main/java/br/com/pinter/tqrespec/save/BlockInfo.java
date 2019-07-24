@@ -32,6 +32,7 @@ public class BlockInfo implements Serializable {
     private int size = -1;
     private Map<String, VariableInfo> variables = new ConcurrentHashMap<>();
     private int parentOffset = -1;
+    private FileBlockType blockType;
 
     public String getTag() {
         return tag;
@@ -81,6 +82,14 @@ public class BlockInfo implements Serializable {
         this.variables = variables;
     }
 
+    public FileBlockType getBlockType() {
+        return blockType;
+    }
+
+    public void setBlockType(FileBlockType blockType) {
+        this.blockType = blockType;
+    }
+
     @Override
     public String toString() {
         return "BlockInfo{" +
@@ -90,6 +99,7 @@ public class BlockInfo implements Serializable {
                 ", size=" + size +
                 ", variables=" + variables +
                 ", parentOffset=" + parentOffset +
+                ", blockType=" + blockType +
                 '}';
     }
 }
