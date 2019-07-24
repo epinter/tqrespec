@@ -32,6 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+@SuppressWarnings("unused")
 abstract class FileParser {
     private static final System.Logger logger = Log.getLogger(FileParser.class.getName());
 
@@ -68,10 +69,10 @@ abstract class FileParser {
         return blocksIgnore;
     }
 
-
     void reset() {
         blockInfoTable = new ConcurrentHashMap<>();
         variableLocation = new ConcurrentHashMap<>();
+        blocksIgnore = new ArrayList<>();
         buffer = null;
     }
 

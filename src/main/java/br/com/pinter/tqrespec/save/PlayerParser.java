@@ -168,15 +168,7 @@ final class PlayerParser extends FileParser {
         return getBuffer();
     }
 
-    @Override
-    void reset() {
-        super.reset();
-        headerInfo = new HeaderInfo();
-    }
-
     void readPlayerChr() throws IOException {
-        reset();
-
         if (!playerChr.exists()) {
             logger.log(System.Logger.Level.DEBUG, "File ''{0}'' doesn't exists", playerChr.toString());
             return;
