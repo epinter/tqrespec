@@ -224,6 +224,7 @@ abstract class FileParser {
                 return;
             }
             if (utf16le) {
+                variableInfo.setVariableType(VariableType.STRING_UTF_16_LE);
                 len *= 2;
             }
 
