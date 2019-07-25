@@ -23,6 +23,7 @@ package br.com.pinter.tqrespec.save;
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.util.Constants;
+import com.google.common.collect.ImmutableListMultimap;
 
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
@@ -119,7 +120,7 @@ abstract class FileParser {
      *         the block the method should parse.
      * @return a table with all variables found
      */
-    abstract ConcurrentHashMap<String, VariableInfo> parseBlock(BlockInfo blockInfo);
+    abstract ImmutableListMultimap<String, VariableInfo> parseBlock(BlockInfo blockInfo);
 
     /**
      * All blocks mapped by {@link FileParser#buildBlocksTable()} are parsed with {@link FileParser#parseBlock(BlockInfo)}.

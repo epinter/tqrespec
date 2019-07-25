@@ -141,11 +141,11 @@ public class PlayerData {
                     }
 
                     PlayerSkill sb = new PlayerSkill();
-                    sb.setSkillName((String) b.getVariables().get(Constants.Save.SKILL_NAME).getValue());
-                    sb.setSkillEnabled((Integer) b.getVariables().get(Constants.Save.SKILL_ENABLED).getValue());
-                    sb.setSkillActive((Integer) b.getVariables().get(Constants.Save.SKILL_ACTIVE).getValue());
-                    sb.setSkillSubLevel((Integer) b.getVariables().get(Constants.Save.SKILL_SUB_LEVEL).getValue());
-                    sb.setSkillTransition((Integer) b.getVariables().get(Constants.Save.SKILL_TRANSITION).getValue());
+                    sb.setSkillName((String) b.getVariables().get(Constants.Save.SKILL_NAME).get(0).getValue());
+                    sb.setSkillEnabled((Integer) b.getVariables().get(Constants.Save.SKILL_ENABLED).get(0).getValue());
+                    sb.setSkillActive((Integer) b.getVariables().get(Constants.Save.SKILL_ACTIVE).get(0).getValue());
+                    sb.setSkillSubLevel((Integer) b.getVariables().get(Constants.Save.SKILL_SUB_LEVEL).get(0).getValue());
+                    sb.setSkillTransition((Integer) b.getVariables().get(Constants.Save.SKILL_TRANSITION).get(0).getValue());
                     sb.setSkillLevel(changes.getInt(b.getStart(), Constants.Save.SKILL_LEVEL));
                     sb.setBlockStart(b.getStart());
                     if (sb.getSkillName() != null) {
@@ -196,7 +196,7 @@ public class PlayerData {
             throw new IllegalStateException("Error reclaiming points. Skill detected.");
         }
         BlockInfo sk = saveData.getBlockInfo().get(blockStart);
-        VariableInfo varSkillLevel = sk.getVariables().get(Constants.Save.SKILL_LEVEL);
+        VariableInfo varSkillLevel = sk.getVariables().get(Constants.Save.SKILL_LEVEL).get(0);
 
         if (varSkillLevel.getVariableType() == VariableType.INTEGER) {
             return changes.getInt(blockStart, Constants.Save.SKILL_LEVEL);
@@ -212,7 +212,7 @@ public class PlayerData {
         }
 
         BlockInfo skillToRemove = saveData.getBlockInfo().get(blockStart);
-        VariableInfo varSkillLevel = skillToRemove.getVariables().get(Constants.Save.SKILL_LEVEL);
+        VariableInfo varSkillLevel = skillToRemove.getVariables().get(Constants.Save.SKILL_LEVEL).get(0);
         if (varSkillLevel.getVariableType() == VariableType.INTEGER) {
             int currentSkillPoints = changes.getInt(Constants.Save.SKILL_POINTS);
             int currentSkillLevel = (int) varSkillLevel.getValue();

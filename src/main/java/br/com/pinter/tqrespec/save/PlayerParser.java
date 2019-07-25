@@ -21,6 +21,8 @@
 package br.com.pinter.tqrespec.save;
 
 import br.com.pinter.tqrespec.logging.Log;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableListMultimap;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -30,7 +32,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
 
 final class PlayerParser extends FileParser {
     private static final System.Logger logger = Log.getLogger(PlayerParser.class.getName());
@@ -49,12 +50,13 @@ final class PlayerParser extends FileParser {
     }
 
     HeaderInfo parseHeader() {
+        ArrayListMultimap<String, VariableInfo> variables = ArrayListMultimap.create();
+
         BlockInfo block = new BlockInfo();
         int headerEnd = getBuffer().capacity() - 1;
         block.setStart(0);
         block.setEnd(headerEnd);
         block.setSize(headerEnd + 1);
-        block.setVariables(new ConcurrentHashMap<>());
 
         HeaderInfo h = new HeaderInfo();
         while (this.getBuffer().position() <= headerEnd) {
@@ -106,9 +108,10 @@ final class PlayerParser extends FileParser {
                 throw new IllegalStateException(String.format("An invalid variable (%s) was found in header, aborting."
                         , name));
             }
-            block.getVariables().put(variableInfo.getName(), variableInfo);
+            variables.put(variableInfo.getName(), variableInfo);
         }
         getBlockInfo().put(block.getStart(), block);
+        block.setVariables(ImmutableListMultimap.copyOf(variables));
         return h;
     }
 
@@ -181,8 +184,8 @@ final class PlayerParser extends FileParser {
     }
 
     @Override
-    ConcurrentHashMap<String, VariableInfo> parseBlock(BlockInfo block) {
-        ConcurrentHashMap<String, VariableInfo> ret = new ConcurrentHashMap<>();
+    ImmutableListMultimap<String, VariableInfo> parseBlock(BlockInfo block) {
+        ArrayListMultimap<String, VariableInfo> ret = ArrayListMultimap.create();
         FileBlockType fileBlock = FileBlockType.BODY;
         this.getBuffer().position(block.getStart() + BEGIN_BLOCK_SIZE);
         ArrayList<VariableInfo> temp = new ArrayList<>();
@@ -276,7 +279,7 @@ final class PlayerParser extends FileParser {
         }
 
         block.setBlockType(fileBlock);
-        return ret;
+        return ImmutableListMultimap.copyOf(ret);
     }
 
     @Override

@@ -20,6 +20,8 @@
 
 package br.com.pinter.tqrespec.save;
 
+import com.google.common.io.BaseEncoding;
+
 import java.io.Serializable;
 
 @SuppressWarnings("unused")
@@ -58,6 +60,9 @@ public class VariableInfo implements Serializable {
         this.valOffset = valOffset;
     }
 
+    /**
+     * Returns the value size. Strings in UTF8 and UTF16 encodings will return the same size.
+     */
     public int getValSize() {
         return valSize;
     }
@@ -73,11 +78,55 @@ public class VariableInfo implements Serializable {
             return valueString;
         if (variableType == VariableType.FLOAT)
             return valueFloat;
-        if (variableType == VariableType.UID)
-            return valueByteArray;
-        if (variableType == VariableType.STREAM)
+        if (variableType == VariableType.UID || variableType == VariableType.STREAM)
             return valueByteArray;
         return null;
+    }
+
+    /**
+     * Returns value as a string. Bytes are converted to hex-string.
+     */
+    public String getValueString() {
+        if (variableType == VariableType.INTEGER)
+            return String.valueOf(valueInteger);
+        if (variableType == VariableType.STRING || variableType == VariableType.STRING_UTF_16_LE)
+            return valueString;
+        if (variableType == VariableType.FLOAT)
+            return String.valueOf(valueFloat);
+        if (variableType == VariableType.UID || variableType == VariableType.STREAM)
+            return BaseEncoding.base16().encode(valueByteArray);
+        return null;
+    }
+
+    /**
+     * Returns value length in bytes
+     */
+    public int getValBytesLength() {
+        int sz = valSize;
+        if (variableType == VariableType.STRING_UTF_16_LE) {
+            sz *= 2;
+        }
+        return sz;
+    }
+
+    /**
+     * Returns total variable length in bytes. Are considered first bytes specifying variable name length,
+     * variable name, first bytes specifying value length if present, value (double if utf16)
+     */
+    public int getVariableBytesLength() {
+        int valSizePrefix = 0;
+        int sz = valSize;
+
+        if (variableType == VariableType.STRING || variableType == VariableType.STRING_UTF_16_LE
+                || variableType == VariableType.STREAM) {
+            valSizePrefix = 4;
+        }
+
+        if (variableType == VariableType.STRING_UTF_16_LE) {
+            sz *= 2;
+        }
+
+        return valOffset - keyOffset + sz + valSizePrefix;
     }
 
     public void setValue(String value) {

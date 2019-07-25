@@ -20,9 +20,9 @@
 
 package br.com.pinter.tqrespec.save;
 
+import com.google.common.collect.ImmutableListMultimap;
+
 import java.io.Serializable;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @SuppressWarnings("unused")
 public class BlockInfo implements Serializable {
@@ -30,7 +30,7 @@ public class BlockInfo implements Serializable {
     private int start = -1;
     private int end = -1;
     private int size = -1;
-    private Map<String, VariableInfo> variables = new ConcurrentHashMap<>();
+    private ImmutableListMultimap<String, VariableInfo> variables = ImmutableListMultimap.of();
     private int parentOffset = -1;
     private FileBlockType blockType;
 
@@ -74,11 +74,11 @@ public class BlockInfo implements Serializable {
         this.parentOffset = parentOffset;
     }
 
-    Map<String, VariableInfo> getVariables() {
+    ImmutableListMultimap<String, VariableInfo> getVariables() {
         return variables;
     }
 
-    void setVariables(Map<String, VariableInfo> variables) {
+    void setVariables(ImmutableListMultimap<String, VariableInfo> variables) {
         this.variables = variables;
     }
 

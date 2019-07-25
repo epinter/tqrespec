@@ -6,13 +6,11 @@ package br.com.pinter.tqrespec.save;
 
 import br.com.pinter.tqrespec.core.GuiceModule;
 import br.com.pinter.tqrespec.core.InjectionContext;
-import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.util.Constants;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -48,7 +46,7 @@ public class PlayerParserTest {
         File playerChr = new File("src/test/resources/_savegame/Player.chr");
         if (!playerChr.exists()) {
             throw new IOException(String.format("File %s is missing," +
-                    " copy the savegame to execute the tests",playerChr));
+                    " copy the savegame to execute the tests", playerChr));
         }
 
         playerParser = new PlayerParser(playerChr,
@@ -97,8 +95,8 @@ public class PlayerParserTest {
         assertTrue(varLocation > 0);
         BlockInfo blockInfo = saveData.getBlockInfo().get(varLocation);
         assertNotNull(blockInfo);
-        assertEquals(VariableType.FLOAT, blockInfo.getVariables().get("str").getVariableType());
-        Float str = (Float) blockInfo.getVariables().get("str").getValue();
+        assertEquals(VariableType.FLOAT, blockInfo.getVariables().get("str").get(0).getVariableType());
+        Float str = (Float) blockInfo.getVariables().get("str").get(0).getValue();
         assertNotNull(str);
         assertTrue(str > 0.0);
     }
@@ -111,7 +109,7 @@ public class PlayerParserTest {
             logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
         }
         playerParser.prepareBufferForRead();
-        assertEquals(0,playerParser.getBuffer().position());
+        assertEquals(0, playerParser.getBuffer().position());
     }
 
     @Test

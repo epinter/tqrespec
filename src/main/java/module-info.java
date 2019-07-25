@@ -12,6 +12,7 @@ module br.com.pinter.tqrespec {
     requires static org.apache.commons.lang3;
     requires br.com.pinter.tqdatabase;
     requires static com.google.guice;
+    requires static com.google.common;
     requires static com.sun.jna.platform;
     exports br.com.pinter.tqrespec;
     exports br.com.pinter.tqrespec.core;
