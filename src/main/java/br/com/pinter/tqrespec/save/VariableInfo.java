@@ -35,6 +35,7 @@ public class VariableInfo implements Serializable {
     private Float valueFloat = null;
     private byte[] valueByteArray = null;
     private VariableType variableType;
+    private int blockOffset = -1;
 
     public String getName() {
         return name;
@@ -151,6 +152,14 @@ public class VariableInfo implements Serializable {
 
     public void setVariableType(VariableType variableType) {
         this.variableType = variableType;
+    }
+
+    public int getBlockOffset() {
+        return blockOffset;
+    }
+
+    public void setBlockOffset(int blockOffset) {
+        this.blockOffset = blockOffset;
     }
 
     @Override

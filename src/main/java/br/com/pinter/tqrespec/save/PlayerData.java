@@ -351,6 +351,14 @@ public class PlayerData {
         return changes.getInt("money");
     }
 
+    public int getVariableValueInteger(VariableInfo variableInfo) {
+        return changes.getInt(variableInfo);
+    }
+
+    public float getVariableValueFloat(VariableInfo variableInfo) {
+        return changes.getFloat(variableInfo);
+    }
+
     public String getPlayerClassName() {
         String charClass = getPlayerClassTag();
         if (StringUtils.isNotEmpty(charClass)) {

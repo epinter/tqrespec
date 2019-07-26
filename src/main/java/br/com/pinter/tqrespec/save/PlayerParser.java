@@ -75,6 +75,7 @@ final class PlayerParser extends FileParser {
             }
 
             VariableInfo variableInfo = new VariableInfo();
+            variableInfo.setBlockOffset(block.getStart());
             variableInfo.setKeyOffset(keyOffset);
             variableInfo.setName(name);
             variableInfo.setVariableType(VariableType.UNKNOWN);
@@ -228,6 +229,7 @@ final class PlayerParser extends FileParser {
             }
 
             VariableInfo variableInfo = readVar(name, fileBlock);
+            variableInfo.setBlockOffset(block.getStart());
             variableInfo.setName(name);
             variableInfo.setKeyOffset(keyOffset);
 
@@ -236,6 +238,9 @@ final class PlayerParser extends FileParser {
                 temp.add(variableInfo);
             }
 
+            if (variableInfo.getBlockOffset() == -1) {
+                throw new IllegalStateException("Illegal block offset");
+            }
             ret.put(variableInfo.getName(), variableInfo);
             putVarIndex(variableInfo.getName(), block.getStart());
         }
