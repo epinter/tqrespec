@@ -27,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,6 +39,7 @@ class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements DeepClo
 
     private static final String ALERT_INVALIDDATA = "alert.changesinvaliddata";
     private static final String MULTIPLE_DEFINITIONS_ERROR = "Variable is defined on multiple locations, aborting";
+    private static final String INVALID_DATA_TYPE = "Variable '%s' has an unexpected data type";
     private Map<Integer, Integer> valuesLengthIndex = new ConcurrentHashMap<>();
 
     ChangesTable() {
@@ -148,8 +150,22 @@ class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements DeepClo
                         this.valuesLengthIndex.put(variableInfo.getValOffset(), variableInfo.getValSize());
                     }
                 } else {
-                    throw new NumberFormatException(String.format("Variable '%s' is not a float", variable));
+                    throw new NumberFormatException(String.format(INVALID_DATA_TYPE, variable));
                 }
+            }
+        } else {
+            throw new IllegalArgumentException(Util.getUIMessage(ALERT_INVALIDDATA, variable));
+        }
+    }
+
+    void setFloat(VariableInfo variable, int value) {
+        if (saveData.getBlockInfo().get(variable.getBlockOffset()) != null) {
+            if (variable.getVariableType() == VariableType.FLOAT && variable.getValSize() == 4) {
+                byte[] data = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putFloat(value).array();
+                this.put(variable.getValOffset(), data);
+                this.valuesLengthIndex.put(variable.getValOffset(), variable.getValSize());
+            } else {
+                throw new NumberFormatException(String.format(INVALID_DATA_TYPE, variable));
             }
         } else {
             throw new IllegalArgumentException(Util.getUIMessage(ALERT_INVALIDDATA, variable));
@@ -176,7 +192,7 @@ class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements DeepClo
     Float[] getFloatList(String variable) {
         ArrayList<Float> ret = new ArrayList<>();
         if (saveData.getVariableLocation().get(variable) != null) {
-            ArrayList<Integer> blocksList = saveData.getVariableLocation().get(variable);
+            List<Integer> blocksList = saveData.getVariableLocation().get(variable);
             for (int block : blocksList) {
                 BlockInfo current = saveData.getBlockInfo().get(block);
                 if (current.getVariables().get(variable).get(0).getVariableType() == VariableType.FLOAT) {
@@ -203,7 +219,7 @@ class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements DeepClo
                     this.valuesLengthIndex.put(variableInfo.getValOffset(), variableInfo.getValSize());
                 }
             } else {
-                throw new NumberFormatException(String.format("Variable '%s' is not an int", variable));
+                throw new NumberFormatException(String.format(INVALID_DATA_TYPE, variable));
             }
         } else {
             throw new IllegalArgumentException(Util.getUIMessage(ALERT_INVALIDDATA, variable));
@@ -226,7 +242,7 @@ class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements DeepClo
                         this.valuesLengthIndex.put(variableInfo.getValOffset(), variableInfo.getValSize());
                     }
                 } else {
-                    throw new NumberFormatException(String.format("Variable '%s' is not an int", variable));
+                    throw new NumberFormatException(String.format(INVALID_DATA_TYPE, variable));
                 }
             }
         } else {
@@ -241,7 +257,7 @@ class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements DeepClo
                 this.put(variable.getValOffset(), data);
                 this.valuesLengthIndex.put(variable.getValOffset(), variable.getValSize());
             } else {
-                throw new NumberFormatException(String.format("Variable '%s' is not an int", variable));
+                throw new NumberFormatException(String.format(INVALID_DATA_TYPE, variable));
             }
         } else {
             throw new IllegalArgumentException(Util.getUIMessage(ALERT_INVALIDDATA, variable));
@@ -298,7 +314,7 @@ class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements DeepClo
     Integer[] getIntList(String variable) {
         ArrayList<Integer> ret = new ArrayList<>();
         if (saveData.getVariableLocation().get(variable) != null) {
-            ArrayList<Integer> blocksList = saveData.getVariableLocation().get(variable);
+            List<Integer> blocksList = saveData.getVariableLocation().get(variable);
             for (int block : blocksList) {
                 BlockInfo current = saveData.getBlockInfo().get(block);
                 if (current.getVariables().get(variable).get(0).getVariableType() == VariableType.INTEGER) {

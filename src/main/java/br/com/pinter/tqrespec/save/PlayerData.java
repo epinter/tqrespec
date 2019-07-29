@@ -291,44 +291,86 @@ public class PlayerData {
         return ret;
     }
 
+    List<VariableInfo> getTempVariableInfo(String var) {
+        List<Integer> temp = saveData.getVariableLocation().get("temp");
+        for (Integer blockStart : temp) {
+            BlockInfo b = saveData.getBlockInfo().get(blockStart);
+            if(!b.getVariableByAlias(var).isEmpty()) {
+                return b.getVariableByAlias(var);
+            }
+        }
+        return List.of();
+    }
+
+    private int getTempAttr(String attr) {
+        int ret = -1;
+        List<VariableInfo> varList = getTempVariableInfo(attr);
+        if (varList.size() == 1 && varList.get(0) != null) {
+            VariableInfo attrVar = varList.get(0);
+            if (attrVar.getVariableType() == VariableType.FLOAT) {
+                ret = Math.round(changes.getFloat(attrVar));
+            } else if (attrVar.getVariableType() == VariableType.INTEGER) {
+                ret = changes.getInt(attrVar);
+            }
+        }
+        if (ret < 0) {
+            throw new IllegalArgumentException(String.format("attribute not found %s", attr));
+        }
+        return ret;
+    }
+
+    private void setTempAttr(String attr, Integer val) {
+        List<VariableInfo> varList = getTempVariableInfo(attr);
+        if (!varList.isEmpty() && varList.get(0) != null) {
+            VariableInfo attrVar = varList.get(0);
+            if (attrVar.getVariableType() == VariableType.FLOAT) {
+                changes.setFloat(attrVar, val);
+            } else if (attrVar.getVariableType() == VariableType.INTEGER) {
+                changes.setInt(attrVar, val);
+            }
+        } else {
+            throw new IllegalArgumentException(String.format("attribute not found %s", attr));
+        }
+    }
+
     public int getStr() {
-        return Math.round(changes.getFloat("str"));
+        return getTempAttr("str");
     }
 
     public void setStr(int val) {
-        changes.setFloat("str", val);
+        setTempAttr("str", val);
     }
 
     public int getInt() {
-        return Math.round(changes.getFloat("int"));
+        return getTempAttr("int");
     }
 
     public void setInt(int val) {
-        changes.setFloat("int", val);
+        setTempAttr("int", val);
     }
 
     public int getDex() {
-        return Math.round(changes.getFloat("dex"));
+        return getTempAttr("dex");
     }
 
     public void setDex(int val) {
-        changes.setFloat("dex", val);
+        setTempAttr("dex", val);
     }
 
     public int getLife() {
-        return Math.round(changes.getFloat("life"));
+        return getTempAttr("life");
     }
 
     public void setLife(int val) {
-        changes.setFloat("life", val);
+        setTempAttr("life", val);
     }
 
     public int getMana() {
-        return Math.round(changes.getFloat("mana"));
+        return getTempAttr("mana");
     }
 
     public void setMana(int val) {
-        changes.setFloat("mana", val);
+        setTempAttr("mana", val);
     }
 
     public int getModifierPoints() {
@@ -368,7 +410,7 @@ public class PlayerData {
     }
 
     public int getDifficulty() {
-        return changes.getInt("difficulty");
+        return getTempAttr("difficulty");
     }
 
     public void reset() {

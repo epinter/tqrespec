@@ -21,12 +21,14 @@
 package br.com.pinter.tqrespec.save;
 
 import com.google.common.io.BaseEncoding;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 
 @SuppressWarnings("unused")
 public class VariableInfo implements Serializable {
     private String name = null;
+    private String alias = null;
     private int keyOffset = -1;
     private int valOffset = -1;
     private int valSize = -1;
@@ -43,6 +45,17 @@ public class VariableInfo implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getAlias() {
+        if(StringUtils.isNotBlank(alias)) {
+            return alias;
+        }
+        return name;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
     }
 
     public int getKeyOffset() {
@@ -164,6 +177,6 @@ public class VariableInfo implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("name={%s}; value={%s}; keyOffset={%d}, valOffset={%d}; valSize={%d}; variableType: {%s}", this.name, this.getValue(), this.keyOffset, this.valOffset, this.valSize, variableType);
+        return String.format("name={%s}; alias={%s}; value={%s}; keyOffset={%d}, valOffset={%d}; valSize={%d}; variableType: {%s}", this.name, alias, this.getValue(), this.keyOffset, this.valOffset, this.valSize, variableType);
     }
 }

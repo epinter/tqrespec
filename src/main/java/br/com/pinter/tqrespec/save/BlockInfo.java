@@ -20,9 +20,11 @@
 
 package br.com.pinter.tqrespec.save;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 @SuppressWarnings("unused")
 public class BlockInfo implements Serializable {
@@ -76,6 +78,16 @@ public class BlockInfo implements Serializable {
 
     ImmutableListMultimap<String, VariableInfo> getVariables() {
         return variables;
+    }
+
+    ImmutableList<VariableInfo> getVariableByAlias(String alias) {
+        ArrayList<VariableInfo> ret = new ArrayList<>();
+        for (VariableInfo v : variables.values()) {
+            if (v.getAlias().equals(alias)) {
+                ret.add(v);
+            }
+        }
+        return ImmutableList.copyOf(ret);
     }
 
     void setVariables(ImmutableListMultimap<String, VariableInfo> variables) {

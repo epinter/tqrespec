@@ -195,11 +195,6 @@ final class PlayerParser extends FileParser {
             int keyOffset = getBuffer().position();
             String name = readString();
 
-            if (StringUtils.isEmpty(name)) {
-                logger.log(System.Logger.Level.DEBUG, "empty name at block ''{0}'' pos ''{1}'' (BEGIN_BLOCK_SIZE=''{2}'', END_BLOCK_SIZE=''{3}'', block_start=''{4}'' block_end=''{5}''",
-                        block.getStart(), keyOffset, BEGIN_BLOCK_SIZE, END_BLOCK_SIZE, block.getStart(), block.getEnd());
-            }
-
             if (BEGIN_BLOCK.equals(name)) {
                 //ignore all child blocks, will be parsed by main loop in parseAllBlocks
                 BlockInfo subBlock = getBlockInfo().get(keyOffset);
@@ -247,40 +242,25 @@ final class PlayerParser extends FileParser {
 
         if (temp.size() == 1) {
             VariableInfo difficulty = temp.get(0);
-            difficulty.setName("difficulty");
-            ret.put(difficulty.getName(), difficulty);
-            putVarIndex(difficulty.getName(), block.getStart());
-        }
-
-        if (temp.size() == 5) {
+            difficulty.setAlias("difficulty");
+        } else if (temp.size() == 5) {
             VariableInfo str = temp.get(0);
             VariableInfo dex = temp.get(1);
             VariableInfo inl = temp.get(2);
             VariableInfo life = temp.get(3);
             VariableInfo mana = temp.get(4);
-            str.setName("str");
-            dex.setName("dex");
-            inl.setName("int");
-            life.setName("life");
-            mana.setName("mana");
+            str.setAlias("str");
+            dex.setAlias("dex");
+            inl.setAlias("int");
+            life.setAlias("life");
+            mana.setAlias("mana");
 
-            ret.put(str.getName(), str);
-            putVarIndex(str.getName(), block.getStart());
-            ret.put(dex.getName(), dex);
-            putVarIndex(dex.getName(), block.getStart());
-            ret.put(inl.getName(), inl);
-            putVarIndex(inl.getName(), block.getStart());
-            ret.put(life.getName(), life);
-            putVarIndex(life.getName(), block.getStart());
-            ret.put(mana.getName(), mana);
-            putVarIndex(mana.getName(), block.getStart());
             String logMsg = "blockStart: ''{0}''; variableInfo: ''{1}'';";
-
-            logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), ret.get("str").toString());
-            logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), ret.get("dex").toString());
-            logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), ret.get("int").toString());
-            logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), ret.get("life").toString());
-            logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), ret.get("mana").toString());
+            logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), str.toString());
+            logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), dex.toString());
+            logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), inl.toString());
+            logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), life.toString());
+            logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), mana.toString());
         }
 
         block.setBlockType(fileBlock);

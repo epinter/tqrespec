@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,7 +41,7 @@ abstract class FileParser {
     private static final byte[] BEGIN_BLOCK_BYTES = new byte[]{0x0B, 0x00, 0x00, 0x00, 0x62, 0x65, 0x67, 0x69, 0x6E, 0x5F, 0x62, 0x6C, 0x6F, 0x63, 0x6B};
     private static final byte[] END_BLOCK_BYTES = new byte[]{0x09, 0x00, 0x00, 0x00, 0x65, 0x6E, 0x64, 0x5F, 0x62, 0x6C, 0x6F, 0x63, 0x6B};
     private ConcurrentHashMap<Integer, BlockInfo> blockInfoTable = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String, ArrayList<Integer>> variableLocation = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, List<Integer>> variableLocation = new ConcurrentHashMap<>();
     private List<Integer> blocksIgnore = new ArrayList<>();
     private ByteBuffer buffer = null;
     static final int BEGIN_BLOCK_SIZE = BEGIN_BLOCK_BYTES.length + 4;
@@ -54,7 +55,7 @@ abstract class FileParser {
         return blockInfoTable;
     }
 
-    ConcurrentHashMap<String, ArrayList<Integer>> getVariableLocation() {
+    ConcurrentHashMap<String, List<Integer>> getVariableLocation() {
         return variableLocation;
     }
 
@@ -82,7 +83,7 @@ abstract class FileParser {
     }
 
     void putVarIndex(String varName, int blockStart) {
-        this.getVariableLocation().computeIfAbsent(varName, k -> new ArrayList<>());
+        this.getVariableLocation().computeIfAbsent(varName, k -> Collections.synchronizedList(new ArrayList<>()));
         this.getVariableLocation().get(varName).add(blockStart);
     }
 

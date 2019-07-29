@@ -18,8 +18,8 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,6 +37,9 @@ public class PlayerParserTest {
 
     @Inject
     private SaveData saveData;
+
+    @Inject
+    private PlayerData playerData;
 
     private PlayerParser playerParser;
 
@@ -91,12 +94,9 @@ public class PlayerParserTest {
             fail();
         }
 
-        int varLocation = saveData.getVariableLocation().get("str").get(0);
-        assertTrue(varLocation > 0);
-        BlockInfo blockInfo = saveData.getBlockInfo().get(varLocation);
-        assertNotNull(blockInfo);
-        assertEquals(VariableType.FLOAT, blockInfo.getVariables().get("str").get(0).getVariableType());
-        Float str = (Float) blockInfo.getVariables().get("str").get(0).getValue();
+        List<VariableInfo> variableInfoList = playerData.getTempVariableInfo("str");
+        assertEquals(VariableType.FLOAT, variableInfoList.get(0).getVariableType());
+        Float str = (Float) variableInfoList.get(0).getValue();
         assertNotNull(str);
         assertTrue(str > 0.0);
     }
@@ -130,7 +130,7 @@ public class PlayerParserTest {
         } catch (Exception e) {
             logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
         }
-        ConcurrentHashMap<String, ArrayList<Integer>> variableLocation = playerParser.getVariableLocation();
+        ConcurrentHashMap<String, List<Integer>> variableLocation = playerParser.getVariableLocation();
         assertNotNull(variableLocation);
         assertFalse(variableLocation.isEmpty());
     }

@@ -23,7 +23,7 @@ package br.com.pinter.tqrespec.save;
 import com.google.inject.Singleton;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SaveData implements Serializable {
     private Map<Integer, BlockInfo> blockInfo;
     private HeaderInfo headerInfo = null;
-    private Map<String, ArrayList<Integer>> variableLocation;
+    private Map<String, List<Integer>> variableLocation;
 
     public SaveData() {
         variableLocation = new ConcurrentHashMap<>();
@@ -54,11 +54,11 @@ public class SaveData implements Serializable {
         this.headerInfo = headerInfo;
     }
 
-    public Map<String, ArrayList<Integer>> getVariableLocation() {
+    public Map<String, List<Integer>> getVariableLocation() {
         return variableLocation;
     }
 
-    public void setVariableLocation(Map<String, ArrayList<Integer>> variableLocation) {
+    public void setVariableLocation(Map<String, List<Integer>> variableLocation) {
         this.variableLocation = variableLocation;
     }
 
