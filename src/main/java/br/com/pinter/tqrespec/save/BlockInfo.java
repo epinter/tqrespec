@@ -26,23 +26,13 @@ import com.google.common.collect.ImmutableListMultimap;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-@SuppressWarnings("unused")
 public class BlockInfo implements Serializable {
-    private String tag = null;
     private int start = -1;
     private int end = -1;
     private int size = -1;
     private ImmutableListMultimap<String, VariableInfo> variables = ImmutableListMultimap.of();
     private int parentOffset = -1;
-    private FileBlockType blockType;
-
-    public String getTag() {
-        return tag;
-    }
-
-    public void setTag(String tag) {
-        this.tag = tag;
-    }
+    private FileBlockType blockType = FileBlockType.UNKNOWN;
 
     public int getStart() {
         return start;
@@ -105,7 +95,6 @@ public class BlockInfo implements Serializable {
     @Override
     public String toString() {
         return "BlockInfo{" +
-                "tag='" + tag + '\'' +
                 ", start=" + start +
                 ", end=" + end +
                 ", size=" + size +
