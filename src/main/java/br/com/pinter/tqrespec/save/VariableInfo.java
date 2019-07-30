@@ -48,7 +48,7 @@ public class VariableInfo implements Serializable {
     }
 
     public String getAlias() {
-        if(StringUtils.isNotBlank(alias)) {
+        if (StringUtils.isNotBlank(alias)) {
             return alias;
         }
         return name;
@@ -128,6 +128,10 @@ public class VariableInfo implements Serializable {
      * variable name, first bytes specifying value length if present, value (double if utf16)
      */
     public int getVariableBytesLength() {
+        if (valOffset == -1) {
+            return name.length() + 4;
+        }
+
         int valSizePrefix = 0;
         int sz = valSize;
 
