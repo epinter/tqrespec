@@ -18,7 +18,7 @@
     along with TQ Respec.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package br.com.pinter.tqrespec.save;
+package br.com.pinter.tqrespec.save.player;
 
 import java.io.Serializable;
 
@@ -30,11 +30,11 @@ public class HeaderInfo implements Serializable {
     private int playerLevel = -1;
     private int playerVersion = -1;
 
-    public int getHeaderVersion() {
+    int getHeaderVersion() {
         return headerVersion;
     }
 
-    public void setHeaderVersion(int headerVersion) {
+    void setHeaderVersion(int headerVersion) {
         this.headerVersion = headerVersion;
     }
 
@@ -42,31 +42,31 @@ public class HeaderInfo implements Serializable {
         return playerCharacterClass;
     }
 
-    public void setPlayerCharacterClass(String playerCharacterClass) {
+    void setPlayerCharacterClass(String playerCharacterClass) {
         this.playerCharacterClass = playerCharacterClass;
     }
 
-    public String getPlayerClassTag() {
+    String getPlayerClassTag() {
         return playerClassTag;
     }
 
-    public void setPlayerClassTag(String playerClassTag) {
+    void setPlayerClassTag(String playerClassTag) {
         this.playerClassTag = playerClassTag;
     }
 
-    public int getPlayerLevel() {
+    int getPlayerLevel() {
         return playerLevel;
     }
 
-    public void setPlayerLevel(int playerLevel) {
+    void setPlayerLevel(int playerLevel) {
         this.playerLevel = playerLevel;
     }
 
-    public int getPlayerVersion() {
+    int getPlayerVersion() {
         return playerVersion;
     }
 
-    public void setPlayerVersion(int playerVersion) {
+    void setPlayerVersion(int playerVersion) {
         this.playerVersion = playerVersion;
     }
 }

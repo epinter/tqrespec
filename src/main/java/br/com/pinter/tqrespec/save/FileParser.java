@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 @SuppressWarnings("unused")
-abstract class FileParser {
+public abstract class FileParser {
     private static final System.Logger logger = Log.getLogger(FileParser.class.getName());
 
     private static final byte[] BEGIN_BLOCK_BYTES = new byte[]{0x0B, 0x00, 0x00, 0x00, 0x62, 0x65, 0x67, 0x69, 0x6E, 0x5F, 0x62, 0x6C, 0x6F, 0x63, 0x6B};
@@ -44,30 +44,30 @@ abstract class FileParser {
     private ConcurrentHashMap<String, List<Integer>> variableLocation = new ConcurrentHashMap<>();
     private List<Integer> blocksIgnore = new ArrayList<>();
     private ByteBuffer buffer = null;
-    static final int BEGIN_BLOCK_SIZE = BEGIN_BLOCK_BYTES.length + 4;
-    static final int END_BLOCK_SIZE = END_BLOCK_BYTES.length + 4;
-    static final String BEGIN_BLOCK = "begin_block";
-    static final String END_BLOCK = "end_block";
+    protected static final int BEGIN_BLOCK_SIZE = BEGIN_BLOCK_BYTES.length + 4;
+    protected static final int END_BLOCK_SIZE = END_BLOCK_BYTES.length + 4;
+    protected static final String BEGIN_BLOCK = "begin_block";
+    protected static final String END_BLOCK = "end_block";
     private static final String BUG_VARIABLESIZE_ERROR_MSG = "BUG: variable size != 0";
 
 
-    ConcurrentHashMap<Integer, BlockInfo> getBlockInfo() {
+    public ConcurrentHashMap<Integer, BlockInfo> getBlockInfo() {
         return blockInfoTable;
     }
 
-    ConcurrentHashMap<String, List<Integer>> getVariableLocation() {
+    public ConcurrentHashMap<String, List<Integer>> getVariableLocation() {
         return variableLocation;
     }
 
-    ByteBuffer getBuffer() {
+    public ByteBuffer getBuffer() {
         return buffer;
     }
 
-    void setBuffer(ByteBuffer buffer) {
+    protected void setBuffer(ByteBuffer buffer) {
         this.buffer = buffer;
     }
 
-    List<Integer> getBlocksIgnore() {
+    protected List<Integer> getBlocksIgnore() {
         return blocksIgnore;
     }
 
@@ -78,16 +78,16 @@ abstract class FileParser {
         buffer = null;
     }
 
-    void prepareBufferForRead() {
+    public void prepareBufferForRead() {
         buffer.rewind();
     }
 
-    void putVarIndex(String varName, int blockStart) {
+    protected void putVarIndex(String varName, int blockStart) {
         this.getVariableLocation().computeIfAbsent(varName, k -> Collections.synchronizedList(new ArrayList<>()));
         this.getVariableLocation().get(varName).add(blockStart);
     }
 
-    void parse() {
+    public void parse() {
         try {
             fillBuffer();
             buildBlocksTable();
@@ -105,14 +105,14 @@ abstract class FileParser {
      *
      * @throws IOException
      */
-    abstract void prepareForParse() throws IOException, IncompatibleSavegameException;
+    protected abstract void prepareForParse() throws IOException, IncompatibleSavegameException;
 
     /**
      * This method should load whole file (raw data) into the bytebuffer.
      *
      * @throws IOException
      */
-    abstract void fillBuffer() throws IOException;
+    protected abstract void fillBuffer() throws IOException;
 
     /**
      * This method is called to parse a block, and should return a table of variables found inside the block.
@@ -121,13 +121,13 @@ abstract class FileParser {
      *         the block the method should parse.
      * @return a table with all variables found
      */
-    abstract ImmutableListMultimap<String, VariableInfo> parseBlock(BlockInfo blockInfo);
+    protected abstract ImmutableListMultimap<String, VariableInfo> parseBlock(BlockInfo blockInfo);
 
     /**
      * All blocks mapped by {@link FileParser#buildBlocksTable()} are parsed with {@link FileParser#parseBlock(BlockInfo)}.
      * Blocks listed in {@link FileParser#blocksIgnore} are skipped (e.g. a header).
      */
-    void parseAllBlocks() {
+    public void parseAllBlocks() {
         for (BlockInfo block : blockInfoTable.values()) {
             //ignore header
             if (block == null || getBlocksIgnore().contains(block.getStart())) {
@@ -154,7 +154,7 @@ abstract class FileParser {
     /**
      * Searches the raw data for blocks
      */
-    void buildBlocksTable() {
+    public void buildBlocksTable() {
         int foundBegin = 0;
         int foundEnd = 0;
 
@@ -314,7 +314,7 @@ abstract class FileParser {
         return buf;
     }
 
-    String readString() {
+    protected String readString() {
         return this.readString(false);
     }
 
@@ -347,17 +347,17 @@ abstract class FileParser {
         return null;
     }
 
-    abstract IFileVariable getFileVariable(String var);
+    protected abstract IFileVariable getFileVariable(String var);
 
     VariableInfo readVar(String name) {
         return readVar(name, new VariableInfo(), FileBlockType.UNKNOWN);
     }
 
-    VariableInfo readVar(String name, VariableInfo variableInfo) {
+    protected VariableInfo readVar(String name, VariableInfo variableInfo) {
         return readVar(name, variableInfo, FileBlockType.UNKNOWN);
     }
 
-    VariableInfo readVar(String name, FileBlockType fileBlock) {
+    protected VariableInfo readVar(String name, FileBlockType fileBlock) {
         return readVar(name, new VariableInfo(), fileBlock);
     }
 
@@ -399,7 +399,7 @@ abstract class FileParser {
     }
 
 
-    String filterFileVariableName(String name) {
+    protected String filterFileVariableName(String name) {
         String varId = name.replaceAll("^[^a-zA-Z_$0-9.]*([a-zA-Z_$0-9.]*).*$", "$1");
         return varId.replace(".", "_");
     }

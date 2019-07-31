@@ -21,7 +21,7 @@
 package br.com.pinter.tqrespec.gui;
 
 import br.com.pinter.tqrespec.logging.Log;
-import br.com.pinter.tqrespec.save.PlayerData;
+import br.com.pinter.tqrespec.save.player.Player;
 import br.com.pinter.tqrespec.tqdata.Db;
 import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Util;
@@ -50,7 +50,7 @@ public class AttributesPaneController implements Initializable {
     private Txt txt;
 
     @Inject
-    private PlayerData playerData;
+    private Player player;
 
     @FXML
     private Spinner strSpinner;
@@ -279,30 +279,30 @@ public class AttributesPaneController implements Initializable {
     public void saveCharHandler() {
         logger.log(System.Logger.Level.DEBUG, "starting savegame task");
 
-        int strOld = playerData.getStr();
-        int intOld = playerData.getInt();
-        int dexOld = playerData.getDex();
-        int lifeOld = playerData.getLife();
-        int manaOld = playerData.getMana();
-        int modifierOld = playerData.getModifierPoints();
+        int strOld = player.getStr();
+        int intOld = player.getInt();
+        int dexOld = player.getDex();
+        int lifeOld = player.getLife();
+        int manaOld = player.getMana();
+        int modifierOld = player.getModifierPoints();
 
         if (strOld != currentStr.get() && currentStr.get() > 0) {
-            playerData.setStr(currentStr.get());
+            player.setStr(currentStr.get());
         }
         if (intOld != currentInt.get() && currentInt.get() > 0) {
-            playerData.setInt(currentInt.get());
+            player.setInt(currentInt.get());
         }
         if (dexOld != currentDex.get() && currentDex.get() > 0) {
-            playerData.setDex(currentDex.get());
+            player.setDex(currentDex.get());
         }
         if (lifeOld != currentLife.get() && currentLife.get() > 0) {
-            playerData.setLife(currentLife.get());
+            player.setLife(currentLife.get());
         }
         if (manaOld != currentMana.get() && currentMana.get() > 0) {
-            playerData.setMana(currentMana.get());
+            player.setMana(currentMana.get());
         }
         if (modifierOld != currentAvail.get() && currentAvail.get() >= 0) {
-            playerData.setModifierPoints(currentAvail.get());
+            player.setModifierPoints(currentAvail.get());
         }
         logger.log(System.Logger.Level.DEBUG, "returning savegame task");
     }
@@ -320,12 +320,12 @@ public class AttributesPaneController implements Initializable {
         manaMin = Math.round(db.player().getPc().getCharacterMana());
 
         clearProperties();
-        int str = playerData.getStr();
-        int inl = playerData.getInt();
-        int dex = playerData.getDex();
-        int life = playerData.getLife();
-        int mana = playerData.getMana();
-        int modifier = playerData.getModifierPoints();
+        int str = player.getStr();
+        int inl = player.getInt();
+        int dex = player.getDex();
+        int life = player.getLife();
+        int mana = player.getMana();
+        int modifier = player.getModifierPoints();
         if (modifier < 0 || str < 0 || dex < 0 || inl < 0 || life < 0 || mana < 0) {
             Util.showError(Util.getUIMessage("alert.errorloadingchar_header"),
                     Util.getUIMessage("alert.errorloadingchar_content", life, mana, str, inl, dex));
@@ -338,11 +338,11 @@ public class AttributesPaneController implements Initializable {
         this.setDexField(dex);
         this.setLifeField(life);
         this.setManaField(mana);
-        int xp = playerData.getXp();
-        int level = playerData.getLevel();
-        int gold = playerData.getMoney();
-        charClassText.setText(playerData.getPlayerClassName());
-        int difficulty = playerData.getDifficulty();
+        int xp = player.getXp();
+        int level = player.getLevel();
+        int gold = player.getMoney();
+        charClassText.setText(player.getPlayerClassName());
+        int difficulty = player.getDifficulty();
         difficultyText.setText(Util.getUIMessage(String.format("difficulty.%d", difficulty)));
         experienceText.setText(NumberFormat.getInstance().format(xp));
         charLevelText.setText(String.valueOf(level));

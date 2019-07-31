@@ -18,7 +18,11 @@
     along with TQ Respec.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package br.com.pinter.tqrespec.save;
+package br.com.pinter.tqrespec.save.player;
+
+import br.com.pinter.tqrespec.save.FileBlockType;
+import br.com.pinter.tqrespec.save.IFileVariable;
+import br.com.pinter.tqrespec.save.VariableType;
 
 import java.util.HashMap;
 

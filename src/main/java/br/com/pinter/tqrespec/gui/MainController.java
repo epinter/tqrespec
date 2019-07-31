@@ -22,8 +22,8 @@ package br.com.pinter.tqrespec.gui;
 
 import br.com.pinter.tqrespec.core.*;
 import br.com.pinter.tqrespec.logging.Log;
-import br.com.pinter.tqrespec.save.PlayerData;
-import br.com.pinter.tqrespec.save.PlayerWriter;
+import br.com.pinter.tqrespec.save.player.Player;
+import br.com.pinter.tqrespec.save.player.PlayerWriter;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
@@ -66,7 +66,7 @@ public class MainController implements Initializable {
     private FXMLLoader fxmlLoaderAbout;
 
     @Inject
-    private PlayerData playerData;
+    private Player player;
 
     @Inject
     private PlayerWriter playerWriter;
@@ -259,7 +259,7 @@ public class MainController implements Initializable {
     public void reset() {
         pointsPaneController.clearProperties();
         skillsPaneController.resetSkilltabControls();
-        playerData.reset();
+        player.reset();
         copyCharInput.clear();
         copyCharInput.setDisable(true);
         characterCombo.setValue(null);
@@ -298,7 +298,7 @@ public class MainController implements Initializable {
             @Override
             public void handleEvent(WorkerStateEvent workerStateEvent) {
                 if ((int) copyCharTask.getValue() == 2) {
-                    playerData.reset();
+                    player.reset();
                     reset();
                     setAllControlsDisable(false);
                     addCharactersToCombo();
@@ -421,7 +421,7 @@ public class MainController implements Initializable {
         MyTask<Boolean> loadTask = new MyTask<>() {
             @Override
             protected Boolean call() {
-                return playerData.loadPlayer(playerName);
+                return player.loadPlayer(playerName);
             }
         };
 

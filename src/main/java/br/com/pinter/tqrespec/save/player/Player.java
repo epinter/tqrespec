@@ -18,28 +18,28 @@
     along with TQ Respec.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package br.com.pinter.tqrespec.save;
+package br.com.pinter.tqrespec.save.player;
 
 import br.com.pinter.tqdatabase.Database;
 import br.com.pinter.tqdatabase.models.Skill;
 import br.com.pinter.tqrespec.core.State;
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
+import br.com.pinter.tqrespec.save.BlockInfo;
+import br.com.pinter.tqrespec.save.VariableInfo;
+import br.com.pinter.tqrespec.save.VariableType;
 import br.com.pinter.tqrespec.tqdata.Db;
-import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Constants;
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
-import java.nio.ByteBuffer;
-import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
-@SuppressWarnings("unused")
-@Singleton
-public class PlayerData {
+public class Player {
     @Inject
     private Db db;
 
@@ -47,61 +47,7 @@ public class PlayerData {
     private Txt txt;
 
     @Inject
-    private SaveData saveData;
-
-    @Inject
-    private ChangesTable changes;
-
-    @Inject
-    private GameInfo gameInfo;
-
-    private String playerName = null;
-    private ByteBuffer buffer = null;
-    private boolean customQuest = false;
-    private final LinkedHashMap<String, PlayerSkill> playerSkills;
-
-    public PlayerData() {
-        playerSkills = new LinkedHashMap<>();
-    }
-
-    public String getPlayerName() {
-        return playerName;
-    }
-
-    public void setPlayerName(String playerName) {
-        this.playerName = playerName;
-    }
-
-    public ByteBuffer getBuffer() {
-        return buffer;
-    }
-
-    public void setBuffer(ByteBuffer buffer) {
-        this.buffer = buffer;
-    }
-
-    ChangesTable getChanges() {
-        return changes;
-    }
-
-    boolean isCustomQuest() {
-        return customQuest;
-    }
-
-    public void setCustomQuest(boolean customQuest) {
-        this.customQuest = customQuest;
-    }
-
-    public String getPlayerClassTag() {
-        if (saveData.getHeaderInfo() != null) {
-            return saveData.getHeaderInfo().getPlayerClassTag();
-        }
-        return null;
-    }
-
-    public Path getPlayerChr() {
-        return gameInfo.playerChr(playerName, customQuest);
-    }
+    private CurrentPlayerData saveData;
 
     public boolean loadPlayer(String playerName) {
         if (State.get().getSaveInProgress() != null && State.get().getSaveInProgress()) {
@@ -110,15 +56,15 @@ public class PlayerData {
 
         try {
             reset();
-            this.playerName = playerName;
+            saveData.setPlayerName(playerName);
             PlayerParser playerParser = new PlayerParser(
-                    new File(gameInfo.playerChr(playerName, customQuest).toString()),
+                    new File(saveData.getPlayerChr().toString()),
                     playerName);
 
-            buffer = playerParser.loadPlayer();
-            saveData.setBlockInfo(playerParser.getBlockInfo());
+            saveData.setBuffer(playerParser.loadPlayer());
+            saveData.getChanges().setBlockInfo(playerParser.getBlockInfo());
             saveData.setHeaderInfo(playerParser.getHeaderInfo());
-            saveData.setVariableLocation(playerParser.getVariableLocation());
+            saveData.getChanges().setVariableLocation(playerParser.getVariableLocation());
             prepareSkillsList();
         } catch (Exception e) {
             reset();
@@ -127,15 +73,15 @@ public class PlayerData {
         return true;
     }
 
-    void prepareSkillsList() {
-        playerSkills.clear();
-        for (String v : saveData.getVariableLocation().keySet()) {
+    private void prepareSkillsList() {
+        saveData.getPlayerSkills().clear();
+        for (String v : saveData.getChanges().getVariableLocation().keySet()) {
             if (v.startsWith(Database.Variables.PREFIX_SKILL_NAME)) {
-                for (int blockOffset : saveData.getVariableLocation().get(v)) {
-                    int parent = saveData.getBlockInfo().get(blockOffset).getParentOffset();
-                    BlockInfo b = saveData.getBlockInfo().get(blockOffset);
-                    if (parent < 0 || !saveData.getBlockInfo().get(parent).getVariables().containsKey("max")
-                            || (changes.get(b.getStart()) != null && changes.get(b.getStart()).length == 0)) {
+                for (int blockOffset : saveData.getChanges().getVariableLocation().get(v)) {
+                    int parent = saveData.getChanges().getBlockInfo().get(blockOffset).getParentOffset();
+                    BlockInfo b = saveData.getChanges().getBlockInfo().get(blockOffset);
+                    if (parent < 0 || !saveData.getChanges().getBlockInfo().get(parent).getVariables().containsKey("max")
+                            || (saveData.getChanges().get(b.getStart()) != null && saveData.getChanges().get(b.getStart()).length == 0)) {
                         //new block size is zero (was removed) or no parent
                         continue;
                     }
@@ -146,11 +92,11 @@ public class PlayerData {
                     sb.setSkillActive((Integer) b.getVariables().get(Constants.Save.SKILL_ACTIVE).get(0).getValue());
                     sb.setSkillSubLevel((Integer) b.getVariables().get(Constants.Save.SKILL_SUB_LEVEL).get(0).getValue());
                     sb.setSkillTransition((Integer) b.getVariables().get(Constants.Save.SKILL_TRANSITION).get(0).getValue());
-                    sb.setSkillLevel(changes.getInt(b.getStart(), Constants.Save.SKILL_LEVEL));
+                    sb.setSkillLevel(getVariableValueInteger(b.getStart(), Constants.Save.SKILL_LEVEL));
                     sb.setBlockStart(b.getStart());
                     if (sb.getSkillName() != null) {
-                        synchronized (playerSkills) {
-                            playerSkills.put(Objects.requireNonNull(Database.normalizeRecordPath(sb.getSkillName())),
+                        synchronized (saveData.getPlayerSkills()) {
+                            saveData.getPlayerSkills().put(Objects.requireNonNull(Database.normalizeRecordPath(sb.getSkillName())),
                                     sb);
                         }
                     }
@@ -160,33 +106,33 @@ public class PlayerData {
     }
 
     public boolean isCharacterLoaded() {
-        return buffer != null;
+        return saveData.getBuffer() != null;
     }
 
     public int getAvailableSkillPoints() {
         if (!isCharacterLoaded()) return 0;
 
-        int block = saveData.getVariableLocation().get(Constants.Save.SKILL_POINTS).get(0);
-        BlockInfo statsBlock = saveData.getBlockInfo().get(block);
-        return changes.getInt(statsBlock.getStart(), Constants.Save.SKILL_POINTS);
+        int block = saveData.getChanges().getVariableLocation().get(Constants.Save.SKILL_POINTS).get(0);
+        BlockInfo statsBlock = saveData.getChanges().getBlockInfo().get(block);
+        return getVariableValueInteger(statsBlock.getStart(), Constants.Save.SKILL_POINTS);
     }
 
     public Map<String, PlayerSkill> getPlayerSkills() {
         boolean update = false;
 
-        for (PlayerSkill b : playerSkills.values()) {
-            if (changes.get(b.getBlockStart()) != null
-                    && changes.get(b.getBlockStart()).length == 0) {
+        for (PlayerSkill b : saveData.getPlayerSkills().values()) {
+            if (saveData.getChanges().get(b.getBlockStart()) != null
+                    && saveData.getChanges().get(b.getBlockStart()).length == 0) {
                 //new block size is zero, was removed, ignore
                 update = true;
             }
         }
 
-        if (playerSkills.isEmpty() || update) {
+        if (saveData.getPlayerSkills().isEmpty() || update) {
             prepareSkillsList();
         }
 
-        return playerSkills;
+        return saveData.getPlayerSkills();
     }
 
     public int getMasteryLevel(PlayerSkill sb) {
@@ -195,11 +141,11 @@ public class PlayerData {
         if (!mastery.isMastery()) {
             throw new IllegalStateException("Error reclaiming points. Skill detected.");
         }
-        BlockInfo sk = saveData.getBlockInfo().get(blockStart);
+        BlockInfo sk = saveData.getChanges().getBlockInfo().get(blockStart);
         VariableInfo varSkillLevel = sk.getVariables().get(Constants.Save.SKILL_LEVEL).get(0);
 
         if (varSkillLevel.getVariableType() == VariableType.INTEGER) {
-            return changes.getInt(blockStart, Constants.Save.SKILL_LEVEL);
+            return getVariableValueInteger(blockStart, Constants.Save.SKILL_LEVEL);
         }
         return -1;
     }
@@ -211,17 +157,17 @@ public class PlayerData {
             throw new IllegalStateException("Error reclaiming points. Mastery detected.");
         }
 
-        BlockInfo skillToRemove = saveData.getBlockInfo().get(blockStart);
+        BlockInfo skillToRemove = saveData.getChanges().getBlockInfo().get(blockStart);
         VariableInfo varSkillLevel = skillToRemove.getVariables().get(Constants.Save.SKILL_LEVEL).get(0);
         if (varSkillLevel.getVariableType() == VariableType.INTEGER) {
-            int currentSkillPoints = changes.getInt(Constants.Save.SKILL_POINTS);
+            int currentSkillPoints = getVariableValueInteger(Constants.Save.SKILL_POINTS);
             int currentSkillLevel = (int) varSkillLevel.getValue();
-            changes.setInt(Constants.Save.SKILL_POINTS, currentSkillPoints + currentSkillLevel);
-            changes.removeBlock(blockStart);
-            changes.setInt("max", changes.getInt("max") - 1);
+            saveData.getChanges().setInt(Constants.Save.SKILL_POINTS, currentSkillPoints + currentSkillLevel);
+            saveData.getChanges().removeBlock(blockStart);
+            saveData.getChanges().setInt("max", getVariableValueInteger("max") - 1);
 
-            if (changes.get(blockStart) != null
-                    && changes.get(blockStart).length == 0) {
+            if (saveData.getChanges().get(blockStart) != null
+                    && saveData.getChanges().get(blockStart).length == 0) {
                 prepareSkillsList();
             }
         }
@@ -238,17 +184,17 @@ public class PlayerData {
             throw new IllegalStateException("Mastery have skills, aborting.");
         }
 
-        int currentSkillPoints = changes.getInt(Constants.Save.SKILL_POINTS);
-        int currentSkillLevel = changes.getInt(blockStart, Constants.Save.SKILL_LEVEL);
+        int currentSkillPoints = getVariableValueInteger(Constants.Save.SKILL_POINTS);
+        int currentSkillLevel = getVariableValueInteger(blockStart, Constants.Save.SKILL_LEVEL);
 
         if (currentSkillLevel > 0) {
-            changes.setInt(Constants.Save.SKILL_POINTS, currentSkillPoints + currentSkillLevel);
-            changes.removeBlock(blockStart);
-            changes.setInt("max", changes.getInt("max") - 1);
+            saveData.getChanges().setInt(Constants.Save.SKILL_POINTS, currentSkillPoints + currentSkillLevel);
+            saveData.getChanges().removeBlock(blockStart);
+            saveData.getChanges().setInt("max", getVariableValueInteger("max") - 1);
         }
 
-        if (changes.get(blockStart) != null
-                && changes.get(blockStart).length == 0) {
+        if (saveData.getChanges().get(blockStart) != null
+                && saveData.getChanges().get(blockStart).length == 0) {
             prepareSkillsList();
         }
     }
@@ -260,11 +206,11 @@ public class PlayerData {
             throw new IllegalStateException("Error reclaiming points. Not a mastery.");
         }
 
-        int currentSkillPoints = changes.getInt(Constants.Save.SKILL_POINTS);
-        int currentSkillLevel = changes.getInt(blockStart, Constants.Save.SKILL_LEVEL);
+        int currentSkillPoints = getVariableValueInteger(Constants.Save.SKILL_POINTS);
+        int currentSkillLevel = getVariableValueInteger(blockStart, Constants.Save.SKILL_LEVEL);
         if (currentSkillLevel > 1) {
-            changes.setInt(Constants.Save.SKILL_POINTS, currentSkillPoints + (currentSkillLevel - 1));
-            changes.setInt(blockStart, Constants.Save.SKILL_LEVEL, 1);
+            saveData.getChanges().setInt(Constants.Save.SKILL_POINTS, currentSkillPoints + (currentSkillLevel - 1));
+            saveData.getChanges().setInt(blockStart, Constants.Save.SKILL_LEVEL, 1);
             prepareSkillsList();
         }
     }
@@ -292,10 +238,10 @@ public class PlayerData {
     }
 
     List<VariableInfo> getTempVariableInfo(String var) {
-        List<Integer> temp = saveData.getVariableLocation().get("temp");
+        List<Integer> temp = saveData.getChanges().getVariableLocation().get("temp");
         for (Integer blockStart : temp) {
-            BlockInfo b = saveData.getBlockInfo().get(blockStart);
-            if(!b.getVariableByAlias(var).isEmpty()) {
+            BlockInfo b = saveData.getChanges().getBlockInfo().get(blockStart);
+            if (!b.getVariableByAlias(var).isEmpty()) {
                 return b.getVariableByAlias(var);
             }
         }
@@ -308,9 +254,9 @@ public class PlayerData {
         if (varList.size() == 1 && varList.get(0) != null) {
             VariableInfo attrVar = varList.get(0);
             if (attrVar.getVariableType() == VariableType.FLOAT) {
-                ret = Math.round(changes.getFloat(attrVar));
+                ret = Math.round(getVariableValueFloat(attrVar));
             } else if (attrVar.getVariableType() == VariableType.INTEGER) {
-                ret = changes.getInt(attrVar);
+                ret = getVariableValueInteger(attrVar);
             }
         }
         if (ret < 0) {
@@ -324,9 +270,9 @@ public class PlayerData {
         if (!varList.isEmpty() && varList.get(0) != null) {
             VariableInfo attrVar = varList.get(0);
             if (attrVar.getVariableType() == VariableType.FLOAT) {
-                changes.setFloat(attrVar, val);
+                saveData.getChanges().setFloat(attrVar, val);
             } else if (attrVar.getVariableType() == VariableType.INTEGER) {
-                changes.setInt(attrVar, val);
+                saveData.getChanges().setInt(attrVar, val);
             }
         } else {
             throw new IllegalArgumentException(String.format("attribute not found %s", attr));
@@ -374,35 +320,43 @@ public class PlayerData {
     }
 
     public int getModifierPoints() {
-        return Math.round(changes.getInt("modifierPoints"));
+        return Math.round(getVariableValueInteger("modifierPoints"));
     }
 
     public void setModifierPoints(int val) {
-        changes.setInt("modifierPoints", val);
+        saveData.getChanges().setInt("modifierPoints", val);
     }
 
     public int getXp() {
-        return changes.getInt("currentStats.experiencePoints");
+        return getVariableValueInteger("currentStats.experiencePoints");
     }
 
     public int getLevel() {
-        return changes.getInt("currentStats.charLevel");
+        return getVariableValueInteger("currentStats.charLevel");
     }
 
     public int getMoney() {
-        return changes.getInt("money");
+        return getVariableValueInteger("money");
     }
 
-    public int getVariableValueInteger(VariableInfo variableInfo) {
-        return changes.getInt(variableInfo);
+    private int getVariableValueInteger(VariableInfo variableInfo) {
+        return saveData.getChanges().getInt(variableInfo);
     }
 
-    public float getVariableValueFloat(VariableInfo variableInfo) {
-        return changes.getFloat(variableInfo);
+    private int getVariableValueInteger(String variable) {
+        return saveData.getChanges().getInt(variable);
+    }
+
+    private int getVariableValueInteger(int blockStart, String variable) {
+        return saveData.getChanges().getInt(blockStart, variable);
+    }
+
+    private float getVariableValueFloat(VariableInfo variableInfo) {
+        return saveData.getChanges().getFloat(variableInfo);
     }
 
     public String getPlayerClassName() {
-        String charClass = getPlayerClassTag();
+        String charClass = saveData.getPlayerClassTag();
         if (StringUtils.isNotEmpty(charClass)) {
             return txt.getString(charClass);
         }
@@ -414,9 +368,6 @@ public class PlayerData {
     }
 
     public void reset() {
-        this.buffer = null;
-        this.playerName = null;
-        this.changes.clear();
         State.get().setSaveInProgress(null);
         saveData.reset();
     }

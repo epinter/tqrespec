@@ -18,7 +18,7 @@
     along with TQ Respec.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package br.com.pinter.tqrespec.save;
+package br.com.pinter.tqrespec.save.player;
 
 public class PlayerSkill {
     private String skillName;

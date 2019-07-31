@@ -2,12 +2,15 @@
  * Copyright (C) 2019 Emerson Pinter - All Rights Reserved
  */
 
-package br.com.pinter.tqrespec.save;
+package br.com.pinter.tqrespec.save.player;
 
 import br.com.pinter.tqrespec.core.GuiceModule;
 import br.com.pinter.tqrespec.core.InjectionContext;
+import br.com.pinter.tqrespec.save.VariableInfo;
+import br.com.pinter.tqrespec.save.VariableType;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.util.Constants;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,10 +39,10 @@ public class PlayerParserTest {
             Collections.singletonList(new GuiceModule()));
 
     @Inject
-    private SaveData saveData;
+    private CurrentPlayerData saveData;
 
     @Inject
-    private PlayerData playerData;
+    private Player player;
 
     private PlayerParser playerParser;
 
@@ -86,16 +89,16 @@ public class PlayerParserTest {
     public void readFloat_Should_readFloatFromSavegame() {
         try {
             playerParser.parse();
-            saveData.setBlockInfo(playerParser.getBlockInfo());
+            saveData.getChanges().setBlockInfo(playerParser.getBlockInfo());
             saveData.setHeaderInfo(playerParser.getHeaderInfo());
-            saveData.setVariableLocation(playerParser.getVariableLocation());
+            saveData.getChanges().setVariableLocation(playerParser.getVariableLocation());
         } catch (Exception e) {
             logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
             fail();
         }
 
-        List<VariableInfo> variableInfoList = playerData.getTempVariableInfo("str");
-        assertEquals(VariableType.FLOAT, variableInfoList.get(0).getVariableType());
+        List<VariableInfo> variableInfoList = player.getTempVariableInfo("str");
+        Assert.assertEquals(VariableType.FLOAT, variableInfoList.get(0).getVariableType());
         Float str = (Float) variableInfoList.get(0).getValue();
         assertNotNull(str);
         assertTrue(str > 0.0);

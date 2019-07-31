@@ -18,9 +18,10 @@
     along with TQ Respec.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package br.com.pinter.tqrespec.save;
+package br.com.pinter.tqrespec.save.player;
 
 import br.com.pinter.tqrespec.logging.Log;
+import br.com.pinter.tqrespec.save.*;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableListMultimap;
 import org.apache.commons.lang3.StringUtils;
@@ -134,13 +135,13 @@ final class PlayerParser extends FileParser {
     }
 
     @Override
-    void fillBuffer() throws IOException {
+    protected void fillBuffer() throws IOException {
         readPlayerChr();
         prepareBufferForRead();
     }
 
     @Override
-    void prepareForParse() throws IOException, IncompatibleSavegameException {
+    protected void prepareForParse() throws IOException, IncompatibleSavegameException {
         //add header to list of ignored blocks
         getBlocksIgnore().add(0);
 
@@ -185,7 +186,7 @@ final class PlayerParser extends FileParser {
     }
 
     @Override
-    ImmutableListMultimap<String, VariableInfo> parseBlock(BlockInfo block) {
+    protected ImmutableListMultimap<String, VariableInfo> parseBlock(BlockInfo block) {
         ArrayListMultimap<String, VariableInfo> ret = ArrayListMultimap.create();
         FileBlockType fileBlock = FileBlockType.BODY;
         this.getBuffer().position(block.getStart() + BEGIN_BLOCK_SIZE);
@@ -268,7 +269,7 @@ final class PlayerParser extends FileParser {
     }
 
     @Override
-    IFileVariable getFileVariable(String var) {
+    protected IFileVariable getFileVariable(String var) {
         return PlayerFileVariable.valueOf(var);
     }
 }

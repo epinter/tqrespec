@@ -66,11 +66,11 @@ public class BlockInfo implements Serializable {
         this.parentOffset = parentOffset;
     }
 
-    ImmutableListMultimap<String, VariableInfo> getVariables() {
+    public ImmutableListMultimap<String, VariableInfo> getVariables() {
         return variables;
     }
 
-    ImmutableList<VariableInfo> getVariableByAlias(String alias) {
+    public ImmutableList<VariableInfo> getVariableByAlias(String alias) {
         ArrayList<VariableInfo> ret = new ArrayList<>();
         for (VariableInfo v : variables.values()) {
             if (v.getAlias().equals(alias)) {
@@ -80,7 +80,7 @@ public class BlockInfo implements Serializable {
         return ImmutableList.copyOf(ret);
     }
 
-    void setVariables(ImmutableListMultimap<String, VariableInfo> variables) {
+    public void setVariables(ImmutableListMultimap<String, VariableInfo> variables) {
         this.variables = variables;
     }
 

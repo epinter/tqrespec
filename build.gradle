@@ -117,6 +117,7 @@ if (moduleInfoPresent) {
                     '--add-opens', 'br.com.pinter.tqrespec/br.com.pinter.tqrespec.core=ALL-UNNAMED',
                     '--add-opens', 'br.com.pinter.tqrespec/br.com.pinter.tqrespec.tqdata=ALL-UNNAMED',
                     '--add-opens', 'br.com.pinter.tqrespec/br.com.pinter.tqrespec.gui=ALL-UNNAMED',
+                    '--add-opens', 'br.com.pinter.tqrespec/br.com.pinter.tqrespec.save.player=ALL-UNNAMED',
                     '--add-opens', 'br.com.pinter.tqrespec/br.com.pinter.tqrespec.save=ALL-UNNAMED',
                     '--add-opens','java.base/java.lang=ALL-UNNAMED',
                     '--module-path', classpath.asPath,
@@ -273,6 +274,7 @@ task appimage(type: Exec) {
                 '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.core=ALL-UNNAMED ' +
                 '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.tqdata=ALL-UNNAMED ' +
                 '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.gui=ALL-UNNAMED ' +
+                '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.save.player=ALL-UNNAMED ' +
                 '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.save=ALL-UNNAMED ' +
                 '--add-opens java.base/java.lang=ALL-UNNAMED ' +
                 '--add-reads br.com.pinter.tqrespec=ALL-UNNAMED'

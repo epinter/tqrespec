@@ -21,7 +21,6 @@
 package br.com.pinter.tqrespec.save;
 
 import br.com.pinter.tqrespec.util.Util;
-import com.google.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.ByteBuffer;
@@ -33,16 +32,16 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 @SuppressWarnings("unused")
-class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements DeepCloneable {
-    @Inject
-    private SaveData saveData;
+public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements DeepCloneable {
+    private Map<Integer, BlockInfo> blockInfo = new ConcurrentHashMap<>();;
+    private Map<String, List<Integer>> variableLocation = new ConcurrentHashMap<>();;
 
     private static final String ALERT_INVALIDDATA = "alert.changesinvaliddata";
     private static final String MULTIPLE_DEFINITIONS_ERROR = "Variable is defined on multiple locations, aborting";
     private static final String INVALID_DATA_TYPE = "Variable '%s' has an unexpected data type";
     private Map<Integer, Integer> valuesLengthIndex = new ConcurrentHashMap<>();
 
-    ChangesTable() {
+    public ChangesTable() {
         super();
     }
 
@@ -61,17 +60,33 @@ class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements DeepClo
         return Objects.hash(super.hashCode(), valuesLengthIndex);
     }
 
-    Map<Integer, Integer> getValuesLengthIndex() {
+    public Map<Integer, Integer> getValuesLengthIndex() {
         return valuesLengthIndex;
     }
 
+    public Map<Integer, BlockInfo> getBlockInfo() {
+        return blockInfo;
+    }
+
+    public void setBlockInfo(Map<Integer, BlockInfo> blockInfo) {
+        this.blockInfo = blockInfo;
+    }
+
+    public Map<String, List<Integer>> getVariableLocation() {
+        return variableLocation;
+    }
+
+    public void setVariableLocation(Map<String, List<Integer>> variableLocation) {
+        this.variableLocation = variableLocation;
+    }
+
     String getString(String variable) {
-        if (saveData.getVariableLocation().get(variable) != null) {
-            int block = saveData.getVariableLocation().get(variable).get(0);
-            if (saveData.getBlockInfo().get(block) != null
-                    && saveData.getBlockInfo().get(block).getVariables().get(variable).get(0).getVariableType()
+        if (getVariableLocation().get(variable) != null) {
+            int block = getVariableLocation().get(variable).get(0);
+            if (getBlockInfo().get(block) != null
+                    && getBlockInfo().get(block).getVariables().get(variable).get(0).getVariableType()
                     == VariableType.STRING) {
-                return (String) saveData.getBlockInfo().get(block).getVariables().get(variable).get(0).getValue();
+                return (String) getBlockInfo().get(block).getVariables().get(variable).get(0).getValue();
             }
         }
         return null;
@@ -81,16 +96,16 @@ class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements DeepClo
         this.setString(variable, value, false);
     }
 
-    void setString(String variable, String value, boolean utf16le) {
-        if (saveData.getVariableLocation().get(variable) != null) {
-            if (saveData.getVariableLocation().get(variable).size() > 1) {
+    public void setString(String variable, String value, boolean utf16le) {
+        if (getVariableLocation().get(variable) != null) {
+            if (getVariableLocation().get(variable).size() > 1) {
                 throw new IllegalStateException(MULTIPLE_DEFINITIONS_ERROR);
             }
-            int block = saveData.getVariableLocation().get(variable).get(0);
-            if (saveData.getBlockInfo().get(block) != null
-                    && saveData.getBlockInfo().get(block).getVariables().get(variable).get(0).getVariableType()
+            int block = getVariableLocation().get(variable).get(0);
+            if (getBlockInfo().get(block) != null
+                    && getBlockInfo().get(block).getVariables().get(variable).get(0).getVariableType()
                     == VariableType.STRING) {
-                VariableInfo variableInfo = saveData.getBlockInfo().get(block).getVariables().get(variable).get(0);
+                VariableInfo variableInfo = getBlockInfo().get(block).getVariables().get(variable).get(0);
                 byte[] str;
                 if (utf16le) {
                     //encode string to the format the game uses, a wide character with second byte always 0
@@ -135,15 +150,15 @@ class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements DeepClo
     }
 
     void setFloat(String variable, float value) {
-        if (saveData.getVariableLocation().get(variable) != null) {
-            if (saveData.getVariableLocation().get(variable).size() > 1) {
+        if (getVariableLocation().get(variable) != null) {
+            if (getVariableLocation().get(variable).size() > 1) {
                 throw new IllegalStateException(MULTIPLE_DEFINITIONS_ERROR);
             }
-            int block = saveData.getVariableLocation().get(variable).get(0);
-            if (saveData.getBlockInfo().get(block) != null) {
-                if (saveData.getBlockInfo().get(block).getVariables().get(variable).get(0).getVariableType()
+            int block = getVariableLocation().get(variable).get(0);
+            if (getBlockInfo().get(block) != null) {
+                if (getBlockInfo().get(block).getVariables().get(variable).get(0).getVariableType()
                         == VariableType.FLOAT) {
-                    VariableInfo variableInfo = saveData.getBlockInfo().get(block).getVariables().get(variable).get(0);
+                    VariableInfo variableInfo = getBlockInfo().get(block).getVariables().get(variable).get(0);
                     if (variableInfo.getValSize() == 4) {
                         byte[] data = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putFloat(value).array();
                         this.put(variableInfo.getValOffset(), data);
@@ -158,8 +173,8 @@ class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements DeepClo
         }
     }
 
-    void setFloat(VariableInfo variable, int value) {
-        if (saveData.getBlockInfo().get(variable.getBlockOffset()) != null) {
+    public void setFloat(VariableInfo variable, int value) {
+        if (getBlockInfo().get(variable.getBlockOffset()) != null) {
             if (variable.getVariableType() == VariableType.FLOAT && variable.getValSize() == 4) {
                 byte[] data = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putFloat(value).array();
                 this.put(variable.getValOffset(), data);
@@ -173,12 +188,12 @@ class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements DeepClo
     }
 
     float getFloat(String variable) {
-        if (saveData.getVariableLocation().get(variable) != null) {
-            int block = saveData.getVariableLocation().get(variable).get(0);
-            if (saveData.getBlockInfo().get(block) != null
-                    && saveData.getBlockInfo().get(block).getVariables().get(variable).get(0).getVariableType()
+        if (getVariableLocation().get(variable) != null) {
+            int block = getVariableLocation().get(variable).get(0);
+            if (getBlockInfo().get(block) != null
+                    && getBlockInfo().get(block).getVariables().get(variable).get(0).getVariableType()
                     == VariableType.FLOAT) {
-                VariableInfo v = saveData.getBlockInfo().get(block).getVariables().get(variable).get(0);
+                VariableInfo v = getBlockInfo().get(block).getVariables().get(variable).get(0);
                 if (this.get(v.getValOffset()) != null) {
                     return ByteBuffer.wrap(this.get(v.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getFloat();
                 } else {
@@ -191,10 +206,10 @@ class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements DeepClo
 
     Float[] getFloatList(String variable) {
         ArrayList<Float> ret = new ArrayList<>();
-        if (saveData.getVariableLocation().get(variable) != null) {
-            List<Integer> blocksList = saveData.getVariableLocation().get(variable);
+        if (getVariableLocation().get(variable) != null) {
+            List<Integer> blocksList = getVariableLocation().get(variable);
             for (int block : blocksList) {
-                BlockInfo current = saveData.getBlockInfo().get(block);
+                BlockInfo current = getBlockInfo().get(block);
                 if (current.getVariables().get(variable).get(0).getVariableType() == VariableType.FLOAT) {
                     float v = (Float) current.getVariables().get(variable).get(0).getValue();
                     ret.add(v);
@@ -204,15 +219,15 @@ class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements DeepClo
         return ret.toArray(new Float[0]);
     }
 
-    void setInt(int blockStart, String variable, int value) {
-        if (saveData.getBlockInfo().get(blockStart) != null) {
-            if (saveData.getBlockInfo().get(blockStart).getVariables().get(variable).size() > 1) {
+    public void setInt(int blockStart, String variable, int value) {
+        if (getBlockInfo().get(blockStart) != null) {
+            if (getBlockInfo().get(blockStart).getVariables().get(variable).size() > 1) {
                 throw new IllegalStateException(MULTIPLE_DEFINITIONS_ERROR);
             }
 
-            if (saveData.getBlockInfo().get(blockStart).getVariables().get(variable).get(0).getVariableType()
+            if (getBlockInfo().get(blockStart).getVariables().get(variable).get(0).getVariableType()
                     == VariableType.INTEGER) {
-                VariableInfo variableInfo = saveData.getBlockInfo().get(blockStart).getVariables().get(variable).get(0);
+                VariableInfo variableInfo = getBlockInfo().get(blockStart).getVariables().get(variable).get(0);
                 if (variableInfo.getValSize() == 4) {
                     byte[] data = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(value).array();
                     this.put(variableInfo.getValOffset(), data);
@@ -226,16 +241,16 @@ class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements DeepClo
         }
     }
 
-    void setInt(String variable, int value) {
-        if (saveData.getVariableLocation().get(variable) != null) {
-            if (saveData.getVariableLocation().get(variable).size() > 1) {
+    public void setInt(String variable, int value) {
+        if (getVariableLocation().get(variable) != null) {
+            if (getVariableLocation().get(variable).size() > 1) {
                 throw new IllegalStateException(MULTIPLE_DEFINITIONS_ERROR);
             }
-            int block = saveData.getVariableLocation().get(variable).get(0);
-            if (saveData.getBlockInfo().get(block) != null) {
-                if (saveData.getBlockInfo().get(block).getVariables().get(variable).get(0).getVariableType()
+            int block = getVariableLocation().get(variable).get(0);
+            if (getBlockInfo().get(block) != null) {
+                if (getBlockInfo().get(block).getVariables().get(variable).get(0).getVariableType()
                         == VariableType.INTEGER) {
-                    VariableInfo variableInfo = saveData.getBlockInfo().get(block).getVariables().get(variable).get(0);
+                    VariableInfo variableInfo = getBlockInfo().get(block).getVariables().get(variable).get(0);
                     if (variableInfo.getValSize() == 4) {
                         byte[] data = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(value).array();
                         this.put(variableInfo.getValOffset(), data);
@@ -250,8 +265,8 @@ class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements DeepClo
         }
     }
 
-    void setInt(VariableInfo variable, int value) {
-        if (saveData.getBlockInfo().get(variable.getBlockOffset()) != null) {
+    public void setInt(VariableInfo variable, int value) {
+        if (getBlockInfo().get(variable.getBlockOffset()) != null) {
             if (variable.getVariableType() == VariableType.INTEGER && variable.getValSize() == 4) {
                 byte[] data = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(value).array();
                 this.put(variable.getValOffset(), data);
@@ -264,7 +279,7 @@ class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements DeepClo
         }
     }
 
-    Integer getInt(VariableInfo variable) {
+    public Integer getInt(VariableInfo variable) {
         if (variable.getVariableType() == VariableType.INTEGER && this.get(variable.getValOffset()) != null) {
             return ByteBuffer.wrap(this.get(variable.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getInt();
         } else {
@@ -272,7 +287,7 @@ class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements DeepClo
         }
     }
 
-    Float getFloat(VariableInfo variable) {
+    public Float getFloat(VariableInfo variable) {
         if (variable.getVariableType() == VariableType.FLOAT && this.get(variable.getValOffset()) != null) {
             return ByteBuffer.wrap(this.get(variable.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getFloat();
         } else {
@@ -280,11 +295,11 @@ class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements DeepClo
         }
     }
 
-    Integer getInt(int blockStart, String variable) {
-        if (saveData.getBlockInfo().get(blockStart) != null
-                && saveData.getBlockInfo().get(blockStart).getVariables().get(variable).get(0).getVariableType()
+    public Integer getInt(int blockStart, String variable) {
+        if (getBlockInfo().get(blockStart) != null
+                && getBlockInfo().get(blockStart).getVariables().get(variable).get(0).getVariableType()
                 == VariableType.INTEGER) {
-            VariableInfo v = saveData.getBlockInfo().get(blockStart).getVariables().get(variable).get(0);
+            VariableInfo v = getBlockInfo().get(blockStart).getVariables().get(variable).get(0);
             if (this.get(v.getValOffset()) != null) {
                 return ByteBuffer.wrap(this.get(v.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getInt();
             } else {
@@ -294,13 +309,13 @@ class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements DeepClo
         return -1;
     }
 
-    Integer getInt(String variable) {
-        if (saveData.getVariableLocation().get(variable) != null) {
-            int block = saveData.getVariableLocation().get(variable).get(0);
-            if (saveData.getBlockInfo().get(block) != null
-                    && saveData.getBlockInfo().get(block).getVariables().get(variable).get(0).getVariableType()
+    public Integer getInt(String variable) {
+        if (getVariableLocation().get(variable) != null) {
+            int block = getVariableLocation().get(variable).get(0);
+            if (getBlockInfo().get(block) != null
+                    && getBlockInfo().get(block).getVariables().get(variable).get(0).getVariableType()
                     == VariableType.INTEGER) {
-                VariableInfo v = saveData.getBlockInfo().get(block).getVariables().get(variable).get(0);
+                VariableInfo v = getBlockInfo().get(block).getVariables().get(variable).get(0);
                 if (this.get(v.getValOffset()) != null) {
                     return ByteBuffer.wrap(this.get(v.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getInt();
                 } else {
@@ -313,10 +328,10 @@ class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements DeepClo
 
     Integer[] getIntList(String variable) {
         ArrayList<Integer> ret = new ArrayList<>();
-        if (saveData.getVariableLocation().get(variable) != null) {
-            List<Integer> blocksList = saveData.getVariableLocation().get(variable);
+        if (getVariableLocation().get(variable) != null) {
+            List<Integer> blocksList = getVariableLocation().get(variable);
             for (int block : blocksList) {
-                BlockInfo current = saveData.getBlockInfo().get(block);
+                BlockInfo current = getBlockInfo().get(block);
                 if (current.getVariables().get(variable).get(0).getVariableType() == VariableType.INTEGER) {
                     int v = (Integer) current.getVariables().get(variable).get(0).getValue();
                     ret.add(v);
@@ -326,8 +341,8 @@ class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements DeepClo
         return ret.toArray(new Integer[0]);
     }
 
-    void removeBlock(int offset) {
-        BlockInfo current = saveData.getBlockInfo().get(offset);
+    public void removeBlock(int offset) {
+        BlockInfo current = getBlockInfo().get(offset);
         //we shouldnt leave var changes in the list, the block will disappear
         // and nothing should be changed
         for (VariableInfo v : current.getVariables().values()) {
