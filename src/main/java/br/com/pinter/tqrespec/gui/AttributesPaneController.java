@@ -355,7 +355,7 @@ public class AttributesPaneController implements Initializable {
         if (manaOld != currentMana.get() && currentMana.get() > 0) {
             playerData.setMana(currentMana.get());
         }
-        if (modifierOld != currentAvail.get() && currentAvail.get() > 0) {
+        if (modifierOld != currentAvail.get() && currentAvail.get() >= 0) {
             playerData.setModifierPoints(currentAvail.get());
         }
         if (DBG) System.out.println("returning savegame task");
