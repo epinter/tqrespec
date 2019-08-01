@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.7.2] - 2019-08-01
+### Fixed
+- Fixed bug when saving available points
+
 ## [0.7.1] - 2019-07-18
 ### Added
 - Detect 'alternative' types of game installation, based on steam

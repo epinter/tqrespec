@@ -24,7 +24,7 @@ sourceSets {
 }
 
 ext.distAppName = 'TQRespec'
-version = '0.7.1'
+version = '0.7.2'
 sourceCompatibility = 11
 targetCompatibility = 11
 ext.moduleName = 'br.com.pinter.tqrespec'
