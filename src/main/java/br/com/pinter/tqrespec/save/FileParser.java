@@ -20,6 +20,7 @@
 
 package br.com.pinter.tqrespec.save;
 
+import br.com.pinter.tqrespec.IBlockType;
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.util.Constants;
@@ -145,7 +146,7 @@ public abstract class FileParser {
     private void setParentType(BlockInfo block) {
         BlockInfo parentBlock = blockInfoTable.get(block.getParentOffset());
         if (parentBlock != null && parentBlock.getVariables().isEmpty()
-                && parentBlock.getBlockType() == FileBlockType.BODY) {
+                && parentBlock.getBlockType().equals(FileBlockType.BODY)) {
             parentBlock.setBlockType(block.getBlockType());
             setParentType(parentBlock);
         }
@@ -357,18 +358,18 @@ public abstract class FileParser {
         return readVar(name, variableInfo, FileBlockType.UNKNOWN);
     }
 
-    protected VariableInfo readVar(String name, FileBlockType fileBlock) {
+    protected VariableInfo readVar(String name, IBlockType fileBlock) {
         return readVar(name, new VariableInfo(), fileBlock);
     }
 
-    VariableInfo readVar(String name, VariableInfo variableInfo, FileBlockType fileBlock) {
+    VariableInfo readVar(String name, VariableInfo variableInfo, IBlockType fileBlock) {
         String varId = filterFileVariableName(name);
 
         VariableType type = null;
         IFileVariable fileVariable = getFileVariable(varId);
         type = getFileVariable(varId).type();
 
-        if (type == VariableType.UNKNOWN && fileVariable.location() == FileBlockType.MULTIPLE) {
+        if (type == VariableType.UNKNOWN && fileVariable.location().equals(FileBlockType.MULTIPLE)) {
             try {
                 IFileVariable fileVariableMultiple = getFileVariable(
                         String.format("%s__%s", name, fileBlock.name()));
@@ -377,7 +378,6 @@ public abstract class FileParser {
                 logger.log(System.Logger.Level.DEBUG, "Variable definition for ''{0}'' not found.", varId);
             }
         }
-
 
         if (type == VariableType.INTEGER) {
             readInt(variableInfo);

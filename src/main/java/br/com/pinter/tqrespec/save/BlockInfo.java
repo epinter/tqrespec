@@ -20,6 +20,7 @@
 
 package br.com.pinter.tqrespec.save;
 
+import br.com.pinter.tqrespec.IBlockType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 
@@ -32,7 +33,7 @@ public class BlockInfo implements Serializable {
     private int size = -1;
     private ImmutableListMultimap<String, VariableInfo> variables = ImmutableListMultimap.of();
     private int parentOffset = -1;
-    private FileBlockType blockType = FileBlockType.UNKNOWN;
+    private IBlockType blockType = FileBlockType.UNKNOWN;
 
     public int getStart() {
         return start;
@@ -84,11 +85,11 @@ public class BlockInfo implements Serializable {
         this.variables = variables;
     }
 
-    public FileBlockType getBlockType() {
+    public IBlockType getBlockType() {
         return blockType;
     }
 
-    public void setBlockType(FileBlockType blockType) {
+    public void setBlockType(IBlockType blockType) {
         this.blockType = blockType;
     }
 

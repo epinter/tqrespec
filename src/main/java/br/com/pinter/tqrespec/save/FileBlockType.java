@@ -20,21 +20,51 @@
 
 package br.com.pinter.tqrespec.save;
 
-public enum FileBlockType {
-    //generic types
-    UNKNOWN,
-    BODY,
-    MULTIPLE,
-    //player file types
-    PLAYER_HEADER,
-    PLAYER_MAIN,
-    PLAYER_ATTRIBUTES,
-    PLAYER_STATS,
-    PLAYER_INVENTORY,
-    PLAYER_ITEM,
-    PLAYER_EQUIPMENT,
-    PLAYER_HOT_SLOT,
-    PLAYER_SKILLS,
-    PLAYER_UI_SKILL,
-    PLAYER_LEVEL_POINTS
+import br.com.pinter.tqrespec.IBlockType;
+
+import java.util.Objects;
+
+public class FileBlockType implements IBlockType {
+    public static FileBlockType MULTIPLE = new FileBlockType(-3, "MULTIPLE");
+    public static FileBlockType BODY = new FileBlockType(-2, "BODY");
+    public static FileBlockType UNKNOWN = new FileBlockType(-1, "UNKNOWN");
+
+    private String name;
+    private int value;
+
+    public FileBlockType(int value, String name) {
+        this.value = value;
+        this.name = name;
+    }
+
+    @Override
+    public int getValue() {
+        return value;
+    }
+
+    @Override
+    public String name() {
+        return name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+        FileBlockType that = (FileBlockType) o;
+        return value == that.value &&
+                name.equals(that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, value);
+    }
+
+    @Override
+    public String toString() {
+        return name();
+    }
+
 }

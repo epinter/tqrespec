@@ -20,6 +20,7 @@
 
 package br.com.pinter.tqrespec.save.player;
 
+import br.com.pinter.tqrespec.IBlockType;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.*;
 import com.google.common.collect.ArrayListMultimap;
@@ -85,7 +86,7 @@ final class PlayerParser extends FileParser {
 
             PlayerFileVariable e = PlayerFileVariable.valueOf(name);
 
-            if (e.var().equals(name) && e.location() == FileBlockType.PLAYER_HEADER) {
+            if (e.var().equals(name) && e.location().equals(PlayerBlockType.PLAYER_HEADER)) {
                 readVar(name, variableInfo);
 
                 String valueLog = null;
@@ -188,7 +189,7 @@ final class PlayerParser extends FileParser {
     @Override
     protected ImmutableListMultimap<String, VariableInfo> parseBlock(BlockInfo block) {
         ArrayListMultimap<String, VariableInfo> ret = ArrayListMultimap.create();
-        FileBlockType fileBlock = FileBlockType.BODY;
+        IBlockType fileBlock = PlayerBlockType.BODY;
         this.getBuffer().position(block.getStart() + BEGIN_BLOCK_SIZE);
         ArrayList<VariableInfo> temp = new ArrayList<>();
 
@@ -209,9 +210,9 @@ final class PlayerParser extends FileParser {
             IFileVariable fileVariable;
             try {
                 fileVariable = PlayerFileVariable.valueOf(filterFileVariableName(name));
-                if (fileVariable.location() != FileBlockType.BODY
-                        && fileVariable.location() != FileBlockType.UNKNOWN
-                        && fileVariable.location() != FileBlockType.MULTIPLE) {
+                if (!fileVariable.location().equals(PlayerBlockType.BODY)
+                        && !fileVariable.location().equals(PlayerBlockType.UNKNOWN)
+                        && !fileVariable.location().equals(PlayerBlockType.MULTIPLE)) {
                     fileBlock = fileVariable.location();
                 }
             } catch (Exception e) {
@@ -220,8 +221,8 @@ final class PlayerParser extends FileParser {
             }
 
             //prepare fileblock for special var 'temp'(attributes)
-            if (name.equals("temp") && fileBlock == FileBlockType.BODY) {
-                fileBlock = FileBlockType.PLAYER_ATTRIBUTES;
+            if (name.equals("temp") && fileBlock.equals(PlayerBlockType.BODY)) {
+                fileBlock = PlayerBlockType.PLAYER_ATTRIBUTES;
             }
 
             VariableInfo variableInfo = readVar(name, fileBlock);
