@@ -107,7 +107,9 @@ public class VariableInfo implements Serializable {
             return valueString;
         if (variableType == VariableType.FLOAT)
             return String.valueOf(valueFloat);
-        if (variableType == VariableType.UID || variableType == VariableType.STREAM)
+        if (variableType == VariableType.UID)
+            return UID.convertUidByteToString(valueByteArray);
+        if (variableType == VariableType.STREAM)
             return BaseEncoding.base16().encode(valueByteArray);
         return null;
     }
