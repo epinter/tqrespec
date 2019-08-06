@@ -34,10 +34,7 @@ import com.google.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class Player {
     @Inject
@@ -365,6 +362,46 @@ public class Player {
 
     public int getDifficulty() {
         return getTempAttr("difficulty");
+    }
+
+    public List<TeleportDifficulty> getTeleports() {
+        List<TeleportDifficulty> ret = new ArrayList<>();
+
+        Optional<BlockInfo> first = saveData.getChanges().getBlockInfo().values().stream().filter(
+                f -> f.getBlockType() == PlayerBlockType.PLAYER_MAIN).findFirst();
+
+        BlockInfo playerMain = null;
+        if (first.isPresent()) {
+            playerMain = first.get();
+        }
+
+        for(int i=0;i <= getDifficulty();i++) {
+            ret.add(getTeleportUidFromDifficulty(i,playerMain));
+        }
+
+        return ret;
+    }
+
+    private TeleportDifficulty getTeleportUidFromDifficulty(int difficulty, BlockInfo block) {
+        List<VariableInfo> teleportUidsSizeVars = new ArrayList<>(Objects.requireNonNull(block).getVariables().get("teleportUIDsSize"));
+        teleportUidsSizeVars.sort(Comparator.comparingInt(VariableInfo::getValOffset));
+        int offsetStart = teleportUidsSizeVars.get(difficulty).getKeyOffset();
+        int offsetStop = teleportUidsSizeVars.get(Math.max(difficulty,2)).getKeyOffset();
+        VariableInfo size = teleportUidsSizeVars.get(difficulty);
+
+        List<VariableInfo> teleports = new ArrayList<>();
+
+        List<VariableInfo> teleportUidVars = new ArrayList<>(block.getVariables().get("teleportUID"));
+        for (VariableInfo v : teleportUidVars) {
+            if (v.getKeyOffset() > offsetStart) {
+                if(offsetStart!=offsetStop && v.getKeyOffset() > offsetStop) {
+                    break;
+                }
+                teleports.add(v);
+            }
+        }
+
+        return new TeleportDifficulty(difficulty, (Integer) size.getValue(),offsetStart,teleports);
     }
 
     public void reset() {
