@@ -33,8 +33,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @SuppressWarnings("unused")
 public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements DeepCloneable {
-    private Map<Integer, BlockInfo> blockInfo = new ConcurrentHashMap<>();;
-    private Map<String, List<Integer>> variableLocation = new ConcurrentHashMap<>();;
+    private Map<Integer, BlockInfo> blockInfo = new ConcurrentHashMap<>();
+    ;
+    private Map<String, List<Integer>> variableLocation = new ConcurrentHashMap<>();
+    ;
 
     private static final String ALERT_INVALIDDATA = "alert.changesinvaliddata";
     private static final String MULTIPLE_DEFINITIONS_ERROR = "Variable is defined on multiple locations, aborting";
@@ -84,8 +86,10 @@ public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements 
         if (getVariableLocation().get(variable) != null) {
             int block = getVariableLocation().get(variable).get(0);
             if (getBlockInfo().get(block) != null
-                    && getBlockInfo().get(block).getVariables().get(variable).get(0).getVariableType()
-                    == VariableType.STRING) {
+                    && (getBlockInfo().get(block).getVariables().get(variable).get(0).getVariableType()
+                    == VariableType.STRING
+                    || getBlockInfo().get(block).getVariables().get(variable).get(0).getVariableType()
+                    == VariableType.STRING_UTF_16_LE)) {
                 return (String) getBlockInfo().get(block).getVariables().get(variable).get(0).getValue();
             }
         }
@@ -103,8 +107,10 @@ public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements 
             }
             int block = getVariableLocation().get(variable).get(0);
             if (getBlockInfo().get(block) != null
-                    && getBlockInfo().get(block).getVariables().get(variable).get(0).getVariableType()
-                    == VariableType.STRING) {
+                    && (getBlockInfo().get(block).getVariables().get(variable).get(0).getVariableType()
+                    == VariableType.STRING
+                    || getBlockInfo().get(block).getVariables().get(variable).get(0).getVariableType()
+                    == VariableType.STRING_UTF_16_LE)) {
                 VariableInfo variableInfo = getBlockInfo().get(block).getVariables().get(variable).get(0);
                 byte[] str;
                 if (utf16le) {

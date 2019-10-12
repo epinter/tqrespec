@@ -4,7 +4,9 @@
 
 package br.com.pinter.tqrespec;
 
-public interface IBlockType {
+import java.io.Serializable;
+
+public interface IBlockType extends Serializable {
     int getValue();
 
     String name();
