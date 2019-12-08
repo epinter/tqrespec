@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
+import java.util.Objects;
 
 public class UID {
     private String value;
@@ -27,6 +28,19 @@ public class UID {
 
     public String getUid() {
         return value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UID uid = (UID) o;
+        return value.equals(uid.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 
     public static String convertUidByteToString(byte[] uid) {
