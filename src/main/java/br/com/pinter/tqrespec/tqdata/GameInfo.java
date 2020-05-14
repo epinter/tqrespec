@@ -25,10 +25,7 @@ import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.util.Constants;
 import com.google.inject.Singleton;
-import com.sun.jna.platform.win32.Advapi32Util;
-import com.sun.jna.platform.win32.Shell32Util;
-import com.sun.jna.platform.win32.ShlObj;
-import com.sun.jna.platform.win32.WinReg;
+import com.sun.jna.platform.win32.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -196,16 +193,16 @@ public class GameInfo {
         try {
             pkgList = Advapi32Util.registryGetKeys(WinReg.HKEY_CURRENT_USER,
                     pkgKeyPath);
-        } catch (Exception e) {
+        } catch (Win32Exception e) {
             logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             return null;
         }
 
         for (String pkg : pkgList) {
-            String pkgDisplayName = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER,
-                    String.format("%s\\%s", pkgKeyPath, pkg), "DisplayName");
-            if (pkgDisplayName.matches(regexGameName)) {
-                try {
+            try {
+                String pkgDisplayName = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER,
+                        String.format("%s\\%s", pkgKeyPath, pkg), "DisplayName");
+                if (pkgDisplayName.matches(regexGameName)) {
                     logger.log(System.Logger.Level.DEBUG, "Package: displayname found -- ", regexGameName);
                     String pkgInstalled = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER,
                             String.format("%s\\%s", pkgKeyPath, pkg), "PackageRootFolder");
@@ -213,11 +210,11 @@ public class GameInfo {
                     if (gamePathExists(pkgInstalledPath)) {
                         return pkgInstalledPath;
                     }
-                } catch (Exception e) {
-                    logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
+                } else {
+                    logger.log(System.Logger.Level.DEBUG, "Package: displayname not found --- ''{0}'' -- ''{1}''", regexGameName, pkgDisplayName);
                 }
-            } else {
-                logger.log(System.Logger.Level.DEBUG, "Package: displayname not found --- ''{0}'' -- ''{1}''", regexGameName, pkgDisplayName);
+            } catch (Win32Exception e) {
+                logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             }
         }
 
@@ -330,7 +327,7 @@ public class GameInfo {
             }
         }
 
-        logger.log(System.Logger.Level.DEBUG, "Game data found: ''{0}''",gamePath);
+        logger.log(System.Logger.Level.DEBUG, "Game data found: ''{0}''", gamePath);
         return gamePath;
     }
 
