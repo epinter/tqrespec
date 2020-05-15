@@ -37,10 +37,8 @@ ext.patchJars = false
 apply from: "gradle/patchModulesJar.gradle"
 if (file('src/main/java/module-info.java').exists()) {
     ext.moduleInfoPresent = true
-    mainClassName = "$moduleName/br.com.pinter.tqrespec.Main"
-} else {
-    mainClassName = "br.com.pinter.tqrespec.Main"
 }
+mainClassName = "br.com.pinter.tqrespec.Main"
 
 if(project.hasProperty('buildVersion')) {
     project.version = project.properties['buildVersion']
@@ -51,16 +49,19 @@ repositories {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: '*.jar')
-    compile fileTree(dir: javafxSdkLibDir, include: '*.jar')
+    implementation fileTree(dir: 'libs', include: '*.jar')
+    implementation fileTree(dir: javafxSdkLibDir, include: '*.jar')
+    implementation group: 'com.google.inject', name: 'guice', version: '4.2.2'
+    implementation group: 'net.java.dev.jna', name: 'jna-platform', version: '5.3.1'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+    implementation project(':tqdatabase')
+
     testImplementation group: 'junit', name: 'junit', version: '4.12'
+    testImplementation group: 'org.hamcrest', name: 'hamcrest-core', version: '1.3'
     testImplementation group: 'org.mockito', name: 'mockito-inline', version: '2.28.2'
     testImplementation group: 'org.powermock', name: 'powermock-module-junit4', version: '2.0.2'
     testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.2'
-    compile group: 'com.google.inject', name: 'guice', version: '4.2.2'
-    compile group: 'net.java.dev.jna', name: 'jna-platform', version: '5.3.1'
-    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
-    compile project(':tqdatabase')
+    testImplementation group: 'com.google.inject', name: 'guice', version: '4.2.2'
 }
 
 import org.apache.tools.ant.taskdefs.condition.Os;
@@ -75,7 +76,7 @@ if (Os.isFamily(Os.FAMILY_WINDOWS)) {
 
 jar {
     manifest {
-        attributes('Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+        attributes('Class-Path': configurations.compileClasspath.collect { it.getName() }.join(' '),
                 'Implementation-Title': distAppName,
                 'Implementation-Version': project.version,
                 'Automatic-Module-Name': moduleName,
@@ -86,7 +87,6 @@ jar {
 }
 shadowJar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    version = null
 }
 
 task copyMetaInf(type: Copy) {
@@ -122,7 +122,7 @@ if (moduleInfoPresent) {
                     '--add-opens','java.base/java.lang=ALL-UNNAMED',
                     '--module-path', classpath.asPath,
                     '--class-path', classpath.asPath,
-                    '--module', mainClassName,
+                    '--module', moduleName,
                     '--patch-module', "$moduleName=" + files(sourceSets.main.output.resourcesDir).asPath,
             ]
             classpath = files()
@@ -144,7 +144,7 @@ task copyToLib(type: Copy) {
     doFirst {
         mkdir "$buildDir/jardist"
     }
-    from(configurations.compile.findAll { !it.getName().matches("javafx.*.jar") }).collect { it.getPath() }
+    from(configurations.compileClasspath.findAll { !it.getName().matches("javafx.*.jar") }).collect { it.getPath() }
 
     from jar
     into "$buildDir/jardist"
@@ -154,7 +154,7 @@ copyToLib.dependsOn(jar)
 classes.dependsOn('copyMetaInf')
 
 task copyJarsToModuleDeps(type: Copy) {
-    from project(':tqdatabase').configurations.compile
+    from project(':tqdatabase').configurations.compileClasspath
     from project.configurations.compile
     into patchjarDir
 }
@@ -176,7 +176,7 @@ task copyAppimageFiles(type: Copy) {
         from project(':tqdatabase').tasks.jar.outputs.files.collect { it.getPath() }
         from jar
     }
-    from(configurations.compile.findAll {
+    from(configurations.compileClasspath.findAll {
         !it.getName().matches("javafx.*.jar") && !it.getName().matches("tqdatabase.*.jar")
     }).collect { it.getPath() }
     into "$buildDir/appimage-files"
@@ -215,6 +215,7 @@ task jlink(type: Exec) {
 
     if (moduleInfoPresent) {
         commandLine binjlink,
+                '-J-Djlink.debug=true',
                 '--module-path', "${javafxSdkLibDir}" + File.pathSeparator + "${buildDir}/appimage-modules",
                 '--add-modules', ("br.com.pinter.tqdatabase,br.com.pinter.tqrespec,javafx.base,javafx.fxml,javafx.graphics,javafx.controls,java.prefs,java.base,jdk.zipfs,jdk.unsupported,java.logging"),
                 '--output', new File(buildDir, '/jre-image'),
@@ -255,7 +256,7 @@ task appimage(type: Exec) {
                 '--echo-mode',
                 '--singleton',
                 '--runtime-image', new File(buildDir, "jre-image"),
-                '--module', mainClassName,
+                '--module', moduleName,
                 '--output', new File(buildDir, '/app-image'),
                 '--name', distAppName,
                 '--icon', "${projectDir}/src/main/resources/icon/icon64.ico",
