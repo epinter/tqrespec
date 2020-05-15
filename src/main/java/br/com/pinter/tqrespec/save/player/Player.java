@@ -227,7 +227,7 @@ public class Player {
         List<Skill> ret = new ArrayList<>();
         for (PlayerSkill sb : getPlayerSkills().values()) {
             Skill skill = db.skills().getSkill(sb.getSkillName(), false);
-            if (skill != null && !skill.isMastery() && skill.getParentPath().equals(mastery.getRecordPath())) {
+            if (skill != null && !skill.isMastery() && mastery.getRecordPath().equals(skill.getParentPath())) {
                 ret.add(skill);
             }
         }
