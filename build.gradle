@@ -25,13 +25,13 @@ sourceSets {
 
 ext.distAppName = 'TQRespec'
 version = '0.7.2'
-sourceCompatibility = 11
-targetCompatibility = 11
+sourceCompatibility = 14
+targetCompatibility = 14
 ext.moduleName = 'br.com.pinter.tqrespec'
 ext.javahome = System.properties['java.home']
 ext.moduleInfoPresent = false
-ext.javafxSdkLibDir = new File(projectDir, 'sdk/javafx-sdk-11/lib')
-ext.javafxSdkBinDir = new File(projectDir, 'sdk/javafx-sdk-11/bin')
+ext.javafxSdkLibDir = new File(projectDir, 'sdk/javafx-sdk-14/lib')
+ext.javafxSdkBinDir = new File(projectDir, 'sdk/javafx-sdk-14/bin')
 ext.patchjarDir = new File(buildDir, '/patchedjar')
 ext.patchJars = false
 apply from: "gradle/patchModulesJar.gradle"
@@ -51,32 +51,32 @@ repositories {
 dependencies {
     implementation fileTree(dir: 'libs', include: '*.jar')
     implementation fileTree(dir: javafxSdkLibDir, include: '*.jar')
-    implementation group: 'com.google.inject', name: 'guice', version: '4.2.2'
+    implementation group: 'com.google.inject', name: 'guice', version: '4.2.3'
     implementation group: 'net.java.dev.jna', name: 'jna-platform', version: '5.3.1'
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
     implementation project(':tqdatabase')
 
-    testImplementation group: 'junit', name: 'junit', version: '4.12'
+    testImplementation group: 'junit', name: 'junit', version: '4.13'
     testImplementation group: 'org.hamcrest', name: 'hamcrest-core', version: '1.3'
-    testImplementation group: 'org.mockito', name: 'mockito-inline', version: '2.28.2'
-    testImplementation group: 'org.powermock', name: 'powermock-module-junit4', version: '2.0.2'
-    testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.2'
-    testImplementation group: 'com.google.inject', name: 'guice', version: '4.2.2'
+    testImplementation group: 'org.mockito', name: 'mockito-inline', version: '3.3.3'
+    testImplementation group: 'org.powermock', name: 'powermock-module-junit4', version: '2.0.7'
+    testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.7'
+    testImplementation group: 'com.google.inject', name: 'guice', version: '4.2.3'
 }
 
 import org.apache.tools.ant.taskdefs.condition.Os;
 
 if (Os.isFamily(Os.FAMILY_WINDOWS)) {
     ext.binjlink = javahome + "/bin/jlink.exe"
-    ext.binjava = javahome + "/bin/java.exe"
+    ext.binjpackage = javahome + "/bin/jpackage.exe"
 } else {
     ext.binjlink = javahome + "/bin/jlink"
-    ext.binjava = javahome + "/bin/java"
+    ext.binjpackage = javahome + "/bin/jpackage"
 }
 
 jar {
     manifest {
-        attributes('Class-Path': configurations.compileClasspath.collect { it.getName() }.join(' '),
+        attributes('Class-Path': configurations.runtimeClasspath.collect { it.getName() }.join(' '),
                 'Implementation-Title': distAppName,
                 'Implementation-Version': project.version,
                 'Automatic-Module-Name': moduleName,
@@ -144,7 +144,7 @@ task copyToLib(type: Copy) {
     doFirst {
         mkdir "$buildDir/jardist"
     }
-    from(configurations.compileClasspath.findAll { !it.getName().matches("javafx.*.jar") }).collect { it.getPath() }
+    from(configurations.runtimeClasspath.findAll { !it.getName().matches("javafx.*\\.jar") }).collect { it.getPath() }
 
     from jar
     into "$buildDir/jardist"
@@ -176,7 +176,7 @@ task copyAppimageFiles(type: Copy) {
         from project(':tqdatabase').tasks.jar.outputs.files.collect { it.getPath() }
         from jar
     }
-    from(configurations.compileClasspath.findAll {
+    from(configurations.runtimeClasspath.findAll {
         !it.getName().matches("javafx.*.jar") && !it.getName().matches("tqdatabase.*.jar")
     }).collect { it.getPath() }
     into "$buildDir/appimage-files"
@@ -246,28 +246,20 @@ task appimage(type: Exec) {
     dependsOn 'jlink'
     workingDir buildDir
     if (moduleInfoPresent) {
-        commandLine binjava,
-                "-Xmx1024M",
-                '--module-path', "${javahome}/jmods",
-                '--add-opens', 'jdk.jlink/jdk.tools.jlink.internal.packager=jdk.packager',
-                '--module', "jdk.packager/jdk.packager.Main",
-                'create-image',
+        commandLine binjpackage,
+                '--type','app-image',
                 '--verbose',
-                '--echo-mode',
-                '--singleton',
-                '--runtime-image', new File(buildDir, "jre-image"),
-                '--module', moduleName,
-                '--output', new File(buildDir, '/app-image'),
+                '--runtime-image', "${buildDir}/jre-image",
+                '--module', "${moduleName}/${mainClassName}",
+                '--dest', "${buildDir}/app-image",
                 '--name', distAppName,
                 '--icon', "${projectDir}/src/main/resources/icon/icon64.ico",
-                '--version', project.version,
+                '--app-version', project.version,
                 '--vendor', 'Emerson Pinter',
-                '--input', new File(buildDir, '/appimage-files'),
+                '--input', "${buildDir}/appimage-files",
                 '--description', 'The respec tool for Titan Quest game',
-                '--class', "br.com.pinter.tqrespec.Main",
-                '--jvm-args',
+                '--java-options',
                 '-XX:+UseSerialGC -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=15 ' +
-                '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED ' +
                 '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED ' +
                 '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec=ALL-UNNAMED ' +
                 '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.core=ALL-UNNAMED ' +
@@ -278,30 +270,23 @@ task appimage(type: Exec) {
                 '--add-opens java.base/java.lang=ALL-UNNAMED ' +
                 '--add-reads br.com.pinter.tqrespec=ALL-UNNAMED'
     } else {
-        commandLine binjava,
-                "-Xmx1024M",
-                '--module-path', "${javahome}/jmods",
-                '--add-opens', 'jdk.jlink/jdk.tools.jlink.internal.packager=jdk.packager',
-                '--module', "jdk.packager/jdk.packager.Main",
-                'create-image',
+        commandLine binjpackage,
+                '--type','app-image',
                 '--verbose',
-                '--echo-mode',
-                '--singleton',
-                '--module-path', "$buildDir/appimage-files",
-                '--runtime-image', new File(buildDir, "jre-image"),
-                '--input', new File(buildDir, '/appimage-files'),
-                '--main-jar', jar.outputs.files.collect { it.getName() }.get(0),
-                '--output', new File(buildDir, '/app-image'),
+                '--runtime-image', "${buildDir}/jre-image",
+                '--dest', "${buildDir}/app-image",
                 '--name', distAppName,
                 '--icon', "${projectDir}/src/main/resources/icon/icon64.ico",
-                '--version', project.version,
+                '--app-version', project.version,
                 '--vendor', 'Emerson Pinter',
+                '--input', "${buildDir}/appimage-files",
                 '--description', 'The respec tool for Titan Quest game',
-                '--class', mainClassName,
-                '--jvm-args',
+                '--main-jar', jar.outputs.files.collect { it.getName() }.get(0),
+                '--main-class', mainClassName,
+                '--java-options',
                 '-XX:+UseSerialGC -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=15 ' +
-                '--add-opens java.base/java.lang=ALL-UNNAMED ' +
-                '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED'
+                        '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED ' +
+                        '--add-opens java.base/java.lang=ALL-UNNAMED '
     }
     doLast {
         copy {

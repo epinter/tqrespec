@@ -104,6 +104,12 @@ public class Main extends Application {
         Task<Void> task = new Task<>() {
             @Override
             public Void call() {
+                try {
+                    new SingleInstanceLock().lock();
+                } catch (IOException e) {
+                    throw new UnhandledRuntimeException("TQRespec is already running");
+                }
+
                 //preload game database metadata and skills
                 notifyPreloader(new Preloader.ProgressNotification(0.3));
                 db.initialize();

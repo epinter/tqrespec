@@ -52,18 +52,23 @@ public class AttributesPaneController implements Initializable {
     @Inject
     private Player player;
 
+    @SuppressWarnings("rawtypes")
     @FXML
     private Spinner strSpinner;
 
+    @SuppressWarnings("rawtypes")
     @FXML
     private Spinner intSpinner;
 
+    @SuppressWarnings("rawtypes")
     @FXML
     private Spinner dexSpinner;
 
+    @SuppressWarnings("rawtypes")
     @FXML
     private Spinner lifeSpinner;
 
+    @SuppressWarnings("rawtypes")
     @FXML
     private Spinner manaSpinner;
 
