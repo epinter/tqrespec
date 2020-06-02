@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Emerson Pinter - All Rights Reserved
+ * Copyright (C) 2020 Emerson Pinter - All Rights Reserved
  */
 
 /*    This file is part of TQ Respec.
@@ -100,7 +100,7 @@ public class Main extends Application {
 
 
     private void load(Stage primaryStage) {
-        logger.log(System.Logger.Level.DEBUG,"preloading data");
+        logger.log(System.Logger.Level.DEBUG, "preloading data");
         Task<Void> task = new Task<>() {
             @Override
             public Void call() {
@@ -130,7 +130,7 @@ public class Main extends Application {
             }
         };
         task.setOnFailed(e -> {
-            logger.log(System.Logger.Level.ERROR,"Error loading application",e.getSource().getException());
+            logger.log(System.Logger.Level.ERROR, "Error loading application", e.getSource().getException());
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("Error loading application");
@@ -159,14 +159,14 @@ public class Main extends Application {
         prepareInjectionContext();
 
         logger = Log.getLogger(Main.class.getName());
-        logger.log(System.Logger.Level.DEBUG,State.get().getDebugPrefix());
+        logger.log(System.Logger.Level.DEBUG, State.get().getDebugPrefix());
         notifyPreloader(new Preloader.ProgressNotification(0.1));
         prepareMainStage(primaryStage);
         load(primaryStage);
     }
 
     public void prepareMainStage(Stage primaryStage) {
-        logger.log(System.Logger.Level.DEBUG,"starting application");
+        logger.log(System.Logger.Level.DEBUG, "starting application");
         Font.loadFont(getClass().getResourceAsStream("/fxml/albertus-mt.ttf"), 16);
         Font.loadFont(getClass().getResourceAsStream("/fxml/albertus-mt-light.ttf"), 16);
         Font.loadFont(getClass().getResourceAsStream("/fxml/fa5-free-solid-900.ttf"), 16);
@@ -229,7 +229,7 @@ public class Main extends Application {
         String debugParam = getParameters().getNamed().get("debug");
         int debug = 0;
         try {
-            if(StringUtils.isNotBlank(debugParam)) {
+            if (StringUtils.isNotBlank(debugParam)) {
                 debug = Integer.valueOf(debugParam);
             }
         } catch (NumberFormatException ignored) {

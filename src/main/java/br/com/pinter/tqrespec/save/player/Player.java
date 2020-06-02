@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Emerson Pinter - All Rights Reserved
+ * Copyright (C) 2020 Emerson Pinter - All Rights Reserved
  */
 
 /*    This file is part of TQ Respec.
@@ -375,8 +375,8 @@ public class Player {
             playerMain = first.get();
         }
 
-        for(int i=0;i <= getDifficulty();i++) {
-            ret.add(getTeleportUidFromDifficulty(i,playerMain));
+        for (int i = 0; i <= getDifficulty(); i++) {
+            ret.add(getTeleportUidFromDifficulty(i, playerMain));
         }
 
         return ret;
@@ -386,7 +386,7 @@ public class Player {
         List<VariableInfo> teleportUidsSizeVars = new ArrayList<>(Objects.requireNonNull(block).getVariables().get("teleportUIDsSize"));
         teleportUidsSizeVars.sort(Comparator.comparingInt(VariableInfo::getValOffset));
         int offsetStart = teleportUidsSizeVars.get(difficulty).getKeyOffset();
-        int offsetStop = teleportUidsSizeVars.get(Math.max(difficulty,2)).getKeyOffset();
+        int offsetStop = teleportUidsSizeVars.get(Math.max(difficulty, 2)).getKeyOffset();
         VariableInfo size = teleportUidsSizeVars.get(difficulty);
 
         List<VariableInfo> teleports = new ArrayList<>();
@@ -394,14 +394,14 @@ public class Player {
         List<VariableInfo> teleportUidVars = new ArrayList<>(block.getVariables().get("teleportUID"));
         for (VariableInfo v : teleportUidVars) {
             if (v.getKeyOffset() > offsetStart) {
-                if(offsetStart!=offsetStop && v.getKeyOffset() > offsetStop) {
+                if (offsetStart != offsetStop && v.getKeyOffset() > offsetStop) {
                     break;
                 }
                 teleports.add(v);
             }
         }
 
-        return new TeleportDifficulty(difficulty, (Integer) size.getValue(),offsetStart,teleports);
+        return new TeleportDifficulty(difficulty, (Integer) size.getValue(), offsetStart, teleports);
     }
 
     public void reset() {

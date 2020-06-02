@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Emerson Pinter - All Rights Reserved
+ * Copyright (C) 2020 Emerson Pinter - All Rights Reserved
  */
 
 /*    This file is part of TQ Respec.
@@ -166,6 +166,6 @@ public class JULLogger implements System.Logger {
     public void log(Level level, ResourceBundle resourceBundle, String format, Object... params) {
         String msg = MessageFormat.format(format, params);
 
-        this.log(level,msg);
+        this.log(level, msg);
     }
 }

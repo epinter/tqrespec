@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Emerson Pinter - All Rights Reserved
+ * Copyright (C) 2020 Emerson Pinter - All Rights Reserved
  */
 
 /*    This file is part of TQ Respec.
@@ -37,7 +37,7 @@ public class OutputStreamLog extends OutputStream {
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
-        int max = Math.min(b.length,off+len);
+        int max = Math.min(b.length, off + len);
 
         for (int i = off; i < max; i++) {
             char c = (char) b[i];

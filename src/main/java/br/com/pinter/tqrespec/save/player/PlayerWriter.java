@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Emerson Pinter - All Rights Reserved
+ * Copyright (C) 2020 Emerson Pinter - All Rights Reserved
  */
 
 /*    This file is part of TQ Respec.
@@ -21,8 +21,8 @@
 package br.com.pinter.tqrespec.save.player;
 
 import br.com.pinter.tqrespec.Settings;
-import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.core.State;
+import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.ChangesTable;
 import br.com.pinter.tqrespec.tqdata.GameInfo;

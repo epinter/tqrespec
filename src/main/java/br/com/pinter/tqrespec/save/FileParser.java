@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Emerson Pinter - All Rights Reserved
+ * Copyright (C) 2020 Emerson Pinter - All Rights Reserved
  */
 
 /*    This file is part of TQ Respec.
@@ -118,8 +118,7 @@ public abstract class FileParser {
     /**
      * This method is called to parse a block, and should return a table of variables found inside the block.
      *
-     * @param blockInfo
-     *         the block the method should parse.
+     * @param blockInfo the block the method should parse.
      * @return a table with all variables found
      */
     protected abstract ImmutableListMultimap<String, VariableInfo> parseBlock(BlockInfo blockInfo);
