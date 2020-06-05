@@ -34,9 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @SuppressWarnings("unused")
 public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements DeepCloneable {
     private Map<Integer, BlockInfo> blockInfo = new ConcurrentHashMap<>();
-    ;
     private Map<String, List<Integer>> variableLocation = new ConcurrentHashMap<>();
-    ;
 
     private static final String ALERT_INVALIDDATA = "alert.changesinvaliddata";
     private static final String MULTIPLE_DEFINITIONS_ERROR = "Variable is defined on multiple locations, aborting";

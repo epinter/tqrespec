@@ -107,11 +107,7 @@ public class Main extends Application {
             gameInfo.getGamePath();
             notifyPreloader(new Preloader.ProgressNotification(0.2));
         } catch (FileNotFoundException e) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle(Util.getUIMessage("main.gameNotDetected"));
-            alert.setHeaderText(Util.getUIMessage("main.chooseGameDirectory"));
-            alert.initOwner(primaryStage);
-            alert.showAndWait();
+            Util.showError(Util.getUIMessage("main.gameNotDetected"), Util.getUIMessage("main.chooseGameDirectory"));
             logger.log(System.Logger.Level.ERROR, "game path not detected, showing DirectoryChooser");
             DirectoryChooser directoryChooser = new DirectoryChooser();
             directoryChooser.setTitle(Util.getUIMessage("main.chooseGameDirectory"));
@@ -125,12 +121,6 @@ public class Main extends Application {
         Task<Void> task = new Task<>() {
             @Override
             public Void call() {
-                try {
-                    new SingleInstanceLock().lock();
-                } catch (IOException e) {
-                    throw new UnhandledRuntimeException("TQRespec is already running");
-                }
-
                 //preload game database metadata and skills
                 notifyPreloader(new Preloader.ProgressNotification(0.3));
                 db.initialize();
@@ -152,11 +142,12 @@ public class Main extends Application {
         };
         task.setOnFailed(e -> {
             Settings.setLastDetectedGamePath(null);
-            logger.log(System.Logger.Level.ERROR, "Error loading application", e.getSource().getException());
+
             Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setHeaderText("Error loading application");
+            logger.log(System.Logger.Level.ERROR, "Error loading application", e.getSource().getException());
             alert.initOwner(primaryStage);
             alert.setTitle("Error");
-            alert.setHeaderText("Error loading application");
             TextArea textArea = new TextArea(ExceptionUtils.getStackTrace(e.getSource().getException()));
             textArea.setMaxWidth(Double.MAX_VALUE);
             textArea.setMaxHeight(Double.MAX_VALUE);
@@ -177,6 +168,15 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        try {
+            new SingleInstanceLock().lock();
+        } catch (IOException e) {
+            Util.showError("TQRespec is already running", null);
+            Platform.exit();
+            System.exit(0);
+        }
+
+
         parseCliParams();
 
         prepareInjectionContext();

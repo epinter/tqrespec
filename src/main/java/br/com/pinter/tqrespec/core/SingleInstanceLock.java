@@ -28,6 +28,7 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.file.Files;
 
 public class SingleInstanceLock {
     private FileChannel fileChannel;
@@ -37,8 +38,7 @@ public class SingleInstanceLock {
 
     public SingleInstanceLock() {
         if (lockFile.exists()) {
-            //noinspection ResultOfMethodCallIgnored
-            lockFile.delete();
+            deleteLock();
         }
     }
 
@@ -55,13 +55,20 @@ public class SingleInstanceLock {
         Runtime.getRuntime().addShutdownHook(new Thread(this::release));
     }
 
+    public void deleteLock() {
+        try {
+            Files.delete(lockFile.toPath());
+        } catch (IOException e) {
+            logger.log(System.Logger.Level.ERROR, "Error deleting lockfile ''{0}''", lockFile.getPath());
+        }
+    }
+
     public void release() {
         if (lock != null) {
             try {
                 lock.release();
                 fileChannel.close();
-                //noinspection ResultOfMethodCallIgnored
-                lockFile.delete();
+                deleteLock();
             } catch (IOException e) {
                 logger.log(System.Logger.Level.ERROR, "Error deleting lockfile ''{0}''", lockFile.getPath());
             }

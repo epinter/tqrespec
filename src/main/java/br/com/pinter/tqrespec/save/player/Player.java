@@ -317,7 +317,7 @@ public class Player {
     }
 
     public int getModifierPoints() {
-        return Math.round(getVariableValueInteger("modifierPoints"));
+        return getVariableValueInteger("modifierPoints");
     }
 
     public void setModifierPoints(int val) {
@@ -373,10 +373,10 @@ public class Player {
         BlockInfo playerMain = null;
         if (first.isPresent()) {
             playerMain = first.get();
-        }
 
-        for (int i = 0; i <= getDifficulty(); i++) {
-            ret.add(getTeleportUidFromDifficulty(i, playerMain));
+            for (int i = 0; i <= getDifficulty(); i++) {
+                ret.add(getTeleportUidFromDifficulty(i, playerMain));
+            }
         }
 
         return ret;

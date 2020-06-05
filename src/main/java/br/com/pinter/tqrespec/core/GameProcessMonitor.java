@@ -52,7 +52,7 @@ public class GameProcessMonitor implements Runnable {
                         Path gamePath = Paths.get(directory);
                         if (processCommand.startsWith(gamePath) &&
                                 processCommand.getFileName().toString().toLowerCase().endsWith(".exe")
-                                && !processCommand.getFileName().toString().toLowerCase().equals("tqrespec.exe")) {
+                                && !processCommand.getFileName().toString().equalsIgnoreCase("tqrespec.exe")) {
                             foundRunning.set(true);
                         }
                     }

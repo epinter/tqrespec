@@ -106,7 +106,7 @@ public class PlayerWriterTest {
         System.err.println(mockSaveData.getHeaderInfo());
 
         int isInMainQuestBefore = saveData.getChanges().getInt("isInMainQuest");
-        Assert.assertEquals(isInMainQuestBefore, 1);
+        Assert.assertEquals(1,isInMainQuestBefore);
         saveData.getChanges().setInt("isInMainQuest", 0);
 
         try {

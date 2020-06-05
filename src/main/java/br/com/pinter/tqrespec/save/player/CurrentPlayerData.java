@@ -32,7 +32,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Singleton
-public class CurrentPlayerData implements Serializable {
+public class CurrentPlayerData {
     @Inject
     private GameInfo gameInfo;
 
@@ -102,4 +102,6 @@ public class CurrentPlayerData implements Serializable {
         this.customQuest = false;
         this.playerSkills.clear();
     }
+
+
 }

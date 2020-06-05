@@ -2,5 +2,5 @@
 *.java text
 *.properties text
 *.gradle text
-grablew text
+grablew binary
 grablew.bat text
