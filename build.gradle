@@ -6,6 +6,7 @@ group 'br.com.pinter.tqrespec'
 apply plugin: 'application'
 apply plugin: 'java'
 apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'org.sonarqube'
 
 buildscript {
     repositories {
@@ -16,6 +17,7 @@ buildscript {
     dependencies {
         classpath "com.github.jengelman.gradle.plugins:shadow:5.1.0"
         classpath 'org.openjfx:javafx-plugin:0.0.7'
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.0"
     }
 }
 
