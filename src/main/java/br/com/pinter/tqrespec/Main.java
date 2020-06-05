@@ -47,6 +47,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Font;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
@@ -54,6 +55,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -101,6 +103,25 @@ public class Main extends Application {
 
     private void load(Stage primaryStage) {
         logger.log(System.Logger.Level.DEBUG, "preloading data");
+        try {
+            gameInfo.getGamePath();
+            notifyPreloader(new Preloader.ProgressNotification(0.2));
+        } catch (FileNotFoundException e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle(Util.getUIMessage("main.gameNotDetected"));
+            alert.setHeaderText(Util.getUIMessage("main.chooseGameDirectory"));
+            alert.initOwner(primaryStage);
+            alert.showAndWait();
+            logger.log(System.Logger.Level.ERROR, "game path not detected, showing DirectoryChooser");
+            DirectoryChooser directoryChooser = new DirectoryChooser();
+            directoryChooser.setTitle(Util.getUIMessage("main.chooseGameDirectory"));
+            File selectedDirectory = directoryChooser.showDialog(primaryStage);
+            if (selectedDirectory == null) {
+                System.exit(1);
+            }
+            gameInfo.setGamePath(selectedDirectory.getPath());
+        }
+
         Task<Void> task = new Task<>() {
             @Override
             public Void call() {
@@ -130,8 +151,10 @@ public class Main extends Application {
             }
         };
         task.setOnFailed(e -> {
+            Settings.setLastDetectedGamePath(null);
             logger.log(System.Logger.Level.ERROR, "Error loading application", e.getSource().getException());
             Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.initOwner(primaryStage);
             alert.setTitle("Error");
             alert.setHeaderText("Error loading application");
             TextArea textArea = new TextArea(ExceptionUtils.getStackTrace(e.getSource().getException()));

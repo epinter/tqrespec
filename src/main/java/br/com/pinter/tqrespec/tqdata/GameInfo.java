@@ -296,18 +296,28 @@ public class GameInfo {
         }
     }
 
+    public void setGamePath(String gamePath) {
+        if (gamePathExists(Paths.get(gamePath))) {
+            Settings.setLastDetectedGamePath(gamePath);
+        }
+        this.gamePath = gamePath;
+    }
+
     public String getGamePath() throws FileNotFoundException {
-        if (!SystemUtils.IS_OS_WINDOWS) {
+        if (StringUtils.isEmpty(gamePath) && !SystemUtils.IS_OS_WINDOWS) {
+            gamePath = Constants.DEV_GAMEDATA;
             logger.log(System.Logger.Level.DEBUG, "OS is not windows, using dev game path");
-            return Constants.DEV_GAMEDATA;
+            return gamePath;
         }
 
-        String lastUsed = Settings.getLastDetectedGamePath();
-        if (StringUtils.isNotBlank(lastUsed)
-                && gamePathExists(Paths.get(lastUsed))) {
-            gamePath = lastUsed;
-            logger.log(System.Logger.Level.DEBUG, "Last-used game path found.");
-            return gamePath;
+        if (StringUtils.isEmpty(gamePath)) {
+            String lastUsed = Settings.getLastDetectedGamePath();
+            if (StringUtils.isNotBlank(lastUsed)
+                    && gamePathExists(Paths.get(lastUsed))) {
+                gamePath = lastUsed;
+                logger.log(System.Logger.Level.DEBUG, "Last-used game path found.");
+                return gamePath;
+            }
         }
 
         if (StringUtils.isEmpty(gamePath)) {

@@ -43,7 +43,11 @@ public class Settings {
 
     public static void setLastDetectedGamePath(String lastDetectedGamePath) {
         Preferences prefs = Preferences.userNodeForPackage(Settings.class);
-        prefs.put(Options.LAST_DETECTED_GAMEPATH.getKey(), lastDetectedGamePath);
+        if(lastDetectedGamePath == null) {
+            prefs.remove(Options.LAST_DETECTED_GAMEPATH.getKey());
+        } else {
+            prefs.put(Options.LAST_DETECTED_GAMEPATH.getKey(), lastDetectedGamePath);
+        }
     }
 
     public static String getLastDetectedGamePath() {

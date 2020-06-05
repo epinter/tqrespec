@@ -16,6 +16,7 @@ hs_err_pid*
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/dictionaries
+.idea/jarRepositories.xml
 .idea/encodings.xml
 .idea/vcs.xml
 .idea/artifacts/
