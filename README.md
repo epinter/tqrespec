@@ -67,7 +67,7 @@ After you finish, you can click on Save. At this moment, TQRespec will make a ba
 
 ## ***Project and source code***
 
-TQRespec is developed in Java language, using OpenJFX to provide graphical user interface, and a few more other open source dependencies. The current version is built using OpenJDK 11. The recommended version is OpenJDK with Hotspot from [AdoptOpenJDK.net](https://adoptopenjdk.net).
+TQRespec is developed in Java language, using OpenJFX to provide graphical user interface, and a few more other open source dependencies. The current version is built using OpenJDK 14.
 The software was made to work in Microsoft Windows operating system, since the game runs only in Windows. But because Java is multi-platform, this project is prepared to allow you to develop and test under Linux. To do so, you will need to have this structure inside the project (./gamedata):
 ~~~
 gamedata/SaveData/Main/_savegame/Player.chr
@@ -80,7 +80,7 @@ gamedata/Text/Text_EN.arc
 
 Before building it, you need to have OpenJFX(JavaFX) SDK inside the ./sdk subdirectory. A repository with the needed files can be found [here](https://github.com/epinter/openjfx-sdk). Just clone it inside sdk directory.
 
-With JDK 11 installed, you can build executing the 'clean' and 'build' gradle tasks with the command:
+With JDK 14 installed, you can build executing the 'clean' and 'build' gradle tasks with the command:
 
 ~~~
 gradlew clean
