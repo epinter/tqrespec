@@ -26,11 +26,13 @@ public abstract class MapTeleport {
     private final int order;
     private final UID uid;
     private final String recordId;
+    private final int act;
 
-    public MapTeleport(int order, UID uid, String recordId) {
+    public MapTeleport(int order, UID uid, int act, String recordId) {
         this.order = order;
         this.uid = uid;
         this.recordId = recordId;
+        this.act = act;
     }
 
     public int getOrder() {
@@ -45,12 +47,17 @@ public abstract class MapTeleport {
         return recordId;
     }
 
+    public int getAct() {
+        return act;
+    }
+
     @Override
     public String toString() {
         return "MapTeleport{" +
                 "order=" + order +
                 ", uid=" + uid +
                 ", recordId='" + recordId + '\'' +
+                ", act=" + act +
                 '}';
     }
 }
