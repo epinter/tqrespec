@@ -20,6 +20,8 @@ hs_err_pid*
 .idea/encodings.xml
 .idea/vcs.xml
 .idea/artifacts/
+.idea/misc.xml
+.idea/azureSettings.xml
 
 # Sensitive or high-churn files:
 .idea/**/dataSources/
