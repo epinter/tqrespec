@@ -98,9 +98,9 @@ public class Toast {
         KeyFrame keyFrameFadeIn = new KeyFrame(Duration.millis(700), new KeyValue(root.opacityProperty(), 1));
         fadeIn.getKeyFrames().add(keyFrameFadeIn);
         fadeIn.setOnFinished(e -> {
-            Task fadeOutTask = new Task() {
+            Task<Void> fadeOutTask = new Task<>() {
                 @Override
-                protected Object call() {
+                protected Void call() {
                     try {
                         Thread.sleep(delay);
                     } catch (InterruptedException ex) {
@@ -122,6 +122,7 @@ public class Toast {
     }
 
     public static Toast show(Stage stage, String header, String content, int delay) {
+        //noinspection InstantiationOfUtilityClass
         return new Toast(stage, header, content, delay);
     }
 }

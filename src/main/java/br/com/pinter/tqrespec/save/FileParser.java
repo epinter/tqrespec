@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @SuppressWarnings("unused")
 public abstract class FileParser {
@@ -52,11 +53,11 @@ public abstract class FileParser {
     private static final String BUG_VARIABLESIZE_ERROR_MSG = "BUG: variable size != 0";
 
 
-    public ConcurrentHashMap<Integer, BlockInfo> getBlockInfo() {
+    public ConcurrentMap<Integer, BlockInfo> getBlockInfo() {
         return blockInfoTable;
     }
 
-    public ConcurrentHashMap<String, List<Integer>> getVariableLocation() {
+    public ConcurrentMap<String, List<Integer>> getVariableLocation() {
         return variableLocation;
     }
 

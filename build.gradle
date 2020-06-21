@@ -28,7 +28,6 @@ sourceSets {
 ext.distAppName = 'TQRespec'
 version = '0.7.2'
 sourceCompatibility = 14
-targetCompatibility = 14
 ext.moduleName = 'br.com.pinter.tqrespec'
 ext.javahome = System.properties['java.home']
 ext.moduleInfoPresent = false

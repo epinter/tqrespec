@@ -25,9 +25,9 @@ import br.com.pinter.tqrespec.IBlockType;
 import java.util.Objects;
 
 public class FileBlockType implements IBlockType {
-    public static FileBlockType MULTIPLE = new FileBlockType(-3, "MULTIPLE");
-    public static FileBlockType BODY = new FileBlockType(-2, "BODY");
-    public static FileBlockType UNKNOWN = new FileBlockType(-1, "UNKNOWN");
+    public static final FileBlockType MULTIPLE = new FileBlockType(-3, "MULTIPLE");
+    public static final FileBlockType BODY = new FileBlockType(-2, "BODY");
+    public static final FileBlockType UNKNOWN = new FileBlockType(-1, "UNKNOWN");
 
     private String name;
     private int value;

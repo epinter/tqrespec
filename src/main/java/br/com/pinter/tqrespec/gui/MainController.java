@@ -49,6 +49,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -125,7 +126,7 @@ public class MainController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         mainFormTitle.setText(String.format("%s v%s", Util.getBuildTitle(), Util.getBuildVersion()));
         mainFormInitialized.addListener(((observable, oldValue, newValue) -> {
-            MyTask windowShownTask = new MyTask() {
+            MyTask<Void> windowShownTask = new MyTask<>() {
                 @Override
                 protected Void call() {
                     windowShownHandler();
@@ -181,7 +182,7 @@ public class MainController implements Initializable {
         copyButton.setGraphic(Icon.FA_COPY.create());
 
         State.get().gameRunningProperty().addListener((value, oldV, newV) -> {
-            if (newV) {
+            if (BooleanUtils.isTrue(newV)) {
                 Platform.runLater(() -> {
                     reset();
                     Toast.show((Stage) rootelement.getScene().getWindow(),
@@ -322,7 +323,7 @@ public class MainController implements Initializable {
     }
 
     private boolean gameRunningAlert() {
-        if (State.get().getGameRunning()) {
+        if (BooleanUtils.isTrue(State.get().getGameRunning())) {
             Util.showError(Util.getUIMessage("alert.errorgamerunning_header"),
                     Util.getUIMessage("alert.errorgamerunning_content"));
             return true;
@@ -401,8 +402,12 @@ public class MainController implements Initializable {
 
     @FXML
     public void characterSelected(ActionEvent evt) {
-        if (State.get().getGameRunning()) {
+        if (BooleanUtils.isTrue(State.get().getGameRunning())) {
             reset();
+            return;
+        }
+
+        if(!(evt.getSource() instanceof ComboBox)) {
             return;
         }
 
@@ -410,7 +415,8 @@ public class MainController implements Initializable {
         copyButton.setDisable(true);
         characterCombo.setDisable(true);
         copyCharInput.clear();
-        ComboBox character = (ComboBox) evt.getSource();
+        ComboBox<?> character = (ComboBox<?>) evt.getSource();
+
         String playerName = (String) character.getSelectionModel().getSelectedItem();
         if (StringUtils.isEmpty((playerName))) {
             return;

@@ -25,7 +25,6 @@ import br.com.pinter.tqrespec.tqdata.GameInfo;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;

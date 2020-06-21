@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -133,7 +134,7 @@ public class PlayerParserTest {
         } catch (Exception e) {
             logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
         }
-        ConcurrentHashMap<String, List<Integer>> variableLocation = playerParser.getVariableLocation();
+        ConcurrentMap<String, List<Integer>> variableLocation = playerParser.getVariableLocation();
         assertNotNull(variableLocation);
         assertFalse(variableLocation.isEmpty());
     }
