@@ -383,7 +383,7 @@ public class MainController implements Initializable {
                             Util.getUIMessage("alert.errorsaving_content", Constants.BACKUP_DIRECTORY));
                 }
                 setAllControlsDisable(false);
-
+                reset();
             }
         });
 
