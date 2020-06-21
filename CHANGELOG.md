@@ -1,4 +1,21 @@
 # Changelog
+## [0.8.0] - 2020-06-21
+### Fixed
+- Fix crash while parsing database with empty skills([#17](https://github.com/epinter/tqrespec/issues/17))
+- Fix crash while searching for game installation([#19](https://github.com/epinter/tqrespec/issues/19))
+- Better handling of empty data from database
+
+### Added
+- Prompt user to configure game path if not detected
+- Logging
+- Command line options for debugging (--debug <number>)
+- Support 32bit builds
+
+### Changed
+- Code cleanup
+- Frameworks/libraries upgraded
+- Runtime upgraded
+- Improve save file parsing, add support for more data types
 
 ## [0.7.2] - 2019-08-01
 ### Fixed

@@ -6,6 +6,7 @@
 [![Release Date](https://img.shields.io/github/release-date/epinter/tqrespec.svg)](https://github.com/epinter/tqrespec/releases/latest)
 [![Steam views](https://img.shields.io/steam/views/1262483108.svg)](https://steamcommunity.com/sharedfiles/filedetails/?id=1262483108)
 [![License](https://img.shields.io/github/license/epinter/tqrespec.svg)](https://github.com/epinter/tqrespec/blob/master/LICENSE)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=epinter_tqrespec&metric=alert_status)](https://sonarcloud.io/dashboard?id=epinter_tqrespec)
 
 ## Introduction
 
@@ -17,7 +18,7 @@ You can download TQRespec from the releases page, [here](https://github.com/epin
 
 #### ***Requirements***
 
-This software requires **Microsoft Windows 64-bit** (tested with Windows 7, 8, 8.1 and 10), **Windows 32-bit is not supported**. You don't need to have java or any other software installed, but if you have problems like missing dlls, check if you have Microsoft Visual C++ Redist 2015 installed.
+This software requires **Microsoft Windows (64-bit recommended)**. You don't need to have java or any other software installed, but if you have problems like missing dlls, check if you have Microsoft Visual C++ Redist 2015 installed.
 
 ## **How to use**
 
@@ -106,4 +107,28 @@ If your game path is not detected, you still can run TQRespec copying the game d
 
 #### ***Errors and reporting***
 If you see an error popup while using TQRespec, click on "Show details" and copy the complete error message (called java Exception). With this exception, a developer can find exactly where the code failed. If the software is crashing and you don't get an error message, or is crashing during startup, go to Windows Explorer and find the log file called **tqrespec.log** inside the directory %TEMP%. The %TEMP% is the windows temporary directory for you user.
+
+#### ***Debug log***
+If you need debug logs, you need to run the application with command line parameters:
+The number is the level of debugging, from 1 to 9:
+
+Lower level of debugging messages sent to log:
+~~~
+TQRespec.exe --debug=1
+~~~ 
+
+More debug for GUI and player save parsing, and basic level for database parsing:
+~~~
+TQRespec.exe --debug=3
+~~~ 
+
+Higher level of debug for GUI, player save and database parsing.
+~~~
+TQRespec.exe --debug=5
+~~~ 
+
+Higher level of debug for the application and all libraries:
+~~~
+TQRespec.exe --debug=9
+~~~ 
 
