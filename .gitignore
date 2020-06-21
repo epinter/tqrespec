@@ -21,6 +21,7 @@ hs_err_pid*
 .idea/vcs.xml
 .idea/artifacts/
 .idea/misc.xml
+.idea/compiler.xml
 .idea/azureSettings.xml
 
 # Sensitive or high-churn files:
