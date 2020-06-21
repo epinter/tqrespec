@@ -171,6 +171,7 @@ task patchModulesJar(type: PatchJarModuleTask) {
 
 task copyAppimageFiles(type: Copy) {
     dependsOn(jar)
+    dependsOn 'tqdatabase:jar'
     doFirst {
         mkdir "$buildDir/appimage-files"
     }
@@ -190,6 +191,7 @@ task copyAppimageModules(type: Copy) {
     }
 
     dependsOn(jar)
+    dependsOn 'tqdatabase:jar'
     doFirst {
         mkdir "$buildDir/appimage-modules"
     }
@@ -205,8 +207,6 @@ task copyAppimageModules(type: Copy) {
 
 task jlink(type: Exec) {
     dependsOn clean
-    dependsOn 'jar'
-    dependsOn 'tqdatabase:jar'
     dependsOn 'copyToLib'
     dependsOn 'copyJarsToModuleDeps'
     if (!patchJars) {
@@ -316,3 +316,5 @@ task appimage(type: Exec) {
         new File(buildDir, "jre-image").deleteDir()
     }
 }
+
+clean.dependsOn subprojects.collect { it.tasks.matching { it.name == 'clean' } }
