@@ -54,7 +54,7 @@ There are five attributes available to change (Health, Energy, Strength, Intelli
 
 #### ***Skills***
 
-Now if you change to Skills tab, you will see two lists with the skills of your character. Below this lists, there are two buttons for each. The first button "Reclaim All Skills Points" will remove all points allocated on skills on that mastery and make the points available to use in game. The button "Mastery" permits you to reduce the mastery level to 1 or remove the mastery completely.
+Now if you change to Skills tab, you will see two lists with the skills of your character. Below these lists, there are two buttons for each. The first button "Reclaim All Skills Points" will remove all points allocated on skills on that mastery and make the points available to use in game. The button "Mastery" permits you to reduce the mastery level to 1 or remove the mastery completely.
 
 If you have a mastery on level 24 and 7 skills with points allocated, you can click on "Reclaim All Skills Points" to have the points from the 7 skills back to you. Then you click on "Mastery / Reclaim" to have 23 points back from the mastery, so you will have the mastery with just 1 point allocated, or you can click on "Mastery / Remove" to have all 24 points from mastery.
 
@@ -65,6 +65,10 @@ If you want to change the name of you character, you can type the new name in th
 #### ***Saving and backup***
 
 After you finish, you can click on Save. At this moment, TQRespec will make a backup of the file "Player.chr" inside a .zip in the folder "Titan Quest - Immortal Throne/SaveData/TQRespec Backup". The file "Player.chr" is where the games saves everything about the character, except the progress, transfer area and storage.
+
+#### ***Multi-language support***
+
+All the languages available in-game are supported. Some interface strings can't be reused, so you will see some strings in your language and others in english if nobody contributed with a translation for your language. See [Translators](#translators) for a list of languages.
 
 ## ***Project and source code***
 
@@ -132,3 +136,11 @@ Higher level of debug for the application and all libraries:
 TQRespec.exe --debug=9
 ~~~ 
 
+## **Contribution**
+
+### ***Translators***
+* Portuguese Brazil (pt-BR): ***Emerson Pinter***
+* Russian (ru): ***Evgeniy Chefranov (titanquest.org.ua)***
+
+### ***Note***
+Contributions are always welcome. They will be accepted or rejected depending on the scope and predefined objectives of the project. Look at the open [issues](https://github.com/epinter/tqrespec/issues) and milestones to know how you can help. Feel free to open an issue and suggest a feature you want to see available.

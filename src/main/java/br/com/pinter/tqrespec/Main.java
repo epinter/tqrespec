@@ -198,7 +198,8 @@ public class Main extends Application {
 
         Parent root;
         try {
-            fxmlLoader.setResources(ResourceBundle.getBundle("i18n.UI"));
+            State.get().setLocale(gameInfo.getGameLanguage());
+            fxmlLoader.setResources(ResourceBundle.getBundle("i18n.UI",State.get().getLocale()));
             fxmlLoader.setLocation(getClass().getResource(Constants.UI.MAIN_FXML));
             root = fxmlLoader.load();
         } catch (IOException e) {

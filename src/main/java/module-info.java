@@ -30,6 +30,7 @@ module br.com.pinter.tqrespec {
     requires java.logging;
     provides System.LoggerFinder with br.com.pinter.tqrespec.logging.JULLoggerFinder;
     requires static org.apache.commons.lang3;
+    requires static org.apache.commons.text;
     requires br.com.pinter.tqdatabase;
     requires static com.google.guice;
     requires static com.google.common;

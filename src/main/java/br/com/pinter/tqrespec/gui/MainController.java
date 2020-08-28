@@ -25,6 +25,7 @@ import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.player.Player;
 import br.com.pinter.tqrespec.save.player.PlayerWriter;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
+import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
 import br.com.pinter.tqrespec.util.Version;
@@ -57,6 +58,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.FileAlreadyExistsException;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 @SuppressWarnings("unused")
@@ -120,10 +122,24 @@ public class MainController implements Initializable {
     @FXML
     public Button resetButton;
 
+    @FXML
+    public Tab skillsTab;
+
+    @FXML
+    public Tab attributesTab;
+
+    @Inject
+    private Txt txt;
+
     public final BooleanProperty saveDisabled = new SimpleBooleanProperty();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        logger.log(System.Logger.Level.DEBUG, "isLocaleLanguageEmpty: "+resources.getLocale().getLanguage().isEmpty());
+        if (!State.get().getLocale().equals(Locale.ENGLISH) && resources.getLocale().getLanguage().isEmpty()) {
+            Util.tryTagText(txt, attributesTab, Constants.UI.TAG_ATTRIBUTESTAB ,false, true);
+            Util.tryTagText(txt, skillsTab, Constants.UI.TAG_SKILLSTAB ,false, true);
+        }
         mainFormTitle.setText(String.format("%s v%s", Util.getBuildTitle(), Util.getBuildVersion()));
         mainFormInitialized.addListener(((observable, oldValue, newValue) -> {
             MyTask<Void> windowShownTask = new MyTask<>() {
@@ -221,7 +237,7 @@ public class MainController implements Initializable {
         Parent root;
         if (fxmlLoaderAbout.getRoot() == null) {
             fxmlLoaderAbout.setLocation(getClass().getResource(Constants.UI.ABOUT_FXML));
-            fxmlLoaderAbout.setResources(ResourceBundle.getBundle("i18n.UI"));
+            fxmlLoaderAbout.setResources(ResourceBundle.getBundle("i18n.UI", State.get().getLocale()));
             fxmlLoaderAbout.load();
         } else {
             root = fxmlLoaderAbout.getRoot();
@@ -407,7 +423,7 @@ public class MainController implements Initializable {
             return;
         }
 
-        if(!(evt.getSource() instanceof ComboBox)) {
+        if (!(evt.getSource() instanceof ComboBox)) {
             return;
         }
 

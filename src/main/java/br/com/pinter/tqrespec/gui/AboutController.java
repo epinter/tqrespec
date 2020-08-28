@@ -25,6 +25,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -33,6 +34,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.net.URL;
@@ -47,6 +49,9 @@ public class AboutController implements Initializable {
 
     @FXML
     private Label aboutVersion;
+
+    @FXML
+    private TextArea aboutText;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -82,6 +87,11 @@ public class AboutController implements Initializable {
         stage.setTitle(Util.getUIMessage("about.title", Util.getBuildTitle()));
         aboutFormTitle.setText(Util.getUIMessage("about.title", Util.getBuildTitle()));
         aboutVersion.setText(Util.getUIMessage("about.version", Util.getBuildVersion()));
+
+        String translators = Util.getUIMessage("main.translators");
+        if(StringUtils.isNotBlank(translators)) {
+            aboutText.appendText("\n\n"+Util.getUIMessage("main.translators"));
+        }
 
         stage.show();
     }

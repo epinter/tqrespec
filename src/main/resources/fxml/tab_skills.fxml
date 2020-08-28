@@ -14,7 +14,7 @@
   ~ Copyright (C) 2019 Emerson Pinter - All Rights Reserved
   -->
 
-<GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" stylesheets="@main.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.pinter.tqrespec.gui.SkillsPaneController">
+<GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" stylesheets="@main.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.pinter.tqrespec.gui.SkillsPaneController">
     <columnConstraints>
         <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" percentWidth="50.0" prefWidth="277.0" />
         <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" percentWidth="50.0" prefWidth="276.0" />
@@ -39,12 +39,12 @@
             </GridPane.margin></ListView>
         <Button fx:id="reclaimSkillsFirstButton" disable="true" maxHeight="40.0" maxWidth="350.0" mnemonicParsing="false" onAction="#reclaimSkillsFirst" styleClass="tq-button" text="%skills.reclaimSkillPoints" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
             <GridPane.margin>
-                <Insets bottom="10.0" left="40.0" right="40.0" top="10.0" />
+                <Insets bottom="10.0" left="35.0" right="35.0" top="10.0" />
             </GridPane.margin>
         </Button>
         <Button fx:id="reclaimSkillsSecondButton" disable="true" maxHeight="40.0" maxWidth="350.0" mnemonicParsing="false" onAction="#reclaimSkillsSecond" styleClass="tq-button" text="%skills.reclaimSkillPoints" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
             <GridPane.margin>
-                <Insets bottom="10.0" left="40.0" right="40.0" top="10.0" />
+                <Insets bottom="10.0" left="35.0" right="35.0" top="10.0" />
             </GridPane.margin>
         </Button>
         <Label fx:id="freeSkillPointsLabel" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="tq-label" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
@@ -54,7 +54,7 @@
           <MenuItem fx:id="removeMasteryFirstItem" mnemonicParsing="false" onAction="#removeMasteryFirst" styleClass="tq-menuitem" text="%skills.removeMastery" />
         </items>
          <GridPane.margin>
-            <Insets bottom="10.0" left="40.0" right="40.0" top="10.0" />
+            <Insets bottom="10.0" left="35.0" right="35.0" top="10.0" />
          </GridPane.margin>
       </MenuButton>
       <MenuButton fx:id="secondMasteryButton" alignment="CENTER" disable="true" maxHeight="40.0" maxWidth="300.0" mnemonicParsing="false" styleClass="tq-menubutton" text="%skills.masteryButton" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
@@ -63,7 +63,7 @@
             <MenuItem fx:id="removeMasterySecondItem" mnemonicParsing="false" onAction="#removeMasterySecond" styleClass="tq-menuitem" text="%skills.removeMastery" />
          </items>
          <GridPane.margin>
-            <Insets bottom="10.0" left="40.0" right="40.0" top="10.0" />
+            <Insets bottom="10.0" left="35.0" right="35.0" top="10.0" />
          </GridPane.margin>
       </MenuButton>
     </children>

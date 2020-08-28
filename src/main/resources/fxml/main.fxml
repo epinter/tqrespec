@@ -23,7 +23,7 @@
   ~ Copyright (C) 2019 Emerson Pinter - All Rights Reserved
   -->
 
-<VBox fx:id="rootelement" alignment="TOP_CENTER" maxHeight="940.0" maxWidth="1320.0" minHeight="470.0" minWidth="660.0" prefHeight="470.0" prefWidth="660.0" stylesheets="@main.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.pinter.tqrespec.gui.MainController">
+<VBox fx:id="rootelement" alignment="TOP_CENTER" maxHeight="940.0" maxWidth="1320.0" minHeight="470.0" minWidth="660.0" prefHeight="470.0" prefWidth="660.0" stylesheets="@main.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.pinter.tqrespec.gui.MainController">
    <children>
       <HBox fx:id="tophbox" fillHeight="false" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" onMouseDragged="#moveWindow" onMousePressed="#startMoveWindow" onMouseReleased="#endMoveWindow" prefHeight="47.0" styleClass="tq-topdecoration" VBox.vgrow="ALWAYS">
          <children>
@@ -96,12 +96,12 @@
             </GridPane>
             <TabPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" side="LEFT" styleClass="tq-tabpane" tabMaxHeight="100.0" tabMaxWidth="100.0" VBox.vgrow="ALWAYS">
                <tabs>
-                  <Tab closable="false" styleClass="tq-tabbutton" text="%main.attributesTab">
+                  <Tab fx:id="attributesTab" closable="false" styleClass="tq-tabbutton" text="%main.attributesTab">
                      <content>
                          <fx:include fx:id="pointsPane" source="tab_points.fxml" />
                      </content>
                   </Tab>
-                  <Tab fx:id="tabSkills" closable="false" styleClass="tq-tabbutton" text="%main.skillsTab">
+                  <Tab fx:id="skillsTab" closable="false" styleClass="tq-tabbutton" text="%main.skillsTab">
                      <content>
                          <fx:include fx:id="skillsPane" source="tab_skills.fxml" />
                      </content>
@@ -113,10 +113,10 @@
             </TabPane>
             <GridPane>
               <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="25.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="30.0" />
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="30.0" />
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="30.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="27.0" />
               </columnConstraints>
               <rowConstraints>
                 <RowConstraints minHeight="10.0" prefHeight="42.0" vgrow="SOMETIMES" />
@@ -124,12 +124,12 @@
                <children>
                   <Button fx:id="saveButton" alignment="CENTER" disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#saveChar" styleClass="tq-button" text="%main.savechar" textAlignment="CENTER" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
                      <GridPane.margin>
-                        <Insets bottom="2.0" left="10.0" right="10.0" top="2.0" />
+                        <Insets bottom="2.0" left="5.0" right="13.0" top="2.0" />
                      </GridPane.margin>
                   </Button>
                   <Button fx:id="copyButton" alignment="CENTER" disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#copyChar" styleClass="tq-button" text="%main.copychar" textAlignment="CENTER">
                      <GridPane.margin>
-                        <Insets left="10.0" right="10.0" />
+                        <Insets right="2.0" />
                      </GridPane.margin>
                   </Button>
                   <TextField fx:id="copyCharInput" onKeyTyped="#copyCharInputChanged" promptText="%main.copycharname" styleClass="tq-textfield" GridPane.columnIndex="1">
@@ -142,7 +142,7 @@
                   </TextField>
                </children>
                <padding>
-                  <Insets left="48.0" right="35.0" top="10.0" />
+                  <Insets left="45.0" right="35.0" top="10.0" />
                </padding>
             </GridPane>
             <HBox prefHeight="26.0" prefWidth="200.0">

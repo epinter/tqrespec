@@ -23,12 +23,14 @@ package br.com.pinter.tqrespec.core;
 import javafx.beans.property.SimpleBooleanProperty;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 
 public class State {
     private static final Object lock = new Object();
     private static State instance = null;
+    private Locale locale = Locale.ENGLISH;
     private final SimpleBooleanProperty saveInProgress = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty gameRunning = new SimpleBooleanProperty(false);
     private final Map<String, Level> debugPrefix = new HashMap<>();
@@ -80,5 +82,16 @@ public class State {
 
     public void addDebugPrefix(String prefix, Level level) {
         getDebugPrefix().put(prefix, level);
+    }
+
+    public Locale getLocale() {
+        if(locale == null) {
+            locale = Locale.ENGLISH;
+        }
+        return locale;
+    }
+
+    public void setLocale(Locale locale) {
+        this.locale = locale;
     }
 }

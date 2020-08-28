@@ -29,12 +29,19 @@ import com.sun.jna.platform.win32.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,6 +50,7 @@ import java.util.regex.Pattern;
 public class GameInfo {
     private final System.Logger logger = Log.getLogger(GameInfo.class.getName());
     private String gamePath = null;
+    private HashMap<String, String> gameOptions;
 
     @SuppressWarnings("unused")
     public String getWindowsVersion() {
@@ -382,6 +390,15 @@ public class GameInfo {
         return null;
     }
 
+    public String getSaveSetingsPath() {
+        if (!SystemUtils.IS_OS_WINDOWS) return Paths.get(Constants.DEV_GAMEDATA, Constants.SETTINGS).toString();
+        String savePath = getSavePath();
+        if (StringUtils.isNotEmpty(savePath)) {
+            return Paths.get(savePath, Constants.SETTINGS).toString();
+        }
+        return null;
+    }
+
     public String[] getPlayerListMain() {
         String savePath = this.getSaveDataMainPath();
         File directory = new File(savePath);
@@ -411,4 +428,36 @@ public class GameInfo {
         return Paths.get(path, "_" + playerName, "Player.chr");
     }
 
+    public Locale getGameLanguage() {
+        String language;
+        try {
+            language = getGameOptionValue("language");
+        } catch (IOException e) {
+            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
+            return Locale.ENGLISH;
+        }
+        return Constants.GAMELANGUAGE_LOCALE.get(language);
+    }
+
+    public String getGameOptionValue(String key) throws IOException {
+        if (gameOptions == null || !gameOptions.containsKey(key)) {
+            readGameOptions();
+        }
+        return gameOptions.get(key);
+    }
+
+    public void readGameOptions() throws IOException {
+        gameOptions = new HashMap<>();
+
+        FileChannel optionsFile = FileChannel.open(Paths.get(getSaveSetingsPath(), "options.txt"));
+        try (BufferedReader reader = new BufferedReader(Channels.newReader(optionsFile, StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] opt = line.split("\\s+=\\s+");
+                if (opt[1] != null) {
+                    gameOptions.put(opt[0].trim(), opt[1].replace("\"", "").trim());
+                }
+            }
+        }
+    }
 }

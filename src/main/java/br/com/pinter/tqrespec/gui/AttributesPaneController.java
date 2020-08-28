@@ -20,27 +20,64 @@
 
 package br.com.pinter.tqrespec.gui;
 
+import br.com.pinter.tqrespec.core.State;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.player.Player;
 import br.com.pinter.tqrespec.tqdata.Db;
 import br.com.pinter.tqrespec.tqdata.Txt;
+import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
 import com.google.inject.Inject;
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.*;
 import javafx.util.converter.NumberStringConverter;
 
 import java.net.URL;
 import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 @SuppressWarnings("unused")
 public class AttributesPaneController implements Initializable {
     private static final System.Logger logger = Log.getLogger(AttributesPaneController.class.getName());
+
+    @FXML
+    private Label strengthLabel;
+
+    @FXML
+    private Label intelligenceLabel;
+
+    @FXML
+    private Label dexterityLabel;
+
+    @FXML
+    private Label energyLabel;
+
+    @FXML
+    private Label healthLabel;
+
+    @FXML
+    private Label availPointsLabel;
+
+    @FXML
+    private Label experienceLabel;
+
+    @FXML
+    private Label charLevelLabel;
+
+    @FXML
+    private Label goldLabel;
+
+    @FXML
+    private Label charClassLabel;
+
+    @FXML
+    private Label difficultyLabel;
 
     @Inject
     private Db db;
@@ -106,7 +143,20 @@ public class AttributesPaneController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        //ignored
+        if(!State.get().getLocale().equals(Locale.ENGLISH) && resourceBundle.getLocale().getLanguage().isEmpty()) {
+            Util.tryTagText(txt, strengthLabel, Constants.UI.TAG_STRLABEL,true,false);
+            Util.tryTagText(txt, intelligenceLabel, Constants.UI.TAG_INTLABEL,true,false);
+            Util.tryTagText(txt, dexterityLabel, Constants.UI.TAG_DEXLABEL,true,false);
+            Util.tryTagText(txt, energyLabel, Constants.UI.TAG_ENERGYLABEL,true,false);
+            Util.tryTagText(txt, healthLabel, Constants.UI.TAG_HEALTHLABEL,true,false);
+            Util.tryTagText(txt, experienceLabel, Constants.UI.TAG_XPLABEL,true,false);
+            Util.tryTagText(txt, goldLabel, Constants.UI.TAG_GOLDLABEL,true,false);
+            Util.tryTagText(txt, charLevelLabel, Constants.UI.TAG_CHARLEVELLABEL,true,false);
+            Util.tryTagText(txt, charClassLabel, Constants.UI.TAG_CLASSLABEL,true,false);
+            Util.tryTagText(txt, difficultyLabel, Constants.UI.TAG_DIFFICULTYLABEL,true,false);
+            Util.tryTagText(txt, charClassLabel, Constants.UI.TAG_CLASSLABEL,true,false);
+            Util.tryTagText(txt, availPointsLabel, Constants.UI.TAG_AVAILPOINTSLABEL,true,true);
+        }
     }
 
     public boolean isSaveDisabled() {
@@ -322,7 +372,14 @@ public class AttributesPaneController implements Initializable {
         int gold = player.getMoney();
         charClassText.setText(player.getPlayerClassName());
         int difficulty = player.getDifficulty();
-        difficultyText.setText(Util.getUIMessage(String.format("difficulty.%d", difficulty)));
+
+        String difficultyTextValue = String.format("%s%02d",Constants.UI.PREFIXTAG_DIFFICULTYLABEL,difficulty+1);
+        if (txt.isTagStringValid(difficultyTextValue)) {
+            difficultyText.setText(Util.cleanTagString(txt.getString(difficultyTextValue)));
+        } else {
+            difficultyText.setText(Util.getUIMessage(String.format("difficulty.%d", difficulty)));
+        }
+
         experienceText.setText(NumberFormat.getInstance().format(xp));
         charLevelText.setText(String.valueOf(level));
         goldText.setText(NumberFormat.getInstance().format(gold));

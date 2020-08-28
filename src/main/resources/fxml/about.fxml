@@ -13,7 +13,7 @@
   ~ Copyright (C) 2019 Emerson Pinter - All Rights Reserved
   -->
 
-<AnchorPane fx:id="rootelement" prefHeight="300.0" prefWidth="370.0" stylesheets="@about.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.pinter.tqrespec.gui.AboutController">
+<AnchorPane fx:id="rootelement" prefHeight="300.0" prefWidth="370.0" stylesheets="@about.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.pinter.tqrespec.gui.AboutController">
    <children>
       <SplitPane dividerPositions="0.43" layoutX="23.0" layoutY="28.0" prefHeight="272.0" prefWidth="370.0" styleClass="bg-container" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
@@ -29,7 +29,7 @@
             </AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" styleClass="tq-splitpane">
                <children>
-                  <TextArea editable="false" layoutX="4.0" layoutY="87.0" prefHeight="194.0" prefWidth="206.0" styleClass="tq-textarea" text="%about.text" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="87.0">
+                  <TextArea fx:id="aboutText" editable="false" layoutX="4.0" layoutY="87.0" prefHeight="194.0" prefWidth="206.0" styleClass="tq-textarea" text="%about.text" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="87.0">
                      <padding>
                         <Insets bottom="3.0" right="3.0" />
                      </padding>

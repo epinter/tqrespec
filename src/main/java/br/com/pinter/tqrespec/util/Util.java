@@ -22,9 +22,13 @@ package br.com.pinter.tqrespec.util;
 
 import br.com.pinter.tqrespec.core.State;
 import br.com.pinter.tqrespec.logging.Log;
+import br.com.pinter.tqrespec.tqdata.Txt;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Labeled;
+import javafx.scene.control.Tab;
 import javafx.stage.Modality;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -111,7 +115,7 @@ public class Util {
     }
 
     public static String getUIMessage(String message) {
-        ResourceBundle ui = ResourceBundle.getBundle("i18n.UI");
+        ResourceBundle ui = ResourceBundle.getBundle("i18n.UI",State.get().getLocale());
         if (ui.containsKey(message)) {
             return ui.getString(message);
         }
@@ -119,7 +123,7 @@ public class Util {
     }
 
     public static String getUIMessage(String message, Object... parameters) {
-        ResourceBundle ui = ResourceBundle.getBundle("i18n.UI");
+        ResourceBundle ui = ResourceBundle.getBundle("i18n.UI",State.get().getLocale());
         if (ui.containsKey(message)) {
             return MessageFormat.format(ui.getString(message), parameters);
         }
@@ -199,4 +203,45 @@ public class Util {
 
         Util.showWarning(Util.getUIMessage("alert.saveinprogress_header"), Util.getUIMessage("alert.saveinprogress_content"));
     }
+
+    public static String cleanTagString(String value) {
+        if(StringUtils.isBlank(value)) {
+            return value;
+        }
+
+        return value.replaceAll("(?:\\{[^}]+\\})*([^{}:]*)(?:\\{[^}]+\\})*","$1")
+                .replace(":","")
+                .trim();
+    }
+
+    private static void setLabeledText(Object obj, String text) {
+        Labeled control = (Labeled) obj;
+        control.setText(text);
+    }
+
+    private static void setTabText(Object obj, String text) {
+        Tab control = (Tab) obj;
+        control.setText(text);
+    }
+
+    public static void tryTagText(Txt txt, Object control, String tag, boolean capitalized, boolean needsClean) {
+        if (!txt.isTagStringValid(tag))
+            return;
+
+        String text = capitalized?txt.getCapitalizedString(tag):txt.getString(tag);
+
+        if(needsClean) {
+            text = Util.cleanTagString(text);
+        }
+        if(control instanceof Labeled) {
+            logger.log(System.Logger.Level.DEBUG,"settext control labeled");
+            setLabeledText(control, text);
+        }else if(control instanceof Tab) {
+            logger.log(System.Logger.Level.DEBUG,"settext control tab");
+            setTabText(control, text);
+        } else {
+            throw new UnsupportedOperationException("BUG: trying to set text on unsupported control");
+        }
+    }
+
 }

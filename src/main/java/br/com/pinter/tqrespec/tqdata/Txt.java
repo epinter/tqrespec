@@ -21,11 +21,14 @@
 package br.com.pinter.tqrespec.tqdata;
 
 import br.com.pinter.tqdatabase.Text;
+import br.com.pinter.tqrespec.core.State;
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.util.Constants;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.WordUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -44,7 +47,7 @@ public class Txt {
             if (text == null) {
                 String path = gameInfo.getGamePath() + "/Text";
                 logger.log(System.Logger.Level.DEBUG, "loading text from ''{0}''", path);
-                text = new Text(path);
+                text = new Text(path, Constants.LOCALE_TEXT.get(State.get().getLocale()));
             }
         } catch (FileNotFoundException e) {
             logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
@@ -68,6 +71,15 @@ public class Txt {
         } catch (IOException e) {
             throw new UnhandledRuntimeException("Error loading text resource", e);
         }
-
     }
+
+    public String getCapitalizedString(String tag) {
+        return WordUtils.capitalize(getString(tag));
+    }
+
+    public boolean isTagStringValid(String tag) {
+        String str = getString(tag);
+        return !StringUtils.isBlank(tag) && !StringUtils.isBlank(str) && !tag.equals(str);
+    }
+
 }
