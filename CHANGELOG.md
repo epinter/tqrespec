@@ -1,4 +1,10 @@
 # Changelog
+## [0.8.1] - 2020-08-29
+### Added
+- Added support for multiple languages (controlled by game option)
+- Added translation for pt-br
+- Added translation for ru
+
 ## [0.8.0] - 2020-06-21
 ### Fixed
 - Fix crash while parsing database with empty skills([#17](https://github.com/epinter/tqrespec/issues/17))
