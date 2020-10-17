@@ -43,7 +43,7 @@ public class Db {
             if (database == null) {
                 String path = String.format("%s/Database/database.arz", gameInfo.getGamePath());
                 logger.log(System.Logger.Level.DEBUG, "loading database from ''{0}''", path);
-                database = new Database(path);
+                database = new Database(new String[]{path});
             }
         } catch (IOException e) {
             throw new UnhandledRuntimeException("Error loading database.", e);
