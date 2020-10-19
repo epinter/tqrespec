@@ -104,7 +104,7 @@ public class Util {
     public static void showError(String message, String contentText) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.initModality(Modality.APPLICATION_MODAL);
-        alert.setTitle("Error");
+        alert.setTitle(getBuildTitle());
         alert.setHeaderText(message);
         alert.setContentText(contentText);
         alert.showAndWait();
@@ -113,7 +113,7 @@ public class Util {
     private static void showWarning(String message, String contentText) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.initModality(Modality.APPLICATION_MODAL);
-        alert.setTitle("Warning");
+        alert.setTitle(getBuildTitle());
         alert.setHeaderText(message);
         alert.setContentText(contentText);
         alert.showAndWait();
@@ -122,7 +122,7 @@ public class Util {
     public static void showInformation(String message, String contentText) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.initModality(Modality.APPLICATION_MODAL);
-        alert.setTitle("Information");
+        alert.setTitle(getBuildTitle());
         alert.setHeaderText(message);
         alert.setContentText(contentText);
         alert.showAndWait();

@@ -22,6 +22,7 @@ package br.com.pinter.tqrespec.core;
 
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.util.Constants;
+import br.com.pinter.tqrespec.util.Util;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -59,7 +60,7 @@ public class ExceptionHandler {
 
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.initModality(Modality.APPLICATION_MODAL);
-        alert.setTitle("Error");
+        alert.setTitle(Util.getBuildTitle());
         alert.setHeaderText("An unhandled exception occurred");
         alert.setContentText(header);
 
