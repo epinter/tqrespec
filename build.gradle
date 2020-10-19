@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Emerson Pinter - All Rights Reserved
+ * Copyright (C) 2020 Emerson Pinter - All Rights Reserved
  */
 
 group 'br.com.pinter.tqrespec'
@@ -32,6 +32,7 @@ ext.distAppName = 'TQRespec'
 version = '0.8.1'
 sourceCompatibility = 14
 ext.moduleName = 'br.com.pinter.tqrespec'
+ext.mainPackageName = 'br.com.pinter.tqrespec'
 ext.javahome = System.properties['java.home']
 ext.moduleInfoPresent = false
 ext.javafxSdkDir = file(String.format("%s/sdk/javafx-sdk-%s", projectDir, sourceCompatibility))
@@ -84,9 +85,8 @@ jar {
                 'Implementation-Title': distAppName,
                 'Implementation-Version': project.version,
                 'Automatic-Module-Name': moduleName,
-                'Main-Class': 'br.com.pinter.tqrespec.Main')
+                'Main-Class': mainClassName)
     }
-//    from('src/main/resources/META-INF')
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 shadowJar {
@@ -116,14 +116,14 @@ if (moduleInfoPresent) {
             jvmArgs = [
                     '-XX:+UseSerialGC',
                     '-XX:MinHeapFreeRatio=10', '-XX:MaxHeapFreeRatio=15',
-                    '--add-reads', 'br.com.pinter.tqrespec=ALL-UNNAMED',
+                    '--add-reads', "${moduleName}=ALL-UNNAMED",
                     '--add-opens', 'javafx.base/com.sun.javafx.reflect=ALL-UNNAMED',
-                    '--add-opens', 'br.com.pinter.tqrespec/br.com.pinter.tqrespec=ALL-UNNAMED',
-                    '--add-opens', 'br.com.pinter.tqrespec/br.com.pinter.tqrespec.core=ALL-UNNAMED',
-                    '--add-opens', 'br.com.pinter.tqrespec/br.com.pinter.tqrespec.tqdata=ALL-UNNAMED',
-                    '--add-opens', 'br.com.pinter.tqrespec/br.com.pinter.tqrespec.gui=ALL-UNNAMED',
-                    '--add-opens', 'br.com.pinter.tqrespec/br.com.pinter.tqrespec.save.player=ALL-UNNAMED',
-                    '--add-opens', 'br.com.pinter.tqrespec/br.com.pinter.tqrespec.save=ALL-UNNAMED',
+                    '--add-opens', "${moduleName}/${mainPackageName}=ALL-UNNAMED",
+                    '--add-opens', "${moduleName}/${mainPackageName}.core=ALL-UNNAMED",
+                    '--add-opens', "${moduleName}/${mainPackageName}.tqdata=ALL-UNNAMED",
+                    '--add-opens', "${moduleName}/${mainPackageName}.gui=ALL-UNNAMED",
+                    '--add-opens', "${moduleName}/${mainPackageName}.save.player=ALL-UNNAMED",
+                    '--add-opens', "${moduleName}/${mainPackageName}.save=ALL-UNNAMED",
                     '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
                     '--module-path', classpath.asPath,
                     '--class-path', classpath.asPath,
@@ -161,7 +161,7 @@ classes.dependsOn('copyMetaInf')
 
 task copyJarsToModuleDeps(type: Copy) {
     from project(':tqdatabase').configurations.compileClasspath
-    from project.configurations.compile
+    from project.configurations.compileClasspath
     into patchjarDir
 }
 
@@ -212,8 +212,9 @@ task copyAppimageModules(type: Copy) {
 task jlink(type: Exec) {
     dependsOn clean
     dependsOn 'copyToLib'
-    dependsOn 'copyJarsToModuleDeps'
-    if (!patchJars) {
+    if (patchJars) {
+        dependsOn 'copyJarsToModuleDeps'
+    } else {
         dependsOn 'copyAppimageFiles'
     }
     dependsOn 'copyAppimageModules'
@@ -223,7 +224,7 @@ task jlink(type: Exec) {
         commandLine binjlink,
                 '-J-Djlink.debug=true',
                 '--module-path', "${javafxSdkLibDir}" + File.pathSeparator + "${buildDir}/appimage-modules",
-                '--add-modules', ("br.com.pinter.tqdatabase,br.com.pinter.tqrespec,javafx.base,javafx.fxml,javafx.graphics,javafx.controls,java.prefs,java.base,jdk.zipfs,jdk.unsupported,java.logging"),
+                '--add-modules', ("br.com.pinter.tqdatabase,${moduleName},javafx.base,javafx.fxml,javafx.graphics,javafx.controls,java.prefs,java.base,jdk.zipfs,jdk.unsupported,java.logging"),
                 '--output', "${buildDir}/jre-image",
                 '--compress', '2',
                 '--no-header-files',
@@ -267,15 +268,15 @@ task appimage(type: Exec) {
                 '--java-options',
                 '-XX:+UseSerialGC ' +
                         '-XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=15 ' +
-                        '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED ' +
-                        '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec=ALL-UNNAMED ' +
-                        '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.core=ALL-UNNAMED ' +
-                        '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.tqdata=ALL-UNNAMED ' +
-                        '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.gui=ALL-UNNAMED ' +
-                        '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.save.player=ALL-UNNAMED ' +
-                        '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.save=ALL-UNNAMED ' +
-                        '--add-opens java.base/java.lang=ALL-UNNAMED ' +
-                        '--add-reads br.com.pinter.tqrespec=ALL-UNNAMED'
+                        "--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED " +
+                        "--add-opens ${moduleName}/${mainPackageName}=ALL-UNNAMED " +
+                        "--add-opens ${moduleName}/${mainPackageName}.core=ALL-UNNAMED " +
+                        "--add-opens ${moduleName}/${mainPackageName}.tqdata=ALL-UNNAMED " +
+                        "--add-opens ${moduleName}/${mainPackageName}.gui=ALL-UNNAMED " +
+                        "--add-opens ${moduleName}/${mainPackageName}.save.player=ALL-UNNAMED " +
+                        "--add-opens ${moduleName}/${mainPackageName}.save=ALL-UNNAMED " +
+                        "--add-opens java.base/java.lang=ALL-UNNAMED " +
+                        "--add-reads ${moduleName}=ALL-UNNAMED"
     } else {
         commandLine binjpackage,
                 '--type', 'app-image',
