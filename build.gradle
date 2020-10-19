@@ -16,23 +16,27 @@ buildscript {
     }
     dependencies {
         classpath "com.github.jengelman.gradle.plugins:shadow:5.1.0"
-        classpath 'org.openjfx:javafx-plugin:0.0.7'
         classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.0"
     }
 }
+
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
 sourceSets {
     main.output.resourcesDir = main.java.outputDir
 }
 
+
+OperatingSystem OS = DefaultNativePlatform.currentOperatingSystem
 ext.distAppName = 'TQRespec'
 version = '0.8.1'
 sourceCompatibility = 14
 ext.moduleName = 'br.com.pinter.tqrespec'
 ext.javahome = System.properties['java.home']
 ext.moduleInfoPresent = false
-ext.javafxSdkLibDir = new File(projectDir, 'sdk/javafx-sdk-14/lib')
-ext.javafxSdkBinDir = new File(projectDir, 'sdk/javafx-sdk-14/bin')
+ext.javafxSdkDir = file(String.format("%s/sdk/javafx-sdk-%s", projectDir, sourceCompatibility))
+ext.javafxSdkBinDir = file("${javafxSdkDir}/bin")
+ext.javafxSdkLibDir = file("${javafxSdkDir}/lib")
 ext.patchjarDir = new File(buildDir, '/patchedjar')
 ext.patchJars = false
 apply from: "gradle/patchModulesJar.gradle"
@@ -41,7 +45,7 @@ if (file('src/main/java/module-info.java').exists()) {
 }
 mainClassName = "br.com.pinter.tqrespec.Main"
 
-if(project.hasProperty('buildVersion')) {
+if (project.hasProperty('buildVersion')) {
     project.version = project.properties['buildVersion']
 }
 
@@ -66,9 +70,7 @@ dependencies {
     testImplementation group: 'com.google.inject', name: 'guice', version: '4.2.3'
 }
 
-import org.apache.tools.ant.taskdefs.condition.Os;
-
-if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+if (OS.isWindows()) {
     ext.binjlink = javahome + "/bin/jlink.exe"
     ext.binjpackage = javahome + "/bin/jpackage.exe"
 } else {
@@ -112,7 +114,8 @@ if (moduleInfoPresent) {
         inputs.property("moduleName", moduleName)
         doFirst {
             jvmArgs = [
-                    '-XX:+UseSerialGC','-XX:MinHeapFreeRatio=10','-XX:MaxHeapFreeRatio=15',
+                    '-XX:+UseSerialGC',
+                    '-XX:MinHeapFreeRatio=10', '-XX:MaxHeapFreeRatio=15',
                     '--add-reads', 'br.com.pinter.tqrespec=ALL-UNNAMED',
                     '--add-opens', 'javafx.base/com.sun.javafx.reflect=ALL-UNNAMED',
                     '--add-opens', 'br.com.pinter.tqrespec/br.com.pinter.tqrespec=ALL-UNNAMED',
@@ -121,7 +124,7 @@ if (moduleInfoPresent) {
                     '--add-opens', 'br.com.pinter.tqrespec/br.com.pinter.tqrespec.gui=ALL-UNNAMED',
                     '--add-opens', 'br.com.pinter.tqrespec/br.com.pinter.tqrespec.save.player=ALL-UNNAMED',
                     '--add-opens', 'br.com.pinter.tqrespec/br.com.pinter.tqrespec.save=ALL-UNNAMED',
-                    '--add-opens','java.base/java.lang=ALL-UNNAMED',
+                    '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
                     '--module-path', classpath.asPath,
                     '--class-path', classpath.asPath,
                     '--module', moduleName,
@@ -134,8 +137,9 @@ if (moduleInfoPresent) {
     run {
         doFirst {
             jvmArgs = [
-                    '-XX:+UseSerialGC','-XX:MinHeapFreeRatio=10','-XX:MaxHeapFreeRatio=15',
-                    '--module-path', javafxSdkLibDir,
+                    '-XX:+UseSerialGC',
+                    '-XX:MinHeapFreeRatio=10', '-XX:MaxHeapFreeRatio=15',
+                    '--module-path', "${javafxSdkLibDir}",
                     '--add-modules', 'javafx.base,javafx.fxml,javafx.graphics,javafx.controls',
             ]
         }
@@ -220,7 +224,7 @@ task jlink(type: Exec) {
                 '-J-Djlink.debug=true',
                 '--module-path', "${javafxSdkLibDir}" + File.pathSeparator + "${buildDir}/appimage-modules",
                 '--add-modules', ("br.com.pinter.tqdatabase,br.com.pinter.tqrespec,javafx.base,javafx.fxml,javafx.graphics,javafx.controls,java.prefs,java.base,jdk.zipfs,jdk.unsupported,java.logging"),
-                '--output', new File(buildDir, '/jre-image'),
+                '--output', "${buildDir}/jre-image",
                 '--compress', '2',
                 '--no-header-files',
                 '--no-man-pages',
@@ -229,7 +233,7 @@ task jlink(type: Exec) {
         commandLine binjlink,
                 '--module-path', "${javafxSdkLibDir}" + File.pathSeparator + "${buildDir}/appimage-modules",
                 '--add-modules', ("javafx.base,javafx.fxml,javafx.graphics,javafx.controls,java.prefs,java.base,jdk.zipfs,jdk.unsupported,java.logging"),
-                '--output', new File(buildDir, '/jre-image'),
+                '--output', "${buildDir}/jre-image",
                 '--compress', '2',
                 '--no-header-files',
                 '--no-man-pages',
@@ -249,7 +253,7 @@ task appimage(type: Exec) {
     workingDir buildDir
     if (moduleInfoPresent) {
         commandLine binjpackage,
-                '--type','app-image',
+                '--type', 'app-image',
                 '--verbose',
                 '--runtime-image', "${buildDir}/jre-image",
                 '--module', "${moduleName}/${mainClassName}",
@@ -261,19 +265,20 @@ task appimage(type: Exec) {
                 '--input', "${buildDir}/appimage-files",
                 '--description', 'The respec tool for Titan Quest game',
                 '--java-options',
-                '-XX:+UseSerialGC -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=15 ' +
-                '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED ' +
-                '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec=ALL-UNNAMED ' +
-                '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.core=ALL-UNNAMED ' +
-                '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.tqdata=ALL-UNNAMED ' +
-                '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.gui=ALL-UNNAMED ' +
-                '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.save.player=ALL-UNNAMED ' +
-                '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.save=ALL-UNNAMED ' +
-                '--add-opens java.base/java.lang=ALL-UNNAMED ' +
-                '--add-reads br.com.pinter.tqrespec=ALL-UNNAMED'
+                '-XX:+UseSerialGC ' +
+                        '-XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=15 ' +
+                        '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED ' +
+                        '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec=ALL-UNNAMED ' +
+                        '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.core=ALL-UNNAMED ' +
+                        '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.tqdata=ALL-UNNAMED ' +
+                        '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.gui=ALL-UNNAMED ' +
+                        '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.save.player=ALL-UNNAMED ' +
+                        '--add-opens br.com.pinter.tqrespec/br.com.pinter.tqrespec.save=ALL-UNNAMED ' +
+                        '--add-opens java.base/java.lang=ALL-UNNAMED ' +
+                        '--add-reads br.com.pinter.tqrespec=ALL-UNNAMED'
     } else {
         commandLine binjpackage,
-                '--type','app-image',
+                '--type', 'app-image',
                 '--verbose',
                 '--runtime-image', "${buildDir}/jre-image",
                 '--dest', "${buildDir}/app-image",
@@ -286,22 +291,23 @@ task appimage(type: Exec) {
                 '--main-jar', jar.outputs.files.collect { it.getName() }.get(0),
                 '--main-class', mainClassName,
                 '--java-options',
-                '-XX:+UseSerialGC -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=15 ' +
+                '-XX:+UseSerialGC ' +
+                        '-XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=15 ' +
                         '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED ' +
                         '--add-opens java.base/java.lang=ALL-UNNAMED '
     }
     doLast {
         copy {
-            if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+            if (OS.isWindows()) {
                 from javafxSdkBinDir.listFiles().findAll {
-                    it.getName().equals("decora_sse.dll") ||
-                            it.getName().equals("fxplugins.dll") ||
-                            it.getName().equals("glass.dll") ||
-                            it.getName().equals("javafx_font.dll") ||
-                            it.getName().equals("javafx_iio.dll") ||
-                            it.getName().equals("prism_common.dll") ||
-                            it.getName().equals("prism_d3d.dll") ||
-                            it.getName().equals("prism_sw.dll")
+                    it.getName() == "decora_sse.dll" ||
+                            it.getName() == "fxplugins.dll" ||
+                            it.getName() == "glass.dll" ||
+                            it.getName() == "javafx_font.dll" ||
+                            it.getName() == "javafx_iio.dll" ||
+                            it.getName() == "prism_common.dll" ||
+                            it.getName() == "prism_d3d.dll" ||
+                            it.getName() == "prism_sw.dll"
                 }.collect()
                 into "$buildDir/app-image/${distAppName}"
             } else {
