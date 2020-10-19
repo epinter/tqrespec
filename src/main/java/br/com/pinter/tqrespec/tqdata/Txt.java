@@ -45,9 +45,7 @@ public class Txt {
     public void initialize() {
         try {
             if (text == null) {
-                String path = gameInfo.getGamePath() + "/Text";
-                logger.log(System.Logger.Level.DEBUG, "loading text from ''{0}''", path);
-                text = new Text(new String[]{path}, Constants.LOCALE_TEXT.get(State.get().getLocale()));
+                text = new Text(gameInfo.getTextPath(), Constants.LOCALE_TEXT.get(State.get().getLocale()));
             }
         } catch (FileNotFoundException e) {
             logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);

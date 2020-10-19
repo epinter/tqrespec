@@ -21,9 +21,11 @@
 package br.com.pinter.tqrespec.tqdata;
 
 import br.com.pinter.tqrespec.Settings;
+import br.com.pinter.tqrespec.core.GameNotFoundException;
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.util.Constants;
+import br.com.pinter.tqrespec.util.Util;
 import com.google.inject.Singleton;
 import com.sun.jna.platform.win32.*;
 import org.apache.commons.lang3.StringUtils;
@@ -39,10 +41,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,21 +50,16 @@ public class GameInfo {
     private final System.Logger logger = Log.getLogger(GameInfo.class.getName());
     private String gamePath = null;
     private HashMap<String, String> gameOptions;
-
-    @SuppressWarnings("unused")
-    public String getWindowsVersion() {
-        int major = Advapi32Util.registryGetIntValue(
-                WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
-                "CurrentMajorVersionNumber");
-        int minor = Advapi32Util.registryGetIntValue(
-                WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
-                "CurrentMinorVersionNumber");
-        return String.format("%d.%d", major, minor);
-    }
+    private final List<Path> resourcesText = new ArrayList<>();
+    private final List<Path> databases = new ArrayList<>();
 
     private boolean gamePathExists(Path path) {
         Path databasePath = Paths.get(path.toString(), "Database");
         return Files.exists(databasePath) && Files.isDirectory(databasePath);
+    }
+
+    private boolean gamePathFileExists(String... path) {
+        return new File(Paths.get(gamePath, path).toString()).exists() && new File(gamePath, "Database").isDirectory();
     }
 
     private Path getGameSteamPath() {
@@ -80,10 +74,26 @@ public class GameInfo {
     }
 
     private Path getSteamLibraryPath() {
+        String steamPath = null;
         try {
-            String steamPath = Advapi32Util.registryGetStringValue(
+            steamPath = Advapi32Util.registryGetStringValue(
                     WinReg.HKEY_CURRENT_USER, "SOFTWARE\\Valve\\Steam", "SteamPath");
+        } catch (Win32Exception e) {
+            logger.log(System.Logger.Level.ERROR, "Error", e);
+        }
 
+        try {
+            if (steamPath == null) {
+                steamPath = Advapi32Util.registryGetStringValue(
+                        WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Valve\\Steam", "InstallPath",
+                        WinNT.KEY_WOW64_32KEY);
+            }
+        } catch (Win32Exception e) {
+            logger.log(System.Logger.Level.ERROR, "Error", e);
+            return null;
+        }
+
+        try {
             Path steamappsPath = Paths.get(steamPath, "SteamApps").toAbsolutePath();
             Path steamGamePath = Paths.get(steamappsPath.toString(), Constants.GAME_DIRECTORY_STEAM).toAbsolutePath();
             if (gamePathExists(steamGamePath)) {
@@ -122,44 +132,41 @@ public class GameInfo {
 
     private Path getGameGogPath() {
         try {
-            String gog64bit = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE,
-                    "SOFTWARE\\GOG.com\\Games\\1196955511", "PATH");
-            if (StringUtils.isNotEmpty(gog64bit)) {
-                Path gog64bitPath = Paths.get(gog64bit).toAbsolutePath();
-                if (gamePathExists(gog64bitPath)) {
-                    return gog64bitPath;
+            String gog = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE,
+                    "SOFTWARE\\GOG.com\\Games\\1196955511", "PATH", WinNT.KEY_WOW64_32KEY);
+            if (StringUtils.isNotEmpty(gog)) {
+                Path gogPath = Paths.get(gog).toAbsolutePath();
+                if (gamePathExists(gogPath)) {
+                    return gogPath;
                 }
             }
         } catch (Exception e) {
             logger.log(System.Logger.Level.DEBUG, Constants.ERROR_MSG_EXCEPTION, e);
         }
-
-        try {
-            String gog32bit = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE,
-                    "SOFTWARE\\Wow6432Node\\GOG.com\\Games\\1196955511", "PATH");
-            Path gog32bitPath = Paths.get(gog32bit).toAbsolutePath();
-            if (gamePathExists(gog32bitPath)) {
-                return gog32bitPath;
-            }
-        } catch (Exception e) {
-            return null;
-        }
         return null;
     }
 
-    private Path getGameDiscPath() {
+    private Path getGameDiscTqitPath() {
+        return getGameDiscPath("SOFTWARE\\Iron Lore\\Titan Quest Immortal Throne");
+    }
+
+    private Path getGameDiscTqPath() {
+        return getGameDiscPath("SOFTWARE\\Iron Lore\\Titan Quest");
+    }
+
+    private Path getGameDiscPath(String reg) {
         try {
-            String disc = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE,
-                    "SOFTWARE\\Iron Lore\\Titan Quest Immortal Throne", "Install Location");
+            String disc = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, reg, "Install Location", WinNT.KEY_WOW64_32KEY);
             if (StringUtils.isNotBlank(disc)) {
                 Path discPath = Paths.get(disc).toAbsolutePath();
                 if (gamePathExists(discPath)) {
                     return discPath;
                 }
             }
-        } catch (Exception e) {
-            return null;
+        } catch (Win32Exception e) {
+            logger.log(System.Logger.Level.DEBUG, Constants.ERROR_MSG_EXCEPTION, e);
         }
+
         return null;
     }
 
@@ -272,29 +279,32 @@ public class GameInfo {
             return gogPath.toString();
         }
 
-        Path microsoftStorePath = getGameMicrosoftStorePath();
-        if (microsoftStorePath != null && gamePathExists(microsoftStorePath)) {
-            logger.log(System.Logger.Level.DEBUG, "Package: found");
-            return microsoftStorePath.toString();
-        }
-
         Path installedPathFallback = getGameInstalledPath(Constants.REGEX_REGISTRY_INSTALL_FALLBACK);
         if (installedPathFallback != null && gamePathExists(installedPathFallback)) {
             logger.log(System.Logger.Level.DEBUG, "Installed: found");
             return installedPathFallback.toString();
         }
 
+        Path microsoftStorePath = getGameMicrosoftStorePath();
+        if (microsoftStorePath != null && gamePathExists(microsoftStorePath)) {
+            logger.log(System.Logger.Level.DEBUG, "Package: found");
+            return microsoftStorePath.toString();
+        }
+
+        //Anniversary Edition not found, search for TQIT
+        Path discPath = getGameDiscTqitPath();
+        if (discPath != null && gamePathExists(discPath)) {
+            logger.log(System.Logger.Level.DEBUG, "Disc: found");
+            return discPath.toString();
+        }
+
+        //Search versions that incorrectly uses SteamPath registry
         Path alternativeSteamBasedPath = getGameSteamApiBasedPath();
         if (alternativeSteamBasedPath != null && gamePathExists(alternativeSteamBasedPath)) {
             logger.log(System.Logger.Level.DEBUG, "'Alternative' installation: found");
             return alternativeSteamBasedPath.toString();
         }
 
-        Path discPath = getGameDiscPath();
-        if (discPath != null && gamePathExists(discPath)) {
-            logger.log(System.Logger.Level.DEBUG, "Disc: found");
-            return discPath.toString();
-        }
         return null;
     }
 
@@ -304,14 +314,22 @@ public class GameInfo {
         }
     }
 
-    public void setGamePath(String gamePath) {
-        if (gamePathExists(Paths.get(gamePath))) {
-            Settings.setLastDetectedGamePath(gamePath);
-        }
-        this.gamePath = gamePath;
+    public void removeSavedDetectedGamePath() {
+        Settings.setLastDetectedGamePath(null);
     }
 
-    public String getGamePath() throws FileNotFoundException {
+    public void setGamePath(String gamePath) throws GameNotFoundException {
+        if (gamePathExists(Paths.get(gamePath))) {
+            this.gamePath = gamePath;
+            searchGamepathResources();
+            saveDetectedGamePath(gamePath);
+        } else {
+            throw new GameNotFoundException(Util.getUIMessage("main.gameNotDetected"));
+        }
+
+    }
+
+    public String getGamePath() throws GameNotFoundException {
         if (StringUtils.isEmpty(gamePath) && !SystemUtils.IS_OS_WINDOWS) {
             gamePath = Constants.DEV_GAMEDATA;
             logger.log(System.Logger.Level.DEBUG, "OS is not windows, using dev game path");
@@ -324,13 +342,13 @@ public class GameInfo {
                     && gamePathExists(Paths.get(lastUsed))) {
                 gamePath = lastUsed;
                 logger.log(System.Logger.Level.DEBUG, "Last-used game path found.");
+                searchGamepathResources();
                 return gamePath;
             }
         }
 
         if (StringUtils.isEmpty(gamePath)) {
             gamePath = detectGamePath();
-            logger.log(System.Logger.Level.DEBUG, "Game path not detected");
             saveDetectedGamePath(gamePath);
         }
 
@@ -341,12 +359,88 @@ public class GameInfo {
             } else if (gamePathExists(Paths.get(Constants.PARENT_GAMEDATA))) {
                 gamePath = Constants.PARENT_GAMEDATA;
             } else {
-                throw new FileNotFoundException("Game path not detected");
+                removeSavedDetectedGamePath();
+                throw new GameNotFoundException("Game path not found");
             }
         }
 
         logger.log(System.Logger.Level.DEBUG, "Game data found: ''{0}''", gamePath);
+        if (gamePath == null) {
+            removeSavedDetectedGamePath();
+            throw new GameNotFoundException(Util.getUIMessage("main.gameNotDetected"));
+        }
+        searchGamepathResources();
         return gamePath;
+    }
+
+    private boolean isTqitDisc() {
+        return !gamePathFileExists("Text", "Text_EN.arc")
+                && gamePathFileExists("Resources", "Text_EN.arc")
+                && gamePathFileExists("tqit.exe")
+                && gamePathFileExists("Resources", "XPack")
+                && !gamePathFileExists("tq.exe")
+                && !gamePathFileExists("Titan Quest.exe")
+                && !gamePathFileExists("XPack2")
+                && !gamePathFileExists("XPack3");
+    }
+
+    private boolean isTqitSteam() {
+        return gamePathFileExists("Text", "Text_EN.arc")
+                && gamePathFileExists("Resources", "Text_EN.arc")
+                && gamePathFileExists("Resources", "XPack")
+                && gamePathFileExists("tqit.exe")
+                && gamePathFileExists("Titan Quest.exe")
+                && !gamePathFileExists("XPack2")
+                && !gamePathFileExists("XPack3");
+    }
+
+    private void addDatabasePath(Path path) {
+        if (!databases.contains(path)) {
+            databases.add(path);
+        }
+    }
+
+    private void addTextPath(Path path) {
+        if (!resourcesText.contains(path)) {
+            resourcesText.add(path);
+        }
+    }
+
+    private void searchGamepathResources() throws GameNotFoundException {
+        if (gamePath == null) {
+            throw new GameNotFoundException(Util.getUIMessage("main.gameNotDetected"));
+        }
+
+        if (isTqitSteam()) {
+            //steam tqit
+            Path tqPath = getGameDiscTqPath();
+            if (tqPath == null) {
+                removeSavedDetectedGamePath();
+                throw new GameNotFoundException("TQ base game not found for steam-version of TQIT: " + gamePath);
+            }
+            addDatabasePath(Paths.get(tqPath.toString(), "Database", "database.arz"));
+            addDatabasePath(Paths.get(gamePath, "Database", "database.arz"));
+            addTextPath(Paths.get(gamePath, "Text"));
+            addTextPath(Paths.get(gamePath, "Resources"));
+            logger.log(System.Logger.Level.DEBUG, "steam tqit");
+        } else if (isTqitDisc()) {
+            //disc tqit (one disc tq and other disc tqit)
+            Path tqPath = getGameDiscTqPath();
+            if (tqPath == null) {
+                removeSavedDetectedGamePath();
+                throw new GameNotFoundException("TQ base game not found for disc-version of TQIT" + gamePath);
+            }
+            addDatabasePath(Paths.get(tqPath.toString(), "Database", "database.arz"));
+            addDatabasePath(Paths.get(gamePath, "Database", "database.arz"));
+            addTextPath(Paths.get(tqPath.toString(), "Text"));
+            addTextPath(Paths.get(gamePath, "Resources"));
+            logger.log(System.Logger.Level.DEBUG, "legacy disc");
+        } else {
+            addDatabasePath(Paths.get(gamePath, "Database", "database.arz"));
+            addTextPath(Paths.get(gamePath, "Text"));
+        }
+        logger.log(System.Logger.Level.INFO, "Using databases ''{0}''", databases.toString());
+        logger.log(System.Logger.Level.INFO, "Using text ''{0}''", resourcesText.toString());
     }
 
     public String getSavePath() {
@@ -459,5 +553,42 @@ public class GameInfo {
                 }
             }
         }
+    }
+
+    private String[] pathsListToArray(List<Path> list) throws FileNotFoundException {
+        List<String> paths = new ArrayList<>();
+        for (Path p : list) {
+            if (!p.toFile().exists()) {
+                throw new FileNotFoundException("Invalid path " + p);
+            }
+            paths.add(p.toString());
+        }
+        return paths.toArray(new String[]{});
+    }
+
+    public String[] getDatabasePath() throws FileNotFoundException {
+        try {
+            if (gamePath == null) {
+                getGamePath();
+            }
+        } catch (GameNotFoundException e) {
+            removeSavedDetectedGamePath();
+            logger.log(System.Logger.Level.ERROR, "Error", e);
+            throw new FileNotFoundException("Database not found");
+        }
+        return pathsListToArray(databases);
+    }
+
+    public String[] getTextPath() throws FileNotFoundException {
+        try {
+            if (gamePath == null) {
+                getGamePath();
+            }
+        } catch (GameNotFoundException e) {
+            removeSavedDetectedGamePath();
+            logger.log(System.Logger.Level.ERROR, "Error", e);
+            throw new FileNotFoundException("Text resources not found");
+        }
+        return pathsListToArray(resourcesText);
     }
 }

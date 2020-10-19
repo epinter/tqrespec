@@ -103,19 +103,29 @@ public class Main extends Application {
 
     private void load(Stage primaryStage) {
         logger.log(System.Logger.Level.DEBUG, "preloading data");
+        File selectedDirectory = null;
         try {
-            gameInfo.getGamePath();
+            gameInfo.getDatabasePath();
+            gameInfo.getTextPath();
             notifyPreloader(new Preloader.ProgressNotification(0.2));
         } catch (FileNotFoundException e) {
             Util.showError(Util.getUIMessage("main.gameNotDetected"), Util.getUIMessage("main.chooseGameDirectory"));
-            logger.log(System.Logger.Level.ERROR, "game path not detected, showing DirectoryChooser");
+            logger.log(System.Logger.Level.ERROR, "game path not detected, showing DirectoryChooser",e);
             DirectoryChooser directoryChooser = new DirectoryChooser();
             directoryChooser.setTitle(Util.getUIMessage("main.chooseGameDirectory"));
-            File selectedDirectory = directoryChooser.showDialog(primaryStage);
+            selectedDirectory = directoryChooser.showDialog(primaryStage);
             if (selectedDirectory == null) {
                 System.exit(1);
             }
-            gameInfo.setGamePath(selectedDirectory.getPath());
+        }
+        if (selectedDirectory != null) {
+            try {
+                gameInfo.setGamePath(selectedDirectory.getPath());
+            } catch (GameNotFoundException e) {
+                logger.log(System.Logger.Level.ERROR,"Error", e);
+                Util.showError(Util.getUIMessage("main.gameNotDetected"),null);
+                Util.closeApplication();
+            }
         }
 
         Task<Void> task = new Task<>() {
@@ -133,7 +143,7 @@ public class Main extends Application {
 
                 try {
                     new Thread(new GameProcessMonitor(gameInfo.getGamePath())).start();
-                } catch (FileNotFoundException e) {
+                } catch (GameNotFoundException e) {
                     logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
                 }
 
@@ -141,13 +151,13 @@ public class Main extends Application {
             }
         };
         task.setOnFailed(e -> {
-            Settings.setLastDetectedGamePath(null);
+            gameInfo.removeSavedDetectedGamePath();
 
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setHeaderText("Error loading application");
             logger.log(System.Logger.Level.ERROR, "Error loading application", e.getSource().getException());
             alert.initOwner(primaryStage);
-            alert.setTitle("Error");
+            alert.setTitle(Util.getBuildTitle());
             TextArea textArea = new TextArea(ExceptionUtils.getStackTrace(e.getSource().getException()));
             textArea.setMaxWidth(Double.MAX_VALUE);
             textArea.setMaxHeight(Double.MAX_VALUE);
@@ -199,7 +209,7 @@ public class Main extends Application {
         Parent root;
         try {
             State.get().setLocale(gameInfo.getGameLanguage());
-            fxmlLoader.setResources(ResourceBundle.getBundle("i18n.UI",State.get().getLocale()));
+            fxmlLoader.setResources(ResourceBundle.getBundle("i18n.UI", State.get().getLocale()));
             fxmlLoader.setLocation(getClass().getResource(Constants.UI.MAIN_FXML));
             root = fxmlLoader.load();
         } catch (IOException e) {
