@@ -47,11 +47,16 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class Util {
     private static final System.Logger logger = Log.getLogger(Util.class.getName());
+    private static String buildVersion;
+    private static String buildTitle;
 
     private Util() {
     }
 
     public static String getBuildVersion() {
+        if(StringUtils.isNotBlank(buildVersion)) {
+            return buildVersion;
+        }
         String implementationVersion = Util.class.getPackage().getImplementationVersion();
         if (implementationVersion == null) {
             Attributes attr = readManifest();
@@ -59,10 +64,14 @@ public class Util {
                 implementationVersion = attr.getValue("Implementation-Version");
             }
         }
-        return Objects.requireNonNullElse(implementationVersion, "0.0");
+        buildVersion = Objects.requireNonNullElse(implementationVersion, "0.0");
+        return buildVersion;
     }
 
     public static String getBuildTitle() {
+        if(StringUtils.isNotBlank(buildTitle)) {
+            return buildTitle;
+        }
         String implementationTitle = Util.class.getPackage().getImplementationTitle();
         if (implementationTitle == null) {
             Attributes attr = readManifest();
@@ -70,10 +79,15 @@ public class Util {
                 implementationTitle = attr.getValue("Implementation-Title");
             }
         }
-        return Objects.requireNonNullElse(implementationTitle, "Development");
+        buildTitle = Objects.requireNonNullElse(implementationTitle, "Development");
+        return buildTitle;
     }
 
     private static Attributes readManifest() {
+        if(!Util.class.getModule().isNamed()) {
+            return null;
+        }
+
         Manifest manifest;
         try {
             FileSystem fs = FileSystems.getFileSystem(URI.create("jrt:/"));
