@@ -112,6 +112,9 @@ final class PlayerParser extends FileParser {
                         , name));
             }
             variables.put(variableInfo.getName(), variableInfo);
+            if (variableInfo.getName().equals("playerCharacterClass")) {
+                putVarIndex(variableInfo.getName(), block.getStart());
+            }
         }
         getBlockInfo().put(block.getStart(), block);
         block.setVariables(ImmutableListMultimap.copyOf(variables));

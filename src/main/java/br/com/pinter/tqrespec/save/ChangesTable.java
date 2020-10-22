@@ -80,7 +80,7 @@ public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements 
         this.variableLocation = variableLocation;
     }
 
-    String getString(String variable) {
+    public String getString(String variable) {
         if (getVariableLocation().get(variable) != null) {
             int block = getVariableLocation().get(variable).get(0);
             if (getBlockInfo().get(block) != null
@@ -94,7 +94,7 @@ public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements 
         return null;
     }
 
-    void setString(String variable, String value) {
+    public void setString(String variable, String value) {
         this.setString(variable, value, false);
     }
 
