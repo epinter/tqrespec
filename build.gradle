@@ -310,16 +310,22 @@ task appimage(type: Exec) {
                             it.getName() == "prism_d3d.dll" ||
                             it.getName() == "prism_sw.dll"
                 }.collect()
-                into "$buildDir/app-image/${distAppName}"
+                into "$buildDir/app-image/${distAppName}/runtime/bin"
             } else {
                 from javafxSdkLibDir.listFiles().findAll { it.getName().endsWith('.so') }.collect()
                 into "$buildDir/app-image/${distAppName}"
             }
         }
-        new File(buildDir, "app-image/${distAppName}/jfxwebkit.dll").delete()
-        new File(buildDir, "app-image/${distAppName}/ucrtbase.dll").delete()
-        new File(buildDir, "app-image/${distAppName}/gstreamer-lite.dll").delete()
-        new File(buildDir, "app-image/${distAppName}/glib-lite.dll").delete()
+        new File(buildDir, "app-image/${distAppName}").listFiles().findAll {
+            it.getName() == "jfxwebkit.dll" ||
+            it.getName() == "ucrtbase.dll" ||
+            it.getName() == "gstreamer-lite.dll" ||
+            it.getName() == "glib-lite.dll" ||
+            it.getName().startsWith("api-ms-win-core") ||
+            it.getName().startsWith("api-ms-win-crt")
+        }.forEach({
+            f -> f.delete()
+        })
         new File(buildDir, "jre-image").deleteDir()
     }
 }
