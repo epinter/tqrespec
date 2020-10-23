@@ -374,8 +374,7 @@ public class GameInfo {
     }
 
     private boolean isTqitDisc() {
-        return !gamePathFileExists("Text", "Text_EN.arc")
-                && gamePathFileExists("Resources", "Text_EN.arc")
+        return gamePathFileExists("Resources", "Text_EN.arc")
                 && gamePathFileExists("tqit.exe")
                 && gamePathFileExists("Resources", "XPack")
                 && !gamePathFileExists("tq.exe")
