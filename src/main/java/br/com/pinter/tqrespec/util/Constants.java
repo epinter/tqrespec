@@ -112,6 +112,7 @@ public class Constants {
         public static final int PRELOADER_HEIGHT = 210;
         public static final String TOAST_HEADER_STYLE = "tq-toast-header";
         public static final String TOAST_CONTENT_STYLE = "tq-toast-content";
+        public static final int TOAST_WARNING_TIMEOUT = 10000;
         public static final String TAG_STRLABEL= "tagCStrength";
         public static final String TAG_INTLABEL= "tagCIntelligence";
         public static final String TAG_DEXLABEL= "tagCDexterity";

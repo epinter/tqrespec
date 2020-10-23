@@ -70,7 +70,7 @@ public class Toast {
 
 
         msg2.setAlignment(Pos.BOTTOM_LEFT);
-        msg2.setTextAlignment(TextAlignment.CENTER);
+        msg2.setTextAlignment(TextAlignment.LEFT);
         msg2.getStyleClass().add(Constants.UI.TOAST_CONTENT_STYLE);
         msg2.setText(content);
         msg2.setWrapText(true);

@@ -29,6 +29,7 @@ import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Singleton
 public class CurrentPlayerData {
@@ -41,6 +42,7 @@ public class CurrentPlayerData {
     private ChangesTable changes = new ChangesTable();
     private HeaderInfo headerInfo = new HeaderInfo();
     private ByteBuffer buffer = null;
+    private final AtomicBoolean missingSkills = new AtomicBoolean(false);
 
     String getPlayerName() {
         return playerName;
@@ -93,6 +95,14 @@ public class CurrentPlayerData {
         this.buffer = buffer;
     }
 
+    public boolean isMissingSkills() {
+        return missingSkills.get();
+    }
+
+    public void setMissingSkills(boolean newValue) {
+        missingSkills.set(newValue);
+    }
+
     void reset() {
         this.buffer = null;
         this.headerInfo = new HeaderInfo();
@@ -100,6 +110,7 @@ public class CurrentPlayerData {
         this.playerName = null;
         this.customQuest = false;
         this.playerSkills.clear();
+        this.missingSkills.set(false);
     }
 
 

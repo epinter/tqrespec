@@ -417,7 +417,7 @@
 	-fx-font-size: 1.6em;
 	-fx-font-family: sans-serif;
 	-fx-font-weight: bold;
-    -fx-text-alignment: right;
+    -fx-text-alignment: center;
     -fx-border-width: 1px;
 
 }
@@ -427,6 +427,6 @@
 	-fx-font-size: 1.2em;
 	-fx-font-family: sans-serif;
 	-fx-font-weight: bold;
-    -fx-text-alignment: right;
+    -fx-text-alignment: left;
 
 }

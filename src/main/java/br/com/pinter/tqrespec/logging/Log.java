@@ -36,6 +36,10 @@ public class Log {
         return System.getLogger(name);
     }
 
+    public static System.Logger getLogger(Class<?> cls) {
+        return System.getLogger(cls.getName());
+    }
+
     public static FileHandler getLogFileHandler() {
         FileHandler fileHandler;
         try {

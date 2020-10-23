@@ -62,4 +62,8 @@ public class Db {
         initialize();
         database.preloadAll();
     }
+
+    public boolean recordExists(String recordId) {
+        return database.recordExists(recordId);
+    }
 }

@@ -24,6 +24,7 @@ import br.com.pinter.tqdatabase.Database;
 import br.com.pinter.tqdatabase.models.Skill;
 import br.com.pinter.tqrespec.core.State;
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
+import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.BlockInfo;
 import br.com.pinter.tqrespec.save.VariableInfo;
 import br.com.pinter.tqrespec.save.VariableType;
@@ -37,6 +38,8 @@ import java.io.File;
 import java.util.*;
 
 public class Player {
+    private static final System.Logger logger = Log.getLogger(Player.class);
+
     @Inject
     private Db db;
 
@@ -92,6 +95,12 @@ public class Player {
                     sb.setSkillLevel(getVariableValueInteger(b.getStart(), Constants.Save.SKILL_LEVEL));
                     sb.setBlockStart(b.getStart());
                     if (sb.getSkillName() != null) {
+                        if (!db.recordExists(sb.getSkillName())) {
+                            logger.log(System.Logger.Level.WARNING,"The character \"{0}\" have the skill \"{1}\", but this" +
+                                    " skill was not found in the game database. Please check if the game installed is compatible" +
+                                    " with your save game.", getPlayerName(), sb.getSkillName());
+                            saveData.setMissingSkills(true);
+                        }
                         synchronized (saveData.getPlayerSkills()) {
                             saveData.getPlayerSkills().put(Objects.requireNonNull(Database.normalizeRecordPath(sb.getSkillName())),
                                     sb);
@@ -102,6 +111,13 @@ public class Player {
         }
     }
 
+    public boolean isMissingSkills() {
+        return saveData.isMissingSkills();
+    }
+
+    public String getPlayerName() {
+        return saveData.getPlayerName();
+    }
     public boolean isCharacterLoaded() {
         return saveData.getBuffer() != null;
     }

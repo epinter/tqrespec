@@ -25,6 +25,7 @@ import br.com.pinter.tqrespec.save.player.Player;
 import br.com.pinter.tqrespec.save.player.PlayerSkill;
 import br.com.pinter.tqrespec.tqdata.Db;
 import br.com.pinter.tqrespec.tqdata.Txt;
+import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
 import com.google.inject.Inject;
 import javafx.beans.binding.Bindings;
@@ -38,6 +39,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import java.net.URL;
@@ -93,6 +96,9 @@ public class SkillsPaneController implements Initializable {
     @FXML
     private MenuButton secondMasteryButton;
 
+    @FXML
+    public GridPane skillsGridPane;
+
     private SimpleStringProperty currentSkillPoints = null;
     private final BooleanProperty saveDisabled = new SimpleBooleanProperty();
     private SimpleStringProperty currentFirstMasteryLevel = null;
@@ -126,6 +132,12 @@ public class SkillsPaneController implements Initializable {
     }
 
     public void loadCharEventHandler() {
+        if(player.isMissingSkills()) {
+            Toast.show((Stage) skillsGridPane.getParent().getScene().getWindow(),
+                    Util.getUIMessage("alert.missingSkill_header"),
+                    Util.getUIMessage("alert.missingSkill_content", player.getPlayerName(), Constants.LOGFILE),
+                    Constants.UI.TOAST_WARNING_TIMEOUT);
+        }
         currentSkillPoints = new SimpleStringProperty();
         currentFirstMasteryLevel = new SimpleStringProperty();
         currentSecondMasteryLevel = new SimpleStringProperty();
