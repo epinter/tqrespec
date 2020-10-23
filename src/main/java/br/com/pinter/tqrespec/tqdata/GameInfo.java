@@ -39,6 +39,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -52,13 +53,14 @@ public class GameInfo {
     private HashMap<String, String> gameOptions;
     private final List<Path> resourcesText = new ArrayList<>();
     private final List<Path> databases = new ArrayList<>();
+    private GameVersion installedVersion = GameVersion.UNKNOWN;
 
     private boolean gamePathExists(Path path) {
         Path databasePath = Paths.get(path.toString(), "Database");
         return Files.exists(databasePath) && Files.isDirectory(databasePath);
     }
 
-    private boolean gamePathFileExists(String... path) {
+    private boolean gamePathFileExists(String... path) throws InvalidPathException {
         return new File(Paths.get(gamePath, path).toString()).exists() && new File(gamePath, "Database").isDirectory();
     }
 
@@ -342,7 +344,12 @@ public class GameInfo {
                     && gamePathExists(Paths.get(lastUsed))) {
                 gamePath = lastUsed;
                 logger.log(System.Logger.Level.DEBUG, "Last-used game path found.");
-                searchGamepathResources();
+                try {
+                    searchGamepathResources();
+                } catch (InvalidPathException e) {
+                    logger.log(System.Logger.Level.ERROR, "Exception", e);
+                    throw new GameNotFoundException("Game path not found", e);
+                }
                 return gamePath;
             }
         }
@@ -365,11 +372,17 @@ public class GameInfo {
         }
 
         logger.log(System.Logger.Level.DEBUG, "Game data found: ''{0}''", gamePath);
-        if (gamePath == null) {
+        if (StringUtils.isEmpty(gamePath)) {
             removeSavedDetectedGamePath();
             throw new GameNotFoundException(Util.getUIMessage("main.gameNotDetected"));
         }
-        searchGamepathResources();
+
+        try {
+            searchGamepathResources();
+        } catch (InvalidPathException e) {
+            logger.log(System.Logger.Level.ERROR, "Exception", e);
+            throw new GameNotFoundException("Game path not found", e);
+        }
         return gamePath;
     }
 
@@ -422,6 +435,7 @@ public class GameInfo {
             addTextPath(Paths.get(gamePath, "Text"));
             addTextPath(Paths.get(gamePath, "Resources"));
             logger.log(System.Logger.Level.DEBUG, "steam tqit");
+            installedVersion = GameVersion.TQIT;
         } else if (isTqitDisc()) {
             //disc tqit (one disc tq and other disc tqit)
             Path tqPath = getGameDiscTqPath();
@@ -434,9 +448,11 @@ public class GameInfo {
             addTextPath(Paths.get(tqPath.toString(), "Text"));
             addTextPath(Paths.get(gamePath, "Resources"));
             logger.log(System.Logger.Level.DEBUG, "legacy disc");
+            installedVersion = GameVersion.TQIT;
         } else {
             addDatabasePath(Paths.get(gamePath, "Database", "database.arz"));
             addTextPath(Paths.get(gamePath, "Text"));
+            installedVersion = GameVersion.TQAE;
         }
         logger.log(System.Logger.Level.INFO, "Using databases ''{0}''", databases.toString());
         logger.log(System.Logger.Level.INFO, "Using text ''{0}''", resourcesText.toString());
@@ -589,5 +605,9 @@ public class GameInfo {
             throw new FileNotFoundException("Text resources not found");
         }
         return pathsListToArray(resourcesText);
+    }
+
+    public GameVersion getInstalledVersion() {
+        return installedVersion;
     }
 }

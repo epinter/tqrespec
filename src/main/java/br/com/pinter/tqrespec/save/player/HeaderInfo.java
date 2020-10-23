@@ -20,21 +20,23 @@
 
 package br.com.pinter.tqrespec.save.player;
 
+import br.com.pinter.tqrespec.tqdata.GameVersion;
+
 import java.io.Serializable;
 
 @SuppressWarnings("unused")
 public class HeaderInfo implements Serializable {
-    private int headerVersion = -1;
+    private GameVersion headerVersion = GameVersion.UNKNOWN;
     private String playerCharacterClass = null;
     private String playerClassTag = null;
     private int playerLevel = -1;
     private int playerVersion = -1;
 
-    int getHeaderVersion() {
+    GameVersion getHeaderVersion() {
         return headerVersion;
     }
 
-    void setHeaderVersion(int headerVersion) {
+    void setHeaderVersion(GameVersion headerVersion) {
         this.headerVersion = headerVersion;
     }
 

@@ -23,6 +23,7 @@ package br.com.pinter.tqrespec.save.player;
 import br.com.pinter.tqrespec.IBlockType;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.*;
+import br.com.pinter.tqrespec.tqdata.GameVersion;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableListMultimap;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +35,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.EnumSet;
 
 final class PlayerParser extends FileParser {
     private static final System.Logger logger = Log.getLogger(PlayerParser.class.getName());
@@ -123,7 +125,7 @@ final class PlayerParser extends FileParser {
 
     private void readIntegerFromHeader(HeaderInfo h, String name, int valueInt) {
         if (name.equals(PlayerFileVariable.valueOf("headerVersion").var()))
-            h.setHeaderVersion(valueInt);
+            h.setHeaderVersion(GameVersion.fromValue(valueInt));
         if (name.equals(PlayerFileVariable.valueOf("playerVersion").var()))
             h.setPlayerVersion(valueInt);
         if (name.equals(PlayerFileVariable.valueOf("playerLevel").var()))
@@ -156,7 +158,7 @@ final class PlayerParser extends FileParser {
 
         headerInfo = parseHeader();
 
-        if (headerInfo.getHeaderVersion() != 2 && headerInfo.getHeaderVersion() != 3) {
+        if (!EnumSet.of(GameVersion.TQIT,GameVersion.TQAE).contains(headerInfo.getHeaderVersion())) {
             throw new IncompatibleSavegameException(
                     String.format("Incompatible player '%s' (headerVersion must be 2 or 3)", this.player));
         }

@@ -9,6 +9,7 @@ import br.com.pinter.tqrespec.core.InjectionContext;
 import br.com.pinter.tqrespec.save.VariableInfo;
 import br.com.pinter.tqrespec.save.VariableType;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
+import br.com.pinter.tqrespec.tqdata.GameVersion;
 import br.com.pinter.tqrespec.util.Constants;
 import org.junit.Assert;
 import org.junit.Before;
@@ -163,7 +164,7 @@ public class PlayerParserTest {
 
         HeaderInfo headerInfo = playerParser.parseHeader();
         assertNotNull(headerInfo);
-        assertTrue(headerInfo.getHeaderVersion() > 0);
+        assertTrue(headerInfo.getHeaderVersion() == GameVersion.TQIT || headerInfo.getHeaderVersion() == GameVersion.TQAE);
         assertTrue(headerInfo.getPlayerVersion() > 0);
         assertTrue(headerInfo.getPlayerLevel() > 0);
     }
