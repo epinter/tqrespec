@@ -20,6 +20,9 @@
 
 package br.com.pinter.tqrespec;
 
+import br.com.pinter.tqrespec.tqdata.GameVersion;
+import br.com.pinter.tqrespec.tqdata.InstallType;
+
 import java.util.prefs.Preferences;
 
 @SuppressWarnings("unused")
@@ -27,6 +30,9 @@ public class Settings {
 
     enum Options {
         LAST_DETECTED_GAMEPATH("last_detectedgamepath"),
+        LAST_DETECTED_GAMEVERSION("last_detectedgameversion"),
+        LAST_DETECTED_INSTALLTYPE("last_detectedinstalltype"),
+        LAST_DETECTED_TQBASEPATH("last_detectedtqbasepath"),
         ALWAYS_FULL_BACKUP("always_fullbackup"),
         ;
 
@@ -41,6 +47,18 @@ public class Settings {
         }
     }
 
+    public static void removeLastDetectedGame() {
+        Preferences prefs = Preferences.userNodeForPackage(Settings.class);
+        prefs.remove(Options.LAST_DETECTED_GAMEPATH.getKey());
+        prefs.remove(Options.LAST_DETECTED_GAMEVERSION.getKey());
+        prefs.remove(Options.LAST_DETECTED_INSTALLTYPE.getKey());
+        prefs.remove(Options.LAST_DETECTED_TQBASEPATH.getKey());
+    }
+
+    public static void setPref(String key, Object value) {
+
+    }
+
     public static void setLastDetectedGamePath(String lastDetectedGamePath) {
         Preferences prefs = Preferences.userNodeForPackage(Settings.class);
         if(lastDetectedGamePath == null) {
@@ -50,9 +68,51 @@ public class Settings {
         }
     }
 
+    public static void setLastDetectedGameVersion(GameVersion gameVersion) {
+        Preferences prefs = Preferences.userNodeForPackage(Settings.class);
+        if(gameVersion == null) {
+            prefs.remove(Options.LAST_DETECTED_GAMEVERSION.getKey());
+        } else {
+            prefs.putInt(Options.LAST_DETECTED_GAMEVERSION.getKey(), gameVersion.value());
+        }
+    }
+
+    public static void setLastDetectedInstallType(InstallType installType) {
+        Preferences prefs = Preferences.userNodeForPackage(Settings.class);
+        if(installType == null) {
+            prefs.remove(Options.LAST_DETECTED_INSTALLTYPE.getKey());
+        } else {
+            prefs.putInt(Options.LAST_DETECTED_INSTALLTYPE.getKey(), installType.value());
+        }
+    }
+
+    public static void setLastDetectedTqBasePath(String tqBasePath) {
+        Preferences prefs = Preferences.userNodeForPackage(Settings.class);
+        if(tqBasePath == null) {
+            prefs.remove(Options.LAST_DETECTED_TQBASEPATH.getKey());
+        } else {
+            prefs.put(Options.LAST_DETECTED_TQBASEPATH.getKey(), tqBasePath);
+        }
+    }
+
     public static String getLastDetectedGamePath() {
         Preferences prefs = Preferences.userNodeForPackage(Settings.class);
         return prefs.get(Options.LAST_DETECTED_GAMEPATH.getKey(), null);
+    }
+
+    public static int getLastDetectedGameVersion() {
+        Preferences prefs = Preferences.userNodeForPackage(Settings.class);
+        return prefs.getInt(Options.LAST_DETECTED_GAMEVERSION.getKey(), 0);
+    }
+
+    public static int getLastDetectedInstallType() {
+        Preferences prefs = Preferences.userNodeForPackage(Settings.class);
+        return prefs.getInt(Options.LAST_DETECTED_INSTALLTYPE.getKey(), 0);
+    }
+
+    public static String getLastDetectedTqBasePath() {
+        Preferences prefs = Preferences.userNodeForPackage(Settings.class);
+        return prefs.get(Options.LAST_DETECTED_TQBASEPATH.getKey(), null);
     }
 
     public static void setAlwaysFullBackup(boolean alwaysFullBackup) {

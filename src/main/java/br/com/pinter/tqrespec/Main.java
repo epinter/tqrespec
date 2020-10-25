@@ -28,6 +28,7 @@ import br.com.pinter.tqrespec.gui.ResizeListener;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.tqdata.Db;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
+import br.com.pinter.tqrespec.tqdata.GameVersion;
 import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
@@ -100,10 +101,54 @@ public class Main extends Application {
         injectionContext.initialize();
     }
 
+    private void chooseDirectory(Stage primaryStage) {
+        File selectedDirectory = null;
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle(Util.getUIMessage("main.chooseGameDirectory"));
+        selectedDirectory = directoryChooser.showDialog(primaryStage);
+
+        if (selectedDirectory == null) {
+            Platform.exit();
+            System.exit(1);
+        }
+
+        try {
+            gameInfo.setManualGamePath(selectedDirectory.getPath());
+            return;
+        } catch (GameNotFoundException e) {
+            logger.log(System.Logger.Level.ERROR,"Error", e);
+        }
+
+        if(GameVersion.TQIT.equals(gameInfo.getInstalledVersion())) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setHeaderText(Util.getUIMessage("alert.chooseTQBaseDir_header"));
+            alert.setContentText(Util.getUIMessage("alert.chooseTQBaseDir_content"));
+            alert.initOwner(primaryStage);
+            alert.setTitle(Util.getBuildTitle());
+            alert.showAndWait();
+            DirectoryChooser tqDirectoryChooser = new DirectoryChooser();
+            tqDirectoryChooser.setTitle(Util.getUIMessage("main.chooseGameDirectory"));
+            File tqSelectedDirectory = tqDirectoryChooser.showDialog(primaryStage);
+
+            if (tqSelectedDirectory == null) {
+                Platform.exit();
+                System.exit(1);
+            }
+
+            try {
+                gameInfo.setManualTqBaseGamePath(selectedDirectory.getPath(),tqSelectedDirectory.getPath());
+                return;
+            } catch (GameNotFoundException e) {
+                logger.log(System.Logger.Level.ERROR,"Game not detected", e);
+            }
+        }
+        Util.showError(Util.getUIMessage("main.gameNotDetected"),null);
+        Platform.exit();
+        System.exit(0);
+    }
 
     private void load(Stage primaryStage) {
         logger.log(System.Logger.Level.DEBUG, "preloading data");
-        File selectedDirectory = null;
         try {
             gameInfo.getDatabasePath();
             gameInfo.getTextPath();
@@ -111,21 +156,7 @@ public class Main extends Application {
         } catch (FileNotFoundException e) {
             Util.showError(Util.getUIMessage("main.gameNotDetected"), Util.getUIMessage("main.chooseGameDirectory"));
             logger.log(System.Logger.Level.ERROR, "game path not detected, showing DirectoryChooser",e);
-            DirectoryChooser directoryChooser = new DirectoryChooser();
-            directoryChooser.setTitle(Util.getUIMessage("main.chooseGameDirectory"));
-            selectedDirectory = directoryChooser.showDialog(primaryStage);
-            if (selectedDirectory == null) {
-                System.exit(1);
-            }
-        }
-        if (selectedDirectory != null) {
-            try {
-                gameInfo.setGamePath(selectedDirectory.getPath());
-            } catch (GameNotFoundException e) {
-                logger.log(System.Logger.Level.ERROR,"Error", e);
-                Util.showError(Util.getUIMessage("main.gameNotDetected"),null);
-                Util.closeApplication();
-            }
+            chooseDirectory(primaryStage);
         }
 
         Task<Void> task = new Task<>() {
@@ -151,7 +182,7 @@ public class Main extends Application {
             }
         };
         task.setOnFailed(e -> {
-            gameInfo.removeSavedDetectedGamePath();
+            gameInfo.removeSavedDetectedGame();
 
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setHeaderText("Error loading application");
