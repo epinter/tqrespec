@@ -35,7 +35,8 @@ ext.moduleName = 'br.com.pinter.tqrespec'
 ext.mainPackageName = 'br.com.pinter.tqrespec'
 ext.javahome = System.properties['java.home']
 ext.moduleInfoPresent = false
-ext.javafxSdkDir = file(String.format("%s/sdk/javafx-sdk-%s", projectDir, sourceCompatibility))
+ext.osArch = System.getProperty("os.arch").toLowerCase()
+ext.javafxSdkDir = file(String.format("%s/sdk/javafx-sdk-%s-%s-%s", projectDir, sourceCompatibility, OS.toFamilyName().toLowerCase(), osArch))
 ext.javafxSdkBinDir = file("${javafxSdkDir}/bin")
 ext.javafxSdkLibDir = file("${javafxSdkDir}/lib")
 ext.patchjarDir = new File(buildDir, '/patchedjar')
@@ -46,8 +47,17 @@ if (file('src/main/java/module-info.java').exists()) {
 }
 mainClassName = "br.com.pinter.tqrespec.Main"
 
+if (!file(javafxSdkDir).directory) {
+    throw new GradleException(String.format("ERROR: openjfx-sdk for java %s (%s) not found in %s", sourceCompatibility, System.getProperty("os.arch"), javafxSdkDir))
+}
+
 if (project.hasProperty('buildVersion')) {
     project.version = project.properties['buildVersion']
+}
+if(osArch.equals("amd64")) {
+    ext.appArchiveName = "${distAppName}-${project.version}.zip"
+} else {
+    ext.appArchiveName = "${distAppName}-${project.version}_${osArch}.zip"
 }
 
 repositories {
@@ -245,9 +255,14 @@ task jlink(type: Exec) {
 task archiveAppimage(type: Zip) {
     dependsOn 'appimage'
     from "${buildDir}/app-image"
-    archiveFileName = "${distAppName}-${project.version}.zip"
+    archiveFileName = appArchiveName
     destinationDirectory = file("$buildDir")
 }
+
+task printArchiveName() {
+    println("Creating archive '${appArchiveName}'")
+}
+tasks.printArchiveName.mustRunAfter('archiveAppimage')
 
 task appimage(type: Exec) {
     dependsOn 'jlink'
