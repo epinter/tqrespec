@@ -1,4 +1,19 @@
 # Changelog
+## [0.8.2] - 2020-10-31
+### Added
+- Added support for multiple databases and resources (used for TQ-IT legacy disc and future mods support)
+- Added translation for uk (by Evgeniy Chefranov)
+- Added translation for it (by Loris Gabriele)
+- Alert user when character have a skill not present in game database
+
+### Changed
+- Refactor game detection to handle installation types, game version and dlcs
+- Removed unneed dlls from app directory
+
+### Fixed
+- Fix crash when running in development without jpms support
+- Fix compatibility with legacy disc version
+
 ## [0.8.1] - 2020-08-29
 ### Added
 - Added support for multiple languages (controlled by game option)
