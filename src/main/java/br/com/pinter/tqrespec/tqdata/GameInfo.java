@@ -480,10 +480,11 @@ public class GameInfo {
         }
 
         if (StringUtils.isEmpty(gamePath)) {
-            if (isValidGamePath(Paths.get(Constants.DEV_GAMEDATA))) {
-                logger.log(System.Logger.Level.DEBUG, "Dev game path found");
+            if (Paths.get(Constants.DEV_GAMEDATA,"Database").toFile().isDirectory()) {
+                logger.log(System.Logger.Level.INFO, "Dev game path found");
                 return setDevGamePath(Constants.DEV_GAMEDATA);
-            } else if (isValidGamePath(Paths.get(Constants.PARENT_GAMEDATA))) {
+            } else if (Paths.get(Constants.PARENT_GAMEDATA,"Database").toFile().isDirectory()) {
+                logger.log(System.Logger.Level.INFO, "Parent game path found");
                 return setDevGamePath(Constants.PARENT_GAMEDATA);
             } else {
                 removeSavedDetectedGame();
