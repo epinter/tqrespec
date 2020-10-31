@@ -18,7 +18,7 @@ You can download TQRespec from the releases page, [here](https://github.com/epin
 
 #### ***Requirements***
 
-This software requires **Microsoft Windows (64-bit recommended)**. You don't need to have java or any other software installed, but if you have problems like missing dlls, check if you have Microsoft Visual C++ Redist 2015 installed.
+This software requires **Microsoft Windows (64-bit recommended)**. You don't need to have java or any other software installed, but if you have problems like missing dlls, check if you have Microsoft Visual C++ Redist 2015-2019 installed.
 
 ## **How to use**
 
@@ -142,6 +142,7 @@ TQRespec.exe --debug=9
 * Portuguese Brazil (pt-BR): ***Emerson Pinter***
 * Russian (ru): ***Evgeniy Chefranov (titanquest.org.ua)***
 * Ukrainian (uk): ***Evgeniy Chefranov (titanquest.org.ua)***
+* Italian (it): ***Loris Gabriele***
 
 ### ***Note***
 Contributions are always welcome. They will be accepted or rejected depending on the scope and predefined objectives of the project. Look at the open [issues](https://github.com/epinter/tqrespec/issues) and milestones to know how you can help. Feel free to open an issue and suggest a feature you want to see available.
