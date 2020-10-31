@@ -97,8 +97,7 @@ public class Constants {
     }
 
     public static class UI {
-        private UI() {
-        }
+        private UI() { }
 
         public static final String MAIN_FXML = "/fxml/main.fxml";
         public static final String ABOUT_FXML = "/fxml/about.fxml";
@@ -127,5 +126,12 @@ public class Constants {
         public static final String TAG_GOLDLABEL = "tagGold";
         public static final String TAG_ATTRIBUTESTAB = "tagCAttributes";
         public static final String TAG_SKILLSTAB = "tagWindowName02";
+    }
+
+    public static class Msg {
+        private Msg() { }
+
+        public static final String MAIN_GAMENOTDETECTED = "main.gameNotDetected";
+        public static final String MAIN_CHOOSEGAMEDIRECTORY = "main.chooseGameDirectory";
     }
 }

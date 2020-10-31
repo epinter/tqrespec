@@ -76,35 +76,37 @@ public class Player {
     private void prepareSkillsList() {
         saveData.getPlayerSkills().clear();
         for (String v : saveData.getChanges().getVariableLocation().keySet()) {
-            if (v.startsWith(Database.Variables.PREFIX_SKILL_NAME)) {
-                for (int blockOffset : saveData.getChanges().getVariableLocation().get(v)) {
-                    int parent = saveData.getChanges().getBlockInfo().get(blockOffset).getParentOffset();
-                    BlockInfo b = saveData.getChanges().getBlockInfo().get(blockOffset);
-                    if (parent < 0 || !saveData.getChanges().getBlockInfo().get(parent).getVariables().containsKey("max")
-                            || (saveData.getChanges().get(b.getStart()) != null && saveData.getChanges().get(b.getStart()).length == 0)) {
-                        //new block size is zero (was removed) or no parent
-                        continue;
-                    }
+            if (!v.startsWith(Database.Variables.PREFIX_SKILL_NAME)) {
+                continue;
+            }
 
-                    PlayerSkill sb = new PlayerSkill();
-                    sb.setSkillName((String) b.getVariables().get(Constants.Save.SKILL_NAME).get(0).getValue());
-                    sb.setSkillEnabled((Integer) b.getVariables().get(Constants.Save.SKILL_ENABLED).get(0).getValue());
-                    sb.setSkillActive((Integer) b.getVariables().get(Constants.Save.SKILL_ACTIVE).get(0).getValue());
-                    sb.setSkillSubLevel((Integer) b.getVariables().get(Constants.Save.SKILL_SUB_LEVEL).get(0).getValue());
-                    sb.setSkillTransition((Integer) b.getVariables().get(Constants.Save.SKILL_TRANSITION).get(0).getValue());
-                    sb.setSkillLevel(getVariableValueInteger(b.getStart(), Constants.Save.SKILL_LEVEL));
-                    sb.setBlockStart(b.getStart());
-                    if (sb.getSkillName() != null) {
-                        if (!db.recordExists(sb.getSkillName())) {
-                            logger.log(System.Logger.Level.WARNING,"The character \"{0}\" have the skill \"{1}\", but this" +
-                                    " skill was not found in the game database. Please check if the game installed is compatible" +
-                                    " with your save game.", getPlayerName(), sb.getSkillName());
-                            saveData.setMissingSkills(true);
-                        }
-                        synchronized (saveData.getPlayerSkills()) {
-                            saveData.getPlayerSkills().put(Objects.requireNonNull(Database.normalizeRecordPath(sb.getSkillName())),
-                                    sb);
-                        }
+            for (int blockOffset : saveData.getChanges().getVariableLocation().get(v)) {
+                int parent = saveData.getChanges().getBlockInfo().get(blockOffset).getParentOffset();
+                BlockInfo b = saveData.getChanges().getBlockInfo().get(blockOffset);
+                if (parent < 0 || !saveData.getChanges().getBlockInfo().get(parent).getVariables().containsKey("max")
+                        || (saveData.getChanges().get(b.getStart()) != null && saveData.getChanges().get(b.getStart()).length == 0)) {
+                    //new block size is zero (was removed) or no parent
+                    continue;
+                }
+
+                PlayerSkill sb = new PlayerSkill();
+                sb.setSkillName((String) b.getVariables().get(Constants.Save.SKILL_NAME).get(0).getValue());
+                sb.setSkillEnabled((Integer) b.getVariables().get(Constants.Save.SKILL_ENABLED).get(0).getValue());
+                sb.setSkillActive((Integer) b.getVariables().get(Constants.Save.SKILL_ACTIVE).get(0).getValue());
+                sb.setSkillSubLevel((Integer) b.getVariables().get(Constants.Save.SKILL_SUB_LEVEL).get(0).getValue());
+                sb.setSkillTransition((Integer) b.getVariables().get(Constants.Save.SKILL_TRANSITION).get(0).getValue());
+                sb.setSkillLevel(getVariableValueInteger(b.getStart(), Constants.Save.SKILL_LEVEL));
+                sb.setBlockStart(b.getStart());
+                if (sb.getSkillName() != null) {
+                    if (!db.recordExists(sb.getSkillName())) {
+                        logger.log(System.Logger.Level.WARNING,"The character \"{0}\" have the skill \"{1}\", but this" +
+                                " skill was not found in the game database. Please check if the game installed is compatible" +
+                                " with your save game.", getPlayerName(), sb.getSkillName());
+                        saveData.setMissingSkills(true);
+                    }
+                    synchronized (saveData.getPlayerSkills()) {
+                        saveData.getPlayerSkills().put(Objects.requireNonNull(Database.normalizeRecordPath(sb.getSkillName())),
+                                sb);
                     }
                 }
             }

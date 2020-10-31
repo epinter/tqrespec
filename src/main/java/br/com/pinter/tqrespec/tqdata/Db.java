@@ -44,6 +44,7 @@ public class Db {
                 database = new Database(gameInfo.getDatabasePath());
             }
         } catch (IOException e) {
+            logger.log(System.Logger.Level.ERROR, "", e);
             throw new UnhandledRuntimeException("Error loading database.", e);
         }
     }

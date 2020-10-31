@@ -55,10 +55,6 @@ public class Settings {
         prefs.remove(Options.LAST_DETECTED_TQBASEPATH.getKey());
     }
 
-    public static void setPref(String key, Object value) {
-
-    }
-
     public static void setLastDetectedGamePath(String lastDetectedGamePath) {
         Preferences prefs = Preferences.userNodeForPackage(Settings.class);
         if(lastDetectedGamePath == null) {

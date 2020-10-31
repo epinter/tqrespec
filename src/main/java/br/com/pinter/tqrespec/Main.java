@@ -104,7 +104,7 @@ public class Main extends Application {
     private void chooseDirectory(Stage primaryStage) {
         File selectedDirectory = null;
         DirectoryChooser directoryChooser = new DirectoryChooser();
-        directoryChooser.setTitle(Util.getUIMessage("main.chooseGameDirectory"));
+        directoryChooser.setTitle(Util.getUIMessage(Constants.Msg.MAIN_CHOOSEGAMEDIRECTORY));
         selectedDirectory = directoryChooser.showDialog(primaryStage);
 
         if (selectedDirectory == null) {
@@ -127,7 +127,7 @@ public class Main extends Application {
             alert.setTitle(Util.getBuildTitle());
             alert.showAndWait();
             DirectoryChooser tqDirectoryChooser = new DirectoryChooser();
-            tqDirectoryChooser.setTitle(Util.getUIMessage("main.chooseGameDirectory"));
+            tqDirectoryChooser.setTitle(Util.getUIMessage(Constants.Msg.MAIN_CHOOSEGAMEDIRECTORY));
             File tqSelectedDirectory = tqDirectoryChooser.showDialog(primaryStage);
 
             if (tqSelectedDirectory == null) {
@@ -139,10 +139,10 @@ public class Main extends Application {
                 gameInfo.setManualTqBaseGamePath(selectedDirectory.getPath(),tqSelectedDirectory.getPath());
                 return;
             } catch (GameNotFoundException e) {
-                logger.log(System.Logger.Level.ERROR,"Game not detected", e);
+                logger.log(System.Logger.Level.ERROR,Constants.Msg.MAIN_GAMENOTDETECTED, e);
             }
         }
-        Util.showError(Util.getUIMessage("main.gameNotDetected"),null);
+        Util.showError(Util.getUIMessage(Constants.Msg.MAIN_GAMENOTDETECTED),null);
         Platform.exit();
         System.exit(0);
     }
@@ -154,7 +154,7 @@ public class Main extends Application {
             gameInfo.getTextPath();
             notifyPreloader(new Preloader.ProgressNotification(0.2));
         } catch (FileNotFoundException e) {
-            Util.showError(Util.getUIMessage("main.gameNotDetected"), Util.getUIMessage("main.chooseGameDirectory"));
+            Util.showError(Util.getUIMessage(Constants.Msg.MAIN_GAMENOTDETECTED), Util.getUIMessage(Constants.Msg.MAIN_CHOOSEGAMEDIRECTORY));
             logger.log(System.Logger.Level.ERROR, "game path not detected, showing DirectoryChooser",e);
             chooseDirectory(primaryStage);
         }
