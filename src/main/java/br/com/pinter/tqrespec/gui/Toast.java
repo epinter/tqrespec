@@ -40,9 +40,11 @@ import javafx.util.Duration;
 
 public class Toast {
     private static final System.Logger logger = Log.getLogger(Toast.class.getName());
+    private static Toast instance;
+    private final Stage toast;
 
     private Toast(Stage stage, String header, String content, int delay) {
-        Stage toast = new Stage();
+        toast = new Stage();
         toast.setResizable(false);
         toast.initOwner(stage);
         toast.initStyle(StageStyle.TRANSPARENT);
@@ -121,8 +123,10 @@ public class Toast {
         fadeIn.play();
     }
 
-    public static Toast show(Stage stage, String header, String content, int delay) {
-        //noinspection InstantiationOfUtilityClass
-        return new Toast(stage, header, content, delay);
+    public static void show(Stage stage, String header, String content, int delay) {
+        if(instance!=null && instance.toast!=null) {
+            instance.toast.close();
+        }
+        instance = new Toast(stage, header, content, delay);
     }
 }
