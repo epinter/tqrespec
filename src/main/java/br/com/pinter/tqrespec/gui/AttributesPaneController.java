@@ -28,15 +28,22 @@ import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
 import com.google.inject.Inject;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 import javafx.util.converter.NumberStringConverter;
 
+import javafx.event.ActionEvent;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -121,6 +128,9 @@ public class AttributesPaneController implements Initializable {
     @FXML
     private Label difficultyText;
 
+    @FXML
+    private ComboBox<String> gender;
+
     private IntegerProperty currentStr = new SimpleIntegerProperty();
     private IntegerProperty currentInt = new SimpleIntegerProperty();
     private IntegerProperty currentDex = new SimpleIntegerProperty();
@@ -187,6 +197,11 @@ public class AttributesPaneController implements Initializable {
         dexSpinner.setDisable(disable);
     }
 
+    public void disableControls(boolean disable) {
+        setSpinnersDisable(disable);
+        gender.setDisable(disable);
+    }
+
     private void setStrField(int value) {
         if (value < strMin && (value - strMin) % strStep == 0) {
             currentAvail.set(currentAvail.get() - ((strMin - value) / strStep));
@@ -197,8 +212,6 @@ public class AttributesPaneController implements Initializable {
         strSpinner.setValueFactory(strFactory);
         strSpinner.getValueFactory().valueProperty().bindBidirectional(currentStr.asObject());
         currentStr.addListener(((observable, oldValue, newValue) -> attributesChanged((int) oldValue, (int) newValue, strStep, currentStr)));
-
-
     }
 
     private void setIntField(int value) {
@@ -303,6 +316,7 @@ public class AttributesPaneController implements Initializable {
         dexSpinner.setValueFactory(null);
         lifeSpinner.setValueFactory(null);
         manaSpinner.setValueFactory(null);
+        gender.getSelectionModel().clearSelection();
     }
 
     public void saveCharHandler() {
@@ -384,6 +398,31 @@ public class AttributesPaneController implements Initializable {
         charLevelText.setText(String.valueOf(level));
         goldText.setText(NumberFormat.getInstance().format(gold));
 
+        gender.getItems().setAll(Util.getUIMessage("main.gender.male"), Util.getUIMessage("main.gender.female"));
+        int genderSelection = switch (player.getGender()) {
+            case MALE -> 0;
+            case FEMALE -> 1;
+        };
+        gender.getSelectionModel().clearAndSelect(genderSelection);
+
+        gender.getSelectionModel().selectedIndexProperty().addListener((o,oldValue,newValue) -> {
+            if(oldValue.intValue() >= 0 && newValue.intValue() >= 0) {
+                Platform.runLater(() -> Toast.show((Stage) gender.getScene().getWindow(),
+                        Util.getUIMessage("alert.genderchange_header"),
+                        Util.getUIMessage("alert.genderchange_content"),
+                        4000));
+            }
+        });
+    }
+
+    @FXML
+    public void genderSelect(ActionEvent e) {
+        int selected = gender.getSelectionModel().getSelectedIndex();
+        System.out.println("SELECTED "+ selected);
+        switch (selected) {
+            case 0 -> player.setGender(Player.Gender.MALE);
+            case 1 -> player.setGender(Player.Gender.FEMALE);
+        }
     }
 }
 

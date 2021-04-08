@@ -67,6 +67,10 @@ public class CurrentPlayerData {
         return null;
     }
 
+    String getPlayerCharacterClass() {
+        return getHeaderInfo().getPlayerCharacterClass();
+    }
+
     Map<String, PlayerSkill> getPlayerSkills() {
         return playerSkills;
     }

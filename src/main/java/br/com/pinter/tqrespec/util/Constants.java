@@ -94,6 +94,12 @@ public class Constants {
         public static final String SKILL_TRANSITION = "skillTransition";
         public static final String SKILL_LEVEL = "skillLevel";
         public static final String SKILL_POINTS = "skillPoints";
+        public static final String PLAYER_CHARACTER_CLASS = "playerCharacterClass";
+        public static final String PLAYER_TEXTURE = "playerTexture";
+        public static final String VALUE_PC_CLASS_MALE = "Warrior";
+        public static final String VALUE_PC_CLASS_FEMALE = "Sorceress";
+        public static final String MALE_DEFAULT_TEXTURE = "Creatures\\pc\\male\\malepc01_tan.tex";
+        public static final String FEMALE_DEFAULT_TEXTURE = "Creatures\\pc\\female\\femalepc01_tan.tex";
     }
 
     public static class UI {

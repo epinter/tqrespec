@@ -21,6 +21,7 @@
 package br.com.pinter.tqrespec.save.player;
 
 import br.com.pinter.tqdatabase.Database;
+import br.com.pinter.tqdatabase.models.Pc;
 import br.com.pinter.tqdatabase.models.Skill;
 import br.com.pinter.tqrespec.core.State;
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
@@ -36,6 +37,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Player {
     private static final System.Logger logger = Log.getLogger(Player.class);
@@ -48,6 +51,11 @@ public class Player {
 
     @Inject
     private CurrentPlayerData saveData;
+
+    public enum Gender {
+        MALE,
+        FEMALE
+    }
 
     public boolean loadPlayer(String playerName) {
         if (State.get().getSaveInProgress() != null && State.get().getSaveInProgress()) {
@@ -378,6 +386,54 @@ public class Player {
         return charClass;
     }
 
+    public Gender getGender() {
+        String playerCharacterClass = saveData.getPlayerCharacterClass();
+
+        if(playerCharacterClass.isEmpty()) {
+            throw new IllegalArgumentException("Error reading playerCharacterClass");
+        }
+
+        if(Constants.Save.VALUE_PC_CLASS_FEMALE.equals(playerCharacterClass)) {
+            return Gender.FEMALE;
+        }
+
+        return  Gender.MALE;
+    }
+
+    public void setGender(Gender gender) {
+        String newTexture;
+        Pc pc;
+
+        if(gender.equals(Gender.FEMALE)) {
+            saveData.getChanges().setString(Constants.Save.PLAYER_CHARACTER_CLASS, Constants.Save.VALUE_PC_CLASS_FEMALE);
+            pc = db.player().getPc(Pc.Gender.FEMALE);
+            newTexture = Constants.Save.FEMALE_DEFAULT_TEXTURE;
+        } else {
+            saveData.getChanges().setString(Constants.Save.PLAYER_CHARACTER_CLASS, Constants.Save.VALUE_PC_CLASS_MALE);
+            pc = db.player().getPc(Pc.Gender.MALE);
+            newTexture = Constants.Save.MALE_DEFAULT_TEXTURE;
+        }
+
+        if(pc.getPlayerTextures()!=null && !pc.getPlayerTextures().isEmpty()) {
+            newTexture = pc.getPlayerTextures().get(0);
+        }
+
+        String currentTexture = saveData.getChanges().getString(Constants.Save.PLAYER_TEXTURE);
+
+        //try to match new gender with old texture color
+        Matcher matcher = Pattern.compile("(?i).*_([^.]+)\\.tex$").matcher(currentTexture);
+        if(matcher.matches()) {
+            String color = matcher.group(1);
+            for(String textureFile: pc.getPlayerTextures()) {
+                if(textureFile.toLowerCase().contains(color.toLowerCase())) {
+                    newTexture = textureFile;
+                }
+            }
+        }
+
+        saveData.getChanges().setString(Constants.Save.PLAYER_TEXTURE, newTexture);
+    }
+
     public int getDifficulty() {
         return getTempAttr("difficulty");
     }
@@ -426,6 +482,5 @@ public class Player {
         State.get().setSaveInProgress(null);
         saveData.reset();
     }
-
 
 }

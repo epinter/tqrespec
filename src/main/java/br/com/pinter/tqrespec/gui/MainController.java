@@ -412,7 +412,7 @@ public class MainController implements Initializable {
             copyButton.setDisable(disable);
         }
 
-        pointsPaneController.setSpinnersDisable(disable);
+        pointsPaneController.disableControls(disable);
         skillsPaneController.disableControls(disable);
     }
 
@@ -438,7 +438,7 @@ public class MainController implements Initializable {
             return;
         }
 
-        pointsPaneController.setSpinnersDisable(false);
+        pointsPaneController.disableControls(false);
 
         MyTask<Boolean> loadTask = new MyTask<>() {
             @Override
