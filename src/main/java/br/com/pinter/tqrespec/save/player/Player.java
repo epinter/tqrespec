@@ -30,6 +30,8 @@ import br.com.pinter.tqrespec.save.BlockInfo;
 import br.com.pinter.tqrespec.save.VariableInfo;
 import br.com.pinter.tqrespec.save.VariableType;
 import br.com.pinter.tqrespec.tqdata.Db;
+import br.com.pinter.tqrespec.tqdata.Mastery;
+import br.com.pinter.tqrespec.tqdata.PlayerCharacter;
 import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Constants;
 import com.google.inject.Inject;
@@ -39,6 +41,7 @@ import java.io.File;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class Player {
     private static final System.Logger logger = Log.getLogger(Player.class);
@@ -51,11 +54,6 @@ public class Player {
 
     @Inject
     private CurrentPlayerData saveData;
-
-    public enum Gender {
-        MALE,
-        FEMALE
-    }
 
     public boolean loadPlayer(String playerName) {
         if (State.get().getSaveInProgress() != null && State.get().getSaveInProgress()) {
@@ -79,6 +77,59 @@ public class Player {
             throw new UnhandledRuntimeException("Error loading character", e);
         }
         return true;
+    }
+
+    public PlayerCharacter getCharacter() {
+        PlayerCharacter playerCharacter = new PlayerCharacter();
+        playerCharacter.setGender(getGender());
+        playerCharacter.setCharacterClass(getPlayerClassName());
+        playerCharacter.setDifficulty(getDifficulty());
+        playerCharacter.setExperience(getXp());
+        playerCharacter.setGold(getMoney());
+        playerCharacter.setLevel(getLevel());
+        playerCharacter.setName(getPlayerName());
+        playerCharacter.setStatAvailableAttrPoints(getModifierPoints());
+        playerCharacter.setStatDex(getDex());
+        playerCharacter.setStatInt(getInt());
+        playerCharacter.setStatStr(getStr());
+        playerCharacter.setStatLife(getLife());
+        playerCharacter.setStatMana(getMana());
+        playerCharacter.setMasteries(new ArrayList<>());
+        playerCharacter.setStatAvailableSkillPoints(getAvailableSkillPoints());
+        playerCharacter.setPlayTimeInSeconds(getStatPlayTimeInSeconds());
+        playerCharacter.setGreatestMonsterKilledName(getStatGreatestMonsterKilledName());
+        playerCharacter.setNumberOfDeaths(getStatNumberOfDeaths());
+        playerCharacter.setNumberOfKills(getStatNumberOfKills());
+        playerCharacter.setExperienceFromKills(getStatExperienceFromKills());
+        playerCharacter.setHealthPotionsUsed(getStatHealthPotionsUsed());
+        playerCharacter.setManaPotionsUsed(getStatManaPotionsUsed());
+        playerCharacter.setNumHitsInflicted(getStatNumHitsInflicted());
+        playerCharacter.setNumHitsReceived(getStatNumHitsReceived());
+        playerCharacter.setGreatestDamageInflicted(getStatGreatestDamageInflicted());
+        playerCharacter.setGreatestMonsterKilledLevel(getStatGreatestMonsterKilledLevel());
+        playerCharacter.setCriticalHitsInflicted(getStatCriticalHitsInflicted());
+
+        List<Skill> playerMasteries = getPlayerMasteries();
+        Map<String, PlayerSkill> playerSkills = getPlayerSkills();
+
+        for (Skill skill: playerMasteries) {
+            PlayerSkill ps = playerSkills.get(skill.getRecordPath());
+            if(ps == null) {
+                logger.log(System.Logger.Level.ERROR, "Error, skill not found while loading character: "+skill.getRecordPath());
+                continue;
+            }
+            int level = ps.getSkillLevel();
+            Mastery mastery = new Mastery();
+            mastery.setMastery(skill);
+            mastery.setLevel(level);
+            mastery.setDisplayName(skill.getSkillDisplayName());
+
+            if(skill.isMastery()) {
+                playerCharacter.getMasteries().add(mastery);
+            }
+        }
+
+        return playerCharacter;
     }
 
     private void prepareSkillsList() {
@@ -162,7 +213,7 @@ public class Player {
         int blockStart = sb.getBlockStart();
         Skill mastery = db.skills().getSkill(sb.getSkillName(), false);
         if (!mastery.isMastery()) {
-            throw new IllegalStateException("Error reclaiming points. Skill detected.");
+            throw new IllegalStateException("Error loading mastery. Skill detected.");
         }
         BlockInfo sk = saveData.getChanges().getBlockInfo().get(blockStart);
         VariableInfo varSkillLevel = sk.getVariables().get(Constants.Save.SKILL_LEVEL).get(0);
@@ -362,6 +413,70 @@ public class Player {
         return getVariableValueInteger("money");
     }
 
+    public int getStatPlayTimeInSeconds() {
+        return getVariableValueInteger("playTimeInSeconds");
+    }
+
+    public String getStatGreatestMonsterKilledName() {
+        List<String> monsters =  saveData.getChanges().getStringValuesFromBlock(
+                (PlayerFileVariable.valueOf("greatestMonsterKilledName").var()))
+                .stream().filter((v) -> v != null && !v.isEmpty()).collect(Collectors.toList());
+        if(monsters.isEmpty()) {
+            return null;
+        }
+        return monsters.get(monsters.size()-1);
+    }
+
+    public int getStatGreatestMonsterKilledLevel() {
+        List<Integer> monsterLevels = saveData.getChanges().getIntValuesFromBlock(
+                PlayerFileVariable.valueOf("greatestMonsterKilledLevel").var())
+                .stream().filter((v) -> v != 0).collect(Collectors.toList());
+        if(monsterLevels.isEmpty()) {
+            return -1;
+        }
+        return monsterLevels.get(monsterLevels.size()-1);
+    }
+
+    public int getStatNumberOfDeaths() {
+        return getVariableValueInteger("numberOfDeaths");
+    }
+
+    public int getStatNumberOfKills() {
+        return getVariableValueInteger("numberOfKills");
+    }
+
+    public int getStatExperienceFromKills() {
+        return getVariableValueInteger("experienceFromKills");
+    }
+
+    public int getStatHealthPotionsUsed() {
+        return getVariableValueInteger("healthPotionsUsed");
+    }
+
+    public int getStatManaPotionsUsed() {
+        return getVariableValueInteger("manaPotionsUsed");
+    }
+
+    public int getStatMaxLevel() {
+        return getVariableValueInteger("maxLevel");
+    }
+
+    public int getStatNumHitsReceived() {
+        return getVariableValueInteger("numHitsReceived");
+    }
+
+    public int getStatNumHitsInflicted() {
+        return getVariableValueInteger("numHitsInflicted");
+    }
+
+    public int getStatGreatestDamageInflicted() {
+        return (int) getVariableValueFloat("greatestDamageInflicted");
+    }
+
+    public int getStatCriticalHitsInflicted() {
+        return getVariableValueInteger("criticalHitsInflicted");
+    }
+
     private int getVariableValueInteger(VariableInfo variableInfo) {
         return saveData.getChanges().getInt(variableInfo);
     }
@@ -372,6 +487,10 @@ public class Player {
 
     private int getVariableValueInteger(int blockStart, String variable) {
         return saveData.getChanges().getInt(blockStart, variable);
+    }
+
+    private float getVariableValueFloat(String variable) {
+        return saveData.getChanges().getFloat(variable);
     }
 
     private float getVariableValueFloat(VariableInfo variableInfo) {
