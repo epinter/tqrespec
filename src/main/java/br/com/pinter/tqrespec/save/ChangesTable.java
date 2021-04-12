@@ -104,9 +104,7 @@ public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements 
                     if(vi.getValue() == null || !vi.getName().equals(variable)) {
                         continue;
                     }
-                    if(vi.getVariableType().equals(VariableType.STRING_UTF_16_LE)) {
-                        ret.add(new String(vi.getValueString().getBytes(StandardCharsets.UTF_16LE)));
-                    } else if(vi.getVariableType().equals(VariableType.STRING)) {
+                    if(vi.getVariableType().equals(VariableType.STRING) || vi.getVariableType().equals(VariableType.STRING_UTF_16_LE)) {
                         ret.add(vi.getValueString());
                     }
                 }
@@ -150,7 +148,6 @@ public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements 
         } else {
             throw new IllegalArgumentException(Util.getUIMessage(ALERT_INVALIDDATA, variable));
         }
-
     }
 
     private byte[] encodeString(String str, boolean wide) {
@@ -383,6 +380,24 @@ public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements 
             }
         }
         return ret.toArray(new Integer[0]);
+    }
+
+    public List<UID> getUIDValuesFromBlock(String variable) {
+        List<UID> ret = new ArrayList<>();
+        if (getVariableLocation().get(variable) != null) {
+            int block = getVariableLocation().get(variable).get(0);
+            if (getBlockInfo().get(block) != null) {
+                for(VariableInfo vi: getBlockInfo().get(block).getVariables().values()) {
+                    if(vi.getValue() == null || !vi.getName().equals(variable)) {
+                        continue;
+                    }
+                    if(vi.getVariableType().equals(VariableType.UID)) {
+                        ret.add(new UID((byte[]) vi.getValue()));
+                    }
+                }
+            }
+        }
+        return ret;
     }
 
     public void removeBlock(int offset) {

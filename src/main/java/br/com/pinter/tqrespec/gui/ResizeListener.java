@@ -76,7 +76,7 @@ public class ResizeListener implements EventHandler<MouseEvent> {
             mousePressed(t);
         } else if (MouseEvent.MOUSE_DRAGGED.equals(t.getEventType())) {
             mouseDragged(t);
-        } else if(MouseEvent.MOUSE_RELEASED.equals(t.getEventType()) || MouseEvent.MOUSE_EXITED.equals(t.getEventType())) {
+        } else if(MouseEvent.MOUSE_RELEASED.equals(t.getEventType())) {
             stage.getScene().setCursor(Cursor.DEFAULT);
             resizeH = false;
             resizeV = false;
