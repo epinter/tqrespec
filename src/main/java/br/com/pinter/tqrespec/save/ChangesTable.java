@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -93,6 +94,27 @@ public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements 
         }
         return null;
     }
+
+    public List<String> getStringValuesFromBlock(String variable) {
+        List<String> ret = new ArrayList<>();
+        if (getVariableLocation().get(variable) != null) {
+            int block = getVariableLocation().get(variable).get(0);
+            if (getBlockInfo().get(block) != null) {
+                for(VariableInfo vi: getBlockInfo().get(block).getVariables().values()) {
+                    if(vi.getValue() == null || !vi.getName().equals(variable)) {
+                        continue;
+                    }
+                    if(vi.getVariableType().equals(VariableType.STRING_UTF_16_LE)) {
+                        ret.add(new String(vi.getValueString().getBytes(StandardCharsets.UTF_16LE)));
+                    } else if(vi.getVariableType().equals(VariableType.STRING)) {
+                        ret.add(vi.getValueString());
+                    }
+                }
+            }
+        }
+        return ret;
+    }
+
 
     public void setString(String variable, String value) {
         this.setString(variable, value, false);
@@ -191,7 +213,7 @@ public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements 
         }
     }
 
-    float getFloat(String variable) {
+    public float getFloat(String variable) {
         if (getVariableLocation().get(variable) != null) {
             int block = getVariableLocation().get(variable).get(0);
             if (getBlockInfo().get(block) != null
@@ -328,6 +350,24 @@ public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements 
             }
         }
         return -1;
+    }
+
+    public List<Integer> getIntValuesFromBlock(String variable) {
+        List<Integer> ret = new ArrayList<>();
+        if (getVariableLocation().get(variable) != null) {
+            int block = getVariableLocation().get(variable).get(0);
+            if (getBlockInfo().get(block) != null) {
+                for(VariableInfo vi: getBlockInfo().get(block).getVariables().values()) {
+                    if(vi.getValue() == null || !vi.getName().equals(variable)) {
+                        continue;
+                    }
+                    if(vi.getVariableType().equals(VariableType.INTEGER)) {
+                        ret.add((Integer) vi.getValue());
+                    }
+                }
+            }
+        }
+        return ret;
     }
 
     Integer[] getIntList(String variable) {
