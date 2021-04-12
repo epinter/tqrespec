@@ -29,6 +29,8 @@ import javafx.stage.Stage;
 @SuppressWarnings("CanBeFinal")
 public class ResizeListener implements EventHandler<MouseEvent> {
     private Stage stage;
+    private boolean scale = true;
+    private boolean keepAspect = true;
 
     private double dx;
     private double dy;
@@ -37,6 +39,22 @@ public class ResizeListener implements EventHandler<MouseEvent> {
 
     public ResizeListener(Stage stage) {
         this.stage = stage;
+    }
+
+    public boolean isScale() {
+        return scale;
+    }
+
+    public void setScale(boolean scale) {
+        this.scale = scale;
+    }
+
+    public boolean isKeepAspect() {
+        return keepAspect;
+    }
+
+    public void setKeepAspect(boolean keepAspect) {
+        this.keepAspect = keepAspect;
     }
 
     @Override
@@ -62,7 +80,9 @@ public class ResizeListener implements EventHandler<MouseEvent> {
     }
 
     private void mouseDragged(MouseEvent t) {
-        stage.getScene().getRoot().styleProperty().bind(Bindings.format("-fx-font-size: %sem;", stage.getWidth() / stage.getMinWidth()));
+        if(scale) {
+            stage.getScene().getRoot().styleProperty().bind(Bindings.format("-fx-font-size: %sem;", stage.getWidth() / stage.getMinWidth()));
+        }
         if (
                 ((stage.getHeight() < stage.getMinHeight() && t.getY() + dy - stage.getHeight() > 0)
                         || stage.getHeight() >= stage.getMinHeight()) &&
@@ -71,14 +91,26 @@ public class ResizeListener implements EventHandler<MouseEvent> {
                                 || stage.getWidth() >= stage.getMinWidth())) {
             if (resizeH) {
                 double newW = t.getX() + dx;
+                double newH = t.getY() + dy;
                 if (newW > stage.getMaxWidth() || newW < stage.getMinWidth()) return;
                 stage.setWidth(newW);
-                stage.setHeight(stage.getWidth() * (stage.getMinHeight() / stage.getMinWidth()));
+                if(keepAspect) {
+                    stage.setHeight(stage.getWidth() * (stage.getMinHeight() / stage.getMinWidth()));
+                } else {
+                    if (newH > stage.getMaxHeight() || newH < stage.getMinHeight()) return;
+                    stage.setHeight(newH);
+                }
             } else if (resizeV) {
+                double newW = t.getX() + dx;
                 double newH = t.getY() + dy;
                 if (newH > stage.getMaxHeight() || newH < stage.getMinHeight()) return;
                 stage.setHeight(newH);
-                stage.setWidth(stage.getHeight() * (stage.getMinWidth() / stage.getMinHeight()));
+                if(keepAspect) {
+                    stage.setWidth(stage.getHeight() * (stage.getMinWidth() / stage.getMinHeight()));
+                } else {
+                    if (newW > stage.getMaxWidth() || newW < stage.getMinWidth()) return;
+                    stage.setWidth(newW);
+                }
             }
         }
     }
