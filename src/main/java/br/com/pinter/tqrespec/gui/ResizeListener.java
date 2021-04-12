@@ -76,6 +76,10 @@ public class ResizeListener implements EventHandler<MouseEvent> {
             mousePressed(t);
         } else if (MouseEvent.MOUSE_DRAGGED.equals(t.getEventType())) {
             mouseDragged(t);
+        } else if(MouseEvent.MOUSE_RELEASED.equals(t.getEventType()) || MouseEvent.MOUSE_EXITED.equals(t.getEventType())) {
+            stage.getScene().setCursor(Cursor.DEFAULT);
+            resizeH = false;
+            resizeV = false;
         }
     }
 
@@ -121,7 +125,7 @@ public class ResizeListener implements EventHandler<MouseEvent> {
     }
 
     private void mouseMoved(MouseEvent t) {
-        double border = 10;
+        double border = 3;
         if (t.getX() < border && t.getY() > stage.getScene().getHeight() - border) {
             stage.getScene().setCursor(Cursor.SW_RESIZE);
             resizeH = true;
@@ -130,7 +134,7 @@ public class ResizeListener implements EventHandler<MouseEvent> {
             stage.getScene().setCursor(Cursor.NE_RESIZE);
             resizeH = true;
             resizeV = true;
-        } else if (t.getX() > stage.getScene().getWidth() - border && t.getY() > stage.getScene().getHeight() - border) {
+        } else if (t.getX() > stage.getScene().getWidth() - border*3 && t.getY() > stage.getScene().getHeight() - border*3) {
             stage.getScene().setCursor(Cursor.SE_RESIZE);
             resizeH = true;
             resizeV = true;
