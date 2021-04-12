@@ -102,4 +102,11 @@ public class UID {
 
         return ret;
     }
+
+    @Override
+    public String toString() {
+        return "UID{" +
+                "value='" + value + '\'' +
+                '}';
+    }
 }

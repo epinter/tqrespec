@@ -23,7 +23,7 @@
   ~ Copyright (C) 2019 Emerson Pinter - All Rights Reserved
   -->
 
-<VBox fx:id="rootelement" alignment="TOP_CENTER" maxHeight="940.0" maxWidth="1320.0" minHeight="470.0" minWidth="660.0" prefHeight="470.0" prefWidth="660.0" stylesheets="@main.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.pinter.tqrespec.gui.MainController">
+<VBox fx:id="rootelement" alignment="TOP_CENTER" maxHeight="940.0" maxWidth="1320.0" minHeight="470.0" minWidth="660.0" prefHeight="470.0" prefWidth="660.0" stylesheets="@main.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.pinter.tqrespec.gui.MainController">
    <children>
       <HBox fx:id="tophbox" fillHeight="false" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" onMouseDragged="#moveWindow" onMousePressed="#startMoveWindow" onMouseReleased="#endMoveWindow" prefHeight="47.0" styleClass="tq-topdecoration" VBox.vgrow="ALWAYS">
          <children>
@@ -58,16 +58,17 @@
         <children>
             <GridPane prefHeight="75.0" prefWidth="637.0">
               <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="83.0" />
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="9.0" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="67.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="9.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="80.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="70.0" />
               </columnConstraints>
               <rowConstraints>
                 <RowConstraints maxHeight="68.0" minHeight="10.0" prefHeight="48.0" vgrow="SOMETIMES" />
                 <RowConstraints maxHeight="27.0" minHeight="10.0" prefHeight="27.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label alignment="BOTTOM_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#openAboutWindow" styleClass="tq-bigtitle" text="TQ Respec" textAlignment="RIGHT" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.valignment="BOTTOM">
+                  <Label alignment="BOTTOM_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#openAboutWindow" styleClass="tq-bigtitle" text="TQ Respec" textAlignment="RIGHT" GridPane.columnIndex="3" GridPane.halignment="LEFT" GridPane.valignment="BOTTOM">
                      <GridPane.margin>
                         <Insets />
                      </GridPane.margin>
@@ -75,17 +76,21 @@
                         <Insets right="5.0" />
                      </padding>
                   </Label>
-                  <Hyperlink fx:id="versionCheck" alignment="CENTER_RIGHT" maxHeight="26.0" maxWidth="1.7976931348623157E308" prefHeight="26.0" styleClass="tq-versioncheck" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="TOP" />
-                  <ComboBox fx:id="characterCombo" maxWidth="1.7976931348623157E308" onAction="#characterSelected" prefHeight="32.0" promptText="%main.labelselectchar" styleClass="tq-charactercombo" stylesheets="@main.css" GridPane.hgrow="ALWAYS" GridPane.rowSpan="2" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
+                  <Hyperlink fx:id="versionCheck" alignment="CENTER_RIGHT" maxHeight="26.0" maxWidth="1.7976931348623157E308" prefHeight="26.0" styleClass="tq-versioncheck" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="TOP" />
+                  <ComboBox fx:id="characterCombo" maxWidth="1.7976931348623157E308" onAction="#characterSelected" prefHeight="32.0" promptText="%main.labelselectchar" styleClass="tq-charactercombo" stylesheets="@main.css" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" GridPane.rowSpan="2" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
                      <GridPane.margin>
                         <Insets bottom="5.0" left="10.0" right="10.0" />
                      </GridPane.margin>
                   </ComboBox>
-                  <Button fx:id="resetButton" contentDisplay="GRAPHIC_ONLY" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#resetButtonClicked" prefHeight="32.0" styleClass="tq-resetbutton" text="Reset" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowSpan="2" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
+                  <Button fx:id="resetButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#resetButtonClicked" prefHeight="32.0" styleClass="tq-resetbutton" text="Reset" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowSpan="2" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
                      <GridPane.margin>
                         <Insets bottom="4.0" />
                      </GridPane.margin>
                   </Button>
+                  <Button fx:id="charactersButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" onAction="#openCharactersWindow" prefHeight="32.0" styleClass="tq-charactersbutton" text="Characters" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowSpan="2" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
+                     <GridPane.margin>
+                        <Insets bottom="4.0" />
+                     </GridPane.margin></Button>
                </children>
                <padding>
                   <Insets left="48.0" right="48.0" />

@@ -23,16 +23,15 @@ package br.com.pinter.tqrespec.save.player;
 import br.com.pinter.tqdatabase.Database;
 import br.com.pinter.tqdatabase.models.Pc;
 import br.com.pinter.tqdatabase.models.Skill;
+import br.com.pinter.tqdatabase.models.Teleport;
 import br.com.pinter.tqrespec.core.State;
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.BlockInfo;
+import br.com.pinter.tqrespec.save.UID;
 import br.com.pinter.tqrespec.save.VariableInfo;
 import br.com.pinter.tqrespec.save.VariableType;
-import br.com.pinter.tqrespec.tqdata.Db;
-import br.com.pinter.tqrespec.tqdata.Mastery;
-import br.com.pinter.tqrespec.tqdata.PlayerCharacter;
-import br.com.pinter.tqrespec.tqdata.Txt;
+import br.com.pinter.tqrespec.tqdata.*;
 import br.com.pinter.tqrespec.util.Constants;
 import com.google.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
@@ -47,6 +46,9 @@ public class Player {
     private static final System.Logger logger = Log.getLogger(Player.class);
 
     @Inject
+    private GameInfo gameInfo;
+
+    @Inject
     private Db db;
 
     @Inject
@@ -55,25 +57,36 @@ public class Player {
     @Inject
     private CurrentPlayerData saveData;
 
+    public CurrentPlayerData getSaveData() {
+            return saveData;
+    }
+
+    public void prepareSaveData() {
+        reset();
+    }
+
     public boolean loadPlayer(String playerName) {
         if (State.get().getSaveInProgress() != null && State.get().getSaveInProgress()) {
             return false;
         }
 
         try {
-            reset();
-            saveData.setPlayerName(playerName);
+            prepareSaveData();
+
+            getSaveData().setPlayerName(playerName);
+            getSaveData().setPlayerChr(gameInfo.playerChr(playerName, saveData.isCustomQuest()));
             PlayerParser playerParser = new PlayerParser(
-                    new File(saveData.getPlayerChr().toString()),
+                    new File(getSaveData().getPlayerChr().toString()),
                     playerName);
 
-            saveData.setBuffer(playerParser.loadPlayer());
-            saveData.getChanges().setBlockInfo(playerParser.getBlockInfo());
-            saveData.setHeaderInfo(playerParser.getHeaderInfo());
-            saveData.getChanges().setVariableLocation(playerParser.getVariableLocation());
+            getSaveData().setBuffer(playerParser.loadPlayer());
+            getSaveData().getChanges().setBlockInfo(playerParser.getBlockInfo());
+            getSaveData().setHeaderInfo(playerParser.getHeaderInfo());
+            getSaveData().getChanges().setVariableLocation(playerParser.getVariableLocation());
             prepareSkillsList();
         } catch (Exception e) {
             reset();
+            logger.log(System.Logger.Level.ERROR, "Error loading character", e);
             throw new UnhandledRuntimeException("Error loading character", e);
         }
         return true;
@@ -108,6 +121,9 @@ public class Player {
         playerCharacter.setGreatestDamageInflicted(getStatGreatestDamageInflicted());
         playerCharacter.setGreatestMonsterKilledLevel(getStatGreatestMonsterKilledLevel());
         playerCharacter.setCriticalHitsInflicted(getStatCriticalHitsInflicted());
+        playerCharacter.getDefaultMapTeleports().put(0, getDefaultMapTeleports(0));
+        playerCharacter.getDefaultMapTeleports().put(1, getDefaultMapTeleports(1));
+        playerCharacter.getDefaultMapTeleports().put(2, getDefaultMapTeleports(2));
 
         List<Skill> playerMasteries = getPlayerMasteries();
         Map<String, PlayerSkill> playerSkills = getPlayerSkills();
@@ -133,17 +149,17 @@ public class Player {
     }
 
     private void prepareSkillsList() {
-        saveData.getPlayerSkills().clear();
-        for (String v : saveData.getChanges().getVariableLocation().keySet()) {
+        getSaveData().getPlayerSkills().clear();
+        for (String v : getSaveData().getChanges().getVariableLocation().keySet()) {
             if (!v.startsWith(Database.Variables.PREFIX_SKILL_NAME)) {
                 continue;
             }
 
-            for (int blockOffset : saveData.getChanges().getVariableLocation().get(v)) {
-                int parent = saveData.getChanges().getBlockInfo().get(blockOffset).getParentOffset();
-                BlockInfo b = saveData.getChanges().getBlockInfo().get(blockOffset);
-                if (parent < 0 || !saveData.getChanges().getBlockInfo().get(parent).getVariables().containsKey("max")
-                        || (saveData.getChanges().get(b.getStart()) != null && saveData.getChanges().get(b.getStart()).length == 0)) {
+            for (int blockOffset : getSaveData().getChanges().getVariableLocation().get(v)) {
+                int parent = getSaveData().getChanges().getBlockInfo().get(blockOffset).getParentOffset();
+                BlockInfo b = getSaveData().getChanges().getBlockInfo().get(blockOffset);
+                if (parent < 0 || !getSaveData().getChanges().getBlockInfo().get(parent).getVariables().containsKey("max")
+                        || (getSaveData().getChanges().get(b.getStart()) != null && getSaveData().getChanges().get(b.getStart()).length == 0)) {
                     //new block size is zero (was removed) or no parent
                     continue;
                 }
@@ -161,10 +177,10 @@ public class Player {
                         logger.log(System.Logger.Level.WARNING,"The character \"{0}\" have the skill \"{1}\", but this" +
                                 " skill was not found in the game database. Please check if the game installed is compatible" +
                                 " with your save game.", getPlayerName(), sb.getSkillName());
-                        saveData.setMissingSkills(true);
+                        getSaveData().setMissingSkills(true);
                     }
-                    synchronized (saveData.getPlayerSkills()) {
-                        saveData.getPlayerSkills().put(Objects.requireNonNull(Database.normalizeRecordPath(sb.getSkillName())),
+                    synchronized (getSaveData().getPlayerSkills()) {
+                        getSaveData().getPlayerSkills().put(Objects.requireNonNull(Database.normalizeRecordPath(sb.getSkillName())),
                                 sb);
                     }
                 }
@@ -173,40 +189,40 @@ public class Player {
     }
 
     public boolean isMissingSkills() {
-        return saveData.isMissingSkills();
+        return getSaveData().isMissingSkills();
     }
 
     public String getPlayerName() {
-        return saveData.getPlayerName();
+        return getSaveData().getPlayerName();
     }
     public boolean isCharacterLoaded() {
-        return saveData.getBuffer() != null;
+        return getSaveData().getBuffer() != null;
     }
 
     public int getAvailableSkillPoints() {
         if (!isCharacterLoaded()) return 0;
 
-        int block = saveData.getChanges().getVariableLocation().get(Constants.Save.SKILL_POINTS).get(0);
-        BlockInfo statsBlock = saveData.getChanges().getBlockInfo().get(block);
+        int block = getSaveData().getChanges().getVariableLocation().get(Constants.Save.SKILL_POINTS).get(0);
+        BlockInfo statsBlock = getSaveData().getChanges().getBlockInfo().get(block);
         return getVariableValueInteger(statsBlock.getStart(), Constants.Save.SKILL_POINTS);
     }
 
     public Map<String, PlayerSkill> getPlayerSkills() {
         boolean update = false;
 
-        for (PlayerSkill b : saveData.getPlayerSkills().values()) {
-            if (saveData.getChanges().get(b.getBlockStart()) != null
-                    && saveData.getChanges().get(b.getBlockStart()).length == 0) {
+        for (PlayerSkill b : getSaveData().getPlayerSkills().values()) {
+            if (getSaveData().getChanges().get(b.getBlockStart()) != null
+                    && getSaveData().getChanges().get(b.getBlockStart()).length == 0) {
                 //new block size is zero, was removed, ignore
                 update = true;
             }
         }
 
-        if (saveData.getPlayerSkills().isEmpty() || update) {
+        if (getSaveData().getPlayerSkills().isEmpty() || update) {
             prepareSkillsList();
         }
 
-        return saveData.getPlayerSkills();
+        return getSaveData().getPlayerSkills();
     }
 
     public int getMasteryLevel(PlayerSkill sb) {
@@ -215,7 +231,7 @@ public class Player {
         if (!mastery.isMastery()) {
             throw new IllegalStateException("Error loading mastery. Skill detected.");
         }
-        BlockInfo sk = saveData.getChanges().getBlockInfo().get(blockStart);
+        BlockInfo sk = getSaveData().getChanges().getBlockInfo().get(blockStart);
         VariableInfo varSkillLevel = sk.getVariables().get(Constants.Save.SKILL_LEVEL).get(0);
 
         if (varSkillLevel.getVariableType() == VariableType.INTEGER) {
@@ -231,17 +247,17 @@ public class Player {
             throw new IllegalStateException("Error reclaiming points. Mastery detected.");
         }
 
-        BlockInfo skillToRemove = saveData.getChanges().getBlockInfo().get(blockStart);
+        BlockInfo skillToRemove = getSaveData().getChanges().getBlockInfo().get(blockStart);
         VariableInfo varSkillLevel = skillToRemove.getVariables().get(Constants.Save.SKILL_LEVEL).get(0);
         if (varSkillLevel.getVariableType() == VariableType.INTEGER) {
             int currentSkillPoints = getVariableValueInteger(Constants.Save.SKILL_POINTS);
             int currentSkillLevel = (int) varSkillLevel.getValue();
-            saveData.getChanges().setInt(Constants.Save.SKILL_POINTS, currentSkillPoints + currentSkillLevel);
-            saveData.getChanges().removeBlock(blockStart);
-            saveData.getChanges().setInt("max", getVariableValueInteger("max") - 1);
+            getSaveData().getChanges().setInt(Constants.Save.SKILL_POINTS, currentSkillPoints + currentSkillLevel);
+            getSaveData().getChanges().removeBlock(blockStart);
+            getSaveData().getChanges().setInt("max", getVariableValueInteger("max") - 1);
 
-            if (saveData.getChanges().get(blockStart) != null
-                    && saveData.getChanges().get(blockStart).length == 0) {
+            if (getSaveData().getChanges().get(blockStart) != null
+                    && getSaveData().getChanges().get(blockStart).length == 0) {
                 prepareSkillsList();
             }
         }
@@ -262,13 +278,13 @@ public class Player {
         int currentSkillLevel = getVariableValueInteger(blockStart, Constants.Save.SKILL_LEVEL);
 
         if (currentSkillLevel > 0) {
-            saveData.getChanges().setInt(Constants.Save.SKILL_POINTS, currentSkillPoints + currentSkillLevel);
-            saveData.getChanges().removeBlock(blockStart);
-            saveData.getChanges().setInt("max", getVariableValueInteger("max") - 1);
+            getSaveData().getChanges().setInt(Constants.Save.SKILL_POINTS, currentSkillPoints + currentSkillLevel);
+            getSaveData().getChanges().removeBlock(blockStart);
+            getSaveData().getChanges().setInt("max", getVariableValueInteger("max") - 1);
         }
 
-        if (saveData.getChanges().get(blockStart) != null
-                && saveData.getChanges().get(blockStart).length == 0) {
+        if (getSaveData().getChanges().get(blockStart) != null
+                && getSaveData().getChanges().get(blockStart).length == 0) {
             prepareSkillsList();
         }
     }
@@ -283,8 +299,8 @@ public class Player {
         int currentSkillPoints = getVariableValueInteger(Constants.Save.SKILL_POINTS);
         int currentSkillLevel = getVariableValueInteger(blockStart, Constants.Save.SKILL_LEVEL);
         if (currentSkillLevel > 1) {
-            saveData.getChanges().setInt(Constants.Save.SKILL_POINTS, currentSkillPoints + (currentSkillLevel - 1));
-            saveData.getChanges().setInt(blockStart, Constants.Save.SKILL_LEVEL, 1);
+            getSaveData().getChanges().setInt(Constants.Save.SKILL_POINTS, currentSkillPoints + (currentSkillLevel - 1));
+            getSaveData().getChanges().setInt(blockStart, Constants.Save.SKILL_LEVEL, 1);
             prepareSkillsList();
         }
     }
@@ -312,9 +328,9 @@ public class Player {
     }
 
     List<VariableInfo> getTempVariableInfo(String var) {
-        List<Integer> temp = saveData.getChanges().getVariableLocation().get("temp");
+        List<Integer> temp = getSaveData().getChanges().getVariableLocation().get("temp");
         for (Integer blockStart : temp) {
-            BlockInfo b = saveData.getChanges().getBlockInfo().get(blockStart);
+            BlockInfo b = getSaveData().getChanges().getBlockInfo().get(blockStart);
             if (!b.getVariableByAlias(var).isEmpty()) {
                 return b.getVariableByAlias(var);
             }
@@ -344,9 +360,9 @@ public class Player {
         if (!varList.isEmpty() && varList.get(0) != null) {
             VariableInfo attrVar = varList.get(0);
             if (attrVar.getVariableType() == VariableType.FLOAT) {
-                saveData.getChanges().setFloat(attrVar, val);
+                getSaveData().getChanges().setFloat(attrVar, val);
             } else if (attrVar.getVariableType() == VariableType.INTEGER) {
-                saveData.getChanges().setInt(attrVar, val);
+                getSaveData().getChanges().setInt(attrVar, val);
             }
         } else {
             throw new IllegalArgumentException(String.format("attribute not found %s", attr));
@@ -398,7 +414,7 @@ public class Player {
     }
 
     public void setModifierPoints(int val) {
-        saveData.getChanges().setInt("modifierPoints", val);
+        getSaveData().getChanges().setInt("modifierPoints", val);
     }
 
     public int getXp() {
@@ -418,7 +434,7 @@ public class Player {
     }
 
     public String getStatGreatestMonsterKilledName() {
-        List<String> monsters =  saveData.getChanges().getStringValuesFromBlock(
+        List<String> monsters =  getSaveData().getChanges().getStringValuesFromBlock(
                 (PlayerFileVariable.valueOf("greatestMonsterKilledName").var()))
                 .stream().filter((v) -> v != null && !v.isEmpty()).collect(Collectors.toList());
         if(monsters.isEmpty()) {
@@ -428,7 +444,7 @@ public class Player {
     }
 
     public int getStatGreatestMonsterKilledLevel() {
-        List<Integer> monsterLevels = saveData.getChanges().getIntValuesFromBlock(
+        List<Integer> monsterLevels = getSaveData().getChanges().getIntValuesFromBlock(
                 PlayerFileVariable.valueOf("greatestMonsterKilledLevel").var())
                 .stream().filter((v) -> v != 0).collect(Collectors.toList());
         if(monsterLevels.isEmpty()) {
@@ -478,27 +494,27 @@ public class Player {
     }
 
     private int getVariableValueInteger(VariableInfo variableInfo) {
-        return saveData.getChanges().getInt(variableInfo);
+        return getSaveData().getChanges().getInt(variableInfo);
     }
 
     private int getVariableValueInteger(String variable) {
-        return saveData.getChanges().getInt(variable);
+        return getSaveData().getChanges().getInt(variable);
     }
 
     private int getVariableValueInteger(int blockStart, String variable) {
-        return saveData.getChanges().getInt(blockStart, variable);
+        return getSaveData().getChanges().getInt(blockStart, variable);
     }
 
     private float getVariableValueFloat(String variable) {
-        return saveData.getChanges().getFloat(variable);
+        return getSaveData().getChanges().getFloat(variable);
     }
 
     private float getVariableValueFloat(VariableInfo variableInfo) {
-        return saveData.getChanges().getFloat(variableInfo);
+        return getSaveData().getChanges().getFloat(variableInfo);
     }
 
     public String getPlayerClassName() {
-        String charClass = saveData.getPlayerClassTag();
+        String charClass = getSaveData().getPlayerClassTag();
         if (StringUtils.isNotEmpty(charClass)) {
             return txt.getString(charClass);
         }
@@ -506,7 +522,7 @@ public class Player {
     }
 
     public Gender getGender() {
-        String playerCharacterClass = saveData.getPlayerCharacterClass();
+        String playerCharacterClass = getSaveData().getPlayerCharacterClass();
 
         if(playerCharacterClass.isEmpty()) {
             throw new IllegalArgumentException("Error reading playerCharacterClass");
@@ -524,11 +540,11 @@ public class Player {
         Pc pc;
 
         if(gender.equals(Gender.FEMALE)) {
-            saveData.getChanges().setString(Constants.Save.PLAYER_CHARACTER_CLASS, Constants.Save.VALUE_PC_CLASS_FEMALE);
+            getSaveData().getChanges().setString(Constants.Save.PLAYER_CHARACTER_CLASS, Constants.Save.VALUE_PC_CLASS_FEMALE);
             pc = db.player().getPc(Pc.Gender.FEMALE);
             newTexture = Constants.Save.FEMALE_DEFAULT_TEXTURE;
         } else {
-            saveData.getChanges().setString(Constants.Save.PLAYER_CHARACTER_CLASS, Constants.Save.VALUE_PC_CLASS_MALE);
+            getSaveData().getChanges().setString(Constants.Save.PLAYER_CHARACTER_CLASS, Constants.Save.VALUE_PC_CLASS_MALE);
             pc = db.player().getPc(Pc.Gender.MALE);
             newTexture = Constants.Save.MALE_DEFAULT_TEXTURE;
         }
@@ -537,7 +553,7 @@ public class Player {
             newTexture = pc.getPlayerTextures().get(0);
         }
 
-        String currentTexture = saveData.getChanges().getString(Constants.Save.PLAYER_TEXTURE);
+        String currentTexture = getSaveData().getChanges().getString(Constants.Save.PLAYER_TEXTURE);
 
         //try to match new gender with old texture color
         Matcher matcher = Pattern.compile("(?i).*_([^.]+)\\.tex$").matcher(currentTexture);
@@ -550,17 +566,35 @@ public class Player {
             }
         }
 
-        saveData.getChanges().setString(Constants.Save.PLAYER_TEXTURE, newTexture);
+        getSaveData().getChanges().setString(Constants.Save.PLAYER_TEXTURE, newTexture);
     }
 
     public int getDifficulty() {
         return getTempAttr("difficulty");
     }
 
+    public List<MapTeleport> getDefaultMapTeleports(int difficulty) {
+        List<MapTeleport> ret = new ArrayList<>();
+        if(getTeleports().size() >= difficulty+1) {
+            for (VariableInfo t : getTeleports().get(difficulty).getTeleportList()) {
+                UID tpUid = new UID((byte[]) t.getValue());
+                MapTeleport mapTeleport = DefaultMapTeleport.get(tpUid);
+                if(mapTeleport == null) {
+                    logger.log(System.Logger.Level.WARNING,String.format("teleport not found with uid = '%s' character=(%s) difficulty=%d",tpUid,getPlayerName(),difficulty));
+                    continue;
+                }
+                Teleport teleport = db.teleports().getTeleport(mapTeleport.getRecordId());
+                mapTeleport.setName(teleport.getDescription());
+                ret.add(mapTeleport);
+            }
+        }
+        return ret;
+    }
+
     public List<TeleportDifficulty> getTeleports() {
         List<TeleportDifficulty> ret = new ArrayList<>();
 
-        Optional<BlockInfo> first = saveData.getChanges().getBlockInfo().values().stream().filter(
+        Optional<BlockInfo> first = getSaveData().getChanges().getBlockInfo().values().stream().filter(
                 f -> f.getBlockType() == PlayerBlockType.PLAYER_MAIN).findFirst();
 
         BlockInfo playerMain = null;

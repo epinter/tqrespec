@@ -5,8 +5,12 @@
 package br.com.pinter.tqrespec.tqdata;
 
 import br.com.pinter.tqrespec.save.player.Gender;
+import br.com.pinter.tqrespec.save.player.TeleportDifficulty;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerCharacter {
     private String name;
@@ -36,8 +40,8 @@ public class PlayerCharacter {
     private int greatestMonsterKilledLevel;
     private int greatestMonsterKilledLifeAndMana;
     private int criticalHitsInflicted;
-
     private List<Mastery> masteries;
+    private Map<Integer, List<MapTeleport>> defaultMapTeleports = new ConcurrentHashMap<>();
 
     public String getName() {
         return name;
@@ -261,5 +265,22 @@ public class PlayerCharacter {
 
     public void setCriticalHitsInflicted(int criticalHitsInflicted) {
         this.criticalHitsInflicted = criticalHitsInflicted;
+    }
+
+    public Map<Integer, List<MapTeleport>> getDefaultMapTeleports() {
+        return defaultMapTeleports;
+    }
+
+    public void setDefaultMapTeleports(Map<Integer, List<MapTeleport>> defaultMapTeleports) {
+        this.defaultMapTeleports = defaultMapTeleports;
+    }
+
+    public MapTeleport getLastMapTeleport() {
+        List<MapTeleport> mapTeleports = getDefaultMapTeleports().get(getDifficulty());
+
+        if(mapTeleports.size() > 0) {
+            return mapTeleports.get(mapTeleports.size() - 1);
+        }
+        return null;
     }
 }

@@ -48,8 +48,10 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.util.Duration;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -67,6 +69,9 @@ public class MainController implements Initializable {
 
     @Inject
     private FXMLLoader fxmlLoaderAbout;
+
+    @Inject
+    private FXMLLoader fxmlLoaderCharacter;
 
     @Inject
     private Player player;
@@ -121,6 +126,9 @@ public class MainController implements Initializable {
 
     @FXML
     public Button resetButton;
+
+    @FXML
+    public Button charactersButton;
 
     @FXML
     public Tab skillsTab;
@@ -194,8 +202,17 @@ public class MainController implements Initializable {
 
         //set icons
         resetButton.setGraphic(Icon.FA_UNDO.create(1.4));
+        Tooltip resetButtonTooltip = new Tooltip(Util.getUIMessage("main.resetButtonTooltip"));
+        resetButtonTooltip.setShowDelay(Duration.millis(Constants.UI.TOOLTIP_SHOWDELAY_MILLIS));
+        resetButton.setTooltip(resetButtonTooltip);
         saveButton.setGraphic(Icon.FA_SAVE.create());
         copyButton.setGraphic(Icon.FA_COPY.create());
+        charactersButton.setGraphic(Icon.FA_USERS.create(1.4));
+        Tooltip charactersButtonTooltip = new Tooltip(Util.getUIMessage("main.charactersButtonTooltip"));
+        charactersButtonTooltip.setShowDelay(Duration.millis(Constants.UI.TOOLTIP_SHOWDELAY_MILLIS));
+        charactersButtonTooltip.setFont(Constants.UI.TOOLTIP_FONT);
+        resetButtonTooltip.setFont(Constants.UI.TOOLTIP_FONT);
+        charactersButton.setTooltip(charactersButtonTooltip);
 
         State.get().gameRunningProperty().addListener((value, oldV, newV) -> {
             if (BooleanUtils.isTrue(newV)) {
@@ -241,6 +258,20 @@ public class MainController implements Initializable {
             fxmlLoaderAbout.load();
         } else {
             root = fxmlLoaderAbout.getRoot();
+            ((Stage) root.getScene().getWindow()).show();
+        }
+    }
+
+    @FXML
+    public void openCharactersWindow(ActionEvent evt) throws IOException {
+        reset();
+        Parent root;
+        if (fxmlLoaderCharacter.getRoot() == null) {
+            fxmlLoaderCharacter.setLocation(getClass().getResource("/fxml/characters.fxml"));
+            fxmlLoaderCharacter.setResources(ResourceBundle.getBundle("i18n.UI", State.get().getLocale()));
+            fxmlLoaderCharacter.load();
+        } else {
+            root = fxmlLoaderCharacter.getRoot();
             ((Stage) root.getScene().getWindow()).show();
         }
     }

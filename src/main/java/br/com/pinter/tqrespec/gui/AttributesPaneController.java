@@ -419,7 +419,6 @@ public class AttributesPaneController implements Initializable {
     @FXML
     public void genderSelect(ActionEvent e) {
         int selected = gender.getSelectionModel().getSelectedIndex();
-        System.out.println("SELECTED "+ selected);
         switch (selected) {
             case 0 -> player.setGender(Gender.MALE);
             case 1 -> player.setGender(Gender.FEMALE);

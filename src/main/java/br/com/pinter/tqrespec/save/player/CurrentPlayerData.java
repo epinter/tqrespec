@@ -33,10 +33,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @Singleton
 public class CurrentPlayerData {
-    @Inject
-    private GameInfo gameInfo;
-
     private String playerName = null;
+    private Path playerChr = null;
     private boolean customQuest = false;
     private final LinkedHashMap<String, PlayerSkill> playerSkills = new LinkedHashMap<>();
     private ChangesTable changes = new ChangesTable();
@@ -76,7 +74,11 @@ public class CurrentPlayerData {
     }
 
     Path getPlayerChr() {
-        return gameInfo.playerChr(playerName, customQuest);
+        return playerChr;
+    }
+
+    public void setPlayerChr(Path playerChr) {
+        this.playerChr = playerChr;
     }
 
     HeaderInfo getHeaderInfo() {

@@ -23,6 +23,7 @@ package br.com.pinter.tqrespec.tqdata;
 import br.com.pinter.tqrespec.save.UID;
 
 public abstract class MapTeleport {
+    private String name;
     private final int order;
     private final UID uid;
     private final String recordId;
@@ -51,10 +52,19 @@ public abstract class MapTeleport {
         return act;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     @Override
     public String toString() {
         return "MapTeleport{" +
-                "order=" + order +
+                "name='" + name + '\'' +
+                ", order=" + order +
                 ", uid=" + uid +
                 ", recordId='" + recordId + '\'' +
                 ", act=" + act +

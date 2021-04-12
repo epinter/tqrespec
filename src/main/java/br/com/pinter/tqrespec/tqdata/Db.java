@@ -23,6 +23,7 @@ package br.com.pinter.tqrespec.tqdata;
 import br.com.pinter.tqdatabase.Database;
 import br.com.pinter.tqdatabase.Player;
 import br.com.pinter.tqdatabase.Skills;
+import br.com.pinter.tqdatabase.Teleports;
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.logging.Log;
 import com.google.inject.Inject;
@@ -57,6 +58,11 @@ public class Db {
     public Player player() {
         initialize();
         return database.player();
+    }
+
+    public Teleports teleports() {
+        initialize();
+        return database.teleports();
     }
 
     public void preloadAll() {

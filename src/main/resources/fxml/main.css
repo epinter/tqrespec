@@ -260,6 +260,24 @@
     -fx-effect: none;
 }
 
+.tq-charactersbutton {
+    -fx-cursor: hand;
+    -fx-background: none;
+    -fx-border-width: 0;
+    -fx-background-image: none;
+    -fx-background-color:transparent;
+}
+
+.tq-charactersbutton > .tq-icon-graphic {
+    -fx-fill: #f6d35b;
+}
+
+.tq-charactersbutton:pressed > .tq-icon-graphic {
+    -fx-fill: #000000;
+    -fx-background-color:red;
+    -fx-effect: none;
+}
+
 .tq-label {
 	-fx-text-fill: #ffffff;
 	-fx-font-size: 1.4em;

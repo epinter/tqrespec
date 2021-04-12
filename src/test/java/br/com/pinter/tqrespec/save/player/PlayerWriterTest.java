@@ -100,11 +100,6 @@ public class PlayerWriterTest {
         PowerMockito.when(mockSaveData.getChanges()).thenReturn(saveData.getChanges());
         PowerMockito.when(mockSaveData.getBuffer()).thenReturn(saveData.getBuffer());
 
-        System.err.println(gameInfo.getSaveDataMainPath());
-        System.err.println(gameInfo.getSaveDataUserPath());
-        System.err.println(mockSaveData.getPlayerName());
-        System.err.println(mockSaveData.getHeaderInfo());
-
         int isInMainQuestBefore = saveData.getChanges().getInt("isInMainQuest");
         Assert.assertEquals(1,isInMainQuestBefore);
         saveData.getChanges().setInt("isInMainQuest", 0);

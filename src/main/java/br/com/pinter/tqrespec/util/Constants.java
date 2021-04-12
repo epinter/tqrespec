@@ -21,6 +21,7 @@
 package br.com.pinter.tqrespec.util;
 
 import com.google.common.collect.ImmutableMap;
+import javafx.scene.text.Font;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -118,6 +119,8 @@ public class Constants {
         public static final String TOAST_HEADER_STYLE = "tq-toast-header";
         public static final String TOAST_CONTENT_STYLE = "tq-toast-content";
         public static final int TOAST_WARNING_TIMEOUT = 10000;
+        public static final int TOOLTIP_SHOWDELAY_MILLIS = 150;
+        public static final Font TOOLTIP_FONT = Font.font("Albertus MT", 14d);
         public static final String TAG_STRLABEL= "tagCStrength";
         public static final String TAG_INTLABEL= "tagCIntelligence";
         public static final String TAG_DEXLABEL= "tagCDexterity";
@@ -132,6 +135,11 @@ public class Constants {
         public static final String TAG_GOLDLABEL = "tagGold";
         public static final String TAG_ATTRIBUTESTAB = "tagCAttributes";
         public static final String TAG_SKILLSTAB = "tagWindowName02";
+        public static final String TAG_STAT_TOTALDEATHS = "tagCDeaths";
+        public static final String TAG_STAT_ELAPSEDTIME = "tagCTime";
+        public static final String TAG_STAT_MONSTERSKILLED = "tagCMonsterKills";
+        public static final String TAG_STAT_GREATESTDAMAGE = "tagCHighestDamage";
+        public static final String TAG_STAT_GREATESTMONSTER = "tagCHighestMonster";
     }
 
     public static class Msg {
