@@ -137,7 +137,7 @@ public class PlayerFileVariable implements IFileVariable {
         map.put("currentStats_charLevel", new PlayerFileVariable("currentStats.charLevel", VariableType.INTEGER, PlayerBlockType.PLAYER_LEVEL_POINTS));
 
         map.put("playTimeInSeconds", new PlayerFileVariable("playTimeInSeconds", VariableType.INTEGER, PlayerBlockType.PLAYER_STATS));
-        map.put("greatestMonsterKilledName", new PlayerFileVariable("greatestMonsterKilledName", VariableType.STRING_UTF_16_LE, PlayerBlockType.PLAYER_STATS));
+        map.put("greatestMonsterKilledName", new PlayerFileVariable("(*greatestMonsterKilledName)[i]", VariableType.STRING_UTF_16_LE, PlayerBlockType.PLAYER_STATS));
         map.put("numberOfDeaths", new PlayerFileVariable("numberOfDeaths", VariableType.INTEGER, PlayerBlockType.PLAYER_STATS));
         map.put("numberOfKills", new PlayerFileVariable("numberOfKills", VariableType.INTEGER, PlayerBlockType.PLAYER_STATS));
         map.put("experienceFromKills", new PlayerFileVariable("experienceFromKills", VariableType.INTEGER, PlayerBlockType.PLAYER_STATS));
@@ -146,7 +146,7 @@ public class PlayerFileVariable implements IFileVariable {
         map.put("maxLevel", new PlayerFileVariable("maxLevel", VariableType.INTEGER, PlayerBlockType.PLAYER_STATS));
         map.put("numHitsReceived", new PlayerFileVariable("numHitsReceived", VariableType.INTEGER, PlayerBlockType.PLAYER_STATS));
         map.put("numHitsInflicted", new PlayerFileVariable("numHitsInflicted", VariableType.INTEGER, PlayerBlockType.PLAYER_STATS));
-        map.put("greatestDamageInflicted", new PlayerFileVariable("greatestDamageInflicted", VariableType.INTEGER, PlayerBlockType.PLAYER_STATS));
+        map.put("greatestDamageInflicted", new PlayerFileVariable("greatestDamageInflicted", VariableType.FLOAT, PlayerBlockType.PLAYER_STATS));
         map.put("greatestMonsterKilledLevel", new PlayerFileVariable("(*greatestMonsterKilledLevel)[i]", VariableType.INTEGER, PlayerBlockType.PLAYER_STATS));
         map.put("greatestMonsterKilledLifeAndMana", new PlayerFileVariable("(*greatestMonsterKilledLifeAndMana)[i]", VariableType.INTEGER, PlayerBlockType.PLAYER_STATS));
         map.put("criticalHitsInflicted", new PlayerFileVariable("criticalHitsInflicted", VariableType.INTEGER, PlayerBlockType.PLAYER_STATS));
