@@ -22,6 +22,7 @@ package br.com.pinter.tqrespec.gui;
 
 import br.com.pinter.tqrespec.core.State;
 import br.com.pinter.tqrespec.logging.Log;
+import br.com.pinter.tqrespec.save.player.Gender;
 import br.com.pinter.tqrespec.save.player.Player;
 import br.com.pinter.tqrespec.tqdata.Db;
 import br.com.pinter.tqrespec.tqdata.Txt;
@@ -420,8 +421,8 @@ public class AttributesPaneController implements Initializable {
         int selected = gender.getSelectionModel().getSelectedIndex();
         System.out.println("SELECTED "+ selected);
         switch (selected) {
-            case 0 -> player.setGender(Player.Gender.MALE);
-            case 1 -> player.setGender(Player.Gender.FEMALE);
+            case 0 -> player.setGender(Gender.MALE);
+            case 1 -> player.setGender(Gender.FEMALE);
         }
     }
 }
