@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2020 Emerson Pinter - All Rights Reserved
+ * Copyright (C) 2021 Emerson Pinter - All Rights Reserved
  */
 
 group 'br.com.pinter.tqrespec'
 apply plugin: 'application'
 apply plugin: 'java'
-apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'org.sonarqube'
 
 buildscript {
@@ -15,8 +14,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath "com.github.jengelman.gradle.plugins:shadow:5.1.0"
-        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.0"
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.1.1"
     }
 }
 
@@ -97,9 +95,6 @@ jar {
                 'Automatic-Module-Name': moduleName,
                 'Main-Class': mainClassName)
     }
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-}
-shadowJar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
@@ -254,15 +249,13 @@ task jlink(type: Exec) {
 
 task archiveAppimage(type: Zip) {
     dependsOn 'appimage'
+    doLast {
+        println("Creating archive '${appArchiveName}'")
+    }
     from "${buildDir}/app-image"
     archiveFileName = appArchiveName
     destinationDirectory = file("$buildDir")
 }
-
-task printArchiveName() {
-    println("Creating archive '${appArchiveName}'")
-}
-tasks.printArchiveName.mustRunAfter('archiveAppimage')
 
 task appimage(type: Exec) {
     dependsOn 'jlink'
