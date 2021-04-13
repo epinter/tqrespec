@@ -123,6 +123,23 @@ public class PlayerParserTest {
     }
 
     @Test
+    public void readGender_Should_readGenderFromSaveGame() {
+        try {
+            playerParser.parse();
+            saveData.getChanges().setBlockInfo(playerParser.getBlockInfo());
+            saveData.setHeaderInfo(playerParser.getHeaderInfo());
+            saveData.getChanges().setVariableLocation(playerParser.getVariableLocation());
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            fail();
+        }
+
+        String playerCharacterClass = saveData.getPlayerCharacterClass();
+        assertNotNull(playerCharacterClass);
+        assertTrue(playerCharacterClass.equals("Warrior") || playerCharacterClass.equals("Sorceress"));
+    }
+
+    @Test
     public void prepareBufferForRead_Should_rewindBuffer() {
         try {
             playerParser.parse();

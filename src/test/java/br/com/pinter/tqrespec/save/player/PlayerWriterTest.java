@@ -37,7 +37,6 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -46,7 +45,7 @@ import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({GameInfo.class, Util.class})
@@ -54,7 +53,7 @@ import static org.junit.Assert.fail;
 public class PlayerWriterTest {
     private static final Logger logger = Logger.getLogger(PlayerWriterTest.class.getName());
 
-    private InjectionContext injectionContext = new InjectionContext(this,
+    private final InjectionContext injectionContext = new InjectionContext(this,
             Collections.singletonList(new GuiceModule()));
 
     @Mock
@@ -98,7 +97,7 @@ public class PlayerWriterTest {
             fail();
         }
 
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         try {
             Files.deleteIfExists(Paths.get("src/test/resources/_testcopy/Player.chr"));
@@ -145,6 +144,69 @@ public class PlayerWriterTest {
             logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
             fail();
         }
+    }
 
+    @Test
+    public void writeGender_Should_writeAndReadGenderFromSaveGame() {
+        try {
+            saveData.reset();
+            saveData.setPlayerName("savegame");
+            saveData.setBuffer(playerParser.loadPlayer());
+            saveData.getChanges().setBlockInfo(playerParser.getBlockInfo());
+            saveData.setHeaderInfo(playerParser.getHeaderInfo());
+            saveData.getChanges().setVariableLocation(playerParser.getVariableLocation());
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            fail();
+        }
+
+        MockitoAnnotations.openMocks(this);
+
+        try {
+            Files.deleteIfExists(Paths.get("src/test/resources/_testcopy/Player.chr"));
+            Files.deleteIfExists(Paths.get("src/test/resources/_testcopy"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        PowerMockito.when(gameInfo.getSaveDataMainPath()).thenReturn("src/test/resources");
+        PowerMockito.when(gameInfo.getSaveDataUserPath()).thenReturn("src/test/resources");
+
+        PowerMockito.when(mockSaveData.getPlayerName()).thenReturn(saveData.getPlayerName());
+        PowerMockito.when(mockSaveData.getHeaderInfo()).thenReturn(saveData.getHeaderInfo());
+        PowerMockito.when(mockSaveData.isCustomQuest()).thenReturn(saveData.isCustomQuest());
+        PowerMockito.when(mockSaveData.getChanges()).thenReturn(saveData.getChanges());
+        PowerMockito.when(mockSaveData.getBuffer()).thenReturn(saveData.getBuffer());
+
+        saveData.getChanges().setString(Constants.Save.PLAYER_CHARACTER_CLASS, "XXGenderX");
+        saveData.getChanges().setString(Constants.Save.PLAYER_TEXTURE, "XXTextureX");
+
+        try {
+            playerWriter.copyCurrentSave("testcopy");
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            fail();
+        }
+
+        File testcopyChr = new File("src/test/resources/_testcopy/Player.chr");
+        playerParser = new PlayerParser(testcopyChr,
+                "testcopy");
+
+        try {
+            saveData.reset();
+            saveData.setPlayerName("testcopy");
+            saveData.setBuffer(playerParser.loadPlayer());
+            saveData.getChanges().setBlockInfo(playerParser.getBlockInfo());
+            saveData.setHeaderInfo(playerParser.getHeaderInfo());
+            saveData.getChanges().setVariableLocation(playerParser.getVariableLocation());
+            String playerCharacterClass = saveData.getPlayerCharacterClass();
+            String texture = saveData.getChanges().getString(Constants.Save.PLAYER_TEXTURE);
+
+            assertNotNull(playerCharacterClass);
+            assertTrue(playerCharacterClass.equals("XXGenderX") && texture.equals("XXTextureX"));
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            fail();
+        }
     }
 }

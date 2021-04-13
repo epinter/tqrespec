@@ -23,6 +23,7 @@ hs_err_pid*
 .idea/misc.xml
 .idea/compiler.xml
 .idea/azureSettings.xml
+.idea/libraries-with-intellij-classes.xml
 
 # Sensitive or high-churn files:
 .idea/**/dataSources/
