@@ -16,6 +16,10 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
+<!--
+  ~ Copyright (C) 2021 Emerson Pinter - All Rights Reserved
+  -->
+
 <VBox fx:id="rootElement" alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="400.0" minWidth="700.0" prefHeight="400.0" prefWidth="700.0" stylesheets="@main.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.pinter.tqrespec.gui.CharactersViewController">
    <children>
       <HBox maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" onMouseDragged="#moveWindow" onMousePressed="#startMoveWindow" onMouseReleased="#endMoveWindow" prefHeight="47.0" styleClass="tq-topdecoration">

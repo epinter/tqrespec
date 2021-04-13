@@ -1,11 +1,13 @@
 ext.PatchJarModuleTask = PatchJarModuleTask
 
+/*
+ * Copyright (C) 2021 Emerson Pinter - All Rights Reserved
+ */
+
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-/*
- * Copyright (C) 2019 Emerson Pinter - All Rights Reserved
- */
+
 
 class PatchJarModuleTask extends DefaultTask {
     boolean debug

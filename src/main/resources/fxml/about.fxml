@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.Pane?>
 
 <!--
-  ~ Copyright (C) 2019 Emerson Pinter - All Rights Reserved
+  ~ Copyright (C) 2021 Emerson Pinter - All Rights Reserved
   -->
 
 <AnchorPane fx:id="rootelement" prefHeight="300.0" prefWidth="370.0" stylesheets="@about.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.pinter.tqrespec.gui.AboutController">
