@@ -29,7 +29,7 @@ public abstract class MapTeleport {
     private final String recordId;
     private final int act;
 
-    public MapTeleport(int order, UID uid, int act, String recordId) {
+    protected MapTeleport(int order, UID uid, int act, String recordId) {
         this.order = order;
         this.uid = uid;
         this.recordId = recordId;

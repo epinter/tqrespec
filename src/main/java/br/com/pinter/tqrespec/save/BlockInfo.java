@@ -25,15 +25,13 @@ import com.google.common.collect.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class BlockInfo implements Serializable {
     private int start = -1;
     private int end = -1;
     private int size = -1;
     private ImmutableListMultimap<String, VariableInfo> variables = ImmutableListMultimap.of();
-    private final Multimap<String, VariableInfo> stagingVariables = MultimapBuilder.hashKeys().arrayListValues().build();
+    private final transient Multimap<String, VariableInfo> stagingVariables = MultimapBuilder.hashKeys().arrayListValues().build();
     private int parentOffset = -1;
     private IBlockType blockType = FileBlockType.UNKNOWN;
 

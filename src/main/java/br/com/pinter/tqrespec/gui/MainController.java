@@ -48,7 +48,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
@@ -290,8 +289,7 @@ public class MainController implements Initializable {
             if (c > 0xFF) {
                 newStr.append(StringUtils.stripAccents(Character.toString(c)).toCharArray()[0]);
             } else {
-                //noinspection RegExpSingleCharAlternation
-                newStr.append(Character.toString(c).replaceAll("\\\\|/|:|\\*|\\?|\"|<|>|\\||;", ""));
+                newStr.append(Character.toString(c).replaceAll("[\\\\/:*?\"<>|;]", ""));
             }
         }
         copyCharInput.setText(newStr.toString());

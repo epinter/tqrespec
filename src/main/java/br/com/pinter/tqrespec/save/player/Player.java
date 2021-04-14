@@ -33,7 +33,6 @@ import br.com.pinter.tqrespec.save.VariableInfo;
 import br.com.pinter.tqrespec.save.VariableType;
 import br.com.pinter.tqrespec.tqdata.*;
 import br.com.pinter.tqrespec.util.Constants;
-import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 
@@ -137,7 +136,7 @@ public class Player {
             }
             int level = ps.getSkillLevel();
             Mastery mastery = new Mastery();
-            mastery.setMastery(skill);
+            mastery.setSkill(skill);
             mastery.setLevel(level);
             mastery.setDisplayName(skill.getSkillDisplayName());
 
@@ -437,7 +436,7 @@ public class Player {
     public String getStatGreatestMonsterKilledName() {
         List<String> monsters =  getSaveData().getChanges().getStringValuesFromBlock(
                 (PlayerFileVariable.valueOf("greatestMonsterKilledName").var()))
-                .stream().filter((v) -> v != null && !v.isEmpty()).collect(Collectors.toList());
+                .stream().filter(v -> v != null && !v.isEmpty()).collect(Collectors.toList());
         if(monsters.isEmpty()) {
             return null;
         }
@@ -447,7 +446,7 @@ public class Player {
     public int getStatGreatestMonsterKilledLevel() {
         List<Integer> monsterLevels = getSaveData().getChanges().getIntValuesFromBlock(
                 PlayerFileVariable.valueOf("greatestMonsterKilledLevel").var())
-                .stream().filter((v) -> v != 0).collect(Collectors.toList());
+                .stream().filter(v -> v != 0).collect(Collectors.toList());
         if(monsterLevels.isEmpty()) {
             return -1;
         }
@@ -616,12 +615,12 @@ public class Player {
         if(teleportDifficulty == null) {
             throw new UnhandledRuntimeException("error creating teleport");
         }
-        int teleportUIDsSizeKeyLength = 4+"teleportUIDsSize".length();
-        int teleportUIDKeyLength = 4+"teleportUID".length();
+        int teleportUIDsSizeKeyLength = 4+Constants.Save.VAR_TELEPORTUIDSSIZE.length();
+        int teleportUIDKeyLength = 4+Constants.Save.VAR_TELEPORTUID.length();
 
         int offset = teleportDifficulty.getOffset()+(teleportUIDsSizeKeyLength+4);
             for(VariableInfo stagingVar:teleportDifficulty.getBlockInfo().getStagingVariables().values()) {
-                if(stagingVar.getVariableType().equals(VariableType.UID) && stagingVar.getName().equals("teleportUID")
+                if(stagingVar.getVariableType().equals(VariableType.UID) && stagingVar.getName().equals(Constants.Save.VAR_TELEPORTUID)
                         && (new UID((byte[]) stagingVar.getValue())).equals(uid)) {
                     logger.log(System.Logger.Level.ERROR,"------------- portal "+uid+"already exists");
                     break;
@@ -629,7 +628,7 @@ public class Player {
             }
 
             for (VariableInfo vi : teleportDifficulty.getTeleportList()) {
-                if (vi.getVariableType().equals(VariableType.UID) && vi.getName().equals("teleportUID")) {
+                if (vi.getVariableType().equals(VariableType.UID) && vi.getName().equals(Constants.Save.VAR_TELEPORTUID)) {
                     MapTeleport currentTeleport = DefaultMapTeleport.get(new UID((byte[]) vi.getValue()));
                     if(currentTeleport.getUid().equals(uid)) {
                         logger.log(System.Logger.Level.ERROR,"------------- portal "+uid+"already exists");
@@ -642,11 +641,11 @@ public class Player {
             throw new UnhandledRuntimeException("error creating teleport, offset not found");
         }
 
-        VariableInfo uidSize = teleportDifficulty.getBlockInfo().getVariables().get("teleportUIDsSize").get(difficulty);
+        VariableInfo uidSize = teleportDifficulty.getBlockInfo().getVariables().get(Constants.Save.VAR_TELEPORTUIDSSIZE).get(difficulty);
         VariableInfo newVi = new VariableInfo();
         newVi.setBlockOffset(uidSize.getBlockOffset());
         newVi.setVariableType(VariableType.UID);
-        newVi.setName("teleportUID");
+        newVi.setName(Constants.Save.VAR_TELEPORTUID);
         newVi.setValue(uid.getBytes());
         newVi.setKeyOffset(offset);
         newVi.setValOffset(offset + teleportUIDKeyLength);
@@ -667,7 +666,7 @@ public class Player {
             return null;
         }
 
-        List<VariableInfo> teleportUidsSizeVars = new ArrayList<>(Objects.requireNonNull(block).getVariables().get("teleportUIDsSize"));
+        List<VariableInfo> teleportUidsSizeVars = new ArrayList<>(Objects.requireNonNull(block).getVariables().get(Constants.Save.VAR_TELEPORTUIDSSIZE));
         teleportUidsSizeVars.sort(Comparator.comparingInt(VariableInfo::getValOffset));
         int offsetStart = teleportUidsSizeVars.get(difficulty).getKeyOffset();
         int offsetStop = teleportUidsSizeVars.get(Math.max(difficulty, 2)).getKeyOffset();
@@ -675,7 +674,7 @@ public class Player {
 
         List<VariableInfo> teleports = new ArrayList<>();
 
-        List<VariableInfo> teleportUidVars = new ArrayList<>(block.getVariables().get("teleportUID"));
+        List<VariableInfo> teleportUidVars = new ArrayList<>(block.getVariables().get(Constants.Save.VAR_TELEPORTUID));
         for (VariableInfo v : teleportUidVars) {
             if (v.getKeyOffset() > offsetStart) {
                 if (offsetStart != offsetStop && v.getKeyOffset() > offsetStop) {

@@ -22,7 +22,6 @@ package br.com.pinter.tqrespec.gui;
 
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.logging.Log;
-import br.com.pinter.tqrespec.save.player.Player;
 import br.com.pinter.tqrespec.save.player.PlayerLoader;
 import br.com.pinter.tqrespec.tqdata.*;
 import br.com.pinter.tqrespec.util.Constants;
@@ -295,15 +294,15 @@ public class CharactersViewController implements Initializable {
         setupTableColumnInteger(colDex, Util.getUIMessage("main.dexterity"), "statDex");
         setupTableColumnInteger(colAvailableAttr, Util.getUIMessage("characters.attributePoints"), "statAvailableAttrPoints");
         setupTableColumnInteger(colAvailableSkill, Util.getUIMessage("characters.skillPoints"), "statAvailableSkillPoints");
-        setupTableColumnString(colMasteryOne, Util.getUIMessage("characters.masteryTitle"), null);
-        setupTableColumnString(colMasteryTwo, Util.getUIMessage("characters.masteryTitle"), null);
+        setupTableColumnString(colMasteryOne, Util.getUIMessage(Constants.Msg.CHARACTERS_TITLE_MASTERY), null);
+        setupTableColumnString(colMasteryTwo, Util.getUIMessage(Constants.Msg.CHARACTERS_TITLE_MASTERY), null);
         setupTableColumnString(colLastTeleport, Util.getUIMessage("characters.lastTeleport"), null);
 
         colMasteryOne.setCellValueFactory(f -> {
-            if (f.getValue().getMasteries() != null && f.getValue().getMasteries().size() > 0) {
+            if (f.getValue().getMasteries() != null && !f.getValue().getMasteries().isEmpty()) {
                 Mastery mastery = f.getValue().getMasteries().get(0);
                 String s = txt.getCapitalizedString(mastery.getDisplayName());
-                return new SimpleStringProperty(String.format("%s (%d)", s, mastery.getLevel()));
+                return new SimpleStringProperty(String.format(Constants.Msg.CHARACTERS_NAMENUMBER_FORMAT, s, mastery.getLevel()));
             }
             return null;
         });
@@ -312,7 +311,7 @@ public class CharactersViewController implements Initializable {
             if (f.getValue().getMasteries() != null && f.getValue().getMasteries().size() > 1) {
                 Mastery mastery = f.getValue().getMasteries().get(1);
                 String s = txt.getCapitalizedString(mastery.getDisplayName());
-                return new SimpleStringProperty(String.format("%s (%d)", s, mastery.getLevel()));
+                return new SimpleStringProperty(String.format(Constants.Msg.CHARACTERS_NAMENUMBER_FORMAT, s, mastery.getLevel()));
             }
             return null;
         });
@@ -329,7 +328,7 @@ public class CharactersViewController implements Initializable {
             return new SimpleStringProperty(difficultyText);
         });
 
-        setupTableColumnString(colPlayTimeInSeconds, txt.getString(Constants.UI.TAG_STAT_ELAPSEDTIME).replaceAll(":",""), null);
+        setupTableColumnString(colPlayTimeInSeconds, txt.getString(Constants.UI.TAG_STAT_ELAPSEDTIME).replace(":", ""), null);
         colPlayTimeInSeconds.setCellValueFactory(f -> {
             int days = f.getValue().getPlayTimeInSeconds() / 86400;
             int hours = (f.getValue().getPlayTimeInSeconds() % 86400) / 3600;
@@ -337,15 +336,15 @@ public class CharactersViewController implements Initializable {
             return new SimpleStringProperty(String.format("%02d:%02d:%02d", days, hours, minutes));
         });
 
-        setupTableColumnInteger(colNumberOfDeaths, txt.getString(Constants.UI.TAG_STAT_TOTALDEATHS).replaceAll(":",""), "numberOfDeaths");
-        setupTableColumnInteger(colNumberOfKills, txt.getString(Constants.UI.TAG_STAT_MONSTERSKILLED).replaceAll(":",""), "numberOfKills");
-        setupTableColumnInteger(colGreatestDamageInflicted, txt.getString(Constants.UI.TAG_STAT_GREATESTDAMAGE).replaceAll(":",""), "greatestDamageInflicted");
-        setupTableColumnString(colGreatestMonsterKilled, txt.getString(Constants.UI.TAG_STAT_GREATESTMONSTER).replaceAll(":",""), null);
+        setupTableColumnInteger(colNumberOfDeaths, txt.getString(Constants.UI.TAG_STAT_TOTALDEATHS).replace(":", ""), "numberOfDeaths");
+        setupTableColumnInteger(colNumberOfKills, txt.getString(Constants.UI.TAG_STAT_MONSTERSKILLED).replace(":", ""), "numberOfKills");
+        setupTableColumnInteger(colGreatestDamageInflicted, txt.getString(Constants.UI.TAG_STAT_GREATESTDAMAGE).replace(":", ""), "greatestDamageInflicted");
+        setupTableColumnString(colGreatestMonsterKilled, txt.getString(Constants.UI.TAG_STAT_GREATESTMONSTER).replace(":", ""), null);
 
         colGreatestMonsterKilled.setCellValueFactory(f -> {
             if (f.getValue().getGreatestMonsterKilledName() != null) {
                 String name = f.getValue().getGreatestMonsterKilledName().replaceAll("^\\{.*}", "");
-                return new SimpleStringProperty(String.format("%s (%d)", name, f.getValue().getGreatestMonsterKilledLevel()));
+                return new SimpleStringProperty(String.format(Constants.Msg.CHARACTERS_NAMENUMBER_FORMAT, name, f.getValue().getGreatestMonsterKilledLevel()));
             }
             return null;
         });
@@ -429,8 +428,8 @@ public class CharactersViewController implements Initializable {
                 Util.getUIMessage("main.dexterity"),
                 Util.getUIMessage("characters.attributePoints"),
                 Util.getUIMessage("characters.skillPoints"),
-                Util.getUIMessage("characters.masteryTitle"),
-                Util.getUIMessage("characters.masteryTitle"),
+                Util.getUIMessage(Constants.Msg.CHARACTERS_TITLE_MASTERY),
+                Util.getUIMessage(Constants.Msg.CHARACTERS_TITLE_MASTERY),
                 Util.getUIMessage("characters.lastTeleport"),
                 txt.getString(Constants.UI.TAG_STAT_ELAPSEDTIME),
                 txt.getString(Constants.UI.TAG_STAT_TOTALDEATHS),
@@ -459,28 +458,28 @@ public class CharactersViewController implements Initializable {
 
             String lastTeleport = "";
             MapTeleport mapTeleport = p.getLastMapTeleport();
-            if(mapTeleport != null) {
+            if (mapTeleport != null) {
                 lastTeleport = txt.getString(mapTeleport.getName());
             }
 
             String masteryOne = "";
             String masteryTwo = "";
-            if (p.getMasteries() != null && p.getMasteries().size() > 0) {
+            if (p.getMasteries() != null && !p.getMasteries().isEmpty()) {
                 Mastery mastery = p.getMasteries().get(0);
                 String s = txt.getCapitalizedString(mastery.getDisplayName());
-                masteryOne = String.format("%s (%d)", s, mastery.getLevel());
+                masteryOne = String.format(Constants.Msg.CHARACTERS_NAMENUMBER_FORMAT, s, mastery.getLevel());
             }
 
             if (p.getMasteries() != null && p.getMasteries().size() > 1) {
                 Mastery mastery = p.getMasteries().get(1);
                 String s = txt.getCapitalizedString(mastery.getDisplayName());
-                masteryTwo = String.format("%s (%d)", s, mastery.getLevel());
+                masteryTwo = String.format(Constants.Msg.CHARACTERS_NAMENUMBER_FORMAT, s, mastery.getLevel());
             }
 
             String greatestMonsterKilled = "";
             if (p.getGreatestMonsterKilledName() != null) {
                 String name = p.getGreatestMonsterKilledName().replaceAll("^\\{.*}", "");
-                greatestMonsterKilled = String.format("%s (%d)", name, p.getGreatestMonsterKilledLevel());
+                greatestMonsterKilled = String.format(Constants.Msg.CHARACTERS_NAMENUMBER_FORMAT, name, p.getGreatestMonsterKilledLevel());
             }
 
             String[] row = new String[]{
@@ -517,13 +516,13 @@ public class CharactersViewController implements Initializable {
         }
 
         try (PrintWriter writer = new PrintWriter(csvFile, StandardCharsets.UTF_8)) {
-            csvRows.stream().map((r) -> {
+            csvRows.stream().map(r -> {
                 List<String> fields = Arrays.stream(r).map(f -> {
                     String d = "";
                     if (f != null) {
-                        d = f.replaceAll("\\r", "");
+                        d = f.replace("\r", "");
                         if (d.matches(".*[,\"']*.*")) {
-                            d = d.replaceAll("\"", "\"\"");
+                            d = d.replace("\"", "\"\"");
                             d = "\"" + d + "\"";
                         }
                     }

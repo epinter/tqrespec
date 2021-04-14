@@ -41,13 +41,13 @@ import javafx.util.Duration;
 public class Toast {
     private static final System.Logger logger = Log.getLogger(Toast.class.getName());
     private static Toast instance;
-    private final Stage toast;
+    private final Stage stage;
 
     private Toast(Stage stage, String header, String content, int delay) {
-        toast = new Stage();
-        toast.setResizable(false);
-        toast.initOwner(stage);
-        toast.initStyle(StageStyle.TRANSPARENT);
+        this.stage = new Stage();
+        this.stage.setResizable(false);
+        this.stage.initOwner(stage);
+        this.stage.initStyle(StageStyle.TRANSPARENT);
 
         StackPane root = new StackPane();
         root.getStylesheets().add(Constants.UI.MAIN_CSS);
@@ -87,14 +87,14 @@ public class Toast {
 
         Scene scene = new Scene(root);
         scene.setFill(Color.TRANSPARENT);
-        toast.setScene(scene);
+        this.stage.setScene(scene);
 
-        toast.show();
-        toast.setX(stage.getX() + ((stage.getWidth() - toast.getWidth()) / 2));
-        toast.setY(stage.getY() + ((stage.getHeight() - toast.getHeight()) / 2));
+        this.stage.show();
+        this.stage.setX(stage.getX() + ((stage.getWidth() - this.stage.getWidth()) / 2));
+        this.stage.setY(stage.getY() + ((stage.getHeight() - this.stage.getHeight()) / 2));
 
-        stage.xProperty().addListener(((observableValue, number, newValue) -> toast.setX(newValue.doubleValue() + ((stage.getWidth() - toast.getWidth()) / 2))));
-        stage.yProperty().addListener(((observableValue, number, newValue) -> toast.setY(newValue.doubleValue() + ((stage.getHeight() - toast.getHeight()) / 2))));
+        stage.xProperty().addListener(((observableValue, number, newValue) -> this.stage.setX(newValue.doubleValue() + ((stage.getWidth() - this.stage.getWidth()) / 2))));
+        stage.yProperty().addListener(((observableValue, number, newValue) -> this.stage.setY(newValue.doubleValue() + ((stage.getHeight() - this.stage.getHeight()) / 2))));
 
         Timeline fadeIn = new Timeline();
         KeyFrame keyFrameFadeIn = new KeyFrame(Duration.millis(700), new KeyValue(root.opacityProperty(), 1));
@@ -113,7 +113,7 @@ public class Toast {
                     Timeline fadeOut = new Timeline();
                     KeyFrame keyFrameFadeOut = new KeyFrame(Duration.millis(700), new KeyValue(root.opacityProperty(), 0));
                     fadeOut.getKeyFrames().add(keyFrameFadeOut);
-                    fadeOut.setOnFinished(t -> toast.close());
+                    fadeOut.setOnFinished(t -> Toast.this.stage.close());
                     fadeOut.play();
                     return null;
                 }
@@ -124,8 +124,8 @@ public class Toast {
     }
 
     public static void show(Stage stage, String header, String content, int delay) {
-        if(instance!=null && instance.toast!=null) {
-            instance.toast.close();
+        if(instance!=null && instance.stage !=null) {
+            instance.stage.close();
         }
         instance = new Toast(stage, header, content, delay);
     }

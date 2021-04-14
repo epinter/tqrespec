@@ -20,9 +20,7 @@
 
 package br.com.pinter.tqrespec.tqdata;
 
-import br.com.pinter.tqdatabase.models.Teleport;
 import br.com.pinter.tqrespec.save.UID;
-import com.google.inject.Inject;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -25,7 +25,7 @@ import br.com.pinter.tqdatabase.models.Skill;
 public class Mastery {
     private String displayName;
     private int level;
-    private Skill mastery;
+    private Skill skill;
 
     public String getDisplayName() {
         return displayName;
@@ -43,12 +43,12 @@ public class Mastery {
         this.level = level;
     }
 
-    public Skill getMastery() {
-        return mastery;
+    public Skill getSkill() {
+        return skill;
     }
 
-    public void setMastery(Skill mastery) {
-        this.mastery = mastery;
+    public void setSkill(Skill skill) {
+        this.skill = skill;
     }
 
     @Override
@@ -56,7 +56,7 @@ public class Mastery {
         return "Mastery{" +
                 "name='" + displayName + '\'' +
                 ", level=" + level +
-                ", mastery=" + mastery +
+                ", mastery=" + skill +
                 '}';
     }
 }

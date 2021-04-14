@@ -24,7 +24,7 @@ import javafx.concurrent.Task;
 
 public abstract class MyTask<T> extends Task<T> {
 
-    public MyTask() {
+    protected MyTask() {
         super();
         this.setOnFailed(workerStateEvent -> {
             throw new UnhandledRuntimeException(this.getException());

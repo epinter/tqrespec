@@ -21,8 +21,6 @@
 package br.com.pinter.tqrespec.save.player;
 
 import br.com.pinter.tqrespec.save.ChangesTable;
-import br.com.pinter.tqrespec.tqdata.GameInfo;
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import java.nio.ByteBuffer;

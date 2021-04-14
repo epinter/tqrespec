@@ -94,28 +94,35 @@ public class ResizeListener implements EventHandler<MouseEvent> {
                         ((stage.getWidth() < stage.getMinWidth() && t.getX() + dx - stage.getWidth() > 0)
                                 || stage.getWidth() >= stage.getMinWidth())) {
             if (resizeH) {
-                double newW = t.getX() + dx;
-                double newH = t.getY() + dy;
-                if (newW > stage.getMaxWidth() || newW < stage.getMinWidth()) return;
-                stage.setWidth(newW);
-                if(keepAspect) {
-                    stage.setHeight(stage.getWidth() * (stage.getMinHeight() / stage.getMinWidth()));
-                } else {
-                    if (newH > stage.getMaxHeight() || newH < stage.getMinHeight()) return;
-                    stage.setHeight(newH);
-                }
+                mouseDraggedResizeH(t);
             } else if (resizeV) {
-                double newW = t.getX() + dx;
-                double newH = t.getY() + dy;
-                if (newH > stage.getMaxHeight() || newH < stage.getMinHeight()) return;
-                stage.setHeight(newH);
-                if(keepAspect) {
-                    stage.setWidth(stage.getHeight() * (stage.getMinWidth() / stage.getMinHeight()));
-                } else {
-                    if (newW > stage.getMaxWidth() || newW < stage.getMinWidth()) return;
-                    stage.setWidth(newW);
-                }
+                mouseDraggedResizeV(t);
             }
+        }
+    }
+
+    private void mouseDraggedResizeH(MouseEvent t) {
+        double newW = t.getX() + dx;
+        double newH = t.getY() + dy;
+        if (newW > stage.getMaxWidth() || newW < stage.getMinWidth()) return;
+        stage.setWidth(newW);
+        if(keepAspect) {
+            stage.setHeight(stage.getWidth() * (stage.getMinHeight() / stage.getMinWidth()));
+        } else {
+            if (newH > stage.getMaxHeight() || newH < stage.getMinHeight()) return;
+            stage.setHeight(newH);
+        }
+    }
+    private void mouseDraggedResizeV(MouseEvent t) {
+        double newW = t.getX() + dx;
+        double newH = t.getY() + dy;
+        if (newH > stage.getMaxHeight() || newH < stage.getMinHeight()) return;
+        stage.setHeight(newH);
+        if(keepAspect) {
+            stage.setWidth(stage.getHeight() * (stage.getMinWidth() / stage.getMinHeight()));
+        } else {
+            if (newW > stage.getMaxWidth() || newW < stage.getMinWidth()) return;
+            stage.setWidth(newW);
         }
     }
 

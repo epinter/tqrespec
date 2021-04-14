@@ -101,6 +101,9 @@ public class Constants {
         public static final String VALUE_PC_CLASS_FEMALE = "Sorceress";
         public static final String MALE_DEFAULT_TEXTURE = "Creatures\\pc\\male\\malepc01_tan.tex";
         public static final String FEMALE_DEFAULT_TEXTURE = "Creatures\\pc\\female\\femalepc01_tan.tex";
+        public static final String VAR_TELEPORTUIDSSIZE = "teleportUIDsSize";
+        public static final String VAR_TELEPORTUID = "teleportUID";
+
     }
 
     public static class UI {
@@ -147,5 +150,7 @@ public class Constants {
 
         public static final String MAIN_GAMENOTDETECTED = "main.gameNotDetected";
         public static final String MAIN_CHOOSEGAMEDIRECTORY = "main.chooseGameDirectory";
+        public static final String CHARACTERS_TITLE_MASTERY = "characters.masteryTitle";
+        public static final String CHARACTERS_NAMENUMBER_FORMAT = "%s (%d)";
     }
 }

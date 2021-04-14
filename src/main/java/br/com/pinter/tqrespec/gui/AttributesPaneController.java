@@ -34,17 +34,16 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.event.Event;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
-import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 import javafx.util.converter.NumberStringConverter;
 
-import javafx.event.ActionEvent;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -154,19 +153,19 @@ public class AttributesPaneController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        if(!State.get().getLocale().equals(Locale.ENGLISH) && resourceBundle.getLocale().getLanguage().isEmpty()) {
-            Util.tryTagText(txt, strengthLabel, Constants.UI.TAG_STRLABEL,true,false);
-            Util.tryTagText(txt, intelligenceLabel, Constants.UI.TAG_INTLABEL,true,false);
-            Util.tryTagText(txt, dexterityLabel, Constants.UI.TAG_DEXLABEL,true,false);
-            Util.tryTagText(txt, energyLabel, Constants.UI.TAG_ENERGYLABEL,true,false);
-            Util.tryTagText(txt, healthLabel, Constants.UI.TAG_HEALTHLABEL,true,false);
-            Util.tryTagText(txt, experienceLabel, Constants.UI.TAG_XPLABEL,true,false);
-            Util.tryTagText(txt, goldLabel, Constants.UI.TAG_GOLDLABEL,true,false);
-            Util.tryTagText(txt, charLevelLabel, Constants.UI.TAG_CHARLEVELLABEL,true,false);
-            Util.tryTagText(txt, charClassLabel, Constants.UI.TAG_CLASSLABEL,true,false);
-            Util.tryTagText(txt, difficultyLabel, Constants.UI.TAG_DIFFICULTYLABEL,true,false);
-            Util.tryTagText(txt, charClassLabel, Constants.UI.TAG_CLASSLABEL,true,false);
-            Util.tryTagText(txt, availPointsLabel, Constants.UI.TAG_AVAILPOINTSLABEL,true,true);
+        if (!State.get().getLocale().equals(Locale.ENGLISH) && resourceBundle.getLocale().getLanguage().isEmpty()) {
+            Util.tryTagText(txt, strengthLabel, Constants.UI.TAG_STRLABEL, true, false);
+            Util.tryTagText(txt, intelligenceLabel, Constants.UI.TAG_INTLABEL, true, false);
+            Util.tryTagText(txt, dexterityLabel, Constants.UI.TAG_DEXLABEL, true, false);
+            Util.tryTagText(txt, energyLabel, Constants.UI.TAG_ENERGYLABEL, true, false);
+            Util.tryTagText(txt, healthLabel, Constants.UI.TAG_HEALTHLABEL, true, false);
+            Util.tryTagText(txt, experienceLabel, Constants.UI.TAG_XPLABEL, true, false);
+            Util.tryTagText(txt, goldLabel, Constants.UI.TAG_GOLDLABEL, true, false);
+            Util.tryTagText(txt, charLevelLabel, Constants.UI.TAG_CHARLEVELLABEL, true, false);
+            Util.tryTagText(txt, charClassLabel, Constants.UI.TAG_CLASSLABEL, true, false);
+            Util.tryTagText(txt, difficultyLabel, Constants.UI.TAG_DIFFICULTYLABEL, true, false);
+            Util.tryTagText(txt, charClassLabel, Constants.UI.TAG_CLASSLABEL, true, false);
+            Util.tryTagText(txt, availPointsLabel, Constants.UI.TAG_AVAILPOINTSLABEL, true, true);
         }
     }
 
@@ -388,7 +387,7 @@ public class AttributesPaneController implements Initializable {
         charClassText.setText(player.getPlayerClassName());
         int difficulty = player.getDifficulty();
 
-        String difficultyTextValue = String.format("%s%02d",Constants.UI.PREFIXTAG_DIFFICULTYLABEL,difficulty+1);
+        String difficultyTextValue = String.format("%s%02d", Constants.UI.PREFIXTAG_DIFFICULTYLABEL, difficulty + 1);
         if (txt.isTagStringValid(difficultyTextValue)) {
             difficultyText.setText(Util.cleanTagString(txt.getString(difficultyTextValue)));
         } else {
@@ -400,14 +399,16 @@ public class AttributesPaneController implements Initializable {
         goldText.setText(NumberFormat.getInstance().format(gold));
 
         gender.getItems().setAll(Util.getUIMessage("main.gender.male"), Util.getUIMessage("main.gender.female"));
-        int genderSelection = switch (player.getGender()) {
-            case MALE -> 0;
-            case FEMALE -> 1;
-        };
+        int genderSelection;
+        if(player.getGender().equals(Gender.FEMALE)) {
+            genderSelection = 1;
+        }else {
+            genderSelection = 0;
+        }
         gender.getSelectionModel().clearAndSelect(genderSelection);
 
-        gender.getSelectionModel().selectedIndexProperty().addListener((o,oldValue,newValue) -> {
-            if(oldValue.intValue() >= 0 && newValue.intValue() >= 0) {
+        gender.getSelectionModel().selectedIndexProperty().addListener((o, oldValue, newValue) -> {
+            if (oldValue.intValue() >= 0 && newValue.intValue() >= 0) {
                 Platform.runLater(() -> Toast.show((Stage) gender.getScene().getWindow(),
                         Util.getUIMessage("alert.genderchange_header"),
                         Util.getUIMessage("alert.genderchange_content"),
@@ -419,9 +420,10 @@ public class AttributesPaneController implements Initializable {
     @FXML
     public void genderSelect(ActionEvent e) {
         int selected = gender.getSelectionModel().getSelectedIndex();
-        switch (selected) {
-            case 0 -> player.setGender(Gender.MALE);
-            case 1 -> player.setGender(Gender.FEMALE);
+        if(selected == 0) {
+            player.setGender(Gender.MALE);
+        } else if (selected == 1) {
+            player.setGender(Gender.FEMALE);
         }
     }
 }
