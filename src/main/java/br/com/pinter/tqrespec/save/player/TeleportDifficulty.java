@@ -20,6 +20,7 @@
 
 package br.com.pinter.tqrespec.save.player;
 
+import br.com.pinter.tqrespec.save.BlockInfo;
 import br.com.pinter.tqrespec.save.VariableInfo;
 
 import java.util.List;
@@ -28,13 +29,15 @@ public class TeleportDifficulty {
     private int difficulty;
     private int size;
     private int offset;
+    private BlockInfo blockInfo;
     private List<VariableInfo> teleportList;
 
-    public TeleportDifficulty(int difficulty, int size, int offset, List<VariableInfo> teleportList) {
+    public TeleportDifficulty(int difficulty, int size, int offset, List<VariableInfo> teleportList, BlockInfo blockInfo) {
         this.difficulty = difficulty;
         this.size = size;
         this.offset = offset;
         this.teleportList = teleportList;
+        this.blockInfo = blockInfo;
     }
 
     public int getDifficulty() {
@@ -51,6 +54,14 @@ public class TeleportDifficulty {
 
     public List<VariableInfo> getTeleportList() {
         return teleportList;
+    }
+
+    public BlockInfo getBlockInfo() {
+        return blockInfo;
+    }
+
+    public void setBlockInfo(BlockInfo blockInfo) {
+        this.blockInfo = blockInfo;
     }
 
     @Override

@@ -33,6 +33,7 @@ import br.com.pinter.tqrespec.save.VariableInfo;
 import br.com.pinter.tqrespec.save.VariableType;
 import br.com.pinter.tqrespec.tqdata.*;
 import br.com.pinter.tqrespec.util.Constants;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 
@@ -594,22 +595,77 @@ public class Player {
     public List<TeleportDifficulty> getTeleports() {
         List<TeleportDifficulty> ret = new ArrayList<>();
 
-        Optional<BlockInfo> first = getSaveData().getChanges().getBlockInfo().values().stream().filter(
-                f -> f.getBlockType() == PlayerBlockType.PLAYER_MAIN).findFirst();
-
-        BlockInfo playerMain = null;
-        if (first.isPresent()) {
-            playerMain = first.get();
-
-            for (int i = 0; i <= getDifficulty(); i++) {
-                ret.add(getTeleportUidFromDifficulty(i, playerMain));
+        for (int i = 0; i <= getDifficulty(); i++) {
+            TeleportDifficulty teleports = getTeleportUidFromDifficulty(i);
+            if(teleports != null) {
+                ret.add(teleports);
             }
         }
 
         return ret;
     }
 
-    private TeleportDifficulty getTeleportUidFromDifficulty(int difficulty, BlockInfo block) {
+    public void insertTeleport(int difficulty, UID uid) {
+        TeleportDifficulty teleportDifficulty = getTeleportUidFromDifficulty(difficulty);
+
+        if(difficulty > getDifficulty()) {
+            throw new UnhandledRuntimeException(String.format("character doesn't have the difficulty %d unlocked", difficulty));
+        }
+
+        if(teleportDifficulty == null) {
+            throw new UnhandledRuntimeException("error creating teleport");
+        }
+        int teleportUIDsSizeKeyLength = 4+"teleportUIDsSize".length();
+        int teleportUIDKeyLength = 4+"teleportUID".length();
+
+        int offset = teleportDifficulty.getOffset()+(teleportUIDsSizeKeyLength+4);
+            for(VariableInfo stagingVar:teleportDifficulty.getBlockInfo().getStagingVariables().values()) {
+                if(stagingVar.getVariableType().equals(VariableType.UID) && stagingVar.getName().equals("teleportUID")
+                        && (new UID((byte[]) stagingVar.getValue())).equals(uid)) {
+                    logger.log(System.Logger.Level.ERROR,"------------- portal "+uid+"already exists");
+                    break;
+                }
+            }
+
+            for (VariableInfo vi : teleportDifficulty.getTeleportList()) {
+                if (vi.getVariableType().equals(VariableType.UID) && vi.getName().equals("teleportUID")) {
+                    MapTeleport currentTeleport = DefaultMapTeleport.get(new UID((byte[]) vi.getValue()));
+                    if(currentTeleport.getUid().equals(uid)) {
+                        logger.log(System.Logger.Level.ERROR,"------------- portal "+uid+"already exists");
+                        return;
+                    }
+                }
+            }
+
+        if(offset <= 200) {
+            throw new UnhandledRuntimeException("error creating teleport, offset not found");
+        }
+
+        VariableInfo uidSize = teleportDifficulty.getBlockInfo().getVariables().get("teleportUIDsSize").get(difficulty);
+        VariableInfo newVi = new VariableInfo();
+        newVi.setBlockOffset(uidSize.getBlockOffset());
+        newVi.setVariableType(VariableType.UID);
+        newVi.setName("teleportUID");
+        newVi.setValue(uid.getBytes());
+        newVi.setKeyOffset(offset);
+        newVi.setValOffset(offset + teleportUIDKeyLength);
+        newVi.setValSize(16);
+        saveData.getChanges().insertVariable(newVi.getKeyOffset(), newVi);
+        saveData.getChanges().incrementInt(uidSize);
+    }
+
+    private TeleportDifficulty getTeleportUidFromDifficulty(int difficulty) {
+        Optional<BlockInfo> first = getSaveData().getChanges().getBlockInfo().values().stream().filter(
+                f -> f.getBlockType() == PlayerBlockType.PLAYER_MAIN).findFirst();
+
+        BlockInfo block;
+
+        if (first.isPresent()) {
+            block = first.get();
+        } else {
+            return null;
+        }
+
         List<VariableInfo> teleportUidsSizeVars = new ArrayList<>(Objects.requireNonNull(block).getVariables().get("teleportUIDsSize"));
         teleportUidsSizeVars.sort(Comparator.comparingInt(VariableInfo::getValOffset));
         int offsetStart = teleportUidsSizeVars.get(difficulty).getKeyOffset();
@@ -628,7 +684,7 @@ public class Player {
             }
         }
 
-        return new TeleportDifficulty(difficulty, (Integer) size.getValue(), offsetStart, teleports);
+        return new TeleportDifficulty(difficulty, (Integer) size.getValue(), offsetStart, teleports, block);
     }
 
     public void reset() {
