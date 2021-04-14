@@ -21,17 +21,19 @@
 package br.com.pinter.tqrespec.save;
 
 import br.com.pinter.tqrespec.IBlockType;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class BlockInfo implements Serializable {
     private int start = -1;
     private int end = -1;
     private int size = -1;
     private ImmutableListMultimap<String, VariableInfo> variables = ImmutableListMultimap.of();
+    private final Multimap<String, VariableInfo> stagingVariables = MultimapBuilder.hashKeys().arrayListValues().build();
     private int parentOffset = -1;
     private IBlockType blockType = FileBlockType.UNKNOWN;
 
@@ -93,13 +95,18 @@ public class BlockInfo implements Serializable {
         this.blockType = blockType;
     }
 
+    public Multimap<String, VariableInfo> getStagingVariables() {
+        return stagingVariables;
+    }
+
     @Override
     public String toString() {
         return "BlockInfo{" +
-                ", start=" + start +
+                "start=" + start +
                 ", end=" + end +
                 ", size=" + size +
                 ", variables=" + variables +
+                ", stagingVariables=" + stagingVariables +
                 ", parentOffset=" + parentOffset +
                 ", blockType=" + blockType +
                 '}';

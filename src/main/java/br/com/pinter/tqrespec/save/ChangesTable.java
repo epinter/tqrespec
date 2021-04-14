@@ -288,6 +288,28 @@ public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements 
         }
     }
 
+    public void incrementInt(VariableInfo variable) {
+        int value = (int) variable.getValue();
+        if(get(variable.getValOffset())!=null) {
+            byte[] currentData = get(variable.getValOffset());
+            int currentValue = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).put(currentData).rewind().getInt();
+            value = currentValue + 1;
+        } else {
+            value++;
+        }
+        if (getBlockInfo().get(variable.getBlockOffset()) != null) {
+            if (variable.getVariableType() == VariableType.INTEGER && variable.getValSize() == 4) {
+                byte[] data = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(value).array();
+                this.put(variable.getValOffset(), data);
+                this.valuesLengthIndex.put(variable.getValOffset(), variable.getValSize());
+            } else {
+                throw new NumberFormatException(String.format(INVALID_DATA_TYPE, variable));
+            }
+        } else {
+            throw new IllegalArgumentException(Util.getUIMessage(ALERT_INVALIDDATA, variable));
+        }
+    }
+
     public void setInt(VariableInfo variable, int value) {
         if (getBlockInfo().get(variable.getBlockOffset()) != null) {
             if (variable.getVariableType() == VariableType.INTEGER && variable.getValSize() == 4) {
@@ -418,13 +440,31 @@ public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements 
         valuesLengthIndex.put(variable.getKeyOffset(), variable.getVariableBytesLength());
     }
 
-    void insertVariable(int offset, VariableInfo variable) {
-        ByteBuffer v = ByteBuffer.wrap(new byte[variable.getVariableBytesLength()]).order(ByteOrder.LITTLE_ENDIAN);
+    public void insertVariable(int offset, VariableInfo variable) {
+        insertVariable(offset, variable,false);
+    }
+
+    public void insertVariable(int offset, VariableInfo variable, boolean overwrite) {
+        int bufSize = variable.getVariableBytesLength();
+
+        if(get(offset) != null && !overwrite) {
+            bufSize += get(offset).length;
+        }
+
+        ByteBuffer v = ByteBuffer.allocate(bufSize).order(ByteOrder.LITTLE_ENDIAN);
+
+        if(get(offset) != null && !overwrite) {
+            v.put(get(offset));
+        }
 
         v.putInt(variable.getName().length());
         v.put(variable.getName().getBytes());
         v.put((byte[]) variable.getValue());
-        this.put(offset, v.array());
+
+        put(offset, v.array());
         valuesLengthIndex.put(offset, 0);
+
+        BlockInfo block = this.blockInfo.get(variable.getBlockOffset());
+        block.getStagingVariables().put(variable.getName(),variable);
     }
 }
