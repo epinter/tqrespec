@@ -589,6 +589,7 @@ public class Player {
                 ret.add(mapTeleport);
             }
         }
+        ret.sort(Comparator.comparingInt(MapTeleport::getOrder));
         return ret;
     }
 
