@@ -16,7 +16,7 @@
     <columnConstraints>
         <ColumnConstraints />
         <ColumnConstraints hgrow="SOMETIMES" percentWidth="25.0" />
-        <ColumnConstraints hgrow="SOMETIMES" percentWidth="25.0" />
+        <ColumnConstraints hgrow="SOMETIMES" percentWidth="20.0" />
         <ColumnConstraints hgrow="SOMETIMES" percentWidth="25.0" />
         <ColumnConstraints hgrow="SOMETIMES" />
     </columnConstraints>

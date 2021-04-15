@@ -82,16 +82,16 @@
                </cursor></TableView>
             <GridPane maxHeight="50.0" maxWidth="1.7976931348623157E308" minHeight="50.0" prefHeight="50.0" VBox.vgrow="NEVER">
               <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="235.0" minWidth="10.0" prefWidth="235.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="457.0" minWidth="10.0" prefWidth="457.0" />
               </columnConstraints>
               <rowConstraints>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Button fx:id="exportButton" mnemonicParsing="false" onAction="#exportCsv" styleClass="tq-button" text="%characters.exportButton">
+                  <Button fx:id="exportButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#exportCsv" styleClass="tq-button" text="%characters.exportButton" GridPane.hgrow="NEVER" GridPane.vgrow="NEVER">
                      <GridPane.margin>
-                        <Insets left="20.0" />
+                        <Insets bottom="6.0" left="20.0" right="20.0" top="6.0" />
                      </GridPane.margin></Button>
                </children>
                <cursor>

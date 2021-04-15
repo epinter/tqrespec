@@ -32,10 +32,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -80,6 +77,9 @@ public class CharactersViewController implements Initializable {
 
     @Inject
     private Txt txt;
+
+    @FXML
+    private Button exportButton;
 
     @FXML
     private TableView<PlayerCharacter> charactersTable;
@@ -272,6 +272,7 @@ public class CharactersViewController implements Initializable {
             setupTable();
         });
 
+        exportButton.setGraphic(Icon.FA_FILE_EXPORT.create());
         stage.show();
     }
 
