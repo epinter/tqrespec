@@ -29,6 +29,7 @@ import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
 import com.google.inject.Inject;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.StringBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -107,6 +108,10 @@ public class SkillsPaneController implements Initializable {
     private int firstMasteryLevel = -1;
     private int secondMasteryLevel = -1;
 
+    private StringBinding freeSkillPointsBinding;
+    private StringBinding reclaimMasterySecondBinding;
+    private StringBinding reclaimMasteryFirstBinding;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         reclaimSkillsFirstButton.setGraphic(Icon.FA_RECYCLE.create());
@@ -142,32 +147,29 @@ public class SkillsPaneController implements Initializable {
         currentFirstMasteryLevel = new SimpleStringProperty();
         currentSecondMasteryLevel = new SimpleStringProperty();
 
-        freeSkillPointsLabel.textProperty().bind(
-                Bindings.createStringBinding(() -> {
-                            if (currentSkillPoints != null && currentSkillPoints.getValue() != null) {
-                                return Util.getUIMessage("skills.availableSkillPoints",
-                                        currentSkillPoints.getValue());
-                            } else {
-                                return "";
-                            }
-                        },
-                        currentSkillPoints
-                )
+        freeSkillPointsBinding = Bindings.createStringBinding(() -> {
+                    if (currentSkillPoints != null && currentSkillPoints.getValue() != null) {
+                        return Util.getUIMessage("skills.availableSkillPoints",
+                                currentSkillPoints.getValue());
+                    } else {
+                        return "";
+                    }
+                },
+                currentSkillPoints
         );
+        freeSkillPointsLabel.textProperty().bind(freeSkillPointsBinding);
 
-        reclaimMasteryFirstItem.textProperty().bind(
-                Bindings.createStringBinding(() -> Util.getUIMessage("skills.reclaimMasteryPoints",
-                        currentFirstMasteryLevel.getValue()),
-                        currentFirstMasteryLevel
-                )
+        reclaimMasteryFirstBinding = Bindings.createStringBinding(() -> Util.getUIMessage("skills.reclaimMasteryPoints",
+                currentFirstMasteryLevel.getValue()),
+                currentFirstMasteryLevel
         );
+        reclaimMasteryFirstItem.textProperty().bind(reclaimMasteryFirstBinding);
 
-        reclaimMasterySecondItem.textProperty().bind(
-                Bindings.createStringBinding(() -> Util.getUIMessage("skills.reclaimMasteryPoints",
-                        currentSecondMasteryLevel.getValue()),
-                        currentSecondMasteryLevel
-                )
+        reclaimMasterySecondBinding = Bindings.createStringBinding(() -> Util.getUIMessage("skills.reclaimMasteryPoints",
+                currentSecondMasteryLevel.getValue()),
+                currentSecondMasteryLevel
         );
+        reclaimMasterySecondItem.textProperty().bind(reclaimMasterySecondBinding);
 
         updateMasteries();
     }

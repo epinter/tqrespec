@@ -21,6 +21,7 @@
 package br.com.pinter.tqrespec.gui;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.StringExpression;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.input.MouseEvent;
@@ -36,6 +37,7 @@ public class ResizeListener implements EventHandler<MouseEvent> {
     private double dy;
     private boolean resizeH = false;
     private boolean resizeV = false;
+    private StringExpression fontBinding;
 
     public ResizeListener(Stage stage) {
         this.stage = stage;
@@ -85,7 +87,8 @@ public class ResizeListener implements EventHandler<MouseEvent> {
 
     private void mouseDragged(MouseEvent t) {
         if(scale) {
-            stage.getScene().getRoot().styleProperty().bind(Bindings.format("-fx-font-size: %sem;", stage.getWidth() / stage.getMinWidth()));
+            fontBinding = Bindings.format("-fx-font-size: %sem;", stage.getWidth() / stage.getMinWidth());
+            stage.getScene().getRoot().styleProperty().bind(fontBinding);
         }
         if (
                 ((stage.getHeight() < stage.getMinHeight() && t.getY() + dy - stage.getHeight() > 0)

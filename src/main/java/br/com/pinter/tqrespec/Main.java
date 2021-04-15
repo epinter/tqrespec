@@ -38,6 +38,7 @@ import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.application.Preloader;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.StringExpression;
 import javafx.concurrent.Task;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
@@ -78,6 +79,8 @@ public class Main extends Application {
     private GameInfo gameInfo;
 
     private System.Logger logger;
+
+    private StringExpression initialFontBinding;
 
     public static void main(String... args) {
         System.setProperty("javafx.preloader", "br.com.pinter.tqrespec.gui.AppPreloader");
@@ -272,7 +275,8 @@ public class Main extends Application {
         scene.setOnMousePressed(listener);
         scene.setOnMouseDragged(listener);
 
-        primaryStage.getScene().getRoot().styleProperty().bind(Bindings.format("-fx-font-size: %sem;", Constants.INITIAL_FONT_SIZE));
+        initialFontBinding = Bindings.format("-fx-font-size: %sem;", Constants.INITIAL_FONT_SIZE);
+        primaryStage.getScene().getRoot().styleProperty().bind(initialFontBinding);
 
         // min* and max* set to -1 will force javafx to use values defined on root element
         primaryStage.setMinHeight(root.minHeight(-1));

@@ -30,10 +30,7 @@ import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
 import com.google.inject.Inject;
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -138,6 +135,13 @@ public class AttributesPaneController implements Initializable {
     private IntegerProperty currentMana = new SimpleIntegerProperty();
     private IntegerProperty currentAvail = new SimpleIntegerProperty();
 
+    private ObjectProperty<Integer> strProperty;
+    private ObjectProperty<Integer> intProperty;
+    private ObjectProperty<Integer> dexProperty;
+    private ObjectProperty<Integer> lifeProperty;
+    private ObjectProperty<Integer> manaProperty;
+    private ObjectProperty<Integer> availProperty;
+
     private final BooleanProperty saveDisabled = new SimpleBooleanProperty();
 
     private int strStep;
@@ -208,9 +212,10 @@ public class AttributesPaneController implements Initializable {
             value = strMin;
         }
         currentStr = new SimpleIntegerProperty(value);
+        strProperty = currentStr.asObject();
         AttrIntegerSpinnerValueFactory strFactory = new AttrIntegerSpinnerValueFactory(strMin, currentStr.get(), currentStr.get(), strStep, currentAvail);
         strSpinner.setValueFactory(strFactory);
-        strSpinner.getValueFactory().valueProperty().bindBidirectional(currentStr.asObject());
+        strSpinner.getValueFactory().valueProperty().bindBidirectional(strProperty);
         currentStr.addListener(((observable, oldValue, newValue) -> attributesChanged((int) oldValue, (int) newValue, strStep, currentStr)));
     }
 
@@ -220,9 +225,10 @@ public class AttributesPaneController implements Initializable {
             value = intMin;
         }
         currentInt = new SimpleIntegerProperty(value);
+        intProperty = currentInt.asObject();
         AttrIntegerSpinnerValueFactory intFactory = new AttrIntegerSpinnerValueFactory(intMin, currentInt.get(), currentInt.get(), intStep, currentAvail);
         intSpinner.setValueFactory(intFactory);
-        intSpinner.getValueFactory().valueProperty().bindBidirectional(currentInt.asObject());
+        intSpinner.getValueFactory().valueProperty().bindBidirectional(intProperty);
         currentInt.addListener(((observable, oldValue, newValue) -> attributesChanged((int) oldValue, (int) newValue, intStep, currentInt)));
     }
 
@@ -232,9 +238,10 @@ public class AttributesPaneController implements Initializable {
             value = dexMin;
         }
         currentDex = new SimpleIntegerProperty(value);
+        dexProperty = currentDex.asObject();
         AttrIntegerSpinnerValueFactory dexFactory = new AttrIntegerSpinnerValueFactory(dexMin, currentDex.get(), currentDex.get(), dexStep, currentAvail);
         dexSpinner.setValueFactory(dexFactory);
-        dexSpinner.getValueFactory().valueProperty().bindBidirectional(currentDex.asObject());
+        dexSpinner.getValueFactory().valueProperty().bindBidirectional(dexProperty);
         currentDex.addListener(((observable, oldValue, newValue) -> attributesChanged((int) oldValue, (int) newValue, dexStep, currentDex)));
     }
 
@@ -244,9 +251,10 @@ public class AttributesPaneController implements Initializable {
             value = lifeMin;
         }
         currentLife = new SimpleIntegerProperty(value);
+        lifeProperty = currentLife.asObject();
         AttrIntegerSpinnerValueFactory lifeFactory = new AttrIntegerSpinnerValueFactory(lifeMin, currentLife.get(), currentLife.get(), lifeStep, currentAvail);
         lifeSpinner.setValueFactory(lifeFactory);
-        lifeSpinner.getValueFactory().valueProperty().bindBidirectional(currentLife.asObject());
+        lifeSpinner.getValueFactory().valueProperty().bindBidirectional(lifeProperty);
         currentLife.addListener(((observable, oldValue, newValue) -> attributesChanged((int) oldValue, (int) newValue, lifeStep, currentLife)));
     }
 
@@ -256,9 +264,10 @@ public class AttributesPaneController implements Initializable {
             value = manaMin;
         }
         currentMana = new SimpleIntegerProperty(value);
+        manaProperty = currentMana.asObject();
         AttrIntegerSpinnerValueFactory manaFactory = new AttrIntegerSpinnerValueFactory(manaMin, currentMana.get(), currentMana.get(), manaStep, currentAvail);
         manaSpinner.setValueFactory(manaFactory);
-        manaSpinner.getValueFactory().valueProperty().bindBidirectional(currentMana.asObject());
+        manaSpinner.getValueFactory().valueProperty().bindBidirectional(manaProperty);
         currentMana.addListener(((observable, oldValue, newValue) -> attributesChanged((int) oldValue, (int) newValue, manaStep, currentMana)));
     }
 
