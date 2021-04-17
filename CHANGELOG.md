@@ -1,4 +1,19 @@
 # Changelog
+## [0.9.0] - 2021-04-17
+### Added
+- Add feature to change character gender ([#27](https://github.com/epinter/tqrespec/issues/27))
+- Add feature to list all characters and export CSV ([#31](https://github.com/epinter/tqrespec/issues/31))
+- Add initial support for teleports (not in use yet)
+
+### Changed
+- Small improvements to visual and behavior of scrollbars and main window components
+- Add option to disable scaling and aspect ratio when resizing specific window
+- Resized main window and some controls
+
+### Fixed
+- Fix a rare case when alert was getting stuck
+- Fix random UI bug when spinners didn't work
+
 ## [0.8.2] - 2020-10-31
 ### Added
 - Added support for multiple databases and resources (used for TQ-IT legacy disc and future mods support)
