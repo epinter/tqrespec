@@ -20,7 +20,6 @@
 
 package br.com.pinter.tqrespec.save;
 
-import br.com.pinter.tqrespec.IBlockType;
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.util.Constants;

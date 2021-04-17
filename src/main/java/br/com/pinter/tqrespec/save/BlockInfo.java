@@ -20,7 +20,6 @@
 
 package br.com.pinter.tqrespec.save;
 
-import br.com.pinter.tqrespec.IBlockType;
 import com.google.common.collect.*;
 
 import java.io.Serializable;

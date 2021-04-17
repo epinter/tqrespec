@@ -20,8 +20,6 @@
 
 package br.com.pinter.tqrespec.save;
 
-import br.com.pinter.tqrespec.IBlockType;
-
 import java.util.Objects;
 
 public class FileBlockType implements IBlockType {

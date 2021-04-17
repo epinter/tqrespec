@@ -20,7 +20,7 @@
 
 package br.com.pinter.tqrespec.save.player;
 
-import br.com.pinter.tqrespec.IBlockType;
+import br.com.pinter.tqrespec.save.IBlockType;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.*;
 import br.com.pinter.tqrespec.tqdata.GameVersion;
