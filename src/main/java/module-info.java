@@ -23,6 +23,7 @@ module br.com.pinter.tqrespec {
     requires javafx.fxml;
     requires javafx.graphics;
     requires javafx.controls;
+    requires java.net.http;
     requires java.prefs;
     requires java.base;
     requires jdk.zipfs;

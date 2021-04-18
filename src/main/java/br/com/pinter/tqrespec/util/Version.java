@@ -22,10 +22,14 @@ package br.com.pinter.tqrespec.util;
 
 import br.com.pinter.tqrespec.logging.Log;
 
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -70,16 +74,19 @@ public class Version implements Comparable<Version> {
 
     @SuppressWarnings("UnusedReturnValue")
     public int checkNewerVersion(String urlPropFile) {
-        URL url = null;
+        URI uri = null;
         try {
-            url = new URL(urlPropFile);
-        } catch (MalformedURLException e) {
+            uri = new URI(urlPropFile);
+        } catch (URISyntaxException e) {
             logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
         }
 
-        try (InputStreamReader reader = new InputStreamReader(Objects.requireNonNull(url).openStream(), StandardCharsets.UTF_8)) {
+        try {
+            StringReader versionDescriptor = new StringReader(downloadVersionDescriptor(uri));
+
             Properties prop = new Properties();
-            prop.load(reader);
+            prop.load(versionDescriptor);
+
             if (prop.getProperty("current_version") != null
                     && Objects.requireNonNullElse(prop.getProperty("module"), "").equals("tqrespec")) {
                 String currentVersion = prop.getProperty("current_version");
@@ -92,10 +99,29 @@ public class Version implements Comparable<Version> {
                 lastCheck = this.compareTo(new Version(currentVersion));
                 return lastCheck;
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
+        } catch (InterruptedException e) {
+            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
+            Thread.currentThread().interrupt();
         }
         return -2;
+    }
+
+    public String downloadVersionDescriptor(URI uri) throws IOException, InterruptedException {
+        HttpClient client = HttpClient.newBuilder()
+                .followRedirects(HttpClient.Redirect.ALWAYS)
+                .connectTimeout(Duration.ofSeconds(20))
+                .build();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .timeout(Duration.ofSeconds(20))
+                .uri(uri)
+                .GET().build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        return response.body();
     }
 
     @Override
