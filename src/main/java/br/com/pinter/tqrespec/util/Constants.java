@@ -116,9 +116,12 @@ public class Constants {
         public static final String PRELOADER_PANE_STYLE = "bg-container";
         public static final String PRELOADER_TITLE_STYLE = "tq-bigtitle";
         public static final String PRELOADER_INDICATOR_STYLE = "indicator";
+        public static final String PRELOADER_VERSION_STYLE = "version";
+        public static final String PRELOADER_TOP_STYLE = "topContainer";
+        public static final String PRELOADER_BOTTOM_STYLE = "bottomContainer";
         public static final String PRELOADER_BAR_STYLE = "bar";
         public static final int PRELOADER_WIDTH = 370;
-        public static final int PRELOADER_HEIGHT = 210;
+        public static final int PRELOADER_HEIGHT = 180;
         public static final String TOAST_HEADER_STYLE = "tq-toast-header";
         public static final String TOAST_CONTENT_STYLE = "tq-toast-content";
         public static final int TOAST_WARNING_TIMEOUT = 10000;

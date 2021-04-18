@@ -27,8 +27,9 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.apache.commons.lang3.SystemUtils;
@@ -39,24 +40,32 @@ public class AppPreloader extends Preloader {
     private Stage stage;
 
     private Scene createPreloaderScene() {
+        Font.loadFont(getClass().getResourceAsStream("/fxml/albertus-mt.ttf"), 16);
+
         BorderPane pane = new BorderPane();
         Scene scene = new Scene(pane, Constants.UI.PRELOADER_WIDTH, Constants.UI.PRELOADER_HEIGHT);
         pane.getStylesheets().add(Constants.UI.PRELOADER_CSS);
         pane.getStyleClass().add(Constants.UI.PRELOADER_PANE_STYLE);
 
-        bar = new ProgressBar(0.1);
-        bar.getStyleClass().add(Constants.UI.PRELOADER_BAR_STYLE);
-        pane.setCenter(bar);
-
         Label title = new Label();
         title.setText(Constants.APPNAME);
         title.getStyleClass().add(Constants.UI.PRELOADER_TITLE_STYLE);
-        pane.setTop(title);
-        BorderPane.setAlignment(title, Pos.CENTER);
+        StackPane topPane = new StackPane(title);
+        topPane.getStyleClass().add(Constants.UI.PRELOADER_TOP_STYLE);
+        StackPane.setAlignment(title, Pos.CENTER);
+        pane.setTop(topPane);
 
-        ProgressIndicator indicator = new ProgressIndicator();
-        indicator.getStyleClass().add(Constants.UI.PRELOADER_INDICATOR_STYLE);
-        pane.setBottom(indicator);
+        bar = new ProgressBar(0.1);
+        bar.getStyleClass().add(Constants.UI.PRELOADER_BAR_STYLE);
+        bar.setMaxWidth(Constants.UI.PRELOADER_WIDTH - 30);
+        pane.setCenter(bar);
+
+        Label versionText = new Label(Util.getBuildVersion());
+        versionText.getStyleClass().add(Constants.UI.PRELOADER_VERSION_STYLE);
+        StackPane bottomPane = new StackPane(versionText);
+        bottomPane.getStyleClass().add(Constants.UI.PRELOADER_BOTTOM_STYLE);
+        StackPane.setAlignment(versionText,Pos.BOTTOM_RIGHT);
+        pane.setBottom(bottomPane);
 
         return scene;
 

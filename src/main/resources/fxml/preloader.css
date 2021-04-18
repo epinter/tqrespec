@@ -16,30 +16,53 @@
 
 .bg-container {
 	-fx-background-color: #000000;
-    -fx-padding: 20px 0 20px 0;
-
+    -fx-padding: 0 0 0 0;
     -fx-border-image-source: url('border.png');
     -fx-border-image-insets: 0;
     -fx-border-image-repeat: stretch;
-    -fx-border-image-width: 2 2 2 2;
-    -fx-border-image-slice: 2 2 2 2;
-
+    -fx-border-image-width: 3 3 3 3;
+    -fx-border-image-slice: 3 3 3 3;
+	-fx-background-image: url('window_bg.png');
+	-fx-background-size: cover;
+	-fx-background-repeat: no-repeat;
 }
+
+.topContainer,
+.bottomContainer {
+    -fx-min-height: 63px;
+    -fx-pref-height: 63px;
+    -fx-max-height: 63px;
+    -fx-padding: 10px 10px 10px 10px;
+}
+
 .bar {
-    -fx-min-width: 340px;
-    -fx-min-height: 70px;
+    -fx-min-height: 50px;
+    -fx-pref-height: 50px;
+    -fx-max-height: 50px;
+    -fx-padding: 0px 0px 0px 0px;
 }
 
 .indicator {
-    -fx-max-height: 30px;
+    -fx-min-height: 35px;
+    -fx-pref-height: 35px;
+    -fx-max-height: 35px;
+    -fx-min-width: 35px;
+    -fx-pref-width: 35px;
+    -fx-max-width: 35px;
+}
+
+.version {
+	-fx-font-size: 1.3em;
+	-fx-font-family: 'Albertus MT Light';
+    -fx-text-fill: #ffd993;
+    -fx-padding: 0 0 0 0;
+    -fx-effect: dropshadow( one-pass-box , black , 0, 0.0 , 0 , 2 );
 }
 
 .tq-bigtitle {
-	-fx-font-size: 30px;
+	-fx-font-size: 3.0em;
 	-fx-font-family: 'Albertus MT';
 	-fx-font-weight: bold;
-	-fx-font-style: italic;
     -fx-text-fill: #ffd993;
-    -fx-effect: dropshadow( one-pass-box , #443823 , 5, 5.0 , 5 , 5 );
-
+    -fx-effect: dropshadow( one-pass-box , black , 5, 5.0 , 5 , 5 );
 }

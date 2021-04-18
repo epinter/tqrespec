@@ -32,6 +32,7 @@ import br.com.pinter.tqrespec.tqdata.GameVersion;
 import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
+import com.google.common.util.concurrent.AtomicDouble;
 import com.google.inject.Inject;
 import javafx.application.Application;
 import javafx.application.HostServices;
@@ -64,8 +65,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+@SuppressWarnings("FieldCanBeLocal")
 public class Main extends Application {
     @Inject
     private Db db;
@@ -82,6 +88,10 @@ public class Main extends Application {
     private System.Logger logger;
 
     private StringExpression initialFontBinding;
+
+    private final AtomicDouble progress = new AtomicDouble(0.0);
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private Future<?> processBarTask;
 
     public static void main(String... args) {
         System.setProperty("javafx.preloader", "br.com.pinter.tqrespec.gui.AppPreloader");
@@ -106,7 +116,7 @@ public class Main extends Application {
     }
 
     private void chooseDirectory(Stage primaryStage) {
-        File selectedDirectory = null;
+        File selectedDirectory;
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle(Util.getUIMessage(Constants.Msg.MAIN_CHOOSEGAMEDIRECTORY));
         selectedDirectory = directoryChooser.showDialog(primaryStage);
@@ -156,7 +166,8 @@ public class Main extends Application {
         try {
             gameInfo.getDatabasePath();
             gameInfo.getTextPath();
-            notifyPreloader(new Preloader.ProgressNotification(0.2));
+            progressSet(0.1, 0.2);
+
         } catch (FileNotFoundException e) {
             Util.showError(Util.getUIMessage(Constants.Msg.MAIN_GAMENOTDETECTED), Util.getUIMessage(Constants.Msg.MAIN_CHOOSEGAMEDIRECTORY));
             logger.log(System.Logger.Level.ERROR, "game path not detected, showing DirectoryChooser",e);
@@ -167,14 +178,15 @@ public class Main extends Application {
             @Override
             public Void call() {
                 //preload game database metadata and skills
-                notifyPreloader(new Preloader.ProgressNotification(0.3));
+                progressSet(0.2, 0.3);
                 db.initialize();
-                notifyPreloader(new Preloader.ProgressNotification(0.7));
+                progressSet(0.3, 0.95);
                 db.skills().preload();
-                //preload text
-                notifyPreloader(new Preloader.ProgressNotification(0.9));
-                db.player().preload();
+                progressSet(0.95, 1.0);
+                db.teleports().preload();
                 txt.preload();
+                progressSet(1.0,1.0);
+                db.player().preload();
 
                 try {
                     new Thread(new GameProcessMonitor(gameInfo.getGamePath())).start();
@@ -191,14 +203,39 @@ public class Main extends Application {
             alertException(primaryStage, e.getSource().getException());
         });
 
-        task.setOnSucceeded(e -> {
-            notifyPreloader(new Preloader.ProgressNotification(1.0));
-            primaryStage.show();
-        });
+        task.setOnSucceeded(e -> primaryStage.show());
+
         new Thread(task).start();
         primaryStage.setOnShown(windowEvent -> notifyPreloader(new Preloader.StateChangeNotification(
                 Preloader.StateChangeNotification.Type.BEFORE_START)));
 
+    }
+
+    private void progressSet(double forceStart, double end) {
+        if(processBarTask != null) {
+            processBarTask.cancel(false);
+        }
+
+        if(forceStart >= progress.get()) {
+            progress.set(forceStart);
+        }
+        notifyPreloader(new Preloader.ProgressNotification(progress.get()));
+
+        if(forceStart == 1.0) {
+            executorService.shutdown();
+            return;
+        }
+
+        processBarTask = executorService.submit(() -> {
+            for(double start = progress.get() ; progress.get() < end; progress.getAndAdd((end-start)/20)) {
+                try {
+                    TimeUnit.MILLISECONDS.sleep(Math.round((1-(end-start))*1000));
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                notifyPreloader(new Preloader.ProgressNotification(progress.get()));
+            }
+        });
     }
 
     private void alertException(Stage primaryStage, Throwable e) {
@@ -231,7 +268,7 @@ public class Main extends Application {
 
         logger = Log.getLogger(Main.class.getName());
         logger.log(System.Logger.Level.DEBUG, State.get().getDebugPrefix());
-        notifyPreloader(new Preloader.ProgressNotification(0.1));
+        progressSet(0.0, 0.1);
         prepareMainStage(primaryStage);
         load(primaryStage);
     }
@@ -306,7 +343,7 @@ public class Main extends Application {
         int debug = 0;
         try {
             if (StringUtils.isNotBlank(debugParam)) {
-                debug = Integer.valueOf(debugParam);
+                debug = Integer.parseInt(debugParam);
             }
         } catch (NumberFormatException ignored) {
             //ignored
