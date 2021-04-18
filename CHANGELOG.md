@@ -1,4 +1,9 @@
 # Changelog
+## [0.9.1] - 2021-04-17
+### Fixed
+- Fix version check
+- Fix crash when savegame directory is not found
+
 ## [0.9.0] - 2021-04-17
 ### Added
 - Add feature to change character gender ([#27](https://github.com/epinter/tqrespec/issues/27))
