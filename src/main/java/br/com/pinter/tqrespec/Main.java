@@ -62,6 +62,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 
@@ -186,18 +187,8 @@ public class Main extends Application {
         };
         task.setOnFailed(e -> {
             gameInfo.removeSavedDetectedGame();
-
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setHeaderText("Error loading application");
-            logger.log(System.Logger.Level.ERROR, "Error loading application", e.getSource().getException());
-            alert.initOwner(primaryStage);
-            alert.setTitle(Util.getBuildTitle());
-            TextArea textArea = new TextArea(ExceptionUtils.getStackTrace(e.getSource().getException()));
-            textArea.setMaxWidth(Double.MAX_VALUE);
-            textArea.setMaxHeight(Double.MAX_VALUE);
-            alert.getDialogPane().setExpandableContent(textArea);
-            alert.showAndWait();
-            System.exit(1);
+            logger.log(System.Logger.Level.ERROR, "Error loading application", e);
+            alertException(primaryStage, e.getSource().getException());
         });
 
         task.setOnSucceeded(e -> {
@@ -208,6 +199,19 @@ public class Main extends Application {
         primaryStage.setOnShown(windowEvent -> notifyPreloader(new Preloader.StateChangeNotification(
                 Preloader.StateChangeNotification.Type.BEFORE_START)));
 
+    }
+
+    private void alertException(Stage primaryStage, Throwable e) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setHeaderText("Error loading application");
+        alert.initOwner(primaryStage);
+        alert.setTitle(Util.getBuildTitle());
+        TextArea textArea = new TextArea(ExceptionUtils.getStackTrace(e));
+        textArea.setMaxWidth(Double.MAX_VALUE);
+        textArea.setMaxHeight(Double.MAX_VALUE);
+        alert.getDialogPane().setExpandableContent(textArea);
+        alert.showAndWait();
+        System.exit(1);
     }
 
     @Override
@@ -242,7 +246,10 @@ public class Main extends Application {
 
         Parent root;
         try {
-            State.get().setLocale(gameInfo.getGameLanguage());
+            Locale gameLanguage = gameInfo.getGameLanguage();
+            if(gameLanguage != null) {
+                State.get().setLocale(gameLanguage);
+            }
             fxmlLoader.setResources(ResourceBundle.getBundle("i18n.UI", State.get().getLocale()));
             fxmlLoader.setLocation(getClass().getResource(Constants.UI.MAIN_FXML));
             root = fxmlLoader.load();

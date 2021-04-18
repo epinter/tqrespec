@@ -721,7 +721,16 @@ public class GameInfo {
     public void readGameOptions() throws IOException {
         gameOptions = new HashMap<>();
 
-        FileChannel optionsFile = FileChannel.open(Paths.get(getSaveSetingsPath(), "options.txt"));
+        String saveSetingsPath = getSaveSetingsPath();
+        if(StringUtils.isBlank(saveSetingsPath)) {
+            throw new IOException("savegame path not found");
+        }
+
+        Path optionsPath = Paths.get(saveSetingsPath, "options.txt");
+        if(!Files.exists(optionsPath)) {
+            throw new IOException("options.txt not found");
+        }
+        FileChannel optionsFile = FileChannel.open(optionsPath);
         try (BufferedReader reader = new BufferedReader(Channels.newReader(optionsFile, StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
