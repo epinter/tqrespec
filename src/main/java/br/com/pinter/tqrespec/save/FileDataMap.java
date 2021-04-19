@@ -25,39 +25,32 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @SuppressWarnings("unused")
-public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements DeepCloneable {
+public class FileDataMap implements DeepCloneable {
     private Map<Integer, BlockInfo> blockInfo = new ConcurrentHashMap<>();
     private Map<String, List<Integer>> variableLocation = new ConcurrentHashMap<>();
+    private final Map<Integer, byte[]> changes = new ConcurrentHashMap<>();
+    private final Map<Integer, Integer> valuesLengthIndex = new ConcurrentHashMap<>();
 
     private static final String ALERT_INVALIDDATA = "alert.changesinvaliddata";
     private static final String MULTIPLE_DEFINITIONS_ERROR = "Variable is defined on multiple locations, aborting";
     private static final String INVALID_DATA_TYPE = "Variable '%s' has an unexpected data type";
-    private Map<Integer, Integer> valuesLengthIndex = new ConcurrentHashMap<>();
-
-    public ChangesTable() {
-        super();
-    }
-
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
-        ChangesTable that = (ChangesTable) o;
-        return Objects.equals(valuesLengthIndex, that.valuesLengthIndex);
+        FileDataMap that = (FileDataMap) o;
+        return Objects.equals(valuesLengthIndex, that.valuesLengthIndex) && Objects.equals(changes, that.changes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), valuesLengthIndex);
+        return Objects.hash(super.hashCode(), changes, valuesLengthIndex);
     }
 
     public Map<Integer, Integer> getValuesLengthIndex() {
@@ -78,6 +71,21 @@ public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements 
 
     public void setVariableLocation(Map<String, List<Integer>> variableLocation) {
         this.variableLocation = variableLocation;
+    }
+
+    public byte[] getBytes(Integer offset) {
+        return changes.get(offset);
+    }
+
+    public Set<Integer> changesKeySet() {
+        return changes.keySet();
+    }
+
+    public void clear() {
+        blockInfo.clear();
+        changes.clear();
+        valuesLengthIndex.clear();
+        variableLocation.clear();
     }
 
     public String getString(String variable) {
@@ -141,7 +149,7 @@ public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements 
                 System.arraycopy(len, 0, data, 0, len.length);
                 System.arraycopy(str, 0, data, len.length, str.length);
 
-                this.put(variableInfo.getValOffset(), data);
+                changes.put(variableInfo.getValOffset(), data);
                 this.valuesLengthIndex.put(variableInfo.getValOffset(), 4 + (variableInfo.getValSize() * (utf16le ? 2 : 1)));
             }
         } else {
@@ -183,7 +191,7 @@ public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements 
                     VariableInfo variableInfo = getBlockInfo().get(block).getVariables().get(variable).get(0);
                     if (variableInfo.getValSize() == 4) {
                         byte[] data = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putFloat(value).array();
-                        this.put(variableInfo.getValOffset(), data);
+                        changes.put(variableInfo.getValOffset(), data);
                         this.valuesLengthIndex.put(variableInfo.getValOffset(), variableInfo.getValSize());
                     }
                 } else {
@@ -199,7 +207,7 @@ public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements 
         if (getBlockInfo().get(variable.getBlockOffset()) != null) {
             if (variable.getVariableType() == VariableType.FLOAT && variable.getValSize() == 4) {
                 byte[] data = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putFloat(value).array();
-                this.put(variable.getValOffset(), data);
+                changes.put(variable.getValOffset(), data);
                 this.valuesLengthIndex.put(variable.getValOffset(), variable.getValSize());
             } else {
                 throw new NumberFormatException(String.format(INVALID_DATA_TYPE, variable));
@@ -216,8 +224,8 @@ public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements 
                     && getBlockInfo().get(block).getVariables().get(variable).get(0).getVariableType()
                     == VariableType.FLOAT) {
                 VariableInfo v = getBlockInfo().get(block).getVariables().get(variable).get(0);
-                if (this.get(v.getValOffset()) != null) {
-                    return ByteBuffer.wrap(this.get(v.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getFloat();
+                if (changes.get(v.getValOffset()) != null) {
+                    return ByteBuffer.wrap(changes.get(v.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getFloat();
                 } else {
                     return (Float) v.getValue();
                 }
@@ -252,7 +260,7 @@ public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements 
                 VariableInfo variableInfo = getBlockInfo().get(blockStart).getVariables().get(variable).get(0);
                 if (variableInfo.getValSize() == 4) {
                     byte[] data = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(value).array();
-                    this.put(variableInfo.getValOffset(), data);
+                    changes.put(variableInfo.getValOffset(), data);
                     this.valuesLengthIndex.put(variableInfo.getValOffset(), variableInfo.getValSize());
                 }
             } else {
@@ -275,7 +283,7 @@ public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements 
                     VariableInfo variableInfo = getBlockInfo().get(block).getVariables().get(variable).get(0);
                     if (variableInfo.getValSize() == 4) {
                         byte[] data = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(value).array();
-                        this.put(variableInfo.getValOffset(), data);
+                        changes.put(variableInfo.getValOffset(), data);
                         this.valuesLengthIndex.put(variableInfo.getValOffset(), variableInfo.getValSize());
                     }
                 } else {
@@ -289,8 +297,8 @@ public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements 
 
     public void incrementInt(VariableInfo variable) {
         int value = (int) variable.getValue();
-        if(get(variable.getValOffset())!=null) {
-            byte[] currentData = get(variable.getValOffset());
+        if(changes.get(variable.getValOffset())!=null) {
+            byte[] currentData = changes.get(variable.getValOffset());
             int currentValue = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).put(currentData).rewind().getInt();
             value = currentValue + 1;
         } else {
@@ -299,7 +307,7 @@ public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements 
         if (getBlockInfo().get(variable.getBlockOffset()) != null) {
             if (variable.getVariableType() == VariableType.INTEGER && variable.getValSize() == 4) {
                 byte[] data = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(value).array();
-                this.put(variable.getValOffset(), data);
+                changes.put(variable.getValOffset(), data);
                 this.valuesLengthIndex.put(variable.getValOffset(), variable.getValSize());
             } else {
                 throw new NumberFormatException(String.format(INVALID_DATA_TYPE, variable));
@@ -313,7 +321,7 @@ public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements 
         if (getBlockInfo().get(variable.getBlockOffset()) != null) {
             if (variable.getVariableType() == VariableType.INTEGER && variable.getValSize() == 4) {
                 byte[] data = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(value).array();
-                this.put(variable.getValOffset(), data);
+                changes.put(variable.getValOffset(), data);
                 this.valuesLengthIndex.put(variable.getValOffset(), variable.getValSize());
             } else {
                 throw new NumberFormatException(String.format(INVALID_DATA_TYPE, variable));
@@ -324,16 +332,16 @@ public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements 
     }
 
     public Integer getInt(VariableInfo variable) {
-        if (variable.getVariableType() == VariableType.INTEGER && this.get(variable.getValOffset()) != null) {
-            return ByteBuffer.wrap(this.get(variable.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getInt();
+        if (variable.getVariableType() == VariableType.INTEGER && changes.get(variable.getValOffset()) != null) {
+            return ByteBuffer.wrap(changes.get(variable.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getInt();
         } else {
             return (Integer) variable.getValue();
         }
     }
 
     public Float getFloat(VariableInfo variable) {
-        if (variable.getVariableType() == VariableType.FLOAT && this.get(variable.getValOffset()) != null) {
-            return ByteBuffer.wrap(this.get(variable.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getFloat();
+        if (variable.getVariableType() == VariableType.FLOAT && changes.get(variable.getValOffset()) != null) {
+            return ByteBuffer.wrap(changes.get(variable.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getFloat();
         } else {
             return (Float) variable.getValue();
         }
@@ -344,8 +352,8 @@ public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements 
                 && getBlockInfo().get(blockStart).getVariables().get(variable).get(0).getVariableType()
                 == VariableType.INTEGER) {
             VariableInfo v = getBlockInfo().get(blockStart).getVariables().get(variable).get(0);
-            if (this.get(v.getValOffset()) != null) {
-                return ByteBuffer.wrap(this.get(v.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getInt();
+            if (changes.get(v.getValOffset()) != null) {
+                return ByteBuffer.wrap(changes.get(v.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getInt();
             } else {
                 return (Integer) v.getValue();
             }
@@ -360,8 +368,8 @@ public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements 
                     && getBlockInfo().get(block).getVariables().get(variable).get(0).getVariableType()
                     == VariableType.INTEGER) {
                 VariableInfo v = getBlockInfo().get(block).getVariables().get(variable).get(0);
-                if (this.get(v.getValOffset()) != null) {
-                    return ByteBuffer.wrap(this.get(v.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getInt();
+                if (changes.get(v.getValOffset()) != null) {
+                    return ByteBuffer.wrap(changes.get(v.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getInt();
                 } else {
                     return (Integer) v.getValue();
                 }
@@ -426,16 +434,16 @@ public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements 
         //we shouldnt leave var changes in the list, the block will disappear
         // and nothing should be changed
         for (VariableInfo v : current.getVariables().values()) {
-            if (this.get(v.getValOffset()) != null) {
-                this.remove(v.getValOffset());
+            if (changes.get(v.getValOffset()) != null) {
+                changes.remove(v.getValOffset());
             }
         }
-        this.put(current.getStart(), new byte[0]);
+        changes.put(current.getStart(), new byte[0]);
         this.valuesLengthIndex.put(current.getStart(), current.getSize());
     }
 
     void removeVariable(VariableInfo variable) {
-        put(variable.getKeyOffset(), new byte[0]);
+        changes.put(variable.getKeyOffset(), new byte[0]);
         valuesLengthIndex.put(variable.getKeyOffset(), variable.getVariableBytesLength());
     }
 
@@ -446,21 +454,21 @@ public class ChangesTable extends ConcurrentHashMap<Integer, byte[]> implements 
     public void insertVariable(int offset, VariableInfo variable, boolean overwrite) {
         int bufSize = variable.getVariableBytesLength();
 
-        if(get(offset) != null && !overwrite) {
-            bufSize += get(offset).length;
+        if(changes.get(offset) != null && !overwrite) {
+            bufSize += changes.get(offset).length;
         }
 
         ByteBuffer v = ByteBuffer.allocate(bufSize).order(ByteOrder.LITTLE_ENDIAN);
 
-        if(get(offset) != null && !overwrite) {
-            v.put(get(offset));
+        if(changes.get(offset) != null && !overwrite) {
+            v.put(changes.get(offset));
         }
 
         v.putInt(variable.getName().length());
         v.put(variable.getName().getBytes());
         v.put((byte[]) variable.getValue());
 
-        put(offset, v.array());
+        changes.put(offset, v.array());
         valuesLengthIndex.put(offset, 0);
 
         BlockInfo block = this.blockInfo.get(variable.getBlockOffset());

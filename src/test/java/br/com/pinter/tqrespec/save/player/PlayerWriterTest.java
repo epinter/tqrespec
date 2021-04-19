@@ -89,9 +89,9 @@ public class PlayerWriterTest {
             saveData.reset();
             saveData.setPlayerName("savegame");
             saveData.setBuffer(playerParser.loadPlayer());
-            saveData.getChanges().setBlockInfo(playerParser.getBlockInfo());
+            saveData.getDataMap().setBlockInfo(playerParser.getBlockInfo());
             saveData.setHeaderInfo(playerParser.getHeaderInfo());
-            saveData.getChanges().setVariableLocation(playerParser.getVariableLocation());
+            saveData.getDataMap().setVariableLocation(playerParser.getVariableLocation());
         } catch (Exception e) {
             logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
             fail();
@@ -112,12 +112,12 @@ public class PlayerWriterTest {
         PowerMockito.when(mockSaveData.getPlayerName()).thenReturn(saveData.getPlayerName());
         PowerMockito.when(mockSaveData.getHeaderInfo()).thenReturn(saveData.getHeaderInfo());
         PowerMockito.when(mockSaveData.isCustomQuest()).thenReturn(saveData.isCustomQuest());
-        PowerMockito.when(mockSaveData.getChanges()).thenReturn(saveData.getChanges());
+        PowerMockito.when(mockSaveData.getDataMap()).thenReturn(saveData.getDataMap());
         PowerMockito.when(mockSaveData.getBuffer()).thenReturn(saveData.getBuffer());
 
-        int isInMainQuestBefore = saveData.getChanges().getInt("isInMainQuest");
+        int isInMainQuestBefore = saveData.getDataMap().getInt("isInMainQuest");
         Assert.assertEquals(1,isInMainQuestBefore);
-        saveData.getChanges().setInt("isInMainQuest", 0);
+        saveData.getDataMap().setInt("isInMainQuest", 0);
 
         try {
             playerWriter.copyCurrentSave("testcopy");
@@ -134,10 +134,10 @@ public class PlayerWriterTest {
             saveData.reset();
             saveData.setPlayerName("testcopy");
             saveData.setBuffer(playerParser.loadPlayer());
-            saveData.getChanges().setBlockInfo(playerParser.getBlockInfo());
+            saveData.getDataMap().setBlockInfo(playerParser.getBlockInfo());
             saveData.setHeaderInfo(playerParser.getHeaderInfo());
-            saveData.getChanges().setVariableLocation(playerParser.getVariableLocation());
-            int isInMainQuestAfter = saveData.getChanges().getInt("isInMainQuest");
+            saveData.getDataMap().setVariableLocation(playerParser.getVariableLocation());
+            int isInMainQuestAfter = saveData.getDataMap().getInt("isInMainQuest");
             Assert.assertTrue(isInMainQuestBefore != isInMainQuestAfter && isInMainQuestAfter == 0);
 
         } catch (Exception e) {
@@ -152,9 +152,9 @@ public class PlayerWriterTest {
             saveData.reset();
             saveData.setPlayerName("savegame");
             saveData.setBuffer(playerParser.loadPlayer());
-            saveData.getChanges().setBlockInfo(playerParser.getBlockInfo());
+            saveData.getDataMap().setBlockInfo(playerParser.getBlockInfo());
             saveData.setHeaderInfo(playerParser.getHeaderInfo());
-            saveData.getChanges().setVariableLocation(playerParser.getVariableLocation());
+            saveData.getDataMap().setVariableLocation(playerParser.getVariableLocation());
         } catch (Exception e) {
             logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
             fail();
@@ -175,11 +175,11 @@ public class PlayerWriterTest {
         PowerMockito.when(mockSaveData.getPlayerName()).thenReturn(saveData.getPlayerName());
         PowerMockito.when(mockSaveData.getHeaderInfo()).thenReturn(saveData.getHeaderInfo());
         PowerMockito.when(mockSaveData.isCustomQuest()).thenReturn(saveData.isCustomQuest());
-        PowerMockito.when(mockSaveData.getChanges()).thenReturn(saveData.getChanges());
+        PowerMockito.when(mockSaveData.getDataMap()).thenReturn(saveData.getDataMap());
         PowerMockito.when(mockSaveData.getBuffer()).thenReturn(saveData.getBuffer());
 
-        saveData.getChanges().setString(Constants.Save.PLAYER_CHARACTER_CLASS, "XXGenderX");
-        saveData.getChanges().setString(Constants.Save.PLAYER_TEXTURE, "XXTextureX");
+        saveData.getDataMap().setString(Constants.Save.PLAYER_CHARACTER_CLASS, "XXGenderX");
+        saveData.getDataMap().setString(Constants.Save.PLAYER_TEXTURE, "XXTextureX");
 
         try {
             playerWriter.copyCurrentSave("testcopy");
@@ -196,11 +196,11 @@ public class PlayerWriterTest {
             saveData.reset();
             saveData.setPlayerName("testcopy");
             saveData.setBuffer(playerParser.loadPlayer());
-            saveData.getChanges().setBlockInfo(playerParser.getBlockInfo());
+            saveData.getDataMap().setBlockInfo(playerParser.getBlockInfo());
             saveData.setHeaderInfo(playerParser.getHeaderInfo());
-            saveData.getChanges().setVariableLocation(playerParser.getVariableLocation());
+            saveData.getDataMap().setVariableLocation(playerParser.getVariableLocation());
             String playerCharacterClass = saveData.getPlayerCharacterClass();
-            String texture = saveData.getChanges().getString(Constants.Save.PLAYER_TEXTURE);
+            String texture = saveData.getDataMap().getString(Constants.Save.PLAYER_TEXTURE);
 
             assertNotNull(playerCharacterClass);
             assertTrue(playerCharacterClass.equals("XXGenderX") && texture.equals("XXTextureX"));

@@ -40,7 +40,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -107,9 +106,9 @@ public class PlayerParserTest {
     public void readFloat_Should_readFloatFromSavegame() {
         try {
             playerParser.parse();
-            saveData.getChanges().setBlockInfo(playerParser.getBlockInfo());
+            saveData.getDataMap().setBlockInfo(playerParser.getBlockInfo());
             saveData.setHeaderInfo(playerParser.getHeaderInfo());
-            saveData.getChanges().setVariableLocation(playerParser.getVariableLocation());
+            saveData.getDataMap().setVariableLocation(playerParser.getVariableLocation());
         } catch (Exception e) {
             logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
             fail();
@@ -126,9 +125,9 @@ public class PlayerParserTest {
     public void readGender_Should_readGenderFromSaveGame() {
         try {
             playerParser.parse();
-            saveData.getChanges().setBlockInfo(playerParser.getBlockInfo());
+            saveData.getDataMap().setBlockInfo(playerParser.getBlockInfo());
             saveData.setHeaderInfo(playerParser.getHeaderInfo());
-            saveData.getChanges().setVariableLocation(playerParser.getVariableLocation());
+            saveData.getDataMap().setVariableLocation(playerParser.getVariableLocation());
         } catch (Exception e) {
             logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
             fail();

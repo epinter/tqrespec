@@ -20,7 +20,7 @@
 
 package br.com.pinter.tqrespec.save.player;
 
-import br.com.pinter.tqrespec.save.ChangesTable;
+import br.com.pinter.tqrespec.save.FileDataMap;
 import com.google.inject.Singleton;
 
 import java.nio.ByteBuffer;
@@ -35,7 +35,7 @@ public class CurrentPlayerData {
     private Path playerChr = null;
     private boolean customQuest = false;
     private final LinkedHashMap<String, PlayerSkill> playerSkills = new LinkedHashMap<>();
-    private ChangesTable changes = new ChangesTable();
+    private FileDataMap dataMap = new FileDataMap();
     private HeaderInfo headerInfo = new HeaderInfo();
     private ByteBuffer buffer = null;
     private final AtomicBoolean missingSkills = new AtomicBoolean(false);
@@ -87,16 +87,16 @@ public class CurrentPlayerData {
         this.headerInfo = headerInfo;
     }
 
-    ChangesTable getChanges() {
-        return changes;
-    }
-
     ByteBuffer getBuffer() {
         return buffer;
     }
 
     void setBuffer(ByteBuffer buffer) {
         this.buffer = buffer;
+    }
+
+    FileDataMap getDataMap() {
+        return dataMap;
     }
 
     public boolean isMissingSkills() {
@@ -108,9 +108,10 @@ public class CurrentPlayerData {
     }
 
     void reset() {
+        dataMap.clear();
         this.buffer = null;
         this.headerInfo = new HeaderInfo();
-        this.changes = new ChangesTable();
+        this.dataMap = new FileDataMap();
         this.playerName = null;
         this.customQuest = false;
         this.playerSkills.clear();

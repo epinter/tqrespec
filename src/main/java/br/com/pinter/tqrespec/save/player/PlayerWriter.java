@@ -24,7 +24,7 @@ import br.com.pinter.tqrespec.Settings;
 import br.com.pinter.tqrespec.core.State;
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.logging.Log;
-import br.com.pinter.tqrespec.save.ChangesTable;
+import br.com.pinter.tqrespec.save.FileDataMap;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
@@ -135,12 +135,12 @@ public class PlayerWriter {
     }
 
     private void writeBuffer(String filename) throws IOException {
-        this.writeBuffer(filename, saveData.getChanges());
+        this.writeBuffer(filename, saveData.getDataMap());
     }
 
-    private void writeBuffer(String filename, ChangesTable changesTable) throws IOException {
+    private void writeBuffer(String filename, FileDataMap fileDataMap) throws IOException {
         saveData.getBuffer().rewind();
-        List<Integer> changedOffsets = new ArrayList<>(changesTable.keySet());
+        List<Integer> changedOffsets = new ArrayList<>(fileDataMap.changesKeySet());
         Collections.sort(changedOffsets);
 
         File out = new File(filename);
@@ -153,9 +153,9 @@ public class PlayerWriter {
                 );
                 outChannel.write(saveData.getBuffer());
                 saveData.getBuffer().limit(saveData.getBuffer().capacity());
-                byte[] c = changesTable.get(offset);
+                byte[] c = fileDataMap.getBytes(offset);
                 outChannel.write(ByteBuffer.wrap(c));
-                int previousValueLength = changesTable.getValuesLengthIndex().get(offset);
+                int previousValueLength = fileDataMap.getValuesLengthIndex().get(offset);
                 saveData.getBuffer().position(
                         saveData.getBuffer().position() + previousValueLength);
             }
@@ -189,11 +189,11 @@ public class PlayerWriter {
         }
         Util.copyDirectoryRecurse(playerSaveDirSource, playerSaveDirTarget, false);
 
-        ChangesTable changesTable = (ChangesTable) saveData.getChanges().deepClone();
+        FileDataMap fileDataMap = (FileDataMap) saveData.getDataMap().deepClone();
 
-        changesTable.setString("myPlayerName", toPlayerName, true);
+        fileDataMap.setString("myPlayerName", toPlayerName, true);
 
-        this.writeBuffer(Paths.get(playerSaveDirTarget.toString(), "Player.chr").toString(), changesTable);
+        this.writeBuffer(Paths.get(playerSaveDirTarget.toString(), "Player.chr").toString(), fileDataMap);
         State.get().setSaveInProgress(false);
     }
 }
