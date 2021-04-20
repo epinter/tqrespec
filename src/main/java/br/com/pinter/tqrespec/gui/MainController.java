@@ -398,7 +398,7 @@ public class MainController implements Initializable {
             protected Integer call() {
                 try {
                     pointsPaneController.saveCharHandler();
-                    return playerWriter.saveCurrent() ? 2 : 0;
+                    return playerWriter.save() ? 2 : 0;
                 } catch (Exception e) {
                     throw new UnhandledRuntimeException("Error saving character", e);
                 }

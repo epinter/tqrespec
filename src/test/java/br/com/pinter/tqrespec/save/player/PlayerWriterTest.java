@@ -100,6 +100,8 @@ public class PlayerWriterTest {
         MockitoAnnotations.openMocks(this);
 
         try {
+            Files.deleteIfExists(Paths.get("src/test/resources/_testcopy/winsys.dxg"));
+            Files.deleteIfExists(Paths.get("src/test/resources/_testcopy/winsys.dxb"));
             Files.deleteIfExists(Paths.get("src/test/resources/_testcopy/Player.chr"));
             Files.deleteIfExists(Paths.get("src/test/resources/_testcopy"));
         } catch (IOException e) {
@@ -163,6 +165,8 @@ public class PlayerWriterTest {
         MockitoAnnotations.openMocks(this);
 
         try {
+            Files.deleteIfExists(Paths.get("src/test/resources/_testcopy/winsys.dxg"));
+            Files.deleteIfExists(Paths.get("src/test/resources/_testcopy/winsys.dxb"));
             Files.deleteIfExists(Paths.get("src/test/resources/_testcopy/Player.chr"));
             Files.deleteIfExists(Paths.get("src/test/resources/_testcopy"));
         } catch (IOException e) {

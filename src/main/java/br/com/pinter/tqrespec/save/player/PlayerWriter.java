@@ -24,30 +24,44 @@ import br.com.pinter.tqrespec.Settings;
 import br.com.pinter.tqrespec.core.State;
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.logging.Log;
+import br.com.pinter.tqrespec.save.FileDataHolder;
 import br.com.pinter.tqrespec.save.FileDataMap;
+import br.com.pinter.tqrespec.save.FileWriter;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
 import com.google.inject.Inject;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class PlayerWriter {
+public class PlayerWriter extends FileWriter {
     private static final System.Logger logger = Log.getLogger(PlayerWriter.class.getName());
     @Inject
     private CurrentPlayerData saveData;
 
     @Inject
     private GameInfo gameInfo;
+
+    @Override
+    public int getCrcOffset() {
+        return 0;
+    }
+
+    @Override
+    public boolean isCreateCrc() {
+        return false;
+    }
+
+    @Override
+    protected FileDataHolder getSaveData() {
+        return saveData;
+    }
 
     @SuppressWarnings("SameParameterValue")
     private boolean backupSaveGame(String fileName, String playerName) throws IOException {
@@ -98,9 +112,15 @@ public class PlayerWriter {
                     });
                 } else {
                     Files.createDirectories(zipFs.getPath(root.toString(), "/" + player.getName(player.getNameCount() - 2)));
-
                     Path destPlayer = zipFs.getPath("/" + player.getName(player.getNameCount() - 2) + "/" + player.getFileName());
                     Files.copy(player, destPlayer, StandardCopyOption.REPLACE_EXISTING);
+
+                    Files.copy(Paths.get(saveData.getPlayerPath().toString(), "winsys.dxb"),
+                            zipFs.getPath("/" + player.getName(player.getNameCount() - 2) + "/winsys.dxb"),
+                            StandardCopyOption.REPLACE_EXISTING);
+                    Files.copy(Paths.get(saveData.getPlayerPath().toString(), "winsys.dxg"),
+                            zipFs.getPath("/" + player.getName(player.getNameCount() - 2) + "/winsys.dxg"),
+                            StandardCopyOption.REPLACE_EXISTING);
                 }
                 return true;
             } catch (IOException e) {
@@ -118,7 +138,7 @@ public class PlayerWriter {
         return this.backupSaveGame(playerChr, playerName);
     }
 
-    public boolean saveCurrent() {
+    public boolean save() {
         if (State.get().getSaveInProgress() != null && State.get().getSaveInProgress()) {
             return false;
         }
@@ -131,41 +151,6 @@ public class PlayerWriter {
         } catch (IOException e) {
             State.get().setSaveInProgress(false);
             throw new UnhandledRuntimeException("Error saving character", e);
-        }
-    }
-
-    private void writeBuffer(String filename) throws IOException {
-        this.writeBuffer(filename, saveData.getDataMap());
-    }
-
-    private void writeBuffer(String filename, FileDataMap fileDataMap) throws IOException {
-        saveData.getBuffer().rewind();
-        List<Integer> changedOffsets = new ArrayList<>(fileDataMap.changesKeySet());
-        Collections.sort(changedOffsets);
-
-        File out = new File(filename);
-        try (FileChannel outChannel = new FileOutputStream(out).getChannel()) {
-
-            for (int offset : changedOffsets) {
-                int rawCount = offset - saveData.getBuffer().position();
-                saveData.getBuffer().limit(rawCount +
-                        saveData.getBuffer().position()
-                );
-                outChannel.write(saveData.getBuffer());
-                saveData.getBuffer().limit(saveData.getBuffer().capacity());
-                byte[] c = fileDataMap.getBytes(offset);
-                outChannel.write(ByteBuffer.wrap(c));
-                int previousValueLength = fileDataMap.getValuesLengthIndex().get(offset);
-                saveData.getBuffer().position(
-                        saveData.getBuffer().position() + previousValueLength);
-            }
-
-            while (true) {
-                if (outChannel.write(saveData.getBuffer()) <= 0) break;
-            }
-
-            saveData.getBuffer().rewind();
-            outChannel.force(false);
         }
     }
 
@@ -194,6 +179,7 @@ public class PlayerWriter {
         fileDataMap.setString("myPlayerName", toPlayerName, true);
 
         this.writeBuffer(Paths.get(playerSaveDirTarget.toString(), "Player.chr").toString(), fileDataMap);
+
         State.get().setSaveInProgress(false);
     }
 }

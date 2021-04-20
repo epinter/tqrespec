@@ -687,8 +687,7 @@ public class GameInfo {
         return ret;
     }
 
-
-    public Path playerChr(String playerName, boolean customQuest) {
+    public Path playerPath(String playerName, boolean customQuest) {
         String path;
 
         if (customQuest) {
@@ -697,7 +696,11 @@ public class GameInfo {
             path = getSaveDataMainPath();
         }
 
-        return Paths.get(path, "_" + playerName, "Player.chr");
+        return Paths.get(path, "_" + playerName);
+    }
+
+    public Path playerChr(String playerName, boolean customQuest) {
+        return Paths.get(playerPath(playerName, customQuest).toString(), "Player.chr");
     }
 
     public Locale getGameLanguage() {

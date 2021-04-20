@@ -20,6 +20,7 @@
 
 package br.com.pinter.tqrespec.save.player;
 
+import br.com.pinter.tqrespec.save.FileDataHolder;
 import br.com.pinter.tqrespec.save.FileDataMap;
 import com.google.inject.Singleton;
 
@@ -30,7 +31,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Singleton
-public class CurrentPlayerData {
+public class CurrentPlayerData implements FileDataHolder {
     private String playerName = null;
     private Path playerChr = null;
     private boolean customQuest = false;
@@ -40,11 +41,13 @@ public class CurrentPlayerData {
     private ByteBuffer buffer = null;
     private final AtomicBoolean missingSkills = new AtomicBoolean(false);
 
-    String getPlayerName() {
+    @Override
+    public String getPlayerName() {
         return playerName;
     }
 
-    void setPlayerName(String playerName) {
+    @Override
+    public void setPlayerName(String playerName) {
         this.playerName = playerName;
     }
 
@@ -87,15 +90,27 @@ public class CurrentPlayerData {
         this.headerInfo = headerInfo;
     }
 
-    ByteBuffer getBuffer() {
+    @Override
+    public Path getPlayerPath() {
+        return playerChr.getParent();
+    }
+
+    @Override
+    public void setPlayerPath(Path playerPath) {
+    }
+
+    @Override
+    public ByteBuffer getBuffer() {
         return buffer;
     }
 
-    void setBuffer(ByteBuffer buffer) {
+    @Override
+    public void setBuffer(ByteBuffer buffer) {
         this.buffer = buffer;
     }
 
-    FileDataMap getDataMap() {
+    @Override
+    public FileDataMap getDataMap() {
         return dataMap;
     }
 
