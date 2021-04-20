@@ -49,6 +49,9 @@ public class Constants {
     public static final String PARENT_GAMEDATA = Paths.get(Paths.get(System.getProperty("user.dir")).getParent().toString(), "gamedata").toString();
     public static final int PROCESS_SCAN_INTERVAL_MS = 3000;
     public static final String ERROR_MSG_EXCEPTION = "Error: ";
+    public static final String STASH_FILE = "winsys.dxb";
+    public static final String STASH_FILE_BACKUP = "winsys.dxg";
+
     /**
      * Maps Game Options language to i18n locale
      */

@@ -5,6 +5,8 @@ sdk/
 *.arz
 *.arc
 Player.chr
+winsys.dxg
+winsys.dxb
 hs_err_pid*
 .gradle
 

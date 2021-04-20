@@ -45,6 +45,7 @@ module br.com.pinter.tqrespec {
     opens br.com.pinter.tqrespec.gui to com.google.guice, javafx.fxml;
     opens br.com.pinter.tqrespec.save to com.google.guice, javafx.fxml;
     opens br.com.pinter.tqrespec.save.player to com.google.guice, javafx.fxml;
+    opens br.com.pinter.tqrespec.save.stash to com.google.guice, javafx.fxml;
     opens br.com.pinter.tqrespec.tqdata to com.google.guice, javafx.fxml;
     opens br.com.pinter.tqrespec.util to com.google.guice, javafx.fxml;
     opens fxml;

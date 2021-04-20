@@ -97,6 +97,7 @@ public class CurrentPlayerData implements FileDataHolder {
 
     @Override
     public void setPlayerPath(Path playerPath) {
+        //not implemented
     }
 
     @Override

@@ -138,6 +138,7 @@ if (moduleInfoPresent) {
                     '--add-opens', "${moduleName}/${mainPackageName}.tqdata=ALL-UNNAMED",
                     '--add-opens', "${moduleName}/${mainPackageName}.gui=ALL-UNNAMED",
                     '--add-opens', "${moduleName}/${mainPackageName}.save.player=ALL-UNNAMED",
+                    '--add-opens', "${moduleName}/${mainPackageName}.save.stash=ALL-UNNAMED",
                     '--add-opens', "${moduleName}/${mainPackageName}.save=ALL-UNNAMED",
                     '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
                     '--module-path', classpath.asPath,
@@ -292,6 +293,7 @@ task appimage(type: Exec) {
                         "--add-opens ${moduleName}/${mainPackageName}.tqdata=ALL-UNNAMED " +
                         "--add-opens ${moduleName}/${mainPackageName}.gui=ALL-UNNAMED " +
                         "--add-opens ${moduleName}/${mainPackageName}.save.player=ALL-UNNAMED " +
+                        "--add-opens ${moduleName}/${mainPackageName}.save.stash=ALL-UNNAMED " +
                         "--add-opens ${moduleName}/${mainPackageName}.save=ALL-UNNAMED " +
                         "--add-opens java.base/java.lang=ALL-UNNAMED " +
                         "--add-reads ${moduleName}=ALL-UNNAMED"

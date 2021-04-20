@@ -27,6 +27,8 @@ import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.FileDataHolder;
 import br.com.pinter.tqrespec.save.FileDataMap;
 import br.com.pinter.tqrespec.save.FileWriter;
+import br.com.pinter.tqrespec.save.stash.StashLoader;
+import br.com.pinter.tqrespec.save.stash.StashWriter;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
@@ -113,15 +115,26 @@ public class PlayerWriter extends FileWriter {
                 } else {
                     Files.createDirectories(zipFs.getPath(root.toString(), "/" + player.getName(player.getNameCount() - 2)));
                     Path destPlayer = zipFs.getPath("/" + player.getName(player.getNameCount() - 2) + "/" + player.getFileName());
-                    Files.copy(player, destPlayer, StandardCopyOption.REPLACE_EXISTING);
 
-                    Files.copy(Paths.get(saveData.getPlayerPath().toString(), "winsys.dxb"),
-                            zipFs.getPath("/" + player.getName(player.getNameCount() - 2) + "/winsys.dxb"),
-                            StandardCopyOption.REPLACE_EXISTING);
-                    Files.copy(Paths.get(saveData.getPlayerPath().toString(), "winsys.dxg"),
-                            zipFs.getPath("/" + player.getName(player.getNameCount() - 2) + "/winsys.dxg"),
-                            StandardCopyOption.REPLACE_EXISTING);
+                    Path srcDxb = Paths.get(saveData.getPlayerPath().toString(), "winsys.dxb");
+                    Path destDxb = zipFs.getPath("/" + player.getName(player.getNameCount() - 2) + "/winsys.dxb");
+                    Path srcDxg = Paths.get(saveData.getPlayerPath().toString(), "winsys.dxg");
+                    Path destDxg = zipFs.getPath("/" + player.getName(player.getNameCount() - 2) + "/winsys.dxg");
+
+                    Files.copy(player, destPlayer, StandardCopyOption.REPLACE_EXISTING);
+                    copyFileTimes(player, destPlayer);
+
+                    if(Files.exists(srcDxb)) {
+                        Files.copy(srcDxb, destDxb, StandardCopyOption.REPLACE_EXISTING);
+                        copyFileTimes(srcDxb, destDxb);
+                    }
+
+                    if(Files.exists(srcDxg)) {
+                        Files.copy(srcDxg, destDxg, StandardCopyOption.REPLACE_EXISTING);
+                        copyFileTimes(srcDxg, destDxg);
+                    }
                 }
+
                 return true;
             } catch (IOException e) {
                 logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
@@ -130,6 +143,12 @@ public class PlayerWriter extends FileWriter {
         }
 
         return false;
+    }
+
+    private void copyFileTimes(Path src, Path dst) throws IOException {
+        Files.setAttribute(dst, "creationTime", Files.getAttribute(src, "creationTime"));
+        Files.setAttribute(dst, "lastModifiedTime", Files.getAttribute(src, "lastModifiedTime"));
+        Files.setAttribute(dst, "lastAccessTime", Files.getAttribute(src, "lastAccessTime"));
     }
 
     public boolean backupCurrent() throws IOException {
@@ -179,6 +198,12 @@ public class PlayerWriter extends FileWriter {
         fileDataMap.setString("myPlayerName", toPlayerName, true);
 
         this.writeBuffer(Paths.get(playerSaveDirTarget.toString(), "Player.chr").toString(), fileDataMap);
+
+        StashLoader stashLoader = new StashLoader();
+        if(stashLoader.loadStash(playerSaveDirTarget, toPlayerName)) {
+            StashWriter stashWriter = new StashWriter(stashLoader.getSaveData());
+            stashWriter.save();
+        }
 
         State.get().setSaveInProgress(false);
     }

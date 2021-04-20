@@ -7,6 +7,9 @@ package br.com.pinter.tqrespec.util;
 import java.nio.ByteBuffer;
 
 public class CRC32 {
+    private CRC32() {
+    }
+
     public static int calculate(ByteBuffer buffer) {
         int oldPosition = buffer.position();
         byte[] data = new byte[buffer.capacity() - oldPosition];
