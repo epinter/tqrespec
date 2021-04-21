@@ -26,8 +26,9 @@ This software requires **Microsoft Windows (64-bit recommended)**. You don't nee
 
 Keep in mind that this software make modifications to your save game (more specifically the file Player.chr). You shouldn't modify your characters while the game is running, you can corrupt your save game. ***YOU SHOULD ALWAYS KEEP A FULL BACKUP OF YOUR SAVE GAME FOLDER*** (Documents/My Games/Titan Quest - Immortal Throne).
 
-![TQRespec Screenshot 1](https://raw.githubusercontent.com/epinter/tqrespec/master/assets/screenshot_attributes.png "Attributes")
-![TQRespec Screenshot 2](https://raw.githubusercontent.com/epinter/tqrespec/master/assets/screenshot_skills.png "Skills")
+![TQRespec Screenshot 1](assets/screenshot_attributes.png "Attributes")
+![TQRespec Screenshot 2](assets/screenshot_skills.png "Skills")
+![TQRespec Screenshot 3](assets/screenshot_characters.png "Characters")
 
 #### ***Running without the game installed***
 
@@ -58,9 +59,13 @@ Now if you change to Skills tab, you will see two lists with the skills of your 
 
 If you have a mastery on level 24 and 7 skills with points allocated, you can click on "Reclaim All Skills Points" to have the points from the 7 skills back to you. Then you click on "Mastery / Reclaim" to have 23 points back from the mastery, so you will have the mastery with just 1 point allocated, or you can click on "Mastery / Remove" to have all 24 points from mastery.
 
+#### ***Characters list and stats***
+
+When you click on the button near the character selection list, you will be able to see a table with all your characters, with attributes and stats. There's also an option to export the table to CSV.
+
 #### ***Copy your character***
 
-If you want to change the name of you character, you can type the new name in the "New save" text field then click on "Copy To" button. A new character will be created, with progress, inventory with all items, attributes, skills, etc... The only thing you will not have on the copy is the Storage.
+If you want to change the name of you character, you can type the new name in the "New save" text field then click on "Copy To" button. A new character will be created, with progress, inventory with all items, attributes, skills, etc...
 
 #### ***Saving and backup***
 
