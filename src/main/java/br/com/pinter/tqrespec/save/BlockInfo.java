@@ -32,7 +32,7 @@ public class BlockInfo implements Serializable {
     private ImmutableListMultimap<String, VariableInfo> variables = ImmutableListMultimap.of();
     private final transient Multimap<String, VariableInfo> stagingVariables = MultimapBuilder.hashKeys().arrayListValues().build();
     private int parentOffset = -1;
-    private IBlockType blockType = FileBlockType.UNKNOWN;
+    private BlockType blockType = FileBlockType.UNKNOWN;
 
     public int getStart() {
         return start;
@@ -84,11 +84,11 @@ public class BlockInfo implements Serializable {
         this.variables = variables;
     }
 
-    public IBlockType getBlockType() {
+    public BlockType getBlockType() {
         return blockType;
     }
 
-    public void setBlockType(IBlockType blockType) {
+    public void setBlockType(BlockType blockType) {
         this.blockType = blockType;
     }
 

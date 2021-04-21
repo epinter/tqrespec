@@ -347,7 +347,7 @@ public abstract class FileParser {
         return null;
     }
 
-    protected abstract IFileVariable getFileVariable(String var);
+    protected abstract FileVariable getFileVariable(String var);
 
     VariableInfo readVar(String name) {
         return readVar(name, new VariableInfo(), FileBlockType.UNKNOWN);
@@ -357,20 +357,20 @@ public abstract class FileParser {
         return readVar(name, variableInfo, FileBlockType.UNKNOWN);
     }
 
-    protected VariableInfo readVar(String name, IBlockType fileBlock) {
+    protected VariableInfo readVar(String name, BlockType fileBlock) {
         return readVar(name, new VariableInfo(), fileBlock);
     }
 
-    VariableInfo readVar(String name, VariableInfo variableInfo, IBlockType fileBlock) {
+    VariableInfo readVar(String name, VariableInfo variableInfo, BlockType fileBlock) {
         String varId = filterFileVariableName(name);
 
         VariableType type = null;
-        IFileVariable fileVariable = getFileVariable(varId);
+        FileVariable fileVariable = getFileVariable(varId);
         type = getFileVariable(varId).type();
 
         if (type == VariableType.UNKNOWN && fileVariable.location().equals(FileBlockType.MULTIPLE)) {
             try {
-                IFileVariable fileVariableMultiple = getFileVariable(
+                FileVariable fileVariableMultiple = getFileVariable(
                         String.format("%s__%s", name, fileBlock.name()));
                 type = fileVariableMultiple.type();
             } catch (Exception e) {

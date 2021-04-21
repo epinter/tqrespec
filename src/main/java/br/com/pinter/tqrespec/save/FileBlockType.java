@@ -22,7 +22,7 @@ package br.com.pinter.tqrespec.save;
 
 import java.util.Objects;
 
-public class FileBlockType implements IBlockType {
+public class FileBlockType implements BlockType {
     public static final FileBlockType MULTIPLE = new FileBlockType(-3, "MULTIPLE");
     public static final FileBlockType BODY = new FileBlockType(-2, "BODY");
     public static final FileBlockType UNKNOWN = new FileBlockType(-1, "UNKNOWN");

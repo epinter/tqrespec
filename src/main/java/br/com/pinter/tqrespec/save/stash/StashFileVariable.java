@@ -20,13 +20,13 @@
 
 package br.com.pinter.tqrespec.save.stash;
 
-import br.com.pinter.tqrespec.save.IBlockType;
-import br.com.pinter.tqrespec.save.IFileVariable;
+import br.com.pinter.tqrespec.save.BlockType;
+import br.com.pinter.tqrespec.save.FileVariable;
 import br.com.pinter.tqrespec.save.VariableType;
 
 import java.util.HashMap;
 
-public class StashFileVariable implements IFileVariable {
+public class StashFileVariable implements FileVariable {
     private static HashMap<String, StashFileVariable> map = new HashMap<>();
 
     static {
@@ -51,7 +51,7 @@ public class StashFileVariable implements IFileVariable {
         map.put("yOffset", new StashFileVariable("yOffset", VariableType.INTEGER, StashBlockType.STASH_ITEM_SUFFIX));
     }
 
-    private final IBlockType location;
+    private final BlockType location;
     private final String var;
     private final VariableType type;
 
@@ -66,11 +66,11 @@ public class StashFileVariable implements IFileVariable {
     }
 
     @Override
-    public IBlockType location() {
+    public BlockType location() {
         return location;
     }
 
-    private StashFileVariable(String variable, VariableType type, IBlockType location) {
+    private StashFileVariable(String variable, VariableType type, BlockType location) {
         this.var = variable;
         this.type = type;
         this.location = location;

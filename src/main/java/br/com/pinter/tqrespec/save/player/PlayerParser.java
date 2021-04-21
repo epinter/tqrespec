@@ -20,7 +20,7 @@
 
 package br.com.pinter.tqrespec.save.player;
 
-import br.com.pinter.tqrespec.save.IBlockType;
+import br.com.pinter.tqrespec.save.BlockType;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.*;
 import br.com.pinter.tqrespec.tqdata.GameVersion;
@@ -194,7 +194,7 @@ final class PlayerParser extends FileParser {
     @Override
     protected ImmutableListMultimap<String, VariableInfo> parseBlock(BlockInfo block) {
         ArrayListMultimap<String, VariableInfo> ret = ArrayListMultimap.create();
-        IBlockType fileBlock = PlayerBlockType.BODY;
+        BlockType fileBlock = PlayerBlockType.BODY;
         this.getBuffer().position(block.getStart() + BEGIN_BLOCK_SIZE);
         ArrayList<VariableInfo> temp = new ArrayList<>();
 
@@ -212,7 +212,7 @@ final class PlayerParser extends FileParser {
                 continue;
             }
 
-            IFileVariable fileVariable;
+            FileVariable fileVariable;
             try {
                 fileVariable = PlayerFileVariable.valueOf(filterFileVariableName(name));
                 if (!fileVariable.location().equals(PlayerBlockType.BODY)
@@ -275,7 +275,7 @@ final class PlayerParser extends FileParser {
     }
 
     @Override
-    protected IFileVariable getFileVariable(String var) {
+    protected FileVariable getFileVariable(String var) {
         return PlayerFileVariable.valueOf(var);
     }
 }

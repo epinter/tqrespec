@@ -20,10 +20,10 @@
 
 package br.com.pinter.tqrespec.save;
 
-public interface IFileVariable {
-    String var();
+import java.io.Serializable;
 
-    VariableType type();
+public interface BlockType extends Serializable {
+    int getValue();
 
-    IBlockType location();
+    String name();
 }

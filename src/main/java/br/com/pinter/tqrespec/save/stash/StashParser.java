@@ -81,7 +81,7 @@ public class StashParser extends FileParser {
     @Override
     protected ImmutableListMultimap<String, VariableInfo> parseBlock(BlockInfo block) {
         ArrayListMultimap<String, VariableInfo> ret = ArrayListMultimap.create();
-        IBlockType fileBlock = StashBlockType.BODY;
+        BlockType fileBlock = StashBlockType.BODY;
         this.getBuffer().position(block.getStart() + BEGIN_BLOCK_SIZE);
 
         while (this.getBuffer().position() < block.getEnd() - END_BLOCK_SIZE) {
@@ -98,7 +98,7 @@ public class StashParser extends FileParser {
                 continue;
             }
 
-            IFileVariable fileVariable;
+            FileVariable fileVariable;
             try {
                 fileVariable = StashFileVariable.valueOf(filterFileVariableName(name));
                 if (!fileVariable.location().equals(StashBlockType.BODY)
@@ -128,7 +128,7 @@ public class StashParser extends FileParser {
     }
 
     @Override
-    protected IFileVariable getFileVariable(String var) {
+    protected FileVariable getFileVariable(String var) {
         return StashFileVariable.valueOf(var);
     }
 }

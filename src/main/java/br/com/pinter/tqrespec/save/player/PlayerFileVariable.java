@@ -20,16 +20,16 @@
 
 package br.com.pinter.tqrespec.save.player;
 
-import br.com.pinter.tqrespec.save.IBlockType;
-import br.com.pinter.tqrespec.save.IFileVariable;
+import br.com.pinter.tqrespec.save.BlockType;
+import br.com.pinter.tqrespec.save.FileVariable;
 import br.com.pinter.tqrespec.save.VariableType;
 
 import java.util.HashMap;
 
-public class PlayerFileVariable implements IFileVariable {
+public class PlayerFileVariable implements FileVariable {
     private static HashMap<String, PlayerFileVariable> map = new HashMap<>();
 
-    private final IBlockType location;
+    private final BlockType location;
     private final String var;
     private final VariableType type;
 
@@ -158,7 +158,7 @@ public class PlayerFileVariable implements IFileVariable {
         map.put("temp__" + PlayerBlockType.PLAYER_MAIN, new PlayerFileVariable("temp", VariableType.INTEGER, PlayerBlockType.PLAYER_MAIN));
     }
 
-    private PlayerFileVariable(String variable, VariableType type, IBlockType location) {
+    private PlayerFileVariable(String variable, VariableType type, BlockType location) {
         this.var = variable;
         this.type = type;
         this.location = location;
@@ -179,7 +179,7 @@ public class PlayerFileVariable implements IFileVariable {
     }
 
     @Override
-    public IBlockType location() {
+    public BlockType location() {
         return location;
     }
 }
