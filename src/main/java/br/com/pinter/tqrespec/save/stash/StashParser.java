@@ -23,9 +23,6 @@ package br.com.pinter.tqrespec.save.stash;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.*;
 import br.com.pinter.tqrespec.util.Constants;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ImmutableListMultimap;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -79,52 +76,13 @@ public class StashParser extends FileParser {
     }
 
     @Override
-    protected ImmutableListMultimap<String, VariableInfo> parseBlock(BlockInfo block) {
-        ArrayListMultimap<String, VariableInfo> ret = ArrayListMultimap.create();
-        BlockType fileBlock = StashBlockType.BODY;
-        this.getBuffer().position(block.getStart() + BEGIN_BLOCK_SIZE);
+    protected void prepareBlockSpecialVariable(VariableInfo variableInfo, String name) {
+        //not implemented
+    }
 
-        while (this.getBuffer().position() < block.getEnd() - END_BLOCK_SIZE) {
-            int keyOffset = getBuffer().position();
-            String name = readString();
-
-            //ignore all child blocks, will be parsed by main loop in parseAllBlocks
-            if (BEGIN_BLOCK.equals(name)) {
-                BlockInfo subBlock = getBlockInfo().get(keyOffset);
-                getBuffer().position(subBlock.getEnd() + 1);
-            }
-
-            if (StringUtils.isEmpty(name) || name.equals(BEGIN_BLOCK) || name.equals(END_BLOCK)) {
-                continue;
-            }
-
-            FileVariable fileVariable;
-            try {
-                fileVariable = StashFileVariable.valueOf(filterFileVariableName(name));
-                if (!fileVariable.location().equals(StashBlockType.BODY)
-                        && !fileVariable.location().equals(StashBlockType.UNKNOWN)
-                        && !fileVariable.location().equals(StashBlockType.MULTIPLE)) {
-                    fileBlock = fileVariable.location();
-                }
-            } catch (Exception e) {
-                throw new IllegalStateException(String.format("An invalid variable (%s) was found in block %s (%s), aborting."
-                        , name, block.getStart(), fileBlock), e.getCause());
-            }
-
-            VariableInfo variableInfo = readVar(name, fileBlock);
-            variableInfo.setBlockOffset(block.getStart());
-            variableInfo.setName(name);
-            variableInfo.setKeyOffset(keyOffset);
-
-            if (variableInfo.getBlockOffset() == -1) {
-                throw new IllegalStateException("Illegal block offset");
-            }
-            ret.put(variableInfo.getName(), variableInfo);
-            putVarIndex(variableInfo.getName(), block.getStart());
-        }
-
-        block.setBlockType(fileBlock);
-        return ImmutableListMultimap.copyOf(ret);
+    @Override
+    protected void processBlockSpecialVariable(BlockInfo block) {
+        //not implemented
     }
 
     @Override

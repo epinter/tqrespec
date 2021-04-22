@@ -23,7 +23,11 @@ package br.com.pinter.tqrespec.save;
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.util.Constants;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.MultimapBuilder;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
@@ -50,6 +54,7 @@ public abstract class FileParser {
     protected static final String BEGIN_BLOCK = "begin_block";
     protected static final String END_BLOCK = "end_block";
     private static final String BUG_VARIABLESIZE_ERROR_MSG = "BUG: variable size != 0";
+    private final ListMultimap<String, VariableInfo> specialVariableStore = MultimapBuilder.hashKeys().arrayListValues().build();
 
 
     public ConcurrentMap<Integer, BlockInfo> getBlockInfo() {
@@ -118,10 +123,88 @@ public abstract class FileParser {
     /**
      * This method is called to parse a block, and should return a table of variables found inside the block.
      *
-     * @param blockInfo the block the method should parse.
+     * @param block the block the method should parse.
      * @return a table with all variables found
      */
-    protected abstract ImmutableListMultimap<String, VariableInfo> parseBlock(BlockInfo blockInfo);
+    protected ImmutableListMultimap<String, VariableInfo> parseBlock(BlockInfo block) {
+        ArrayListMultimap<String, VariableInfo> ret = ArrayListMultimap.create();
+        BlockType blockType = FileBlockType.BODY;
+        this.getBuffer().position(block.getStart() + BEGIN_BLOCK_SIZE);
+
+        specialVariableStore.clear();
+
+        while (this.getBuffer().position() < block.getEnd() - END_BLOCK_SIZE) {
+            int keyOffset = getBuffer().position();
+            String name = readString();
+
+            skipSubBlock(block, name, keyOffset);
+
+            if (StringUtils.isEmpty(name) || name.equals(END_BLOCK) || name.equals(BEGIN_BLOCK)) {
+                continue;
+            }
+
+            //pass current blockType (detected from previous variable read), so we can distinguish variables that repeat
+            blockType = validateBlockType(block, name, blockType);
+
+            VariableInfo variableInfo = readVar(name, blockType);
+            variableInfo.setBlockOffset(block.getStart());
+            variableInfo.setName(name);
+            variableInfo.setKeyOffset(keyOffset);
+
+            prepareBlockSpecialVariable(variableInfo, name);
+
+            if (variableInfo.getBlockOffset() == -1) {
+                throw new IllegalStateException("Illegal block offset");
+            }
+            ret.put(variableInfo.getName(), variableInfo);
+            putVarIndex(variableInfo.getName(), block.getStart());
+        }
+
+        processBlockSpecialVariable(block);
+
+        block.setBlockType(blockType);
+        return ImmutableListMultimap.copyOf(ret);
+    }
+
+    protected void skipSubBlock(BlockInfo block, String name, int keyOffset) {
+        if (BEGIN_BLOCK.equals(name)) {
+            //ignore all child blocks, will be parsed by main loop in parseAllBlocks
+            BlockInfo subBlock = getBlockInfo().get(keyOffset);
+            getBuffer().position(subBlock.getEnd() + 1);
+        }
+    }
+
+    protected BlockType validateBlockType(BlockInfo block, String name, BlockType previous) {
+        BlockType blockType = previous;
+        FileVariable fileVariable;
+        try {
+            fileVariable = getFileVariable(filterFileVariableName(name));
+            if (!fileVariable.location().equals(FileBlockType.BODY)
+                    && !fileVariable.location().equals(FileBlockType.UNKNOWN)
+                    && !fileVariable.location().equals(FileBlockType.MULTIPLE)) {
+                blockType = fileVariable.location();
+            }
+        } catch (Exception e) {
+            throw new IllegalStateException(String.format("An invalid variable (%s) was found in block %s, aborting."
+                    , name, block.getStart()), e.getCause());
+        }
+
+        blockType = filterBlockType(blockType, name);
+
+        return blockType;
+    }
+
+    protected BlockType filterBlockType(BlockType fileBlock, String name) {
+        return fileBlock;
+    }
+
+    protected abstract void prepareBlockSpecialVariable(VariableInfo variableInfo, String name);
+
+    protected abstract void processBlockSpecialVariable(BlockInfo block);
+
+    public ListMultimap<String, VariableInfo> getSpecialVariableStore() {
+        return specialVariableStore;
+    }
 
     /**
      * All blocks mapped by {@link FileParser#buildBlocksTable()} are parsed with {@link FileParser#parseBlock(BlockInfo)}.
@@ -396,7 +479,6 @@ public abstract class FileParser {
 
         return variableInfo;
     }
-
 
     protected String filterFileVariableName(String name) {
         String varId = name.replaceAll("^[^a-zA-Z_$0-9.]*([a-zA-Z_$0-9.]*).*$", "$1");

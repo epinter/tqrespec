@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
-import java.util.ArrayList;
 import java.util.EnumSet;
 
 final class PlayerParser extends FileParser {
@@ -192,86 +191,50 @@ final class PlayerParser extends FileParser {
     }
 
     @Override
-    protected ImmutableListMultimap<String, VariableInfo> parseBlock(BlockInfo block) {
-        ArrayListMultimap<String, VariableInfo> ret = ArrayListMultimap.create();
-        BlockType fileBlock = PlayerBlockType.BODY;
-        this.getBuffer().position(block.getStart() + BEGIN_BLOCK_SIZE);
-        ArrayList<VariableInfo> temp = new ArrayList<>();
-
-        while (this.getBuffer().position() < block.getEnd() - END_BLOCK_SIZE) {
-            int keyOffset = getBuffer().position();
-            String name = readString();
-
-            if (BEGIN_BLOCK.equals(name)) {
-                //ignore all child blocks, will be parsed by main loop in parseAllBlocks
-                BlockInfo subBlock = getBlockInfo().get(keyOffset);
-                getBuffer().position(subBlock.getEnd() + 1);
-            }
-
-            if (StringUtils.isEmpty(name) || name.equals(END_BLOCK) || name.equals(BEGIN_BLOCK)) {
-                continue;
-            }
-
-            FileVariable fileVariable;
-            try {
-                fileVariable = PlayerFileVariable.valueOf(filterFileVariableName(name));
-                if (!fileVariable.location().equals(PlayerBlockType.BODY)
-                        && !fileVariable.location().equals(PlayerBlockType.UNKNOWN)
-                        && !fileVariable.location().equals(PlayerBlockType.MULTIPLE)) {
-                    fileBlock = fileVariable.location();
-                }
-            } catch (Exception e) {
-                throw new IllegalStateException(String.format("An invalid variable (%s) was found in block %s (%s), aborting."
-                        , name, block.getStart(), fileBlock), e.getCause());
-            }
-
-            //prepare fileblock for special var 'temp'(attributes)
-            if (name.equals("temp") && fileBlock.equals(PlayerBlockType.BODY)) {
-                fileBlock = PlayerBlockType.PLAYER_ATTRIBUTES;
-            }
-
-            VariableInfo variableInfo = readVar(name, fileBlock);
-            variableInfo.setBlockOffset(block.getStart());
-            variableInfo.setName(name);
-            variableInfo.setKeyOffset(keyOffset);
-
-            //store variable for attributes and difficulty in a dedicated list
-            if (name.equals("temp")) {
-                temp.add(variableInfo);
-            }
-
-            if (variableInfo.getBlockOffset() == -1) {
-                throw new IllegalStateException("Illegal block offset");
-            }
-            ret.put(variableInfo.getName(), variableInfo);
-            putVarIndex(variableInfo.getName(), block.getStart());
+    protected BlockType filterBlockType(BlockType type, String name) {
+        //prepare fileblock for special var 'temp' (attributes)
+        //temp variables for the attributes are always inside a separate block, so the current blocktype will be always BODY
+        //difficulty variable is always at the end of main block, so blocktype will be PLAYER_MAIN
+        if (name.equals("temp") && type.equals(FileBlockType.BODY)) {
+            return PlayerBlockType.PLAYER_ATTRIBUTES;
         }
+        return type;
+    }
 
-        if (temp.size() == 1) {
-            VariableInfo difficulty = temp.get(0);
+    @Override
+    protected void prepareBlockSpecialVariable(VariableInfo variableInfo, String name) {
+        //store variable for attributes and difficulty in a dedicated list
+        if (name.equals("temp")) {
+            getSpecialVariableStore().put("temp", variableInfo);
+        }
+    }
+
+    @Override
+    protected void processBlockSpecialVariable(BlockInfo block) {
+        String key = "temp";
+        String logMsg = "blockStart: ''{0}''; variableInfo: ''{1}'';";
+        if (getSpecialVariableStore().get(key).size() == 1) {
+            VariableInfo difficulty = getSpecialVariableStore().get(key).get(0);
             difficulty.setAlias("difficulty");
-        } else if (temp.size() == 5) {
-            VariableInfo str = temp.get(0);
-            VariableInfo dex = temp.get(1);
-            VariableInfo inl = temp.get(2);
-            VariableInfo life = temp.get(3);
-            VariableInfo mana = temp.get(4);
+            logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), difficulty.toString());
+        } else if (getSpecialVariableStore().get(key).size() == 5) {
+            VariableInfo str = getSpecialVariableStore().get(key).get(0);
+            VariableInfo dex = getSpecialVariableStore().get(key).get(1);
+            VariableInfo inl = getSpecialVariableStore().get(key).get(2);
+            VariableInfo life = getSpecialVariableStore().get(key).get(3);
+            VariableInfo mana = getSpecialVariableStore().get(key).get(4);
             str.setAlias("str");
             dex.setAlias("dex");
             inl.setAlias("int");
             life.setAlias("life");
             mana.setAlias("mana");
 
-            String logMsg = "blockStart: ''{0}''; variableInfo: ''{1}'';";
             logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), str.toString());
             logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), dex.toString());
             logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), inl.toString());
             logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), life.toString());
             logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), mana.toString());
         }
-
-        block.setBlockType(fileBlock);
-        return ImmutableListMultimap.copyOf(ret);
     }
 
     @Override

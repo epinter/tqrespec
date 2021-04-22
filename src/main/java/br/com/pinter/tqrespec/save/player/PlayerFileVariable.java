@@ -21,6 +21,7 @@
 package br.com.pinter.tqrespec.save.player;
 
 import br.com.pinter.tqrespec.save.BlockType;
+import br.com.pinter.tqrespec.save.FileBlockType;
 import br.com.pinter.tqrespec.save.FileVariable;
 import br.com.pinter.tqrespec.save.VariableType;
 
@@ -70,7 +71,7 @@ public class PlayerFileVariable implements FileVariable {
         map.put("markerUID", new PlayerFileVariable("markerUID", VariableType.UID, PlayerBlockType.PLAYER_MAIN));
         map.put("strategicMovementRespawnPoint", new PlayerFileVariable("strategicMovementRespawnPoint[i]", VariableType.UID, PlayerBlockType.PLAYER_MAIN));
 
-        map.put("skillName", new PlayerFileVariable("skillName", VariableType.STRING, PlayerBlockType.BODY));//PLAYER_SKILLS + PLAYER_HOT_SLOT
+        map.put("skillName", new PlayerFileVariable("skillName", VariableType.STRING, FileBlockType.BODY));//PLAYER_SKILLS + PLAYER_HOT_SLOT
         map.put("skillActive", new PlayerFileVariable("skillActive", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLS));
         map.put("skillLevel", new PlayerFileVariable("skillLevel", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLS));
         map.put("skillEnabled", new PlayerFileVariable("skillEnabled", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLS));
@@ -80,7 +81,7 @@ public class PlayerFileVariable implements FileVariable {
         map.put("masteriesAllowed", new PlayerFileVariable("masteriesAllowed", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLS));
         map.put("skillReclamationPointsUsed", new PlayerFileVariable("skillReclamationPointsUsed", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLS));
 
-        map.put("defaultText", new PlayerFileVariable("defaultText", VariableType.STRING_UTF_16_LE, PlayerBlockType.BODY));
+        map.put("defaultText", new PlayerFileVariable("defaultText", VariableType.STRING_UTF_16_LE, FileBlockType.BODY));
         map.put("itemPositionsSavedAsGridCoords", new PlayerFileVariable("itemPositionsSavedAsGridCoords", VariableType.INTEGER, PlayerBlockType.PLAYER_INVENTORY));
         map.put("numberOfSacks", new PlayerFileVariable("numberOfSacks", VariableType.INTEGER, PlayerBlockType.PLAYER_INVENTORY));
         map.put("currentlyFocusedSackNumber", new PlayerFileVariable("currentlyFocusedSackNumber", VariableType.INTEGER, PlayerBlockType.PLAYER_INVENTORY));
@@ -153,7 +154,7 @@ public class PlayerFileVariable implements FileVariable {
         map.put("criticalHitsReceived", new PlayerFileVariable("criticalHitsReceived", VariableType.INTEGER, PlayerBlockType.PLAYER_STATS));
 
         //repeated variables with different types, should be named (name)__(blockname)
-        map.put("temp", new PlayerFileVariable("temp", VariableType.UNKNOWN, PlayerBlockType.MULTIPLE));
+        map.put("temp", new PlayerFileVariable("temp", VariableType.UNKNOWN, FileBlockType.MULTIPLE));
         map.put("temp__" + PlayerBlockType.PLAYER_ATTRIBUTES, new PlayerFileVariable("temp", VariableType.FLOAT, PlayerBlockType.PLAYER_ATTRIBUTES));
         map.put("temp__" + PlayerBlockType.PLAYER_MAIN, new PlayerFileVariable("temp", VariableType.INTEGER, PlayerBlockType.PLAYER_MAIN));
     }
@@ -181,5 +182,14 @@ public class PlayerFileVariable implements FileVariable {
     @Override
     public BlockType location() {
         return location;
+    }
+
+    @Override
+    public String toString() {
+        return "PlayerFileVariable{" +
+                "location=" + location +
+                ", var='" + var + '\'' +
+                ", type=" + type +
+                '}';
     }
 }
