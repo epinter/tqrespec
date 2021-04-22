@@ -123,12 +123,21 @@ public abstract class FileParser {
         prepareBufferForRead();
     }
 
+    /**
+     * Method that starts the parse process and returns the buffer
+     *
+     * @return buffer
+     */
     public ByteBuffer load() {
         parse();
         return getBuffer();
     }
 
-
+    /**
+     * Reads a file into the buffer
+     *
+     * @throws IOException
+     */
     protected abstract void readFile() throws IOException;
 
     /**
@@ -177,6 +186,13 @@ public abstract class FileParser {
         return ImmutableListMultimap.copyOf(ret);
     }
 
+    /**
+     * Method called by parseBlock to skips child blocks processing.
+     *
+     * @param block Current block
+     * @param name Variable name
+     * @param keyOffset Key offset for current variable
+     */
     protected void skipSubBlock(BlockInfo block, String name, int keyOffset) {
         if (BEGIN_BLOCK.equals(name)) {
             //ignore all child blocks, will be parsed by main loop in parseAllBlocks
@@ -205,14 +221,36 @@ public abstract class FileParser {
         return blockType;
     }
 
-    protected BlockType filterBlockType(BlockType fileBlock, String name) {
-        return fileBlock;
+    /**
+     *  Used to change or execute something related to blocktypes
+     *
+     * @param blockType BlockType
+     * @param name Variable name
+     * @return The new block type
+     */
+    protected BlockType filterBlockType(BlockType blockType, String name) {
+        return blockType;
     }
 
+    /**
+     * Prepare data related to special variables. It's called at the end of parseBlock's variable processing.
+     *
+     * @param variableInfo The variable object
+     * @param name The name found by parseBlock
+     */
     protected abstract void prepareBlockSpecialVariable(VariableInfo variableInfo, String name);
 
+    /**
+     * Process all the special variables inside current block. It's called at the end of parseBlock's block processing.
+     *
+     * @param block Current block
+     */
     protected abstract void processBlockSpecialVariable(BlockInfo block);
 
+    /**
+     * Getter for specialVariableStore
+     * @return specialVariableStore
+     */
     public ListMultimap<String, VariableInfo> getSpecialVariableStore() {
         return specialVariableStore;
     }

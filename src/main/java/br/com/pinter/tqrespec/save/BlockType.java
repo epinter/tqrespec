@@ -22,6 +22,9 @@ package br.com.pinter.tqrespec.save;
 
 import java.io.Serializable;
 
+/**
+ * Class to hold block types of the files parsed. (HEADER, BODY, etc..)
+ */
 public interface BlockType extends Serializable {
     int getValue();
 
