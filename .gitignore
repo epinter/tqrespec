@@ -2,11 +2,9 @@ gamedata/
 libs/
 tqdatabase/
 sdk/
+src/test/resources/_testcopy/
 *.arz
 *.arc
-Player.chr
-winsys.dxg
-winsys.dxb
 hs_err_pid*
 .gradle
 

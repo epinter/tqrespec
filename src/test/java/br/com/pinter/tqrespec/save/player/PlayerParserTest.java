@@ -22,10 +22,13 @@ package br.com.pinter.tqrespec.save.player;
 
 import br.com.pinter.tqrespec.core.GuiceModule;
 import br.com.pinter.tqrespec.core.InjectionContext;
+import br.com.pinter.tqrespec.save.UID;
 import br.com.pinter.tqrespec.save.VariableInfo;
 import br.com.pinter.tqrespec.save.VariableType;
+import br.com.pinter.tqrespec.tqdata.DefaultMapTeleport;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.tqdata.GameVersion;
+import br.com.pinter.tqrespec.tqdata.MapTeleport;
 import br.com.pinter.tqrespec.util.Constants;
 import org.junit.Assert;
 import org.junit.Before;
@@ -38,8 +41,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -102,9 +104,9 @@ public class PlayerParserTest {
 
     }
 
-    @Test
-    public void readGender_Should_readGenderFromSaveGame() {
+    private void parse() {
         try {
+            saveData.reset();
             playerParser.parse();
             saveData.getDataMap().setBlockInfo(playerParser.getBlockInfo());
             saveData.setHeaderInfo(playerParser.getHeaderInfo());
@@ -113,6 +115,11 @@ public class PlayerParserTest {
             logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
             fail();
         }
+    }
+
+    @Test
+    public void readGender_Should_readGenderFromSaveGame() {
+        parse();
 
         String playerCharacterClass = saveData.getPlayerCharacterClass();
         assertNotNull(playerCharacterClass);
@@ -184,15 +191,7 @@ public class PlayerParserTest {
 
     @Test
     public void readDifficulty_Should_readLegendaryDifficultyFromSaveGame() {
-        try {
-            playerParser.parse();
-            saveData.getDataMap().setBlockInfo(playerParser.getBlockInfo());
-            saveData.setHeaderInfo(playerParser.getHeaderInfo());
-            saveData.getDataMap().setVariableLocation(playerParser.getVariableLocation());
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
-            fail();
-        }
+        parse();
 
         List<VariableInfo> variableInfoList = player.getTempVariableInfo("difficulty");
         Assert.assertEquals(VariableType.INTEGER, variableInfoList.get(0).getVariableType());
@@ -203,7 +202,7 @@ public class PlayerParserTest {
 
     @Test
     public void readStr_Should_readStrFromSavegame() {
-        float str = (Float) readFloatTempVar("str");
+        float str = readFloatTempVar("str");
         assertEquals(54.0, str, 0);
 
     }
@@ -252,16 +251,72 @@ public class PlayerParserTest {
         assertEquals(75, level, 0);
     }
 
-    private float readFloatTempVar(String alias) {
-        try {
-            playerParser.parse();
-            saveData.getDataMap().setBlockInfo(playerParser.getBlockInfo());
-            saveData.setHeaderInfo(playerParser.getHeaderInfo());
-            saveData.getDataMap().setVariableLocation(playerParser.getVariableLocation());
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
-            fail();
+    @Test
+    public void readClass_Should_readClassFromSavegame() {
+        parse();
+
+        assertEquals("tagCClass27", player.getSaveData().getHeaderInfo().getPlayerClassTag());
+    }
+
+    @Test
+    public void readPlayerName_Should_readPlayerNameFromSavegame() {
+        assertEquals("teste4", readStringVar("myPlayerName"));
+    }
+
+    @Test
+    public void matchTeleports_Should_matchTeleportsFromSavegame() {
+        parse();
+        List<TeleportDifficulty> saveTeleports = player.getTeleports();
+        assertEquals(3, saveTeleports.size());
+        Map<Integer, List<UID>> teleports = new HashMap<>();
+
+        final String helos = "4136144580-999965812-3093316465-1160239764";
+        final String hades = "137995607-2789228967-2353681595-2123008457";
+
+        boolean helosNormal = false;
+        boolean helosEpic = false;
+        boolean helosLegendary = false;
+        boolean hadesNormal = false;
+        boolean hadesEpic = false;
+        boolean hadesLegendary = false;
+        for (TeleportDifficulty t: saveTeleports) {
+            assertTrue(t.getTeleportList().size() > 0);
+            for (VariableInfo v: t.getTeleportList()) {
+                UID uid = new UID((byte[]) v.getValue());
+                switch (uid.getUid()) {
+                    case helos -> {
+                        helosNormal = t.getDifficulty() == 0 || helosNormal;
+                        helosEpic = t.getDifficulty() == 1 || helosEpic;
+                        helosLegendary = t.getDifficulty() == 2 || helosLegendary;
+                    }
+                    case hades -> {
+                        hadesNormal = t.getDifficulty() == 0 || hadesNormal;
+                        hadesEpic = t.getDifficulty() == 1 || hadesEpic;
+                        hadesLegendary = t.getDifficulty() == 2 || hadesLegendary;
+                    }
+                    default -> {
+                        //ignored
+                        }
+                }
+                teleports.computeIfAbsent(t.getDifficulty(), k -> new ArrayList<>());
+                if(!teleports.get(t.getDifficulty()).contains(uid)) {
+                    teleports.get(t.getDifficulty()).add(uid);
+                }
+            }
         }
+        assertEquals(30,teleports.get(0).size());
+        assertEquals(30,teleports.get(1).size());
+        assertEquals(38,teleports.get(2).size());
+        assertTrue(hadesNormal && hadesEpic && hadesLegendary && helosNormal && helosEpic && helosLegendary);
+    }
+
+    @Test
+    public void readMonsterName_Should_readMonsterNameFromSavegame() {
+        assertEquals("{^r}Hades ~ God of the Dead", readStringVar(PlayerFileVariable.valueOf("greatestMonsterKilledName").var()));
+    }
+
+    private float readFloatTempVar(String alias) {
+        parse();
 
         List<VariableInfo> variableInfoList = player.getTempVariableInfo(alias);
         Assert.assertEquals(VariableType.FLOAT, variableInfoList.get(0).getVariableType());
@@ -269,16 +324,15 @@ public class PlayerParserTest {
     }
 
     private int readIntegerVar(String name) {
-        try {
-            playerParser.parse();
-            saveData.getDataMap().setBlockInfo(playerParser.getBlockInfo());
-            saveData.setHeaderInfo(playerParser.getHeaderInfo());
-            saveData.getDataMap().setVariableLocation(playerParser.getVariableLocation());
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
-            fail();
-        }
+        parse();
 
         return saveData.getDataMap().getInt(name);
     }
+
+    private String readStringVar(String name) {
+        parse();
+
+        return saveData.getDataMap().getString(name);
+    }
+
 }

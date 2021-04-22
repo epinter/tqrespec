@@ -22,6 +22,9 @@ package br.com.pinter.tqrespec.save.player;
 
 import br.com.pinter.tqrespec.core.GuiceModule;
 import br.com.pinter.tqrespec.core.InjectionContext;
+import br.com.pinter.tqrespec.save.stash.StashData;
+import br.com.pinter.tqrespec.save.stash.StashLoader;
+import br.com.pinter.tqrespec.save.stash.StashWriter;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
@@ -148,8 +151,7 @@ public class PlayerWriterTest {
         }
     }
 
-    @Test
-    public void writeGender_Should_writeAndReadGenderFromSaveGame() {
+    private void prepareCopySavegame() {
         try {
             saveData.reset();
             saveData.setPlayerName("savegame");
@@ -181,10 +183,9 @@ public class PlayerWriterTest {
         PowerMockito.when(mockSaveData.isCustomQuest()).thenReturn(saveData.isCustomQuest());
         PowerMockito.when(mockSaveData.getDataMap()).thenReturn(saveData.getDataMap());
         PowerMockito.when(mockSaveData.getBuffer()).thenReturn(saveData.getBuffer());
+    }
 
-        saveData.getDataMap().setString(Constants.Save.PLAYER_CHARACTER_CLASS, "XXGenderX");
-        saveData.getDataMap().setString(Constants.Save.PLAYER_TEXTURE, "XXTextureX");
-
+    private void copyAndParseSavegame() {
         try {
             playerWriter.copyCurrentSave("testcopy");
         } catch (IOException e) {
@@ -203,14 +204,57 @@ public class PlayerWriterTest {
             saveData.getDataMap().setBlockInfo(playerParser.getBlockInfo());
             saveData.setHeaderInfo(playerParser.getHeaderInfo());
             saveData.getDataMap().setVariableLocation(playerParser.getVariableLocation());
-            String playerCharacterClass = saveData.getPlayerCharacterClass();
-            String texture = saveData.getDataMap().getString(Constants.Save.PLAYER_TEXTURE);
-
-            assertNotNull(playerCharacterClass);
-            assertTrue(playerCharacterClass.equals("XXGenderX") && texture.equals("XXTextureX"));
         } catch (Exception e) {
             logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
             fail();
         }
     }
+
+    @Test
+    public void readStashFname_Should_ReadStashFnameFromSaveGame() {
+        prepareCopySavegame();
+
+        copyAndParseSavegame();
+
+        StashData stashData = null;
+        StashLoader stashLoader = new StashLoader();
+        if(stashLoader.loadStash(Paths.get("src/test/resources/_testcopy"), "testcopy")) {
+            stashData = stashLoader.getSaveData();
+            StashWriter stashWriter = new StashWriter(stashData);
+            stashWriter.save();
+        } else {
+            fail();
+        }
+
+        assertTrue("src\\test\\resources\\_testcopy\\winsys.dxb".equals(stashData.getDataMap().getString("fName"))
+                || "src\\test\\resources\\_testcopy/winsys.dxb".equals(stashData.getDataMap().getString("fName")));
+    }
+
+    @Test
+    public void writeGender_Should_writeAndReadGenderFromSaveGame() {
+        prepareCopySavegame();
+
+        saveData.getDataMap().setString(Constants.Save.PLAYER_CHARACTER_CLASS, "XXGenderX");
+        saveData.getDataMap().setString(Constants.Save.PLAYER_TEXTURE, "XXTextureX");
+
+        copyAndParseSavegame();
+
+        String playerCharacterClass = saveData.getPlayerCharacterClass();
+        String texture = saveData.getDataMap().getString(Constants.Save.PLAYER_TEXTURE);
+
+        assertNotNull(playerCharacterClass);
+        assertTrue(playerCharacterClass.equals("XXGenderX") && texture.equals("XXTextureX"));
+    }
+
+    @Test
+    public void writePoints_Should_writeAndReadPointsFromSaveGame() {
+        prepareCopySavegame();
+
+        saveData.getDataMap().setInt("modifierPoints", 121);
+
+        copyAndParseSavegame();
+
+        assertEquals(121, saveData.getDataMap().getInt("modifierPoints"), 0);
+    }
+
 }
