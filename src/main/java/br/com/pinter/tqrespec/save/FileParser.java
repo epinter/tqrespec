@@ -118,7 +118,18 @@ public abstract class FileParser {
      *
      * @throws IOException
      */
-    protected abstract void fillBuffer() throws IOException;
+    public void fillBuffer() throws IOException {
+        readFile();
+        prepareBufferForRead();
+    }
+
+    public ByteBuffer load() {
+        parse();
+        return getBuffer();
+    }
+
+
+    protected abstract void readFile() throws IOException;
 
     /**
      * This method is called to parse a block, and should return a table of variables found inside the block.

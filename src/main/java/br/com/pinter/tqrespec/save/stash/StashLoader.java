@@ -39,7 +39,7 @@ public class StashLoader {
         StashParser stashParser = new StashParser(playerPath.toString());
         stashData = new StashData();
         stashData.setPlayerPath(playerPath);
-        stashData.setBuffer(stashParser.loadStash());
+        stashData.setBuffer(stashParser.load());
         stashData.setPlayerName(playerName);
         stashData.setCustomQuest(false);
         stashData.getDataMap().setBlockInfo(stashParser.getBlockInfo());

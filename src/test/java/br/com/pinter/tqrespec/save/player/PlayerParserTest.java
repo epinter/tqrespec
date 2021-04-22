@@ -82,7 +82,6 @@ public class PlayerParserTest {
     public void parseAllBlocks_Should_parseAllBlocksFromSavegame() {
         try {
             playerParser.fillBuffer();
-            playerParser.readPlayerChr();
         } catch (Exception e) {
             logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
             fail("parseAllBlocks: readPlayerChr() failed");
@@ -173,7 +172,6 @@ public class PlayerParserTest {
     @Test
     public void parseHeader_Should_parseFileHeader() {
         try {
-            playerParser.readPlayerChr();
             playerParser.fillBuffer();
             playerParser.buildBlocksTable();
             playerParser.prepareForParse();

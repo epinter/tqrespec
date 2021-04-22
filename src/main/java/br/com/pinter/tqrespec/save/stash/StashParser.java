@@ -43,12 +43,8 @@ public class StashParser extends FileParser {
         return Paths.get(playerPath, Constants.STASH_FILE).toString();
     }
 
-    public ByteBuffer loadStash() {
-        parse();
-        return getBuffer();
-    }
-
-    private void readStash() throws IOException {
+    @Override
+    protected void readFile() throws IOException {
         try (FileChannel in = new FileInputStream(getStashFileName()).getChannel()) {
             setBuffer(ByteBuffer.allocate((int) in.size()));
             this.getBuffer().order(ByteOrder.LITTLE_ENDIAN);
@@ -67,12 +63,6 @@ public class StashParser extends FileParser {
             throw new IOException("Can't read stash from" + playerPath);
         }
         logger.log(System.Logger.Level.DEBUG, "Stash ''{0}'' loaded, size=''{1}''", playerPath, this.getBuffer().capacity());
-    }
-
-    @Override
-    protected void fillBuffer() throws IOException {
-        readStash();
-        prepareBufferForRead();
     }
 
     @Override

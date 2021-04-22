@@ -79,7 +79,7 @@ public class Player {
                     new File(getSaveData().getPlayerChr().toString()),
                     playerName);
 
-            getSaveData().setBuffer(playerParser.loadPlayer());
+            getSaveData().setBuffer(playerParser.load());
             getSaveData().getDataMap().setBlockInfo(playerParser.getBlockInfo());
             getSaveData().setHeaderInfo(playerParser.getHeaderInfo());
             getSaveData().getDataMap().setVariableLocation(playerParser.getVariableLocation());

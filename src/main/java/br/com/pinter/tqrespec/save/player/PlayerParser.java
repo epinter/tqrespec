@@ -140,12 +140,6 @@ final class PlayerParser extends FileParser {
     }
 
     @Override
-    protected void fillBuffer() throws IOException {
-        readPlayerChr();
-        prepareBufferForRead();
-    }
-
-    @Override
     protected void prepareForParse() throws IOException, IncompatibleSavegameException {
         //add header to list of ignored blocks
         getBlocksIgnore().add(0);
@@ -167,12 +161,8 @@ final class PlayerParser extends FileParser {
         }
     }
 
-    ByteBuffer loadPlayer() {
-        parse();
-        return getBuffer();
-    }
-
-    void readPlayerChr() throws IOException {
+    @Override
+    protected void readFile() throws IOException {
         if (!playerChr.exists()) {
             logger.log(System.Logger.Level.DEBUG, "File ''{0}'' doesn't exists", playerChr.toString());
             return;

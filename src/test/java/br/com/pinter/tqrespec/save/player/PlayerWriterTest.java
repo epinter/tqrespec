@@ -91,7 +91,7 @@ public class PlayerWriterTest {
         try {
             saveData.reset();
             saveData.setPlayerName("savegame");
-            saveData.setBuffer(playerParser.loadPlayer());
+            saveData.setBuffer(playerParser.load());
             saveData.getDataMap().setBlockInfo(playerParser.getBlockInfo());
             saveData.setHeaderInfo(playerParser.getHeaderInfo());
             saveData.getDataMap().setVariableLocation(playerParser.getVariableLocation());
@@ -138,7 +138,7 @@ public class PlayerWriterTest {
         try {
             saveData.reset();
             saveData.setPlayerName("testcopy");
-            saveData.setBuffer(playerParser.loadPlayer());
+            saveData.setBuffer(playerParser.load());
             saveData.getDataMap().setBlockInfo(playerParser.getBlockInfo());
             saveData.setHeaderInfo(playerParser.getHeaderInfo());
             saveData.getDataMap().setVariableLocation(playerParser.getVariableLocation());
@@ -155,7 +155,7 @@ public class PlayerWriterTest {
         try {
             saveData.reset();
             saveData.setPlayerName("savegame");
-            saveData.setBuffer(playerParser.loadPlayer());
+            saveData.setBuffer(playerParser.load());
             saveData.getDataMap().setBlockInfo(playerParser.getBlockInfo());
             saveData.setHeaderInfo(playerParser.getHeaderInfo());
             saveData.getDataMap().setVariableLocation(playerParser.getVariableLocation());
@@ -200,7 +200,7 @@ public class PlayerWriterTest {
         try {
             saveData.reset();
             saveData.setPlayerName("testcopy");
-            saveData.setBuffer(playerParser.loadPlayer());
+            saveData.setBuffer(playerParser.load());
             saveData.getDataMap().setBlockInfo(playerParser.getBlockInfo());
             saveData.setHeaderInfo(playerParser.getHeaderInfo());
             saveData.getDataMap().setVariableLocation(playerParser.getVariableLocation());
