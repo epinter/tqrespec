@@ -103,25 +103,6 @@ public class PlayerParserTest {
     }
 
     @Test
-    public void readFloat_Should_readFloatFromSavegame() {
-        try {
-            playerParser.parse();
-            saveData.getDataMap().setBlockInfo(playerParser.getBlockInfo());
-            saveData.setHeaderInfo(playerParser.getHeaderInfo());
-            saveData.getDataMap().setVariableLocation(playerParser.getVariableLocation());
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
-            fail();
-        }
-
-        List<VariableInfo> variableInfoList = player.getTempVariableInfo("str");
-        Assert.assertEquals(VariableType.FLOAT, variableInfoList.get(0).getVariableType());
-        Float str = (Float) variableInfoList.get(0).getValue();
-        assertNotNull(str);
-        assertTrue(str > 0.0);
-    }
-
-    @Test
     public void readGender_Should_readGenderFromSaveGame() {
         try {
             playerParser.parse();
@@ -199,5 +180,105 @@ public class PlayerParserTest {
         assertTrue(headerInfo.getHeaderVersion() == GameVersion.TQIT || headerInfo.getHeaderVersion() == GameVersion.TQAE);
         assertTrue(headerInfo.getPlayerVersion() > 0);
         assertTrue(headerInfo.getPlayerLevel() > 0);
+    }
+
+    @Test
+    public void readDifficulty_Should_readLegendaryDifficultyFromSaveGame() {
+        try {
+            playerParser.parse();
+            saveData.getDataMap().setBlockInfo(playerParser.getBlockInfo());
+            saveData.setHeaderInfo(playerParser.getHeaderInfo());
+            saveData.getDataMap().setVariableLocation(playerParser.getVariableLocation());
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            fail();
+        }
+
+        List<VariableInfo> variableInfoList = player.getTempVariableInfo("difficulty");
+        Assert.assertEquals(VariableType.INTEGER, variableInfoList.get(0).getVariableType());
+        Integer difficulty = (Integer) variableInfoList.get(0).getValue();
+
+        assertEquals(2, difficulty, 0);
+    }
+
+    @Test
+    public void readStr_Should_readStrFromSavegame() {
+        float str = (Float) readFloatTempVar("str");
+        assertEquals(54.0, str, 0);
+
+    }
+
+    @Test
+    public void readIntl_Should_readStrFromSavegame() {
+        float intl = readFloatTempVar("int");
+        assertEquals(622.0, intl, 0);
+
+    }
+
+    @Test
+    public void readDex_Should_readStrFromSavegame() {
+        float dex = readFloatTempVar("dex");
+        assertEquals(102.0, dex, 0);
+
+    }
+
+    @Test
+    public void readMana_Should_readStrFromSavegame() {
+        float mana = readFloatTempVar("mana");
+        assertEquals(340.0, mana, 0);
+    }
+
+    @Test
+    public void readLife_Should_readStrFromSavegame() {
+        float life = readFloatTempVar("life");
+        assertEquals(460.0, life, 0);
+    }
+
+    @Test
+    public void readAvailableAttributePoints_Should_readAvailableAttributePointsFromSavegame() {
+        float available = readIntegerVar("modifierPoints");
+        assertEquals(8.0, available, 0);
+    }
+
+    @Test
+    public void readXp_Should_readXpFromSavegame() {
+        float xp = readIntegerVar("currentStats.experiencePoints");
+        assertEquals(160547234, xp, 0);
+    }
+
+    @Test
+    public void readLevel_Should_readLevelFromSavegame() {
+        float level = readIntegerVar("currentStats.charLevel");
+        assertEquals(75, level, 0);
+    }
+
+    private float readFloatTempVar(String alias) {
+        try {
+            playerParser.parse();
+            saveData.getDataMap().setBlockInfo(playerParser.getBlockInfo());
+            saveData.setHeaderInfo(playerParser.getHeaderInfo());
+            saveData.getDataMap().setVariableLocation(playerParser.getVariableLocation());
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            fail();
+        }
+
+        List<VariableInfo> variableInfoList = player.getTempVariableInfo(alias);
+        Assert.assertEquals(VariableType.FLOAT, variableInfoList.get(0).getVariableType());
+        return (Float) variableInfoList.get(0).getValue();
+    }
+
+    private int readIntegerVar(String name) {
+        try {
+            playerParser.parse();
+            saveData.getDataMap().setBlockInfo(playerParser.getBlockInfo());
+            saveData.setHeaderInfo(playerParser.getHeaderInfo());
+            saveData.getDataMap().setVariableLocation(playerParser.getVariableLocation());
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            fail();
+        }
+
+        return saveData.getDataMap().getInt(name);
     }
 }
