@@ -474,4 +474,46 @@ public class FileDataMap implements DeepCloneable {
         BlockInfo block = this.blockInfo.get(variable.getBlockOffset());
         block.getStagingVariables().put(variable.getName(),variable);
     }
+
+    public List<VariableInfo> getTempVariableInfo(String var) {
+        List<Integer> temp = variableLocation.get("temp");
+        for (Integer blockStart : temp) {
+            BlockInfo b = blockInfo.get(blockStart);
+            if (!b.getVariableByAlias(var).isEmpty()) {
+                return b.getVariableByAlias(var);
+            }
+        }
+        return List.of();
+    }
+
+    public int getTempAttr(String attr) {
+        int ret = -1;
+        List<VariableInfo> varList = getTempVariableInfo(attr);
+        if (varList.size() == 1 && varList.get(0) != null) {
+            VariableInfo attrVar = varList.get(0);
+            if (attrVar.getVariableType() == VariableType.FLOAT) {
+                ret = Math.round(getFloat(attrVar));
+            } else if (attrVar.getVariableType() == VariableType.INTEGER) {
+                ret = getInt(attrVar);
+            }
+        }
+        if (ret < 0) {
+            throw new IllegalArgumentException(String.format("attribute not found %s", attr));
+        }
+        return ret;
+    }
+
+    public void setTempAttr(String attr, Integer val) {
+        List<VariableInfo> varList = getTempVariableInfo(attr);
+        if (!varList.isEmpty() && varList.get(0) != null) {
+            VariableInfo attrVar = varList.get(0);
+            if (attrVar.getVariableType() == VariableType.FLOAT) {
+                setFloat(attrVar, val);
+            } else if (attrVar.getVariableType() == VariableType.INTEGER) {
+                setInt(attrVar, val);
+            }
+        } else {
+            throw new IllegalArgumentException(String.format("attribute not found %s", attr));
+        }
+    }
 }

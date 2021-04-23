@@ -191,7 +191,7 @@ public class PlayerParserTest {
     public void readDifficulty_Should_readLegendaryDifficultyFromSaveGame() {
         parse();
 
-        List<VariableInfo> variableInfoList = player.getTempVariableInfo("difficulty");
+        List<VariableInfo> variableInfoList = saveData.getDataMap().getTempVariableInfo("difficulty");
         Assert.assertEquals(VariableType.INTEGER, variableInfoList.get(0).getVariableType());
         Integer difficulty = (Integer) variableInfoList.get(0).getValue();
 
@@ -316,7 +316,7 @@ public class PlayerParserTest {
     private float readFloatTempVar(String alias) {
         parse();
 
-        List<VariableInfo> variableInfoList = player.getTempVariableInfo(alias);
+        List<VariableInfo> variableInfoList = saveData.getDataMap().getTempVariableInfo(alias);
         Assert.assertEquals(VariableType.FLOAT, variableInfoList.get(0).getVariableType());
         return (Float) variableInfoList.get(0).getValue();
     }

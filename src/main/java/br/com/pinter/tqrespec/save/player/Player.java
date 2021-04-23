@@ -74,7 +74,7 @@ public class Player {
             prepareSaveData();
 
             getSaveData().setPlayerName(playerName);
-            getSaveData().setPlayerChr(gameInfo.playerChr(playerName, saveData.isCustomQuest()));
+            getSaveData().setPlayerChr(gameInfo.playerChr(playerName, getSaveData().isCustomQuest()));
             PlayerParser playerParser = new PlayerParser(
                     new File(getSaveData().getPlayerChr().toString()),
                     playerName);
@@ -327,86 +327,44 @@ public class Player {
         return ret;
     }
 
-    List<VariableInfo> getTempVariableInfo(String var) {
-        List<Integer> temp = getSaveData().getDataMap().getVariableLocation().get("temp");
-        for (Integer blockStart : temp) {
-            BlockInfo b = getSaveData().getDataMap().getBlockInfo().get(blockStart);
-            if (!b.getVariableByAlias(var).isEmpty()) {
-                return b.getVariableByAlias(var);
-            }
-        }
-        return List.of();
-    }
-
-    private int getTempAttr(String attr) {
-        int ret = -1;
-        List<VariableInfo> varList = getTempVariableInfo(attr);
-        if (varList.size() == 1 && varList.get(0) != null) {
-            VariableInfo attrVar = varList.get(0);
-            if (attrVar.getVariableType() == VariableType.FLOAT) {
-                ret = Math.round(getVariableValueFloat(attrVar));
-            } else if (attrVar.getVariableType() == VariableType.INTEGER) {
-                ret = getVariableValueInteger(attrVar);
-            }
-        }
-        if (ret < 0) {
-            throw new IllegalArgumentException(String.format("attribute not found %s", attr));
-        }
-        return ret;
-    }
-
-    private void setTempAttr(String attr, Integer val) {
-        List<VariableInfo> varList = getTempVariableInfo(attr);
-        if (!varList.isEmpty() && varList.get(0) != null) {
-            VariableInfo attrVar = varList.get(0);
-            if (attrVar.getVariableType() == VariableType.FLOAT) {
-                getSaveData().getDataMap().setFloat(attrVar, val);
-            } else if (attrVar.getVariableType() == VariableType.INTEGER) {
-                getSaveData().getDataMap().setInt(attrVar, val);
-            }
-        } else {
-            throw new IllegalArgumentException(String.format("attribute not found %s", attr));
-        }
-    }
-
     public int getStr() {
-        return getTempAttr("str");
+        return getSaveData().getDataMap().getTempAttr("str");
     }
 
     public void setStr(int val) {
-        setTempAttr("str", val);
+        getSaveData().getDataMap().setTempAttr("str", val);
     }
 
     public int getInt() {
-        return getTempAttr("int");
+        return getSaveData().getDataMap().getTempAttr("int");
     }
 
     public void setInt(int val) {
-        setTempAttr("int", val);
+        getSaveData().getDataMap().setTempAttr("int", val);
     }
 
     public int getDex() {
-        return getTempAttr("dex");
+        return getSaveData().getDataMap().getTempAttr("dex");
     }
 
     public void setDex(int val) {
-        setTempAttr("dex", val);
+        getSaveData().getDataMap().setTempAttr("dex", val);
     }
 
     public int getLife() {
-        return getTempAttr("life");
+        return getSaveData().getDataMap().getTempAttr("life");
     }
 
     public void setLife(int val) {
-        setTempAttr("life", val);
+        getSaveData().getDataMap().setTempAttr("life", val);
     }
 
     public int getMana() {
-        return getTempAttr("mana");
+        return getSaveData().getDataMap().getTempAttr("mana");
     }
 
     public void setMana(int val) {
-        setTempAttr("mana", val);
+        getSaveData().getDataMap().setTempAttr("mana", val);
     }
 
     public int getModifierPoints() {
@@ -570,7 +528,7 @@ public class Player {
     }
 
     public int getDifficulty() {
-        return getTempAttr("difficulty");
+        return getSaveData().getDataMap().getTempAttr("difficulty");
     }
 
     public List<MapTeleport> getDefaultMapTeleports(int difficulty) {
@@ -650,8 +608,8 @@ public class Player {
         newVi.setKeyOffset(offset);
         newVi.setValOffset(offset + teleportUIDKeyLength);
         newVi.setValSize(16);
-        saveData.getDataMap().insertVariable(newVi.getKeyOffset(), newVi);
-        saveData.getDataMap().incrementInt(uidSize);
+        getSaveData().getDataMap().insertVariable(newVi.getKeyOffset(), newVi);
+        getSaveData().getDataMap().incrementInt(uidSize);
     }
 
     private TeleportDifficulty getTeleportUidFromDifficulty(int difficulty) {
@@ -689,7 +647,9 @@ public class Player {
 
     public void reset() {
         State.get().setSaveInProgress(null);
-        saveData.reset();
+        if(getSaveData()!=null) {
+            getSaveData().reset();
+        }
     }
 
 }
