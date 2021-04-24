@@ -28,13 +28,11 @@ import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
-import br.com.pinter.tqrespec.util.Version;
 import com.google.inject.Inject;
 import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -55,8 +53,6 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.Locale;
@@ -148,49 +144,14 @@ public class MainController implements Initializable {
             Util.tryTagText(txt, skillsTab, Constants.UI.TAG_SKILLSTAB ,false, true);
         }
         mainFormTitle.setText(String.format("%s v%s", Util.getBuildTitle(), Util.getBuildVersion()));
-        mainFormInitialized.addListener(((observable, oldValue, newValue) -> {
-            MyTask<Void> windowShownTask = new MyTask<>() {
-                @Override
-                protected Void call() {
-                    windowShownHandler();
-                    return null;
-                }
-            };
-            new WorkerThread(windowShownTask).start();
-        }));
-
-        Task<Version> taskCheckVersion = new Task<>() {
+        mainFormInitialized.addListener(((observable, oldValue, newValue) -> new WorkerThread(new MyTask<>() {
             @Override
-            protected Version call() {
-                Version version = new Version(Util.getBuildVersion());
-                version.checkNewerVersion(Constants.VERSION_CHECK_URL);
-                //new version available (-1 our version is less than remote, 0 equal, 1 greater, -2 error checking
-                return version;
+            protected Void call() {
+                windowShownHandler();
+                return null;
             }
-        };
+        }).start()));
 
-        taskCheckVersion.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, (WorkerStateEvent e) -> {
-            Version version = taskCheckVersion.getValue();
-            if (version == null || version.getLastCheck() != -1 || StringUtils.isEmpty(version.getUrlPage())) {
-                versionCheck.setDisable(true);
-                return;
-            }
-            versionCheck.setOnAction(event -> {
-                final Task<Void> openUrl = new Task<>() {
-                    @Override
-                    public Void call() {
-                        try {
-                            hostServices.showDocument(new URI(version.getUrlPage()).toString());
-                        } catch (URISyntaxException e) {
-                            //ignored
-                        }
-                        return null;
-                    }
-                };
-                new Thread(openUrl).start();
-            });
-            versionCheck.setText(Util.getUIMessage("about.newversion"));
-        });
         //initialize properties and bind them to respective properties in the tab controllers
         saveDisabled.setValue(saveButton.isDisable());
         pointsPaneController.setSaveDisabled(saveButton.isDisabled());
@@ -225,7 +186,7 @@ public class MainController implements Initializable {
             }
         });
 
-        new Thread(taskCheckVersion).start();
+        new CheckVersionService(Util.getBuildVersion(), Constants.VERSION_CHECK_URL, versionCheck).start();
     }
 
     private void addCharactersToCombo() {
@@ -363,9 +324,7 @@ public class MainController implements Initializable {
                 setAllControlsDisable(false);
             }
         });
-
         new WorkerThread(copyCharTask).start();
-
     }
 
     private boolean gameRunningAlert() {
@@ -428,7 +387,6 @@ public class MainController implements Initializable {
                 reset();
             }
         });
-
         new WorkerThread(backupSaveGameTask).start();
     }
 
