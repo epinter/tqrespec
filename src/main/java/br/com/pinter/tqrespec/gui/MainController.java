@@ -324,7 +324,15 @@ public class MainController implements Initializable {
                 setAllControlsDisable(false);
             }
         });
+        setCursorWaitOnTask(copyCharTask);
         new WorkerThread(copyCharTask).start();
+    }
+
+    private void setCursorWaitOnTask(MyTask<?> task) {
+        rootelement.getScene().setCursor(Cursor.WAIT);
+        task.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, (e) -> rootelement.getScene().setCursor(Cursor.DEFAULT));
+        task.addEventHandler(WorkerStateEvent.WORKER_STATE_FAILED, (e) -> rootelement.getScene().setCursor(Cursor.DEFAULT));
+        task.addEventHandler(WorkerStateEvent.WORKER_STATE_CANCELLED, (e) -> rootelement.getScene().setCursor(Cursor.DEFAULT));
     }
 
     private boolean gameRunningAlert() {
@@ -366,6 +374,7 @@ public class MainController implements Initializable {
             @Override
             public void handleEvent(WorkerStateEvent workerStateEvent) {
                 if ((int) backupSaveGameTask.getValue() == 2) {
+                    setCursorWaitOnTask(saveGameTask);
                     new WorkerThread(saveGameTask).start();
                 } else {
                     Util.showError(Util.getUIMessage("alert.errorbackup_header"),
@@ -387,6 +396,7 @@ public class MainController implements Initializable {
                 reset();
             }
         });
+        setCursorWaitOnTask(backupSaveGameTask);
         new WorkerThread(backupSaveGameTask).start();
     }
 

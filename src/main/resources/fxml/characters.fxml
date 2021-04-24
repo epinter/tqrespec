@@ -76,10 +76,7 @@
                   <TableColumn fx:id="colNumHitsReceived" prefWidth="75.0" text="numHitsReceived" />
                   <TableColumn fx:id="colNumHitsInflicted" prefWidth="75.0" text="numHitsInflicted" />
                   <TableColumn fx:id="colCriticalHitsInflicted" prefWidth="75.0" text="criticalHitsInflicted" />
-               </columns>
-               <cursor>
-                  <Cursor fx:constant="DEFAULT" />
-               </cursor></TableView>
+               </columns></TableView>
             <GridPane maxHeight="50.0" maxWidth="1.7976931348623157E308" minHeight="50.0" prefHeight="50.0" VBox.vgrow="NEVER">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="235.0" minWidth="10.0" prefWidth="235.0" />
@@ -94,9 +91,6 @@
                         <Insets bottom="6.0" left="20.0" right="20.0" top="6.0" />
                      </GridPane.margin></Button>
                </children>
-               <cursor>
-                  <Cursor fx:constant="DEFAULT" />
-               </cursor>
             </GridPane>
          </children>
       </VBox>

@@ -20,13 +20,16 @@
 
 package br.com.pinter.tqrespec.gui;
 
+import br.com.pinter.tqrespec.core.MyTask;
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
+import br.com.pinter.tqrespec.core.WorkerThread;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.player.PlayerLoader;
 import br.com.pinter.tqrespec.tqdata.*;
 import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
 import com.google.inject.Inject;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -257,19 +260,35 @@ public class CharactersViewController implements Initializable {
         stage.setTitle(Util.getUIMessage("characters.title", Util.getBuildTitle()));
         charFormTitle.setText(Util.getUIMessage("characters.title", Util.getBuildTitle()));
 
-        stage.setOnShowing(evt -> {
-            characters = new ArrayList<>();
-            for (String p : gameInfo.getPlayerListMain()) {
-                try {
-                    player.loadPlayer(p);
-                } catch (RuntimeException e) {
-                    logger.log(System.Logger.Level.ERROR, String.format("Error loading character '%s'", p));
-                    continue;
-                }
-                characters.add(player.getCharacter());
-            }
+        stage.addEventHandler(WindowEvent.WINDOW_SHOWING, e -> {
+            new WorkerThread(new MyTask<>() {
+                @Override
+                protected Void call() {
+                    Platform.runLater(() -> {
+                        charactersTable.setPlaceholder(new Label(Util.getUIMessage("characters.loadingPlaceholder")));
+                        rootElement.getScene().setCursor(Cursor.WAIT);
 
-            setupTable();
+                    });
+
+                    characters = new ArrayList<>();
+                    for (String p : gameInfo.getPlayerListMain()) {
+                        try {
+                            player.loadPlayer(p);
+                        } catch (RuntimeException e) {
+                            logger.log(System.Logger.Level.ERROR, String.format("Error loading character '%s'", p));
+                            continue;
+                        }
+                        characters.add(player.getCharacter());
+                    }
+
+                    Platform.runLater(() -> {
+                        setupTable();
+                        charactersTable.setPlaceholder(new Label(""));
+                        Platform.runLater(() -> rootElement.getScene().setCursor(Cursor.DEFAULT));
+                    });
+                    return null;
+                }
+            }).start();
         });
 
         exportButton.setGraphic(Icon.FA_FILE_EXPORT.create());
