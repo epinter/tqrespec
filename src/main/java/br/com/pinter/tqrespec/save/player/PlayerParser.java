@@ -24,8 +24,10 @@ import br.com.pinter.tqrespec.save.BlockType;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.*;
 import br.com.pinter.tqrespec.tqdata.GameVersion;
+import br.com.pinter.tqrespec.util.Util;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableListMultimap;
+import javafx.application.Platform;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -162,10 +164,10 @@ final class PlayerParser extends FileParser {
     }
 
     @Override
-    protected void readFile() throws IOException {
+    protected boolean readFile() throws IOException {
         if (!playerChr.exists()) {
             logger.log(System.Logger.Level.DEBUG, "File ''{0}'' doesn't exists", playerChr.toString());
-            return;
+            throw new IOException("Couldn't load file");
         }
 
         try (FileChannel in = new FileInputStream(playerChr).getChannel()) {
@@ -175,9 +177,11 @@ final class PlayerParser extends FileParser {
             while (true) {
                 if (in.read(this.getBuffer()) <= 0) break;
             }
+
         }
 
         logger.log(System.Logger.Level.DEBUG, "File ''{0}'' read to buffer: ''{1}''", playerChr, this.getBuffer());
+        return this.getBuffer() != null;
     }
 
     @Override

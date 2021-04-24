@@ -233,8 +233,9 @@ public class MainController implements Initializable {
             characterCombo.getSelectionModel().clearSelection();
             characterCombo.getItems().setAll(gameInfo.getPlayerListMain());
             characterCombo.getItems().sort(String::compareTo);
-        } catch (Exception e) {
+        } catch (ClassCastException | UnsupportedOperationException | IllegalArgumentException e) {
             logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
+            throw new UnhandledRuntimeException(Constants.ERROR_MSG_EXCEPTION, e);
         }
     }
 
@@ -396,12 +397,8 @@ public class MainController implements Initializable {
         MyTask<Integer> saveGameTask = new MyTask<>() {
             @Override
             protected Integer call() {
-                try {
-                    pointsPaneController.saveCharHandler();
-                    return playerWriter.save() ? 2 : 0;
-                } catch (Exception e) {
-                    throw new UnhandledRuntimeException("Error saving character", e);
-                }
+                pointsPaneController.saveCharHandler();
+                return playerWriter.save() ? 2 : 0;
             }
         };
 

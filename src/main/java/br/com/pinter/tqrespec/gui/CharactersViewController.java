@@ -262,8 +262,8 @@ public class CharactersViewController implements Initializable {
             for (String p : gameInfo.getPlayerListMain()) {
                 try {
                     player.loadPlayer(p);
-                } catch (UnhandledRuntimeException e) {
-                    logger.log(System.Logger.Level.ERROR, String.format("error loading character '%s'", p));
+                } catch (RuntimeException e) {
+                    logger.log(System.Logger.Level.ERROR, String.format("Error loading character '%s'", p));
                     continue;
                 }
                 characters.add(player.getCharacter());

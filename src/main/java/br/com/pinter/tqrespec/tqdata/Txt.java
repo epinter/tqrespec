@@ -57,7 +57,7 @@ public class Txt {
         initialize();
         try {
             return text.getString(str);
-        } catch (Exception ignore) {
+        } catch (IOException ignore) {
             return null;
         }
     }

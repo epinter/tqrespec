@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class StashParser extends FileParser {
@@ -44,7 +45,10 @@ public class StashParser extends FileParser {
     }
 
     @Override
-    protected void readFile() throws IOException {
+    protected boolean readFile() throws IOException {
+        if(!Files.exists(Paths.get(getStashFileName()))) {
+            return false;
+        }
         try (FileChannel in = new FileInputStream(getStashFileName()).getChannel()) {
             setBuffer(ByteBuffer.allocate((int) in.size()));
             this.getBuffer().order(ByteOrder.LITTLE_ENDIAN);
@@ -55,6 +59,7 @@ public class StashParser extends FileParser {
         }
 
         logger.log(System.Logger.Level.DEBUG, "File ''{0}'' read to buffer: ''{1}''", getStashFileName(), this.getBuffer());
+        return this.getBuffer() != null;
     }
 
     @Override

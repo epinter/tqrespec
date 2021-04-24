@@ -23,6 +23,7 @@ package br.com.pinter.tqrespec.save;
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.util.Constants;
+import br.com.pinter.tqrespec.util.Util;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ListMultimap;
@@ -99,7 +100,8 @@ public abstract class FileParser {
             buildBlocksTable();
             prepareForParse();
             parseAllBlocks();
-        } catch (Exception e) {
+        } catch (IOException | IncompatibleSavegameException e) {
+            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             throw new UnhandledRuntimeException(e);
         }
     }
@@ -119,8 +121,9 @@ public abstract class FileParser {
      * @throws IOException
      */
     public void fillBuffer() throws IOException {
-        readFile();
-        prepareBufferForRead();
+        if(readFile()) {
+            prepareBufferForRead();
+        }
     }
 
     /**
@@ -137,8 +140,9 @@ public abstract class FileParser {
      * Reads a file into the buffer
      *
      * @throws IOException
+     * @return
      */
-    protected abstract void readFile() throws IOException;
+    protected abstract boolean readFile() throws IOException;
 
     /**
      * This method is called to parse a block, and should return a table of variables found inside the block.
@@ -204,16 +208,19 @@ public abstract class FileParser {
     protected BlockType validateBlockType(BlockInfo block, String name, BlockType previous) {
         BlockType blockType = previous;
         FileVariable fileVariable;
+        final String invalidVarMsg = "An invalid variable (%s) was found in block %s, aborting.";
         try {
             fileVariable = getFileVariable(filterFileVariableName(name));
+            if(fileVariable == null) {
+                throw new IllegalStateException(String.format(invalidVarMsg, name, block.getStart()));
+            }
             if (!fileVariable.location().equals(FileBlockType.BODY)
                     && !fileVariable.location().equals(FileBlockType.UNKNOWN)
                     && !fileVariable.location().equals(FileBlockType.MULTIPLE)) {
                 blockType = fileVariable.location();
             }
-        } catch (Exception e) {
-            throw new IllegalStateException(String.format("An invalid variable (%s) was found in block %s, aborting."
-                    , name, block.getStart()), e.getCause());
+        } catch (ClassCastException e) {
+            throw new IllegalStateException(String.format(invalidVarMsg, name, block.getStart()), e);
         }
 
         blockType = filterBlockType(blockType, name);
@@ -501,13 +508,15 @@ public abstract class FileParser {
         type = getFileVariable(varId).type();
 
         if (type == VariableType.UNKNOWN && fileVariable.location().equals(FileBlockType.MULTIPLE)) {
-            try {
-                FileVariable fileVariableMultiple = getFileVariable(
-                        String.format("%s__%s", name, fileBlock.name()));
-                type = fileVariableMultiple.type();
-            } catch (Exception e) {
-                logger.log(System.Logger.Level.DEBUG, "Variable definition for ''{0}'' not found.", varId);
+            FileVariable fileVariableMultiple = getFileVariable(
+                    String.format("%s__%s", name, fileBlock.name()));
+
+            if(fileVariableMultiple == null) {
+                String msg = String.format("Variable definition for '%s' not found.", varId);
+                logger.log(System.Logger.Level.ERROR, "Variable definition for ''{0}'' not found.", varId);
+                throw new UnhandledRuntimeException(msg);
             }
+            type = fileVariableMultiple.type();
         }
 
         if (type == VariableType.INTEGER) {

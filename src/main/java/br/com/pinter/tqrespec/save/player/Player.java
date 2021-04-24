@@ -84,7 +84,7 @@ public class Player {
             getSaveData().setHeaderInfo(playerParser.getHeaderInfo());
             getSaveData().getDataMap().setVariableLocation(playerParser.getVariableLocation());
             prepareSkillsList();
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             reset();
             logger.log(System.Logger.Level.ERROR, "Error loading character", e);
             throw new UnhandledRuntimeException("Error loading character", e);
