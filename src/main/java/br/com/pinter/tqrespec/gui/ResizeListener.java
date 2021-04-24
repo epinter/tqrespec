@@ -27,6 +27,8 @@ import javafx.scene.Cursor;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 @SuppressWarnings("CanBeFinal")
 public class ResizeListener implements EventHandler<MouseEvent> {
     private Stage stage;
@@ -38,6 +40,7 @@ public class ResizeListener implements EventHandler<MouseEvent> {
     private boolean resizeH = false;
     private boolean resizeV = false;
     private StringExpression fontBinding;
+    private final AtomicBoolean cursorChanged = new AtomicBoolean(false);
 
     public ResizeListener(Stage stage) {
         this.stage = stage;
@@ -79,7 +82,10 @@ public class ResizeListener implements EventHandler<MouseEvent> {
         } else if (MouseEvent.MOUSE_DRAGGED.equals(t.getEventType())) {
             mouseDragged(t);
         } else if(MouseEvent.MOUSE_RELEASED.equals(t.getEventType())) {
-            stage.getScene().setCursor(Cursor.DEFAULT);
+            if(cursorChanged.get()) {
+                stage.getScene().setCursor(Cursor.DEFAULT);
+                cursorChanged.set(false);
+            }
             resizeH = false;
             resizeV = false;
         }
@@ -137,29 +143,37 @@ public class ResizeListener implements EventHandler<MouseEvent> {
     private void mouseMoved(MouseEvent t) {
         double border = 3;
         if (t.getX() < border && t.getY() > stage.getScene().getHeight() - border) {
-            stage.getScene().setCursor(Cursor.SW_RESIZE);
+            setCursor(Cursor.SW_RESIZE);
             resizeH = true;
             resizeV = true;
         } else if (t.getX() > stage.getScene().getWidth() - border && t.getY() < border) {
-            stage.getScene().setCursor(Cursor.NE_RESIZE);
+            setCursor(Cursor.NE_RESIZE);
             resizeH = true;
             resizeV = true;
         } else if (t.getX() > stage.getScene().getWidth() - border*3 && t.getY() > stage.getScene().getHeight() - border*3) {
-            stage.getScene().setCursor(Cursor.SE_RESIZE);
+            setCursor(Cursor.SE_RESIZE);
             resizeH = true;
             resizeV = true;
-        } else if (t.getX() < border || t.getX() > stage.getScene().getWidth() - border) {
-            stage.getScene().setCursor(Cursor.E_RESIZE);
+        } else if (t.getX() > stage.getScene().getWidth() - border) {
+            setCursor(Cursor.W_RESIZE);
             resizeH = true;
             resizeV = false;
         } else if (t.getY() > stage.getScene().getHeight() - border) {
-            stage.getScene().setCursor(Cursor.N_RESIZE);
+            setCursor(Cursor.N_RESIZE);
             resizeH = false;
             resizeV = true;
         } else {
-            stage.getScene().setCursor(Cursor.DEFAULT);
+            if(cursorChanged.get()) {
+                stage.getScene().setCursor(Cursor.DEFAULT);
+                cursorChanged.set(false);
+            }
             resizeH = false;
             resizeV = false;
         }
+    }
+
+    private void setCursor(Cursor cursor) {
+        stage.getScene().setCursor(cursor);
+        cursorChanged.set(true);
     }
 }

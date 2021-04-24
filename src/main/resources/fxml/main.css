@@ -361,10 +361,6 @@
     -fx-text-fill: #f6d35b;
 }
 
-.tq-tabpane {
-    -fx-cursor: default;
-}
-
 .tq-tabpane .tab-header-area .headers-region {
     visibility: visible;
 }
