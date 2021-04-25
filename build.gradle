@@ -165,7 +165,7 @@ task copyToLib(type: Copy) {
     doFirst {
         mkdir "$buildDir/jardist"
     }
-    from(configurations.runtimeClasspath.findAll { !it.getName().matches("javafx.*\\.jar") }).collect { it.getPath() }
+    from(configurations.runtimeClasspath.findAll { !it.getName().toLowerCase().matches("javafx.*\\.jar") }).collect { it.getPath() }
 
     from jar
     into "$buildDir/jardist"
@@ -199,7 +199,7 @@ task copyAppimageFiles(type: Copy) {
         from jar
     }
     from(configurations.runtimeClasspath.findAll {
-        !it.getName().matches("javafx.*.jar") && !it.getName().matches("tqdatabase.*.jar")
+        !it.getName().toLowerCase().matches("javafx.*.jar") && !it.getName().toLowerCase().matches("tqdatabase.*.jar")
     }).collect { it.getPath() }
     into "$buildDir/appimage-files"
 }
@@ -320,28 +320,28 @@ task appimage(type: Exec) {
         copy {
             if (OS.isWindows()) {
                 from javafxSdkBinDir.listFiles().findAll {
-                    it.getName() == "decora_sse.dll" ||
-                            it.getName() == "fxplugins.dll" ||
-                            it.getName() == "glass.dll" ||
-                            it.getName() == "javafx_font.dll" ||
-                            it.getName() == "javafx_iio.dll" ||
-                            it.getName() == "prism_common.dll" ||
-                            it.getName() == "prism_d3d.dll" ||
-                            it.getName() == "prism_sw.dll"
+                    it.getName().equalsIgnoreCase("decora_sse.dll") ||
+                            it.getName().equalsIgnoreCase("fxplugins.dll") ||
+                            it.getName().equalsIgnoreCase("glass.dll") ||
+                            it.getName().equalsIgnoreCase("javafx_font.dll") ||
+                            it.getName().equalsIgnoreCase("javafx_iio.dll") ||
+                            it.getName().equalsIgnoreCase("prism_common.dll") ||
+                            it.getName().equalsIgnoreCase("prism_d3d.dll") ||
+                            it.getName().equalsIgnoreCase("prism_sw.dll")
                 }.collect()
                 into "$buildDir/app-image/${distAppName}/runtime/bin"
             } else {
-                from javafxSdkLibDir.listFiles().findAll { it.getName().endsWith('.so') }.collect()
+                from javafxSdkLibDir.listFiles().findAll { it.getName().toLowerCase().endsWith('.so') }.collect()
                 into "$buildDir/app-image/${distAppName}"
             }
         }
         new File(buildDir, "app-image/${distAppName}").listFiles().findAll {
-            it.getName() == "jfxwebkit.dll" ||
-            it.getName() == "ucrtbase.dll" ||
-            it.getName() == "gstreamer-lite.dll" ||
-            it.getName() == "glib-lite.dll" ||
-            it.getName().startsWith("api-ms-win-core") ||
-            it.getName().startsWith("api-ms-win-crt")
+            it.getName().equalsIgnoreCase("jfxwebkit.dll") ||
+            it.getName().equalsIgnoreCase("ucrtbase.dll") ||
+            it.getName().equalsIgnoreCase("gstreamer-lite.dll") ||
+            it.getName().equalsIgnoreCase("glib-lite.dll") ||
+            it.getName().toLowerCase().startsWith("api-ms-win-core") ||
+            it.getName().toLowerCase().startsWith("api-ms-win-crt")
         }.forEach({
             f -> f.delete()
         })
