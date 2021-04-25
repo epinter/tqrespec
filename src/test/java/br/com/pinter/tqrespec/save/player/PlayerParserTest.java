@@ -20,54 +20,50 @@
 
 package br.com.pinter.tqrespec.save.player;
 
-import br.com.pinter.tqrespec.core.GuiceModule;
-import br.com.pinter.tqrespec.core.InjectionContext;
 import br.com.pinter.tqrespec.save.UID;
 import br.com.pinter.tqrespec.save.VariableInfo;
-import br.com.pinter.tqrespec.save.VariableType;
-import br.com.pinter.tqrespec.tqdata.DefaultMapTeleport;
-import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.tqdata.GameVersion;
-import br.com.pinter.tqrespec.tqdata.MapTeleport;
 import br.com.pinter.tqrespec.util.Constants;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(GameInfo.class)
-@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "org.w3c.*", "com.sun.org.apache.xalan.*"})
-public class PlayerParserTest {
+@ExtendWith(MockitoExtension.class)
+class PlayerParserTest {
     private static final Logger logger = Logger.getLogger(PlayerParserTest.class.getName());
 
-    private InjectionContext injectionContext = new InjectionContext(this,
-            Collections.singletonList(new GuiceModule()));
+    @Mock
+    private CurrentPlayerData mockSaveData;
 
-    @Inject
+    @InjectMocks
     private CurrentPlayerData saveData;
 
-    @Inject
-    private Player player;
+    @InjectMocks
+    private PlayerLoader player;
 
     private PlayerParser playerParser;
 
-    @Before
-    public void setUp() throws IOException {
-        injectionContext.initialize();
+    @BeforeEach
+    void setUp() throws IOException {
+        MockitoAnnotations.openMocks(this);
+
         File playerChr = new File("src/test/resources/_savegame/Player.chr");
         if (!playerChr.exists()) {
             throw new IOException(String.format("File %s is missing," +
@@ -79,7 +75,7 @@ public class PlayerParserTest {
     }
 
     @Test
-    public void parseAllBlocks_Should_parseAllBlocksFromSavegame() {
+    void parseAllBlocks_Should_parseAllBlocksFromSavegame() {
         try {
             playerParser.fillBuffer();
         } catch (Exception e) {
@@ -97,6 +93,7 @@ public class PlayerParserTest {
         }
 
         playerParser.parseAllBlocks();
+
         assertNotNull(playerParser.getBlockInfo());
         assertFalse(playerParser.getBlockInfo().isEmpty());
         assertTrue(playerParser.getBlockInfo().size() > 1);
@@ -117,7 +114,7 @@ public class PlayerParserTest {
     }
 
     @Test
-    public void readGender_Should_readGenderFromSaveGame() {
+    void readGender_Should_readGenderFromSaveGame() {
         parse();
 
         String playerCharacterClass = saveData.getPlayerCharacterClass();
@@ -126,7 +123,7 @@ public class PlayerParserTest {
     }
 
     @Test
-    public void prepareBufferForRead_Should_rewindBuffer() {
+    void prepareBufferForRead_Should_rewindBuffer() {
         try {
             playerParser.parse();
         } catch (Exception e) {
@@ -137,7 +134,7 @@ public class PlayerParserTest {
     }
 
     @Test
-    public void getBuffer_Should_returnByteBuffer() {
+    void getBuffer_Should_returnByteBuffer() {
         try {
             playerParser.parse();
         } catch (Exception e) {
@@ -148,7 +145,7 @@ public class PlayerParserTest {
     }
 
     @Test
-    public void getVariableLocation_Should_returnVariableOffsetList() {
+    void getVariableLocation_Should_returnVariableOffsetList() {
         try {
             playerParser.parse();
         } catch (Exception e) {
@@ -160,7 +157,7 @@ public class PlayerParserTest {
     }
 
     @Test
-    public void parse_Should_parseWholeSavegame() {
+    void parse_Should_parseWholeSavegame() {
         try {
             playerParser.parse();
         } catch (Exception e) {
@@ -170,7 +167,7 @@ public class PlayerParserTest {
     }
 
     @Test
-    public void parseHeader_Should_parseFileHeader() {
+    void parseHeader_Should_parseFileHeader() {
         try {
             playerParser.fillBuffer();
             playerParser.buildBlocksTable();
@@ -188,82 +185,69 @@ public class PlayerParserTest {
     }
 
     @Test
-    public void readDifficulty_Should_readLegendaryDifficultyFromSaveGame() {
+    void readDifficulty_Should_readLegendaryDifficultyFromSaveGame() {
+        assertEquals(2, readTempVar("difficulty"), 0);
+    }
+
+    @Test
+    void readStr_Should_readStrFromSavegame() {
+        assertEquals(54, readTempVar("str"), 0);
+
+    }
+
+    @Test
+    void readIntl_Should_readStrFromSavegame() {
+        assertEquals(622, readTempVar("int"), 0);
+
+    }
+
+    @Test
+    void readDex_Should_readStrFromSavegame() {
+        assertEquals(102, readTempVar("dex"), 0);
+    }
+
+    @Test
+    void readMana_Should_readStrFromSavegame() {
+        assertEquals(340, readTempVar("mana"), 0);
+    }
+
+    @Test
+    void readLife_Should_readStrFromSavegame() {
+        assertEquals(460, readTempVar("life"), 0);
+    }
+
+    @Test
+    void readAvailableAttributePoints_Should_readAvailableAttributePointsFromSavegame() {
+        assertEquals(8, readIntegerVar("modifierPoints"), 0);
+    }
+
+    @Test
+    void readXp_Should_readXpFromSavegame() {
+        assertEquals(160547234, readIntegerVar("currentStats.experiencePoints"), 0);
+    }
+
+    @Test
+    void readLevel_Should_readLevelFromSavegame() {
+        assertEquals(75, readIntegerVar("currentStats.charLevel"), 0);
+    }
+
+    @Test
+    void readClass_Should_readClassFromSavegame() {
         parse();
 
-        List<VariableInfo> variableInfoList = saveData.getDataMap().getTempVariableInfo("difficulty");
-        Assert.assertEquals(VariableType.INTEGER, variableInfoList.get(0).getVariableType());
-        Integer difficulty = (Integer) variableInfoList.get(0).getValue();
-
-        assertEquals(2, difficulty, 0);
-    }
-
-    @Test
-    public void readStr_Should_readStrFromSavegame() {
-        float str = readFloatTempVar("str");
-        assertEquals(54.0, str, 0);
-
-    }
-
-    @Test
-    public void readIntl_Should_readStrFromSavegame() {
-        float intl = readFloatTempVar("int");
-        assertEquals(622.0, intl, 0);
-
-    }
-
-    @Test
-    public void readDex_Should_readStrFromSavegame() {
-        float dex = readFloatTempVar("dex");
-        assertEquals(102.0, dex, 0);
-
-    }
-
-    @Test
-    public void readMana_Should_readStrFromSavegame() {
-        float mana = readFloatTempVar("mana");
-        assertEquals(340.0, mana, 0);
-    }
-
-    @Test
-    public void readLife_Should_readStrFromSavegame() {
-        float life = readFloatTempVar("life");
-        assertEquals(460.0, life, 0);
-    }
-
-    @Test
-    public void readAvailableAttributePoints_Should_readAvailableAttributePointsFromSavegame() {
-        float available = readIntegerVar("modifierPoints");
-        assertEquals(8.0, available, 0);
-    }
-
-    @Test
-    public void readXp_Should_readXpFromSavegame() {
-        float xp = readIntegerVar("currentStats.experiencePoints");
-        assertEquals(160547234, xp, 0);
-    }
-
-    @Test
-    public void readLevel_Should_readLevelFromSavegame() {
-        float level = readIntegerVar("currentStats.charLevel");
-        assertEquals(75, level, 0);
-    }
-
-    @Test
-    public void readClass_Should_readClassFromSavegame() {
-        parse();
-
+        Mockito.when(mockSaveData.getHeaderInfo()).thenReturn(saveData.getHeaderInfo());
         assertEquals("tagCClass27", player.getSaveData().getHeaderInfo().getPlayerClassTag());
     }
 
     @Test
-    public void readPlayerName_Should_readPlayerNameFromSavegame() {
+    void readPlayerName_Should_readPlayerNameFromSavegame() {
         assertEquals("teste4", readStringVar("myPlayerName"));
     }
 
     @Test
-    public void matchTeleports_Should_matchTeleportsFromSavegame() {
+    void matchTeleports_Should_matchTeleportsFromSavegame() {
         parse();
+        Mockito.when(mockSaveData.getDataMap()).thenReturn(saveData.getDataMap());
         List<TeleportDifficulty> saveTeleports = player.getTeleports();
         assertEquals(3, saveTeleports.size());
         Map<Integer, List<UID>> teleports = new HashMap<>();
@@ -277,9 +261,9 @@ public class PlayerParserTest {
         boolean hadesNormal = false;
         boolean hadesEpic = false;
         boolean hadesLegendary = false;
-        for (TeleportDifficulty t: saveTeleports) {
+        for (TeleportDifficulty t : saveTeleports) {
             assertTrue(t.getTeleportList().size() > 0);
-            for (VariableInfo v: t.getTeleportList()) {
+            for (VariableInfo v : t.getTeleportList()) {
                 UID uid = new UID((byte[]) v.getValue());
                 switch (uid.getUid()) {
                     case helos -> {
@@ -294,31 +278,29 @@ public class PlayerParserTest {
                     }
                     default -> {
                         //ignored
-                        }
+                    }
                 }
                 teleports.computeIfAbsent(t.getDifficulty(), k -> new ArrayList<>());
-                if(!teleports.get(t.getDifficulty()).contains(uid)) {
+                if (!teleports.get(t.getDifficulty()).contains(uid)) {
                     teleports.get(t.getDifficulty()).add(uid);
                 }
             }
         }
-        assertEquals(30,teleports.get(0).size());
-        assertEquals(30,teleports.get(1).size());
-        assertEquals(38,teleports.get(2).size());
+        assertEquals(30, teleports.get(0).size());
+        assertEquals(30, teleports.get(1).size());
+        assertEquals(38, teleports.get(2).size());
         assertTrue(hadesNormal && hadesEpic && hadesLegendary && helosNormal && helosEpic && helosLegendary);
     }
 
     @Test
-    public void readMonsterName_Should_readMonsterNameFromSavegame() {
+    void readMonsterName_Should_readMonsterNameFromSavegame() {
         assertEquals("{^r}Hades ~ God of the Dead", readStringVar(PlayerFileVariable.valueOf("greatestMonsterKilledName").var()));
     }
 
-    private float readFloatTempVar(String alias) {
+    private int readTempVar(String alias) {
         parse();
 
-        List<VariableInfo> variableInfoList = saveData.getDataMap().getTempVariableInfo(alias);
-        Assert.assertEquals(VariableType.FLOAT, variableInfoList.get(0).getVariableType());
-        return (Float) variableInfoList.get(0).getValue();
+        return saveData.getDataMap().getTempAttr(alias);
     }
 
     private int readIntegerVar(String name) {

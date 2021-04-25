@@ -20,44 +20,32 @@
 
 package br.com.pinter.tqrespec.save.player;
 
-import br.com.pinter.tqrespec.core.GuiceModule;
-import br.com.pinter.tqrespec.core.InjectionContext;
 import br.com.pinter.tqrespec.save.stash.StashData;
 import br.com.pinter.tqrespec.save.stash.StashLoader;
 import br.com.pinter.tqrespec.save.stash.StashWriter;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.util.Constants;
-import br.com.pinter.tqrespec.util.Util;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({GameInfo.class, Util.class})
-@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "org.w3c.*", "com.sun.org.apache.xalan.*"})
-public class PlayerWriterTest {
+@ExtendWith(MockitoExtension.class)
+class PlayerWriterTest {
     private static final Logger logger = Logger.getLogger(PlayerWriterTest.class.getName());
-
-    private final InjectionContext injectionContext = new InjectionContext(this,
-            Collections.singletonList(new GuiceModule()));
 
     @Mock
     private CurrentPlayerData mockSaveData;
@@ -73,9 +61,8 @@ public class PlayerWriterTest {
     @InjectMocks
     private PlayerWriter playerWriter;
 
-    @Before
-    public void setUp() throws IOException {
-        injectionContext.initialize();
+    @BeforeEach
+    void setUp() throws IOException {
         File playerChr = new File("src/test/resources/_savegame/Player.chr");
         if (!playerChr.exists()) {
             throw new IOException(String.format("File %s is missing," +
@@ -87,7 +74,7 @@ public class PlayerWriterTest {
     }
 
     @Test
-    public void copyAndSet_Should_copySavegameAndTestNewValue() {
+    void copyAndSet_Should_copySavegameAndTestNewValue() {
         try {
             saveData.reset();
             saveData.setPlayerName("savegame");
@@ -111,17 +98,14 @@ public class PlayerWriterTest {
             e.printStackTrace();
         }
 
-        PowerMockito.when(gameInfo.getSaveDataMainPath()).thenReturn("src/test/resources");
-        PowerMockito.when(gameInfo.getSaveDataUserPath()).thenReturn("src/test/resources");
-
-        PowerMockito.when(mockSaveData.getPlayerName()).thenReturn(saveData.getPlayerName());
-        PowerMockito.when(mockSaveData.getHeaderInfo()).thenReturn(saveData.getHeaderInfo());
-        PowerMockito.when(mockSaveData.isCustomQuest()).thenReturn(saveData.isCustomQuest());
-        PowerMockito.when(mockSaveData.getDataMap()).thenReturn(saveData.getDataMap());
-        PowerMockito.when(mockSaveData.getBuffer()).thenReturn(saveData.getBuffer());
+        Mockito.when(gameInfo.getSaveDataMainPath()).thenReturn("src/test/resources");
+        Mockito.when(mockSaveData.getPlayerName()).thenReturn(saveData.getPlayerName());
+        Mockito.when(mockSaveData.isCustomQuest()).thenReturn(saveData.isCustomQuest());
+        Mockito.when(mockSaveData.getDataMap()).thenReturn(saveData.getDataMap());
+        Mockito.when(mockSaveData.getBuffer()).thenReturn(saveData.getBuffer());
 
         int isInMainQuestBefore = saveData.getDataMap().getInt("isInMainQuest");
-        Assert.assertEquals(1,isInMainQuestBefore);
+        assertEquals(1, isInMainQuestBefore);
         saveData.getDataMap().setInt("isInMainQuest", 0);
 
         try {
@@ -143,7 +127,7 @@ public class PlayerWriterTest {
             saveData.setHeaderInfo(playerParser.getHeaderInfo());
             saveData.getDataMap().setVariableLocation(playerParser.getVariableLocation());
             int isInMainQuestAfter = saveData.getDataMap().getInt("isInMainQuest");
-            Assert.assertTrue(isInMainQuestBefore != isInMainQuestAfter && isInMainQuestAfter == 0);
+            assertTrue(isInMainQuestBefore != isInMainQuestAfter && isInMainQuestAfter == 0);
 
         } catch (Exception e) {
             logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
@@ -175,14 +159,11 @@ public class PlayerWriterTest {
             e.printStackTrace();
         }
 
-        PowerMockito.when(gameInfo.getSaveDataMainPath()).thenReturn("src/test/resources");
-        PowerMockito.when(gameInfo.getSaveDataUserPath()).thenReturn("src/test/resources");
-
-        PowerMockito.when(mockSaveData.getPlayerName()).thenReturn(saveData.getPlayerName());
-        PowerMockito.when(mockSaveData.getHeaderInfo()).thenReturn(saveData.getHeaderInfo());
-        PowerMockito.when(mockSaveData.isCustomQuest()).thenReturn(saveData.isCustomQuest());
-        PowerMockito.when(mockSaveData.getDataMap()).thenReturn(saveData.getDataMap());
-        PowerMockito.when(mockSaveData.getBuffer()).thenReturn(saveData.getBuffer());
+        Mockito.when(gameInfo.getSaveDataMainPath()).thenReturn("src/test/resources");
+        Mockito.when(mockSaveData.getPlayerName()).thenReturn(saveData.getPlayerName());
+        Mockito.when(mockSaveData.isCustomQuest()).thenReturn(saveData.isCustomQuest());
+        Mockito.when(mockSaveData.getDataMap()).thenReturn(saveData.getDataMap());
+        Mockito.when(mockSaveData.getBuffer()).thenReturn(saveData.getBuffer());
     }
 
     private void copyAndParseSavegame() {
@@ -211,14 +192,14 @@ public class PlayerWriterTest {
     }
 
     @Test
-    public void readStashFname_Should_ReadStashFnameFromSaveGame() {
+    void readStashFname_Should_ReadStashFnameFromSaveGame() {
         prepareCopySavegame();
 
         copyAndParseSavegame();
 
         StashData stashData = null;
         StashLoader stashLoader = new StashLoader();
-        if(stashLoader.loadStash(Paths.get("src/test/resources/_testcopy"), "testcopy")) {
+        if (stashLoader.loadStash(Paths.get("src/test/resources/_testcopy"), "testcopy")) {
             stashData = stashLoader.getSaveData();
             StashWriter stashWriter = new StashWriter(stashData);
             stashWriter.save();
@@ -231,7 +212,7 @@ public class PlayerWriterTest {
     }
 
     @Test
-    public void writeGender_Should_writeAndReadGenderFromSaveGame() {
+    void writeGender_Should_writeAndReadGenderFromSaveGame() {
         prepareCopySavegame();
 
         saveData.getDataMap().setString(Constants.Save.PLAYER_CHARACTER_CLASS, "XXGenderX");
@@ -247,7 +228,7 @@ public class PlayerWriterTest {
     }
 
     @Test
-    public void writePoints_Should_writeAndReadPointsFromSaveGame() {
+    void writePoints_Should_writeAndReadPointsFromSaveGame() {
         prepareCopySavegame();
 
         saveData.getDataMap().setInt("modifierPoints", 121);
