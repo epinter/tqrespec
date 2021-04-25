@@ -234,10 +234,11 @@ public class CharactersViewController implements Initializable {
         ResizeListener listener = new ResizeListener(stage);
         listener.setScale(false);
         listener.setKeepAspect(false);
-        scene.setOnMouseMoved(listener);
-        scene.setOnMousePressed(listener);
-        scene.setOnMouseDragged(listener);
-        scene.setOnMouseReleased(listener);
+        scene.addEventFilter(MouseEvent.MOUSE_MOVED, listener);
+        scene.addEventFilter(MouseEvent.MOUSE_PRESSED, listener);
+        scene.addEventFilter(MouseEvent.MOUSE_DRAGGED, listener);
+        scene.addEventFilter(MouseEvent.MOUSE_RELEASED, listener);
+
 
         // min* and max* set to -1 will force javafx to use values defined on root element
         stage.setMinHeight(rootElement.minHeight(-1));

@@ -49,6 +49,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
@@ -315,9 +316,11 @@ public class Main extends Application {
         primaryStage.resizableProperty().setValue(Boolean.FALSE);
 
         ResizeListener listener = new ResizeListener(primaryStage);
-        scene.setOnMouseMoved(listener);
-        scene.setOnMousePressed(listener);
-        scene.setOnMouseDragged(listener);
+        scene.addEventFilter(MouseEvent.MOUSE_MOVED, listener);
+        scene.addEventFilter(MouseEvent.MOUSE_PRESSED, listener);
+        scene.addEventFilter(MouseEvent.MOUSE_DRAGGED, listener);
+        scene.addEventFilter(MouseEvent.MOUSE_RELEASED, listener);
+
 
         initialFontBinding = Bindings.format("-fx-font-size: %sem;", Constants.INITIAL_FONT_SIZE);
         primaryStage.getScene().getRoot().styleProperty().bind(initialFontBinding);
