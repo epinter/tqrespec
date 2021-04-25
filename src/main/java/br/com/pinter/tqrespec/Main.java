@@ -357,10 +357,7 @@ public class Main extends Application {
             case 9:
                 State.get().addDebugPrefix("*", Level.FINER);
                 break;
-            case 8:
-            case 7:
-            case 6:
-            case 5:
+            case 8, 7, 6, 5:
                 State.get().addDebugPrefix("*", Level.FINE);
                 State.get().addDebugPrefix(Database.class.getPackageName(), Level.FINER);
                 State.get().addDebugPrefix(Main.class.getPackageName(), Level.FINER);

@@ -330,9 +330,9 @@ public class MainController implements Initializable {
 
     private void setCursorWaitOnTask(MyTask<?> task) {
         rootelement.getScene().setCursor(Cursor.WAIT);
-        task.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, (e) -> rootelement.getScene().setCursor(Cursor.DEFAULT));
-        task.addEventHandler(WorkerStateEvent.WORKER_STATE_FAILED, (e) -> rootelement.getScene().setCursor(Cursor.DEFAULT));
-        task.addEventHandler(WorkerStateEvent.WORKER_STATE_CANCELLED, (e) -> rootelement.getScene().setCursor(Cursor.DEFAULT));
+        task.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, e -> rootelement.getScene().setCursor(Cursor.DEFAULT));
+        task.addEventHandler(WorkerStateEvent.WORKER_STATE_FAILED, e -> rootelement.getScene().setCursor(Cursor.DEFAULT));
+        task.addEventHandler(WorkerStateEvent.WORKER_STATE_CANCELLED, e -> rootelement.getScene().setCursor(Cursor.DEFAULT));
     }
 
     private boolean gameRunningAlert() {

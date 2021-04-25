@@ -261,36 +261,34 @@ public class CharactersViewController implements Initializable {
         stage.setTitle(Util.getUIMessage("characters.title", Util.getBuildTitle()));
         charFormTitle.setText(Util.getUIMessage("characters.title", Util.getBuildTitle()));
 
-        stage.addEventHandler(WindowEvent.WINDOW_SHOWING, e -> {
-            new WorkerThread(new MyTask<>() {
-                @Override
-                protected Void call() {
-                    Platform.runLater(() -> {
-                        charactersTable.setPlaceholder(new Label(Util.getUIMessage("characters.loadingPlaceholder")));
-                        rootElement.getScene().setCursor(Cursor.WAIT);
+        stage.addEventHandler(WindowEvent.WINDOW_SHOWING, e -> new WorkerThread(new MyTask<>() {
+            @Override
+            protected Void call() {
+                Platform.runLater(() -> {
+                    charactersTable.setPlaceholder(new Label(Util.getUIMessage("characters.loadingPlaceholder")));
+                    rootElement.getScene().setCursor(Cursor.WAIT);
 
-                    });
+                });
 
-                    characters = new ArrayList<>();
-                    for (String p : gameInfo.getPlayerListMain()) {
-                        try {
-                            player.loadPlayer(p);
-                        } catch (RuntimeException e) {
-                            logger.log(System.Logger.Level.ERROR, String.format("Error loading character '%s'", p));
-                            continue;
-                        }
-                        characters.add(player.getCharacter());
+                characters = new ArrayList<>();
+                for (String p : gameInfo.getPlayerListMain()) {
+                    try {
+                        player.loadPlayer(p);
+                    } catch (RuntimeException e) {
+                        logger.log(System.Logger.Level.ERROR, String.format("Error loading character '%s'", p));
+                        continue;
                     }
-
-                    Platform.runLater(() -> {
-                        setupTable();
-                        charactersTable.setPlaceholder(new Label(""));
-                        Platform.runLater(() -> rootElement.getScene().setCursor(Cursor.DEFAULT));
-                    });
-                    return null;
+                    characters.add(player.getCharacter());
                 }
-            }).start();
-        });
+
+                Platform.runLater(() -> {
+                    setupTable();
+                    charactersTable.setPlaceholder(new Label(""));
+                    Platform.runLater(() -> rootElement.getScene().setCursor(Cursor.DEFAULT));
+                });
+                return null;
+            }
+        }).start());
 
         exportButton.setGraphic(Icon.FA_FILE_EXPORT.create());
         stage.show();

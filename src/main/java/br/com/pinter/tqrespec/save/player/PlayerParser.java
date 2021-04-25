@@ -24,10 +24,8 @@ import br.com.pinter.tqrespec.save.BlockType;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.*;
 import br.com.pinter.tqrespec.tqdata.GameVersion;
-import br.com.pinter.tqrespec.util.Util;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableListMultimap;
-import javafx.application.Platform;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;

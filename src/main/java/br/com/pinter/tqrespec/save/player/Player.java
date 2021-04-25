@@ -451,10 +451,6 @@ public class Player {
         return getVariableValueInteger("criticalHitsInflicted");
     }
 
-    private int getVariableValueInteger(VariableInfo variableInfo) {
-        return getSaveData().getDataMap().getInt(variableInfo);
-    }
-
     private int getVariableValueInteger(String variable) {
         return getSaveData().getDataMap().getInt(variable);
     }
@@ -465,10 +461,6 @@ public class Player {
 
     private float getVariableValueFloat(String variable) {
         return getSaveData().getDataMap().getFloat(variable);
-    }
-
-    private float getVariableValueFloat(VariableInfo variableInfo) {
-        return getSaveData().getDataMap().getFloat(variableInfo);
     }
 
     public String getPlayerClassName() {
