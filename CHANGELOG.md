@@ -1,4 +1,16 @@
 # Changelog
+## [0.9.2] - 2021-04-30
+### Added
+- Copy character's storage when copying character ([#1](https://github.com/epinter/tqrespec/issues/1))
+
+### Changed
+- Improved window resize
+- Add wait cursor for longer operations
+- Better preloader visual
+
+### Fixed
+- Fixed minor UI bugs
+
 ## [0.9.1] - 2021-04-17
 ### Fixed
 - Fix version check
