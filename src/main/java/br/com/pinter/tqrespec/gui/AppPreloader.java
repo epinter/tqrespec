@@ -57,7 +57,7 @@ public class AppPreloader extends Preloader {
 
         bar = new ProgressBar(0.1);
         bar.getStyleClass().add(Constants.UI.PRELOADER_BAR_STYLE);
-        bar.setMaxWidth(Constants.UI.PRELOADER_WIDTH - 30);
+        bar.setMaxWidth(Constants.UI.PRELOADER_WIDTH - 30d);
         pane.setCenter(bar);
 
         Label versionText = new Label(Util.getBuildVersion());
