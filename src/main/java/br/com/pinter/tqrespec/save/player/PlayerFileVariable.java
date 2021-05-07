@@ -47,6 +47,7 @@ public class PlayerFileVariable implements FileVariable {
 
         map.put("playerTexture", new PlayerFileVariable("playerTexture", VariableType.STRING, PlayerBlockType.PLAYER_MAIN));
         map.put("myPlayerName", new PlayerFileVariable("myPlayerName", VariableType.STRING_UTF_16_LE, PlayerBlockType.PLAYER_MAIN));
+        map.put("mySaveId", new PlayerFileVariable("mySaveId", VariableType.STRING, PlayerBlockType.PLAYER_MAIN));
         map.put("isInMainQuest", new PlayerFileVariable("isInMainQuest", VariableType.INTEGER, PlayerBlockType.PLAYER_MAIN));
         map.put("disableAutoPopV2", new PlayerFileVariable("disableAutoPopV2", VariableType.INTEGER, PlayerBlockType.PLAYER_MAIN));
         map.put("numTutorialPagesV2", new PlayerFileVariable("numTutorialPagesV2", VariableType.INTEGER, PlayerBlockType.PLAYER_MAIN));

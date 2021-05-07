@@ -20,6 +20,7 @@
 
 package br.com.pinter.tqrespec.util;
 
+import br.com.pinter.tqrespec.save.Platform;
 import com.google.common.collect.ImmutableMap;
 import javafx.scene.text.Font;
 
@@ -33,6 +34,7 @@ public class Constants {
     }
 
     public static final String APPNAME = "TQRespec";
+    public static final Platform PRIMARY_PLATFORM = Platform.WINDOWS;
     public static final String LOGFILE = new File(System.getProperty("java.io.tmpdir"), "tqrespec.log").getAbsolutePath();
     public static final String LOGLEVELS = "br.com.pinter.tqrespec=INFO;br.com.pinter.tqdatabase=INFO";
     public static final String REGEX_REGISTRY_INSTALL = "Titan Quest.*Anniversary.*";

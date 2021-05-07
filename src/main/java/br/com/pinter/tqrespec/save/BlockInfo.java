@@ -30,7 +30,7 @@ public class BlockInfo implements Serializable {
     private int end = -1;
     private int size = -1;
     private ImmutableListMultimap<String, VariableInfo> variables = ImmutableListMultimap.of();
-    private final transient Multimap<String, VariableInfo> stagingVariables = MultimapBuilder.hashKeys().arrayListValues().build();
+    private transient Multimap<String, VariableInfo> stagingVariables = MultimapBuilder.hashKeys().arrayListValues().build();
     private int parentOffset = -1;
     private BlockType blockType = FileBlockType.UNKNOWN;
 
@@ -93,6 +93,10 @@ public class BlockInfo implements Serializable {
     }
 
     public Multimap<String, VariableInfo> getStagingVariables() {
+        if(stagingVariables == null) {
+            // stagingVariables content is lost during deepClone
+            stagingVariables = MultimapBuilder.hashKeys().arrayListValues().build();
+        }
         return stagingVariables;
     }
 

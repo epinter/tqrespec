@@ -80,6 +80,7 @@ public class Player {
                     playerName);
 
             getSaveData().setBuffer(playerParser.load());
+            getSaveData().setPlatform(playerParser.getDetectedPlatform());
             getSaveData().getDataMap().setBlockInfo(playerParser.getBlockInfo());
             getSaveData().setHeaderInfo(playerParser.getHeaderInfo());
             getSaveData().getDataMap().setVariableLocation(playerParser.getVariableLocation());

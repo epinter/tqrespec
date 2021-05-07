@@ -32,12 +32,10 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
 public abstract class FileParser {
@@ -54,6 +52,7 @@ public abstract class FileParser {
     protected static final String BEGIN_BLOCK = "begin_block";
     protected static final String END_BLOCK = "end_block";
     private static final String BUG_VARIABLESIZE_ERROR_MSG = "BUG: variable size != 0";
+    private Platform detectedPlatform = Platform.WINDOWS;
     private final ListMultimap<String, VariableInfo> specialVariableStore = MultimapBuilder.hashKeys().arrayListValues().build();
 
 
@@ -75,6 +74,14 @@ public abstract class FileParser {
 
     protected List<Integer> getBlocksIgnore() {
         return blocksIgnore;
+    }
+
+    public Platform getDetectedPlatform() {
+        return detectedPlatform;
+    }
+
+    protected void setDetectedPlatform(Platform detectedPlatform) {
+        this.detectedPlatform = detectedPlatform;
     }
 
     void reset() {
@@ -169,6 +176,8 @@ public abstract class FileParser {
             //pass current blockType (detected from previous variable read), so we can distinguish variables that repeat
             blockType = validateBlockType(block, name, blockType);
 
+            preprocessVariable(name, keyOffset, blockType);
+
             VariableInfo variableInfo = readVar(name, blockType);
             variableInfo.setBlockOffset(block.getStart());
             variableInfo.setName(name);
@@ -188,6 +197,8 @@ public abstract class FileParser {
         block.setBlockType(blockType);
         return ImmutableListMultimap.copyOf(ret);
     }
+
+    protected abstract void preprocessVariable(String name, int keyOffset, BlockType block);
 
     /**
      * Method called by parseBlock to skips child blocks processing.
@@ -266,7 +277,7 @@ public abstract class FileParser {
      * Blocks listed in {@link FileParser#blocksIgnore} are skipped (e.g. a header).
      */
     public void parseAllBlocks() {
-        for (BlockInfo block : blockInfoTable.values()) {
+        for (BlockInfo block : blockInfoTable.values().stream().sorted(Comparator.comparing(BlockInfo::getStart)).collect(Collectors.toList())) {
             //ignore header
             if (block == null || getBlocksIgnore().contains(block.getStart())) {
                 continue;
@@ -365,7 +376,11 @@ public abstract class FileParser {
             }
             if (utf16le) {
                 variableInfo.setVariableType(VariableType.STRING_UTF_16_LE);
-                len *= 2;
+                if(detectedPlatform.equals(Platform.WINDOWS)) { // 2-byte string
+                    len *= 2;
+                } else if(detectedPlatform.equals(Platform.MOBILE)) { //4-byte string
+                    len *= 4;
+                }
             }
 
             byte[] buf = new byte[len];

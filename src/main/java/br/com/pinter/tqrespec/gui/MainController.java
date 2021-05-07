@@ -462,6 +462,18 @@ public class MainController implements Initializable {
             }
         });
 
+        loadTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new MyEventHandler<>() {
+            @Override
+            public void handleEvent(WorkerStateEvent workerStateEvent) {
+                if (player.getSaveData().getPlatform().equals(br.com.pinter.tqrespec.save.Platform.MOBILE)) {
+                    Toast.show((Stage) rootelement.getScene().getWindow(),
+                            Util.getUIMessage("main.mobileSavegameToast_header"),
+                            Util.getUIMessage("main.mobileSavegameToast_content"),
+                            3000);
+                }
+            }
+        });
+
         new WorkerThread(loadTask).start();
     }
 

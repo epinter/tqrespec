@@ -21,10 +21,15 @@
 package br.com.pinter.tqrespec.save;
 
 import br.com.pinter.tqrespec.util.Util;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -34,6 +39,7 @@ public class FileDataMap implements DeepCloneable {
     private Map<String, List<Integer>> variableLocation = new ConcurrentHashMap<>();
     private final Map<Integer, byte[]> changes = new ConcurrentHashMap<>();
     private final Map<Integer, Integer> valuesLengthIndex = new ConcurrentHashMap<>();
+    private Platform platform = Platform.WINDOWS;
 
     private static final String ALERT_INVALIDDATA = "alert.changesinvaliddata";
     private static final String MULTIPLE_DEFINITIONS_ERROR = "Variable is defined on multiple locations, aborting";
@@ -81,6 +87,14 @@ public class FileDataMap implements DeepCloneable {
         return changes.keySet();
     }
 
+    public Platform getPlatform() {
+        return platform;
+    }
+
+    public void setPlatform(Platform platform) {
+        this.platform = platform;
+    }
+
     public void clear() {
         blockInfo.clear();
         changes.clear();
@@ -120,7 +134,6 @@ public class FileDataMap implements DeepCloneable {
         return ret;
     }
 
-
     public void setString(String variable, String value) {
         this.setString(variable, value, false);
     }
@@ -150,16 +163,26 @@ public class FileDataMap implements DeepCloneable {
                 System.arraycopy(str, 0, data, len.length, str.length);
 
                 changes.put(variableInfo.getValOffset(), data);
-                this.valuesLengthIndex.put(variableInfo.getValOffset(), 4 + (variableInfo.getValSize() * (utf16le ? 2 : 1)));
+                this.valuesLengthIndex.put(variableInfo.getValOffset(), 4 + (variableInfo.getValSize() * getUtfSize(utf16le)));
             }
         } else {
             throw new IllegalArgumentException(Util.getUIMessage(ALERT_INVALIDDATA, variable));
         }
     }
 
+    private int getUtfSize(boolean utf16le) {
+        int utfSize = 1;
+        if(utf16le && platform.equals(Platform.WINDOWS)) {
+            utfSize = 2;
+        } else if(utf16le && platform.equals(Platform.MOBILE)) {
+            utfSize = 4;
+        }
+        return utfSize;
+    }
+
     private byte[] encodeString(String str, boolean wide) {
         //allocate the number of characters * 2 so the buffer can hold the '0'
-        ByteBuffer buffer = ByteBuffer.allocate(str.length() * (wide ? 2 : 1));
+        ByteBuffer buffer = ByteBuffer.allocate(str.length() * getUtfSize(wide));
 
         for (char c : str.toCharArray()) {
             byte n;
@@ -171,7 +194,11 @@ public class FileDataMap implements DeepCloneable {
                 n = (byte) c;
             }
             if (wide) {
-                buffer.put(new byte[]{n, 0});
+                if(platform.equals(Platform.WINDOWS)) {
+                    buffer.put(new byte[]{n, 0});
+                } else if(platform.equals(Platform.MOBILE)) {
+                    buffer.put(new byte[]{n, 0, 0, 0});
+                }
             } else {
                 buffer.put(new byte[]{n});
             }
@@ -466,12 +493,21 @@ public class FileDataMap implements DeepCloneable {
 
         v.putInt(variable.getName().length());
         v.put(variable.getName().getBytes());
-        v.put((byte[]) variable.getValue());
+        if(variable.getVariableType().equals(VariableType.UID)) {
+            v.put((byte[]) variable.getValue());
+        } else if(variable.getVariableType().equals(VariableType.STRING)) {
+            String value = (String) variable.getValue();
+            v.putInt(value.length());
+            v.put(value.getBytes(StandardCharsets.UTF_8));
+        } else {
+            throw new IllegalStateException("not implemented");
+        }
 
         changes.put(offset, v.array());
         valuesLengthIndex.put(offset, 0);
 
         BlockInfo block = this.blockInfo.get(variable.getBlockOffset());
+
         block.getStagingVariables().put(variable.getName(),variable);
     }
 

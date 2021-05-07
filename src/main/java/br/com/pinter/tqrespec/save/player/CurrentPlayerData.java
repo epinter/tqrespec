@@ -22,6 +22,7 @@ package br.com.pinter.tqrespec.save.player;
 
 import br.com.pinter.tqrespec.save.FileDataHolder;
 import br.com.pinter.tqrespec.save.FileDataMap;
+import br.com.pinter.tqrespec.save.Platform;
 import com.google.inject.Singleton;
 
 import java.nio.ByteBuffer;
@@ -121,6 +122,14 @@ public class CurrentPlayerData implements FileDataHolder {
 
     public void setMissingSkills(boolean newValue) {
         missingSkills.set(newValue);
+    }
+
+    public Platform getPlatform() {
+        return getDataMap().getPlatform();
+    }
+
+    public void setPlatform(Platform platform) {
+        getDataMap().setPlatform(platform);
     }
 
     void reset() {

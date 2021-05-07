@@ -183,6 +183,14 @@ final class PlayerParser extends FileParser {
     }
 
     @Override
+    protected void preprocessVariable(String name, int keyOffset, BlockType blockType) {
+        if(name.equals("mySaveId") && blockType.equals(PlayerBlockType.PLAYER_MAIN)) {
+            logger.log(System.Logger.Level.INFO, "Mobile savegame detected: ''{0}''", playerChr);
+            setDetectedPlatform(Platform.MOBILE);
+        }
+    }
+
+    @Override
     protected BlockType filterBlockType(BlockType type, String name) {
         //prepare fileblock for special var 'temp' (attributes)
         //temp variables for the attributes are always inside a separate block, so the current blocktype will be always BODY

@@ -63,6 +63,11 @@ public class StashParser extends FileParser {
     }
 
     @Override
+    protected void preprocessVariable(String name, int keyOffset, BlockType block) {
+        //not implemented
+    }
+
+    @Override
     protected void prepareForParse() throws IOException {
         if (this.getBuffer() == null || this.getBuffer().capacity() <= 50) {
             throw new IOException("Can't read stash from" + playerPath);
