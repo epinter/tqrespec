@@ -38,6 +38,7 @@ public class VariableInfo implements Serializable {
     private byte[] valueByteArray = null;
     private VariableType variableType;
     private int blockOffset = -1;
+    private int utf16SizeBytes = 2;
 
     public String getName() {
         return name;
@@ -120,7 +121,7 @@ public class VariableInfo implements Serializable {
     public int getValBytesLength() {
         int sz = valSize;
         if (variableType == VariableType.STRING_UTF_16_LE) {
-            sz *= 2;
+            sz *= utf16SizeBytes;
         }
         return sz;
     }
@@ -134,19 +135,17 @@ public class VariableInfo implements Serializable {
             return name.length() + 4;
         }
 
-        int valSizePrefix = 0;
-        int sz = valSize;
+        return valOffset - keyOffset + getValBytesLength() + getValuePrefix();
+    }
 
-        if (variableType == VariableType.STRING || variableType == VariableType.STRING_UTF_16_LE
-                || variableType == VariableType.STREAM) {
+    private int getValuePrefix() {
+        int valSizePrefix = 0;
+
+        if (variableType == VariableType.STRING || variableType == VariableType.STRING_UTF_16_LE || variableType == VariableType.STREAM) {
             valSizePrefix = 4;
         }
 
-        if (variableType == VariableType.STRING_UTF_16_LE) {
-            sz *= 2;
-        }
-
-        return valOffset - keyOffset + sz + valSizePrefix;
+        return valSizePrefix;
     }
 
     public void setValue(String value) {
@@ -179,6 +178,123 @@ public class VariableInfo implements Serializable {
 
     public void setBlockOffset(int blockOffset) {
         this.blockOffset = blockOffset;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+    public static class Builder {
+        private String builderName = null;
+        private String builderAlias = null;
+        private int builderKeyOffset = -1;
+        private int builderValOffset = -1;
+        private int builderValSize = -1;
+        private String builderValueString = null;
+        private Integer builderValueInteger = null;
+        private Float builderValueFloat = null;
+        private byte[] builderValueByteArray = null;
+        private VariableType builderVariableType;
+        private int builderBlockOffset = -1;
+        private int builderUtf16SizeBytes = 2;
+
+        public Builder name(String builderName) {
+            this.builderName = builderName;
+            return this;
+        }
+
+        public Builder alias(String builderAlias) {
+            this.builderAlias = builderAlias;
+            return this;
+        }
+
+        public Builder keyOffset(int builderKeyOffset) {
+            this.builderKeyOffset = builderKeyOffset;
+            return this;
+        }
+
+        public Builder valOffset(int builderValOffset) {
+            this.builderValOffset = builderValOffset;
+            return this;
+        }
+
+        public Builder valSize(int builderValSize) {
+            this.builderValSize = builderValSize;
+            return this;
+        }
+
+        public Builder value(String value) {
+            this.builderValueString = value;
+            return this;
+        }
+
+        public Builder value(int value) {
+            this.builderValueInteger = value;
+            return this;
+        }
+
+        public Builder value(float value) {
+            this.builderValueFloat = value;
+            return this;
+        }
+
+        public Builder value(byte[] value) {
+            this.builderValueByteArray = value;
+            return this;
+        }
+
+        public Builder variableType(VariableType builderVariableType) {
+            this.builderVariableType = builderVariableType;
+            return this;
+        }
+
+        public Builder blockOffset(int builderBlockOffset) {
+            this.builderBlockOffset = builderBlockOffset;
+            return this;
+        }
+
+        public Builder utf16SizeBytes(int utf16SizeBytes) {
+            this.builderUtf16SizeBytes = utf16SizeBytes;
+            return this;
+        }
+
+        public VariableInfo build() {
+            if(builderUtf16SizeBytes !=2 && builderUtf16SizeBytes != 4) {
+                builderUtf16SizeBytes = 2;
+            }
+
+            VariableInfo v = new VariableInfo();
+            v.name = builderName;
+            v.blockOffset = builderBlockOffset;
+            v.alias = builderAlias;
+            v.keyOffset = builderKeyOffset;
+            v.valOffset = builderValOffset;
+            v.valSize = builderValSize;
+            v.valueString = builderValueString;
+            v.valueInteger = builderValueInteger;
+            v.valueFloat = builderValueFloat;
+            v.valueByteArray = builderValueByteArray;
+            v.variableType = builderVariableType;
+            v.utf16SizeBytes = builderUtf16SizeBytes;
+
+            if(v.valSize == -1) {
+                if(v.variableType.equals(VariableType.FLOAT) || v.variableType.equals(VariableType.INTEGER)) {
+                    v.valSize = 4;
+                } else if(v.variableType.equals(VariableType.UID)) {
+                    v.valSize = 16;
+                } else if(v.variableType.equals(VariableType.STREAM) && v.valueByteArray != null) {
+                    v.valSize = v.valueByteArray.length;
+                } else if(v.variableType == VariableType.STRING && v.valueString != null) {
+                    v.valSize = v.valueString.length();
+                } else if(v.variableType == VariableType.STRING_UTF_16_LE && v.valueString != null) {
+                    v.valSize = v.valueString.length() * builderUtf16SizeBytes;
+                }
+            }
+
+            if(v.valOffset == -1) {
+                v.valOffset = builderKeyOffset + 4 + v.name.length() + v.getValuePrefix();
+            }
+            return v;
+        }
     }
 
     @Override
