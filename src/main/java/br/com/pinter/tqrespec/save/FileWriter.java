@@ -30,6 +30,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -44,11 +48,15 @@ public abstract class FileWriter {
 
     protected abstract FileDataHolder getSaveData();
 
-    protected void writeBuffer(String filename) throws IOException {
-        this.writeBuffer(filename, getSaveData().getDataMap());
+    protected void writeBuffer(String rootPath, String filename) throws IOException {
+        writeBuffer(rootPath, filename, getSaveData().getDataMap(), FileSystems.getDefault());
     }
 
-    protected void writeBuffer(String filename, FileDataMap fileDataMap) throws IOException {
+    protected void writeBuffer(String rootPath, String filename, FileDataMap fileDataMap) throws IOException {
+        writeBuffer(rootPath, filename, fileDataMap, FileSystems.getDefault());
+    }
+
+    protected void writeBuffer(String rootPath, String filename, FileDataMap fileDataMap, FileSystem fileSystem) throws IOException {
         getSaveData().getBuffer().rewind();
 
         List<Integer> changedOffsets = new ArrayList<>(fileDataMap.changesKeySet());
@@ -56,49 +64,44 @@ public abstract class FileWriter {
 
         ByteArrayOutputStream outBuffer = new ByteArrayOutputStream();
 
-        File out = new File(filename);
-        try (FileChannel outChannel = new FileOutputStream(out).getChannel()) {
+        for (int offset : changedOffsets) {
+            int rawCount = offset - getSaveData().getBuffer().position();
+            getSaveData().getBuffer().limit(rawCount +
+                    getSaveData().getBuffer().position()
+            );
 
-            for (int offset : changedOffsets) {
-                int rawCount = offset - getSaveData().getBuffer().position();
-                getSaveData().getBuffer().limit(rawCount +
-                        getSaveData().getBuffer().position()
-                );
-
-                byte[] buf = new byte[getSaveData().getBuffer().remaining()];
-                getSaveData().getBuffer().get(buf);
-                outBuffer.write(buf);
-                getSaveData().getBuffer().limit(getSaveData().getBuffer().capacity());
-                byte[] c = fileDataMap.getBytes(offset);
-                outBuffer.write(c);
-                int previousValueLength = fileDataMap.getValuesLengthIndex().get(offset);
-                getSaveData().getBuffer().position(
-                        getSaveData().getBuffer().position() + previousValueLength);
-            }
-
-            while (true) {
-                byte[] buf = new byte[getSaveData().getBuffer().remaining()];
-                getSaveData().getBuffer().get(buf);
-                outBuffer.write(buf);
-                if (buf.length == 0) break;
-            }
-
-            ByteBuffer bufferWrapper = ByteBuffer.wrap(outBuffer.toByteArray()).order(ByteOrder.LITTLE_ENDIAN);
-
-            if (isCreateCrc()) {
-                bufferWrapper.putInt(getCrcOffset(), 0);
-                bufferWrapper.putInt(getCrcOffset(), CRC32.calculate(bufferWrapper));
-            }
-            bufferWrapper.rewind();
-
-            while (true) {
-                if (outChannel.write(bufferWrapper) <= 0) break;
-            }
-
-            getSaveData().getBuffer().rewind();
-            outChannel.force(false);
+            byte[] buf = new byte[getSaveData().getBuffer().remaining()];
+            //copy to buf everything until next change
+            getSaveData().getBuffer().get(buf);
+            outBuffer.write(buf);
+            //restore bytebuffer limit
+            getSaveData().getBuffer().limit(getSaveData().getBuffer().capacity());
+            //copy changed bytes to output buffer
+            byte[] c = fileDataMap.getBytes(offset);
+            outBuffer.write(c);
+            int previousValueLength = fileDataMap.getValuesLengthIndex().get(offset);
+            //skip the number of bytes of original value, to position the cursor at the next variable/block
+            getSaveData().getBuffer().position(
+                    getSaveData().getBuffer().position() + previousValueLength);
         }
 
+        //copy remaining data to output buffer
+        while (true) {
+            byte[] buf = new byte[getSaveData().getBuffer().remaining()];
+            getSaveData().getBuffer().get(buf);
+            outBuffer.write(buf);
+            if (buf.length == 0) break;
+        }
+
+        ByteBuffer bufferWrapper = ByteBuffer.wrap(outBuffer.toByteArray()).order(ByteOrder.LITTLE_ENDIAN);
+
+        if (isCreateCrc()) {
+            bufferWrapper.putInt(getCrcOffset(), 0);
+            bufferWrapper.putInt(getCrcOffset(), CRC32.calculate(bufferWrapper));
+        }
+
+        Files.write(fileSystem.getPath(rootPath, filename), bufferWrapper.array());
+        getSaveData().getBuffer().rewind();
     }
 
 }

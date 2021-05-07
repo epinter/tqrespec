@@ -27,12 +27,14 @@ import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.FileDataHolder;
 import br.com.pinter.tqrespec.save.FileDataMap;
 import br.com.pinter.tqrespec.save.FileWriter;
+import br.com.pinter.tqrespec.save.Platform;
 import br.com.pinter.tqrespec.save.stash.StashLoader;
 import br.com.pinter.tqrespec.save.stash.StashWriter;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
 import com.google.inject.Inject;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -162,9 +164,11 @@ public class PlayerWriter extends FileWriter {
             return false;
         }
         State.get().setSaveInProgress(true);
-        String playerChr = saveData.getPlayerChr().toString();
+        Path chrPath = saveData.getPlayerChr();
+        String rootPath = chrPath.getRoot()+chrPath.subpath(0, chrPath.getNameCount()-1).toString();
+        String playerChr = chrPath.getFileName().toString();
         try {
-            this.writeBuffer(playerChr);
+            this.writeBuffer(rootPath, playerChr);
             State.get().setSaveInProgress(false);
             return true;
         } catch (IOException e) {
@@ -175,34 +179,38 @@ public class PlayerWriter extends FileWriter {
 
     public void copyCurrentSave(String toPlayerName) throws IOException {
         State.get().setSaveInProgress(true);
-        String path;
-        if (saveData.isCustomQuest()) {
-            path = gameInfo.getSaveDataUserPath();
-        } else {
-            path = gameInfo.getSaveDataMainPath();
-        }
+        try {
+            String path;
+            if (saveData.isCustomQuest()) {
+                path = gameInfo.getSaveDataUserPath();
+            } else {
+                path = gameInfo.getSaveDataMainPath();
+            }
 
-        String fromPlayerName = saveData.getPlayerName();
+            String fromPlayerName = saveData.getPlayerName();
 
-        Path playerSaveDirSource = Paths.get(path, "_" + fromPlayerName);
-        Path playerSaveDirTarget = Paths.get(path, "_" + toPlayerName);
+            Path playerSaveDirSource = Paths.get(path, "_" + fromPlayerName);
+            Path playerSaveDirTarget = Paths.get(path, "_" + toPlayerName);
 
-        if (Files.exists(playerSaveDirTarget)) {
+            if (Files.exists(playerSaveDirTarget)) {
+                State.get().setSaveInProgress(false);
+                throw new FileAlreadyExistsException("Target Directory already exists");
+            }
+            FileDataMap fileDataMap = (FileDataMap) saveData.getDataMap().deepClone();
+            fileDataMap.setString("myPlayerName", toPlayerName, true);
+
+            Util.copyDirectoryRecurse(playerSaveDirSource, playerSaveDirTarget, false);
+            writeBuffer(playerSaveDirTarget.toString(), "Player.chr", fileDataMap);
+
+            StashLoader stashLoader = new StashLoader();
+            if (stashLoader.loadStash(playerSaveDirTarget, toPlayerName)) {
+                StashWriter stashWriter = new StashWriter(stashLoader.getSaveData());
+                stashWriter.save();
+            }
+        }catch (IOException e) {
+            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             State.get().setSaveInProgress(false);
-            throw new FileAlreadyExistsException("Target Directory already exists");
-        }
-        Util.copyDirectoryRecurse(playerSaveDirSource, playerSaveDirTarget, false);
-
-        FileDataMap fileDataMap = (FileDataMap) saveData.getDataMap().deepClone();
-
-        fileDataMap.setString("myPlayerName", toPlayerName, true);
-
-        this.writeBuffer(Paths.get(playerSaveDirTarget.toString(), "Player.chr").toString(), fileDataMap);
-
-        StashLoader stashLoader = new StashLoader();
-        if(stashLoader.loadStash(playerSaveDirTarget, toPlayerName)) {
-            StashWriter stashWriter = new StashWriter(stashLoader.getSaveData());
-            stashWriter.save();
+            throw new IOException(e);
         }
 
         State.get().setSaveInProgress(false);

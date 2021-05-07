@@ -145,6 +145,9 @@ public class Util {
     }
 
     public static void copyDirectoryRecurse(Path source, Path target, boolean replace) throws FileAlreadyExistsException {
+        copyDirectoryRecurse(source, target, replace, FileSystems.getDefault());
+    }
+    public static void copyDirectoryRecurse(Path source, Path target, boolean replace, FileSystem fileSystem) throws FileAlreadyExistsException {
         if (!replace && Files.exists(target)) {
             throw new FileAlreadyExistsException(target.toString() + " already exists");
         }
@@ -152,7 +155,7 @@ public class Util {
         FileVisitor<Path> fileVisitor = new FileVisitor<>() {
             @Override
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
-                Path targetDir = target.resolve(source.relativize(dir));
+                Path targetDir = fileSystem.getPath(target.toString(), source.relativize(dir).toString());
 
                 try {
                     Files.copy(dir, targetDir, COPY_ATTRIBUTES);
@@ -168,7 +171,8 @@ public class Util {
 
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-                Path targetFile = target.resolve(source.relativize(file));
+                Path targetFile = fileSystem.getPath(target.toString(), source.relativize(file).toString());
+
                 try {
                     Files.copy(file, targetFile, replace ? new CopyOption[]{COPY_ATTRIBUTES, REPLACE_EXISTING}
                             : new CopyOption[]{COPY_ATTRIBUTES});
@@ -186,17 +190,6 @@ public class Util {
 
             @Override
             public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
-                Path targetDir = target.resolve(source.relativize(dir));
-
-                if (exc == null) {
-                    try {
-                        FileTime fileTime = Files.getLastModifiedTime(dir);
-                        Files.setLastModifiedTime(targetDir, fileTime);
-                    } catch (IOException e) {
-                        logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
-                        return FileVisitResult.TERMINATE;
-                    }
-                }
                 return FileVisitResult.CONTINUE;
             }
         };

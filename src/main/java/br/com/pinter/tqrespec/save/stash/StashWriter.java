@@ -45,9 +45,9 @@ public class StashWriter extends FileWriter {
         try {
             String fName = String.format("%s/winsys.dxb", saveData.getPlayerPath());
             getSaveData().getDataMap().setString("fName", fName);
-            writeBuffer(Paths.get(saveData.getPlayerPath().toString(), Constants.STASH_FILE).toString());
+            writeBuffer(saveData.getPlayerPath().toString(), Constants.STASH_FILE);
             getSaveData().getDataMap().setString("fName", fName.replaceAll("\\.dxb$", ".dxg"));
-            writeBuffer(Paths.get(saveData.getPlayerPath().toString(), Constants.STASH_FILE_BACKUP).toString());
+            writeBuffer(saveData.getPlayerPath().toString(), Constants.STASH_FILE_BACKUP);
             return true;
         } catch (IOException e) {
             logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
