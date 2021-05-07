@@ -446,6 +446,9 @@ public class GameInfo {
                 throw new GameNotFoundException("Game path not found", e);
             }
             saveDetectedGame();
+            logger.log(System.Logger.Level.INFO, "Using databases ''{0}''", databases.toString());
+            logger.log(System.Logger.Level.INFO, "Using text ''{0}''", resourcesText.toString());
+            logger.log(System.Logger.Level.INFO, "GameVersion:''{0}'';InstallType:''{1}''", installedVersion, installType);
             return gamePath;
         } else {
             throw new GameNotFoundException(Util.getUIMessage(Constants.Msg.MAIN_GAMENOTDETECTED));
@@ -456,7 +459,12 @@ public class GameInfo {
         if(Paths.get(path,DATABASE_DIR).toFile().isDirectory() && Paths.get(path,"Text").toFile().isDirectory()) {
             addDatabasePath(Paths.get(path, DATABASE_DIR, DATABASE_FILE));
             addTextPath(Paths.get(path, "Text"));
+            dlcRagnarok = true;
+            dlcAtlantis = true;
             gamePath = path;
+            logger.log(System.Logger.Level.INFO, "Using databases ''{0}''", databases.toString());
+            logger.log(System.Logger.Level.INFO, "Using text ''{0}''", resourcesText.toString());
+            logger.log(System.Logger.Level.INFO, "GameVersion:''{0}'';InstallType:''{1}''", installedVersion, installType);
             return gamePath;
         }
 
@@ -497,6 +505,14 @@ public class GameInfo {
             return setDevGamePath(Constants.DEV_GAMEDATA);
         }
 
+        if (Paths.get(Constants.DEV_GAMEDATA, DATABASE_DIR).toFile().isDirectory()) {
+            logger.log(System.Logger.Level.INFO, "Dev game path found");
+            return setDevGamePath(Constants.DEV_GAMEDATA);
+        } else if (Paths.get(Constants.PARENT_GAMEDATA, DATABASE_DIR).toFile().isDirectory()) {
+            logger.log(System.Logger.Level.INFO, "Parent game path found");
+            return setDevGamePath(Constants.PARENT_GAMEDATA);
+        }
+
         if (StringUtils.isEmpty(gamePath)) {
             String lastUsedGamePath = getLastUsedGamePath();
             if(StringUtils.isNotBlank(lastUsedGamePath)) {
@@ -508,19 +524,6 @@ public class GameInfo {
             Path installedPath = detectInstallation();
             if (installedPath != null) {
                 setGamePath(installedPath.toString());
-            }
-        }
-
-        if (StringUtils.isEmpty(gamePath)) {
-            if (Paths.get(Constants.DEV_GAMEDATA, DATABASE_DIR).toFile().isDirectory()) {
-                logger.log(System.Logger.Level.INFO, "Dev game path found");
-                return setDevGamePath(Constants.DEV_GAMEDATA);
-            } else if (Paths.get(Constants.PARENT_GAMEDATA, DATABASE_DIR).toFile().isDirectory()) {
-                logger.log(System.Logger.Level.INFO, "Parent game path found");
-                return setDevGamePath(Constants.PARENT_GAMEDATA);
-            } else {
-                removeSavedDetectedGame();
-                throw new GameNotFoundException(Util.getUIMessage(Constants.Msg.MAIN_GAMENOTDETECTED));
             }
         }
 
@@ -616,9 +619,6 @@ public class GameInfo {
             gamePath = null;
             throw new GameNotFoundException(String.format("Can't find TQIT or TQAE (%s,%s)", installedVersion,installType));
         }
-        logger.log(System.Logger.Level.INFO, "Using databases ''{0}''", databases.toString());
-        logger.log(System.Logger.Level.INFO, "Using text ''{0}''", resourcesText.toString());
-        logger.log(System.Logger.Level.INFO, "GameVersion:''{0}'';InstallType:''{1}''", installedVersion,installType);
     }
 
     public String getSavePath() {
