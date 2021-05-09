@@ -58,6 +58,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class CharactersViewController implements Initializable {
@@ -173,8 +174,13 @@ public class CharactersViewController implements Initializable {
 
     private List<PlayerCharacter> characters;
 
+    private AtomicBoolean loadingCharacters = new AtomicBoolean(false);
+
     @FXML
     public void closeWindow(@SuppressWarnings("unused") MouseEvent evt) {
+        if(loadingCharacters.get()) {
+            return;
+        }
         charactersTable.scrollToColumnIndex(0);
         charactersTable.scrollTo(0);
         charactersTable.getItems().clear();
@@ -264,6 +270,8 @@ public class CharactersViewController implements Initializable {
         stage.addEventHandler(WindowEvent.WINDOW_SHOWING, e -> new WorkerThread(new MyTask<>() {
             @Override
             protected Void call() {
+                loadingCharacters.set(true);
+
                 Platform.runLater(() -> {
                     charactersTable.setPlaceholder(new Label(Util.getUIMessage("characters.loadingPlaceholder")));
                     rootElement.getScene().setCursor(Cursor.WAIT);
@@ -285,6 +293,7 @@ public class CharactersViewController implements Initializable {
                     setupTable();
                     charactersTable.setPlaceholder(new Label(""));
                     Platform.runLater(() -> rootElement.getScene().setCursor(Cursor.DEFAULT));
+                    loadingCharacters.set(false);
                 });
                 return null;
             }
