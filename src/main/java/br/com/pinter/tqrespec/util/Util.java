@@ -145,25 +145,28 @@ public class Util {
     }
 
     public static void copyDirectoryRecurse(Path source, Path target, boolean replace) throws FileAlreadyExistsException {
-        copyDirectoryRecurse(source, target, replace, FileSystems.getDefault());
+        copyDirectoryRecurse(source, target, replace, FileSystems.getDefault(), null);
     }
-    public static void copyDirectoryRecurse(Path source, Path target, boolean replace, FileSystem fileSystem) throws FileAlreadyExistsException {
+    public static void copyDirectoryRecurse(Path source, Path target, boolean replace, FileSystem fileSystem, String excludeRegex) throws FileAlreadyExistsException {
         if (!replace && Files.exists(target)) {
             throw new FileAlreadyExistsException(target.toString() + " already exists");
         }
 
         FileVisitor<Path> fileVisitor = new FileVisitor<>() {
             @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
                 Path targetDir = fileSystem.getPath(target.toString(), source.relativize(dir).toString());
 
                 try {
+                    if(excludeRegex!=null && dir.getFileName().toString().matches(excludeRegex)) {
+                        return FileVisitResult.SKIP_SUBTREE;
+                    }
                     Files.copy(dir, targetDir, COPY_ATTRIBUTES);
                 } catch (DirectoryNotEmptyException ignored) {
                     //ignore
                 } catch (IOException e) {
                     logger.log(System.Logger.Level.ERROR, "Unable to create directory ''{0}''", targetDir);
-                    return FileVisitResult.TERMINATE;
+                    throw new IOException("Unable to create directory "+targetDir);
                 }
 
                 return FileVisitResult.CONTINUE;
@@ -174,6 +177,9 @@ public class Util {
                 Path targetFile = fileSystem.getPath(target.toString(), source.relativize(file).toString());
 
                 try {
+                    if(excludeRegex!=null && file.getFileName().toString().matches(excludeRegex)) {
+                        return FileVisitResult.CONTINUE;
+                    }
                     Files.copy(file, targetFile, replace ? new CopyOption[]{COPY_ATTRIBUTES, REPLACE_EXISTING}
                             : new CopyOption[]{COPY_ATTRIBUTES});
                 } catch (IOException e) {
