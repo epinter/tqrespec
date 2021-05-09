@@ -9,7 +9,6 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
@@ -99,7 +98,7 @@
                   <Insets />
                </VBox.margin>
             </GridPane>
-            <TabPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" side="LEFT" styleClass="tq-tabpane" tabMaxHeight="100.0" tabMaxWidth="100.0" VBox.vgrow="ALWAYS">
+            <TabPane fx:id="tabPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="270.0" side="LEFT" styleClass="tq-tabpane" tabMaxHeight="100.0" tabMaxWidth="100.0" VBox.vgrow="ALWAYS">
                <tabs>
                   <Tab fx:id="attributesTab" closable="false" styleClass="tq-tabbutton" text="%main.attributesTab">
                      <content>
@@ -111,6 +110,11 @@
                          <fx:include fx:id="skillsPane" source="tab_skills.fxml" />
                      </content>
                   </Tab>
+                   <Tab fx:id="miscTab" closable="false" styleClass="tq-tabbutton" text="%main.miscTab">
+                       <content>
+                           <fx:include fx:id="miscPane" source="tab_misc.fxml" />
+                       </content>
+                   </Tab>
                </tabs>
                <padding>
                   <Insets right="48.0" />
@@ -132,19 +136,6 @@
                         <Insets bottom="2.0" left="5.0" right="13.0" top="2.0" />
                      </GridPane.margin>
                   </Button>
-                  <Button fx:id="copyButton" alignment="CENTER" disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#copyChar" styleClass="tq-button" text="%main.copychar" textAlignment="CENTER">
-                     <GridPane.margin>
-                        <Insets right="2.0" />
-                     </GridPane.margin>
-                  </Button>
-                  <TextField fx:id="copyCharInput" onKeyTyped="#copyCharInputChanged" promptText="%main.copycharname" styleClass="tq-textfield" GridPane.columnIndex="1">
-                     <padding>
-                        <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
-                     </padding>
-                     <GridPane.margin>
-                        <Insets left="10.0" right="10.0" />
-                     </GridPane.margin>
-                  </TextField>
                </children>
                <padding>
                   <Insets left="45.0" right="35.0" top="10.0" />

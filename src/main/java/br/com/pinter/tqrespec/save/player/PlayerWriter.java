@@ -35,6 +35,7 @@ import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
 import com.google.inject.Inject;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,7 +43,9 @@ import java.net.URI;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PlayerWriter extends FileWriter {
     private static final System.Logger logger = Log.getLogger(PlayerWriter.class.getName());
@@ -126,12 +129,12 @@ public class PlayerWriter extends FileWriter {
                     Files.copy(player, destPlayer, StandardCopyOption.REPLACE_EXISTING);
                     copyFileTimes(player, destPlayer);
 
-                    if(Files.exists(srcDxb)) {
+                    if (Files.exists(srcDxb)) {
                         Files.copy(srcDxb, destDxb, StandardCopyOption.REPLACE_EXISTING);
                         copyFileTimes(srcDxb, destDxb);
                     }
 
-                    if(Files.exists(srcDxg)) {
+                    if (Files.exists(srcDxg)) {
                         Files.copy(srcDxg, destDxg, StandardCopyOption.REPLACE_EXISTING);
                         copyFileTimes(srcDxg, destDxg);
                     }
@@ -165,7 +168,7 @@ public class PlayerWriter extends FileWriter {
         }
         State.get().setSaveInProgress(true);
         Path chrPath = saveData.getPlayerChr();
-        String rootPath = chrPath.getRoot()+chrPath.subpath(0, chrPath.getNameCount()-1).toString();
+        String rootPath = chrPath.getRoot() + chrPath.subpath(0, chrPath.getNameCount() - 1).toString();
         String playerChr = chrPath.getFileName().toString();
         try {
             this.writeBuffer(rootPath, playerChr);
@@ -178,7 +181,15 @@ public class PlayerWriter extends FileWriter {
     }
 
     public void copyCurrentSave(String toPlayerName) throws IOException {
+        copyCurrentSave(toPlayerName, null, null);
+    }
+
+    public void copyCurrentSave(String toPlayerName, Platform conversionTarget, Path zipOutputPath) throws IOException {
+        if(StringUtils.isBlank(toPlayerName)) {
+            throw new IllegalArgumentException("character name can't be empty");
+        }
         State.get().setSaveInProgress(true);
+
         try {
             String path;
             if (saveData.isCustomQuest()) {
@@ -191,28 +202,70 @@ public class PlayerWriter extends FileWriter {
 
             Path playerSaveDirSource = Paths.get(path, "_" + fromPlayerName);
             Path playerSaveDirTarget = Paths.get(path, "_" + toPlayerName);
+            String toZipPath = "/_" + toPlayerName;
+            Platform oldPlatform = getSaveData().getDataMap().getPlatform();
+            boolean backupOnly = false;
 
-            if (Files.exists(playerSaveDirTarget)) {
+            if((conversionTarget == null && zipOutputPath == null && toPlayerName.equals(fromPlayerName))
+                    || (conversionTarget != null && conversionTarget.equals(oldPlatform))) {
                 State.get().setSaveInProgress(false);
-                throw new FileAlreadyExistsException("Target Directory already exists");
+                throw new IllegalStateException("An expected error occurred during character copy");
             }
+
+            String saveId = RandomStringUtils.randomNumeric(10);
+            if (zipOutputPath == null && Files.exists(playerSaveDirTarget)) {
+                State.get().setSaveInProgress(false);
+                throw new FileAlreadyExistsException("Target directory already exists: "+playerSaveDirTarget);
+            }
+
             FileDataMap fileDataMap = (FileDataMap) saveData.getDataMap().deepClone();
-            fileDataMap.setString("myPlayerName", toPlayerName, true);
 
-            Util.copyDirectoryRecurse(playerSaveDirSource, playerSaveDirTarget, false);
-            writeBuffer(playerSaveDirTarget.toString(), "Player.chr", fileDataMap);
-
-            StashLoader stashLoader = new StashLoader();
-            if (stashLoader.loadStash(playerSaveDirTarget, toPlayerName)) {
-                StashWriter stashWriter = new StashWriter(stashLoader.getSaveData());
-                stashWriter.save();
+            if(!toPlayerName.equals(fromPlayerName)) {
+                // set name before conversion
+                fileDataMap.setString("myPlayerName", toPlayerName, true);
             }
-        }catch (IOException e) {
-            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
-            State.get().setSaveInProgress(false);
-            throw new IOException(e);
-        }
 
-        State.get().setSaveInProgress(false);
+            if (conversionTarget != null) {
+                if(conversionTarget.equals(Platform.MOBILE)) {
+                    toZipPath = "/__save" + saveId;
+                }
+                fileDataMap.convertTo(conversionTarget, saveId);
+            }
+
+            if (zipOutputPath != null) {
+                if(toPlayerName.equals(fromPlayerName) && conversionTarget == null) {
+                    backupOnly = true;
+                }
+                try (FileSystem zipfs = FileSystems.newFileSystem(URI.create("jar:" + zipOutputPath.toUri()), Map.of("create", "true"))) {
+                    Path dir = zipfs.getPath(toZipPath);
+                    String excludeCopyRegex = null;
+                    if(conversionTarget != null && conversionTarget.equals(Platform.MOBILE)) {
+                        excludeCopyRegex = "(?i)(?:^backup.*|^winsys.dxg$|^winsys.dxb$|^settings.txt$)";
+                    }
+                    Util.copyDirectoryRecurse(playerSaveDirSource, dir, false, zipfs, excludeCopyRegex);
+                    if(!backupOnly) {
+                        Files.deleteIfExists(zipfs.getPath(dir.toString(), "Player.chr"));
+                        writeBuffer(dir.toString(), "Player.chr", fileDataMap, zipfs);
+                    }
+                }
+            } else {
+                String excludeCopyRegex = "(?i)(?:^backup.*)";
+                if(conversionTarget != null && oldPlatform.equals(Platform.MOBILE)) {
+                    excludeCopyRegex = "(?i)(?:^backup.*|^.winsys.dxg$|^.winsys.dxb$|^SavingChar.txt$)";
+                }
+                Util.copyDirectoryRecurse(playerSaveDirSource, playerSaveDirTarget, false, excludeCopyRegex);
+                writeBuffer(playerSaveDirTarget.toString(), "Player.chr", fileDataMap);
+                StashLoader stashLoader = new StashLoader();
+                if (stashLoader.loadStash(playerSaveDirTarget, toPlayerName)) {
+                    StashWriter stashWriter = new StashWriter(stashLoader.getSaveData());
+                    stashWriter.save();
+                }
+            }
+        } catch (IOException e) {
+            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
+            throw new IOException(e);
+        } finally {
+            State.get().setSaveInProgress(false);
+        }
     }
 }

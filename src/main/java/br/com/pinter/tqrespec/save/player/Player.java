@@ -101,7 +101,7 @@ public class Player {
         playerCharacter.setExperience(getXp());
         playerCharacter.setGold(getMoney());
         playerCharacter.setLevel(getLevel());
-        playerCharacter.setName(getPlayerName());
+        playerCharacter.setName(getCharacterName());
         playerCharacter.setStatAvailableAttrPoints(getModifierPoints());
         playerCharacter.setStatDex(getDex());
         playerCharacter.setStatInt(getInt());
@@ -177,7 +177,7 @@ public class Player {
                     if (!db.recordExists(sb.getSkillName())) {
                         logger.log(System.Logger.Level.WARNING,"The character \"{0}\" have the skill \"{1}\", but this" +
                                 " skill was not found in the game database. Please check if the game installed is compatible" +
-                                " with your save game.", getPlayerName(), sb.getSkillName());
+                                " with your save game.", getPlayerSavegameName(), sb.getSkillName());
                         getSaveData().setMissingSkills(true);
                     }
                     synchronized (getSaveData().getPlayerSkills()) {
@@ -193,9 +193,21 @@ public class Player {
         return getSaveData().isMissingSkills();
     }
 
-    public String getPlayerName() {
+
+    /**
+     * @return The character name from directory
+     */
+    public String getPlayerSavegameName() {
         return getSaveData().getPlayerName();
     }
+
+    /**
+     * @return The character name from Player.chr
+     */
+    public String getCharacterName() {
+        return getSaveData().getDataMap().getCharacterName();
+    }
+
     public boolean isCharacterLoaded() {
         return getSaveData().getBuffer() != null;
     }
@@ -531,7 +543,7 @@ public class Player {
                 UID tpUid = new UID((byte[]) t.getValue());
                 MapTeleport mapTeleport = DefaultMapTeleport.get(tpUid);
                 if(mapTeleport == null) {
-                    logger.log(System.Logger.Level.WARNING,String.format("teleport not found with uid = '%s' character=(%s) difficulty=%d",tpUid,getPlayerName(),difficulty));
+                    logger.log(System.Logger.Level.WARNING,String.format("teleport not found with uid = '%s' character=(%s) difficulty=%d",tpUid, getPlayerSavegameName(),difficulty));
                     continue;
                 }
                 Teleport teleport = db.teleports().getTeleport(mapTeleport.getRecordId());

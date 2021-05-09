@@ -181,6 +181,14 @@ public class FileDataMap implements DeepCloneable {
         }
     }
 
+    public String getCharacterName() {
+        if(platform.equals(Platform.MOBILE)) {
+            return new String((getString("myPlayerName")).getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_16LE);
+        } else {
+            return getString("myPlayerName");
+        }
+    }
+
     private String readStringFromMap(int offset, Platform fromPlatform, boolean wide) {
         byte[] data = Arrays.copyOfRange(changes.get(offset), 4, changes.get(offset).length-1);
 

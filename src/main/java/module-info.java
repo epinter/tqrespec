@@ -40,6 +40,7 @@ module br.com.pinter.tqrespec {
     exports br.com.pinter.tqrespec.core;
     exports br.com.pinter.tqrespec.gui;
     exports br.com.pinter.tqrespec.tqdata;
+    exports br.com.pinter.tqrespec.save;
     opens br.com.pinter.tqrespec to com.google.guice, javafx.fxml;
     opens br.com.pinter.tqrespec.core to com.google.guice, javafx.fxml;
     opens br.com.pinter.tqrespec.gui to com.google.guice, javafx.fxml;

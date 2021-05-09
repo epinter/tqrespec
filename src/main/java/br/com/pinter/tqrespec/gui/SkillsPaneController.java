@@ -140,7 +140,7 @@ public class SkillsPaneController implements Initializable {
         if(player.isMissingSkills()) {
             Toast.show((Stage) skillsGridPane.getParent().getScene().getWindow(),
                     Util.getUIMessage("alert.missingSkill_header"),
-                    Util.getUIMessage("alert.missingSkill_content", player.getPlayerName(), Constants.LOGFILE),
+                    Util.getUIMessage("alert.missingSkill_content", player.getPlayerSavegameName(), Constants.LOGFILE),
                     Constants.UI.TOAST_WARNING_TIMEOUT);
         }
         currentSkillPoints = new SimpleStringProperty();

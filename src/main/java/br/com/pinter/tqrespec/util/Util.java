@@ -27,7 +27,9 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.Tab;
+import javafx.scene.control.Tooltip;
 import javafx.stage.Modality;
+import javafx.util.Duration;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -147,6 +149,11 @@ public class Util {
     public static void copyDirectoryRecurse(Path source, Path target, boolean replace) throws FileAlreadyExistsException {
         copyDirectoryRecurse(source, target, replace, FileSystems.getDefault(), null);
     }
+
+    public static void copyDirectoryRecurse(Path source, Path target, boolean replace, String excludeRegex) throws FileAlreadyExistsException {
+        copyDirectoryRecurse(source, target, replace, FileSystems.getDefault(), excludeRegex);
+    }
+
     public static void copyDirectoryRecurse(Path source, Path target, boolean replace, FileSystem fileSystem, String excludeRegex) throws FileAlreadyExistsException {
         if (!replace && Files.exists(target)) {
             throw new FileAlreadyExistsException(target.toString() + " already exists");
@@ -257,4 +264,13 @@ public class Util {
         }
     }
 
+    public static Tooltip simpleTooltip(String message) {
+        Tooltip tooltip = new Tooltip(message);
+        tooltip.setFont(Constants.UI.TOOLTIP_FONT);
+        tooltip.setShowDelay(Duration.millis(Constants.UI.TOOLTIP_SHOWDELAY_MILLIS));
+        tooltip.setShowDuration(Duration.millis(Constants.UI.TOOLTIP_SHOWDURATION_MILLIS));
+        tooltip.setWrapText(true);
+        tooltip.setMaxWidth(Constants.UI.TOOLTIP_MAXWIDTH);
+        return tooltip;
+    }
 }

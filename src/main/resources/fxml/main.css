@@ -15,6 +15,11 @@
     -fx-font-family: 'Albertus MT';
 }
 
+.tooltip {
+    -fx-wrap-text: true;
+    -fx-show-duration: 8000ms;
+}
+
 .scroll-bar:horizontal > .thumb,
 .scroll-bar:vertical > .thumb {
         -fx-background: -fx-accent;
@@ -172,6 +177,23 @@
 }
 /* ******* */
 
+.vertical-separator .line {
+    -fx-border-image-source: url('sv.png');
+    -fx-border-width: 1;
+    -fx-border-image-width: 0 0 0 1;
+    -fx-border-image-slice: 0 0 0 1;
+    -fx-border-image-insets: 0;
+    -fx-effect: dropshadow( one-pass-box , black , 0, 0.0 , 1 , 0 );
+}
+
+.horizontal-separator .line {
+    -fx-border-image-source: url('sv.png');
+    -fx-border-width: 1;
+    -fx-border-image-width: 0 0 1 0;
+    -fx-border-image-slice: 0 0 1 0;
+    -fx-border-image-insets: 0;
+    -fx-effect: dropshadow( one-pass-box , black , 0, 0.0 , 0 , 1 );
+}
 
 /* character combobox */
 .tq-charactercombo:hover {
@@ -278,14 +300,18 @@
     -fx-effect: none;
 }
 
+.tq-labelradio,
 .tq-label {
-	-fx-text-fill: #ffffff;
 	-fx-font-size: 1.4em;
 	-fx-font-family: 'Albertus MT Light';
+}
+
+.tq-labelradio .text,
+.tq-label .text {
+	-fx-text-fill: #ffffff;
     -fx-effect: dropshadow( one-pass-box , black , 0, 0.0 , 0 , 2 );
     -fx-text-alignment: right;
 }
-
 
 .tq-textfield {
     -fx-background-color: #443823;
@@ -394,7 +420,7 @@
 }
 
 .tq-tabbutton {
-	-fx-font-family: 'Albertus MT';
+	-fx-font-family: 'Albertus MT Light';
 	-fx-font-size: 0.7em;
     -fx-border-image-source: url('border.png');
     -fx-border-image-insets: 0;

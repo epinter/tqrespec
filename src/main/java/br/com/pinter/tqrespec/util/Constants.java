@@ -34,7 +34,6 @@ public class Constants {
     }
 
     public static final String APPNAME = "TQRespec";
-    public static final Platform PRIMARY_PLATFORM = Platform.WINDOWS;
     public static final String LOGFILE = new File(System.getProperty("java.io.tmpdir"), "tqrespec.log").getAbsolutePath();
     public static final String LOGLEVELS = "br.com.pinter.tqrespec=INFO;br.com.pinter.tqdatabase=INFO";
     public static final String REGEX_REGISTRY_INSTALL = "Titan Quest.*Anniversary.*";
@@ -53,6 +52,7 @@ public class Constants {
     public static final String ERROR_MSG_EXCEPTION = "Error: ";
     public static final String STASH_FILE = "winsys.dxb";
     public static final String STASH_FILE_BACKUP = "winsys.dxg";
+    public static final int MAX_CHARACTER_NAME_LENGTH = 14;
 
     /**
      * Maps Game Options language to i18n locale
@@ -131,7 +131,9 @@ public class Constants {
         public static final String TOAST_CONTENT_STYLE = "tq-toast-content";
         public static final int TOAST_WARNING_TIMEOUT = 10000;
         public static final int TOOLTIP_SHOWDELAY_MILLIS = 150;
-        public static final Font TOOLTIP_FONT = Font.font("Albertus MT", 14d);
+        public static final int TOOLTIP_SHOWDURATION_MILLIS = 9000;
+        public static final double TOOLTIP_MAXWIDTH = 500d;
+        public static final Font TOOLTIP_FONT = Font.font("Albertus MT", 16d);
         public static final String TAG_STRLABEL= "tagCStrength";
         public static final String TAG_INTLABEL= "tagCIntelligence";
         public static final String TAG_DEXLABEL= "tagCDexterity";

@@ -41,7 +41,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
@@ -96,10 +95,7 @@ public class MainController implements Initializable {
     private Hyperlink versionCheck;
 
     @FXML
-    private Button copyButton;
-
-    @FXML
-    private TextField copyCharInput;
+    private TabPane tabPane;
 
     private double dragX;
     private double dragY;
@@ -120,6 +116,12 @@ public class MainController implements Initializable {
     public SkillsPaneController skillsPaneController;
 
     @FXML
+    public GridPane miscPane;
+
+    @FXML
+    public MiscPaneController miscPaneController;
+
+    @FXML
     public Button resetButton;
 
     @FXML
@@ -130,6 +132,9 @@ public class MainController implements Initializable {
 
     @FXML
     public Tab attributesTab;
+
+    @FXML
+    public Tab miscTab;
 
     @Inject
     private Txt txt;
@@ -154,25 +159,21 @@ public class MainController implements Initializable {
 
         //initialize properties and bind them to respective properties in the tab controllers
         saveDisabled.setValue(saveButton.isDisable());
+        miscPaneController.setMainController(this);
         pointsPaneController.setSaveDisabled(saveButton.isDisabled());
         skillsPaneController.setSaveDisabled(saveButton.isDisabled());
+        miscPaneController.setSaveDisabled(saveButton.isDisabled());
         saveButton.disableProperty().bindBidirectional(saveDisabled);
         saveDisabled.bindBidirectional(pointsPaneController.saveDisabledProperty());
         saveDisabled.bindBidirectional(skillsPaneController.saveDisabledProperty());
+        saveDisabled.bindBidirectional(miscPaneController.saveDisabledProperty());
 
         //set icons
         resetButton.setGraphic(Icon.FA_UNDO.create(1.4));
-        Tooltip resetButtonTooltip = new Tooltip(Util.getUIMessage("main.resetButtonTooltip"));
-        resetButtonTooltip.setShowDelay(Duration.millis(Constants.UI.TOOLTIP_SHOWDELAY_MILLIS));
-        resetButton.setTooltip(resetButtonTooltip);
+        resetButton.setTooltip(Util.simpleTooltip(Util.getUIMessage("main.resetButtonTooltip")));
         saveButton.setGraphic(Icon.FA_SAVE.create());
-        copyButton.setGraphic(Icon.FA_COPY.create());
         charactersButton.setGraphic(Icon.FA_USERS.create(1.4));
-        Tooltip charactersButtonTooltip = new Tooltip(Util.getUIMessage("main.charactersButtonTooltip"));
-        charactersButtonTooltip.setShowDelay(Duration.millis(Constants.UI.TOOLTIP_SHOWDELAY_MILLIS));
-        charactersButtonTooltip.setFont(Constants.UI.TOOLTIP_FONT);
-        resetButtonTooltip.setFont(Constants.UI.TOOLTIP_FONT);
-        charactersButton.setTooltip(charactersButtonTooltip);
+        charactersButton.setTooltip(Util.simpleTooltip(Util.getUIMessage("main.charactersButtonTooltip")));
 
         State.get().gameRunningProperty().addListener((value, oldV, newV) -> {
             if (BooleanUtils.isTrue(newV)) {
@@ -189,7 +190,7 @@ public class MainController implements Initializable {
         new CheckVersionService(Util.getBuildVersion(), Constants.VERSION_CHECK_URL, versionCheck).start();
     }
 
-    private void addCharactersToCombo() {
+    public void addCharactersToCombo() {
         try {
             characterCombo.getSelectionModel().clearSelection();
             characterCombo.getItems().setAll(gameInfo.getPlayerListMain());
@@ -200,9 +201,20 @@ public class MainController implements Initializable {
         }
     }
 
+    public void setCharacterCombo(String characterName) {
+        if (characterCombo.getItems().contains(characterName)) {
+            characterCombo.setValue(characterName);
+        }
+    }
+
     private void windowShownHandler() {
         assert characterCombo == null : "fx:id=\"characterCombo\" not found in FXML.";
         addCharactersToCombo();
+        tabPane.addEventHandler(MouseEvent.MOUSE_ENTERED, e -> {
+            if(State.get().getLastCursorWaitTask() != null && State.get().getLastCursorWaitTask().isRunning()) {
+                tabPane.setCursor(Cursor.WAIT);
+            }
+        });
     }
 
     @FXML
@@ -212,6 +224,10 @@ public class MainController implements Initializable {
 
     @FXML
     public void openAboutWindow(MouseEvent evt) throws IOException {
+        if(State.get().getSaveInProgress()) {
+            return;
+        }
+
         Parent root;
         if (fxmlLoaderAbout.getRoot() == null) {
             fxmlLoaderAbout.setLocation(getClass().getResource(Constants.UI.ABOUT_FXML));
@@ -225,6 +241,10 @@ public class MainController implements Initializable {
 
     @FXML
     public void openCharactersWindow(ActionEvent evt) throws IOException {
+        if(State.get().getSaveInProgress()) {
+            return;
+        }
+
         reset();
         Parent root;
         if (fxmlLoaderCharacter.getRoot() == null) {
@@ -238,104 +258,40 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    public void copyCharInputChanged(KeyEvent event) {
-        if (characterCombo.getValue() == null || characterCombo.getValue().isEmpty()) {
-            return;
-        }
-        String str = copyCharInput.getText();
-        int caret = copyCharInput.getCaretPosition();
-        StringBuilder newStr = new StringBuilder();
-
-        for (char c : str.toCharArray()) {
-            //all characters above 0xFF needs to have accents stripped
-            if (c > 0xFF) {
-                newStr.append(StringUtils.stripAccents(Character.toString(c)).toCharArray()[0]);
-            } else {
-                newStr.append(Character.toString(c).replaceAll("[\\\\/:*?\"<>|;]", ""));
-            }
-        }
-        copyCharInput.setText(newStr.toString());
-        copyCharInput.positionCaret(caret);
-        copyButton.setDisable(copyCharInput.getText().isBlank());
-    }
-
-    @FXML
     public void resetButtonClicked(ActionEvent event) {
-        reset();
+        if(!State.get().getSaveInProgress()) {
+            reset();
+        }
     }
 
     public void reset() {
         pointsPaneController.clearProperties();
         skillsPaneController.resetSkilltabControls();
+        miscPaneController.reset();
         player.reset();
-        copyCharInput.clear();
-        copyCharInput.setDisable(true);
         characterCombo.setValue(null);
         characterCombo.getItems().clear();
         addCharactersToCombo();
+        setAllControlsDisable(true);
         characterCombo.setDisable(false);
-        setAllControlsDisable(true);
-        skillsPaneController.resetSkilltabControls();
-        pointsPaneController.clearProperties();
+        Toast.cancel();
+        restoreDefaultCursor();
+        tabPane.getSelectionModel().select(attributesTab);
     }
 
-    @FXML
-    public void copyChar(ActionEvent evt) {
-        if (gameRunningAlert()) {
-            return;
-        }
-        String targetPlayerName = copyCharInput.getText();
-        setAllControlsDisable(true);
-
-        MyTask<Integer> copyCharTask = new MyTask<>() {
-            @Override
-            protected Integer call() {
-                try {
-                    playerWriter.copyCurrentSave(targetPlayerName);
-                    return 2;
-                } catch (FileAlreadyExistsException e) {
-                    return 3;
-                } catch (IOException e) {
-                    return 0;
-                }
-            }
-        };
-
-        //noinspection Convert2Lambda
-        copyCharTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new MyEventHandler<>() {
-            @Override
-            public void handleEvent(WorkerStateEvent workerStateEvent) {
-                if ((int) copyCharTask.getValue() == 2) {
-                    player.reset();
-                    reset();
-                    setAllControlsDisable(false);
-                    addCharactersToCombo();
-                    if (characterCombo.getItems().contains(targetPlayerName)) {
-                        characterCombo.setValue(targetPlayerName);
-                    }
-                } else if ((int) copyCharTask.getValue() == 3) {
-                    Util.showError("Target Directory already exists!",
-                            String.format("The specified target directory already exists. Aborting the copy to character '%s'",
-                                    targetPlayerName));
-                } else {
-                    Util.showError(Util.getUIMessage("alert.errorcopying_header"),
-                            Util.getUIMessage("alert.errorcopying_content", targetPlayerName));
-                }
-                setAllControlsDisable(false);
-            }
-        });
-        setCursorWaitOnTask(copyCharTask);
-        new WorkerThread(copyCharTask).start();
+    public void setCursorWaitOnTask(MyTask<?> task) {
+        tabPane.setCursor(Cursor.WAIT);
+        State.get().setLastCursorWaitTask(task);
+        task.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, e -> restoreDefaultCursor());
+        task.addEventHandler(WorkerStateEvent.WORKER_STATE_FAILED, e -> restoreDefaultCursor());
+        task.addEventHandler(WorkerStateEvent.WORKER_STATE_CANCELLED, e -> restoreDefaultCursor());
     }
 
-    private void setCursorWaitOnTask(MyTask<?> task) {
-        rootelement.getScene().setCursor(Cursor.WAIT);
-        task.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, e -> rootelement.getScene().setCursor(Cursor.DEFAULT));
-        task.addEventHandler(WorkerStateEvent.WORKER_STATE_FAILED, e -> rootelement.getScene().setCursor(Cursor.DEFAULT));
-        task.addEventHandler(WorkerStateEvent.WORKER_STATE_CANCELLED, e -> rootelement.getScene().setCursor(Cursor.DEFAULT));
+    private void restoreDefaultCursor() {
+        tabPane.setCursor(Cursor.DEFAULT);
     }
 
-    private boolean gameRunningAlert() {
+    public boolean gameRunningAlert() {
         if (BooleanUtils.isTrue(State.get().getGameRunning())) {
             Util.showError(Util.getUIMessage("alert.errorgamerunning_header"),
                     Util.getUIMessage("alert.errorgamerunning_content"));
@@ -400,18 +356,19 @@ public class MainController implements Initializable {
         new WorkerThread(backupSaveGameTask).start();
     }
 
-    private void setAllControlsDisable(boolean disable) {
+    public void setAllControlsDisable(boolean disable) {
         saveDisabled.set(disable);
-        if (copyCharInput.getText().length() > 0 || disable) {
-            copyButton.setDisable(disable);
-        }
 
+        characterCombo.setDisable(disable);
         pointsPaneController.disableControls(disable);
         skillsPaneController.disableControls(disable);
+        miscPaneController.disableControls(disable);
     }
 
     @FXML
     public void characterSelected(ActionEvent evt) {
+        Toast.cancel();
+
         if (BooleanUtils.isTrue(State.get().getGameRunning())) {
             reset();
             return;
@@ -422,9 +379,7 @@ public class MainController implements Initializable {
         }
 
         saveDisabled.set(true);
-        copyButton.setDisable(true);
         characterCombo.setDisable(true);
-        copyCharInput.clear();
         ComboBox<?> character = (ComboBox<?>) evt.getSource();
 
         String playerName = (String) character.getSelectionModel().getSelectedItem();
@@ -433,6 +388,8 @@ public class MainController implements Initializable {
         }
 
         pointsPaneController.disableControls(false);
+        miscPaneController.reset();
+        miscPaneController.disableControls(false);
 
         MyTask<Boolean> loadTask = new MyTask<>() {
             @Override
@@ -446,11 +403,13 @@ public class MainController implements Initializable {
             @Override
             public void handleEvent(WorkerStateEvent workerStateEvent) {
                 pointsPaneController.loadCharHandler();
+                miscPaneController.loadCharEventHandler();
                 if (pointsPaneController.getCurrentAvail() >= 0) {
                     saveDisabled.set(false);
                 }
                 characterCombo.setDisable(false);
-                copyCharInput.setDisable(false);
+                miscPaneController.disableControls(false);
+                tabPane.getSelectionModel().select(attributesTab);
             }
         });
 

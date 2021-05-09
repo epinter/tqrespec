@@ -25,6 +25,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
 public class State {
@@ -34,6 +35,7 @@ public class State {
     private final SimpleBooleanProperty saveInProgress = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty gameRunning = new SimpleBooleanProperty(false);
     private final Map<String, Level> debugPrefix = new HashMap<>();
+    private final AtomicReference<MyTask<?>> lastCursorWaitTask = new AtomicReference<>();
 
     public static State get() {
         State c = instance;
@@ -93,5 +95,14 @@ public class State {
 
     public void setLocale(Locale locale) {
         this.locale = locale;
+    }
+
+    public MyTask<?> getLastCursorWaitTask() {
+        return lastCursorWaitTask.get();
+    }
+
+    public State setLastCursorWaitTask(MyTask<?> lastCursorWaitTask) {
+        this.lastCursorWaitTask.set(lastCursorWaitTask);
+        return this;
     }
 }
