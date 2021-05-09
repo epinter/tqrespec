@@ -204,6 +204,12 @@ public class AttributesPaneController implements Initializable {
     public void disableControls(boolean disable) {
         setSpinnersDisable(disable);
         gender.setDisable(disable);
+        availPointsText.setDisable(disable);
+        charClassText.setDisable(disable);
+        difficultyText.setDisable(disable);
+        experienceText.setDisable(disable);
+        charLevelText.setDisable(disable);
+        goldText.setDisable(disable);
     }
 
     private void setStrField(int value) {
@@ -297,19 +303,19 @@ public class AttributesPaneController implements Initializable {
     }
 
     public void clearProperties() {
+        availPointsText.textProperty().unbindBidirectional(currentAvail);
         currentAvail.setValue(null);
         currentStr.setValue(null);
         currentInt.setValue(null);
         currentDex.setValue(null);
         currentLife.setValue(null);
         currentMana.setValue(null);
+        availPointsText.setText("");
         experienceText.setText("");
         charLevelText.setText("");
         goldText.setText("");
         charClassText.setText("");
         difficultyText.setText("");
-        if (availPointsText.textProperty().isBound())
-            availPointsText.textProperty().unbindBidirectional(currentAvail);
         if (strSpinner.getValueFactory() != null && strSpinner.getValueFactory().valueProperty().isBound())
             strSpinner.getValueFactory().valueProperty().unbindBidirectional(currentStr.asObject());
         if (intSpinner.getValueFactory() != null && intSpinner.getValueFactory().valueProperty().isBound())
