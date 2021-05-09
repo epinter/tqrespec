@@ -123,6 +123,12 @@ public class Toast {
         fadeIn.play();
     }
 
+    public static void cancel() {
+        if(instance!=null && instance.stage !=null) {
+            instance.stage.close();
+        }
+    }
+
     public static void show(Stage stage, String header, String content, int delay) {
         if(instance!=null && instance.stage !=null) {
             instance.stage.close();
