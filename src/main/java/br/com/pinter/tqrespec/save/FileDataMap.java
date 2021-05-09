@@ -116,6 +116,82 @@ public class FileDataMap implements DeepCloneable {
         return null;
     }
 
+    public void convertTo(Platform target, String saveId) {
+        Platform currentPlatform = platform;
+        platform = target;
+        if(currentPlatform.equals(target)) {
+            throw new IllegalStateException("can't convert to same platform");
+        }
+
+        if(currentPlatform.equals(Platform.WINDOWS) && target.equals(Platform.MOBILE)) {
+            BlockInfo myPlayerNameBlock = this.blockInfo.get(variableLocation.get("myPlayerName").get(0));
+            int myPlayerNameKeyOffset = myPlayerNameBlock.getVariables().get("myPlayerName").get(0).getKeyOffset();
+            VariableInfo variableInfo = VariableInfo.builder().name("mySaveId")
+                    .blockOffset(myPlayerNameBlock.getStart())
+                    .keyOffset(myPlayerNameKeyOffset)
+                    .variableType(VariableType.STRING)
+                    .value(saveId).build();
+
+            insertVariable(myPlayerNameKeyOffset ,variableInfo);
+            for(BlockInfo b: getBlockInfo().values()) {
+                for (VariableInfo v : b.getVariables().values()) {
+                    if(v.getVariableType().equals(VariableType.STRING_UTF_16_LE)) {
+                        String oldValue;
+                        if(changes.get(v.getValOffset()) != null) {
+                            oldValue = readStringFromMap(v.getValOffset(), Platform.WINDOWS,true);
+                        } else {
+                            oldValue = (String) v.getValue();
+                        }
+                        byte[] newValue = encodeString(oldValue,true);
+                        byte[] len = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(oldValue.length()).array();
+                        byte[] data = new byte[4 + newValue.length];
+                        System.arraycopy(len, 0, data, 0, len.length);
+                        System.arraycopy(newValue, 0, data, len.length, newValue.length);
+
+                        changes.put(v.getValOffset(), data);
+                        valuesLengthIndex.put(v.getValOffset(), 4 + (v.getValSize() * 2));
+                    }
+                }
+            }
+        } else if(currentPlatform.equals(Platform.MOBILE) && target.equals(Platform.WINDOWS)) {
+            for (BlockInfo b : getBlockInfo().values()) {
+                for (VariableInfo v : b.getVariables().values()) {
+                    if (v.getName().equals("mySaveId")) {
+                        removeVariable(v);
+                    } else {
+                        if(v.getVariableType().equals(VariableType.STRING_UTF_16_LE)) {
+                            String oldValue;
+                            if(changes.get(v.getValOffset()) != null) {
+                                oldValue = readStringFromMap(v.getValOffset(), Platform.MOBILE,true);
+                            } else {
+                                oldValue = new String(((String) v.getValue()).getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_16LE);
+                            }
+                            byte[] newValue = encodeString(oldValue,true);
+                            byte[] len = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(oldValue.length()).array();
+                            byte[] data = new byte[4 + newValue.length];
+                            System.arraycopy(len, 0, data, 0, len.length);
+                            System.arraycopy(newValue, 0, data, len.length, newValue.length);
+
+                            changes.put(v.getValOffset(), data);
+                            valuesLengthIndex.put(v.getValOffset(), 4 + (v.getValSize() * 4));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private String readStringFromMap(int offset, Platform fromPlatform, boolean wide) {
+        byte[] data = Arrays.copyOfRange(changes.get(offset), 4, changes.get(offset).length-1);
+
+        if(wide && fromPlatform.equals(Platform.MOBILE)) {
+            return decodeString(data, wide, 4);
+        } else if(wide && fromPlatform.equals(Platform.WINDOWS)) {
+            return decodeString(data, wide, 2);
+        }
+        return new String(data, StandardCharsets.UTF_8);
+    }
+
     public List<String> getStringValuesFromBlock(String variable) {
         List<String> ret = new ArrayList<>();
         if (getVariableLocation().get(variable) != null) {
@@ -178,6 +254,14 @@ public class FileDataMap implements DeepCloneable {
             utfSize = 4;
         }
         return utfSize;
+    }
+
+    private String decodeString(byte[] str, boolean wide, int bytesPerChar) {
+        StringBuilder ret = new StringBuilder();
+        for (int i = 0; i < str.length; i=i+bytesPerChar) {
+            ret.append((char) str[i]);
+        }
+        return ret.toString();
     }
 
     private byte[] encodeString(String str, boolean wide) {
