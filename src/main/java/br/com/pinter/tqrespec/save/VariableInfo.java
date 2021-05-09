@@ -291,7 +291,7 @@ public class VariableInfo implements Serializable {
             }
 
             if(v.valOffset == -1) {
-                v.valOffset = builderKeyOffset + 4 + v.name.length() + v.getValuePrefix();
+                v.valOffset = builderKeyOffset + 4 + v.name.length();
             }
             return v;
         }
