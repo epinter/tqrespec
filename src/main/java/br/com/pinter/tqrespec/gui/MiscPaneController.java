@@ -10,6 +10,7 @@ import br.com.pinter.tqrespec.core.WorkerThread;
 import br.com.pinter.tqrespec.save.Platform;
 import br.com.pinter.tqrespec.save.player.Player;
 import br.com.pinter.tqrespec.save.player.PlayerWriter;
+import br.com.pinter.tqrespec.tqdata.PlayerCharacterFile;
 import br.com.pinter.tqrespec.util.Util;
 import com.google.inject.Inject;
 import javafx.beans.property.BooleanProperty;
@@ -205,7 +206,7 @@ public class MiscPaneController implements Initializable {
                     if (finalConversionTarget != null) {
                         playerWriter.copyCurrentSave(targetPlayerName, finalConversionTarget, finalZipPath);
                     } else if (finalZipPath != null) {
-                        playerWriter.copyCurrentSave(targetPlayerName, null, finalZipPath);
+                        playerWriter.copyCurrentSave(targetPlayerName, Platform.UNDEFINED, finalZipPath);
                     } else {
                         playerWriter.copyCurrentSave(targetPlayerName);
                     }
@@ -227,7 +228,7 @@ public class MiscPaneController implements Initializable {
                     reset();
                     setAllControlsDisable(false);
                     mainController.addCharactersToCombo();
-                    mainController.setCharacterCombo(targetPlayerName);
+                    mainController.reset();
                 } else if (copyCharTask.getValue() == 3) {
                     Util.showError("Target Directory already exists!",
                             String.format("The specified target directory already exists. Aborting the copy to character '%s'",
@@ -236,7 +237,6 @@ public class MiscPaneController implements Initializable {
                     Util.showError(Util.getUIMessage("alert.errorcopying_header"),
                             Util.getUIMessage("alert.errorcopying_content", targetPlayerName));
                 }
-                setAllControlsDisable(false);
             }
         });
         mainController.setCursorWaitOnTask(copyCharTask);

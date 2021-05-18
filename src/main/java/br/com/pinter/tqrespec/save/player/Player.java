@@ -37,6 +37,7 @@ import com.google.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -66,6 +67,10 @@ public class Player {
     }
 
     public boolean loadPlayer(String playerName) {
+        return loadPlayer(playerName, false);
+    }
+
+    public boolean loadPlayer(String playerName, boolean external) {
         if (State.get().getSaveInProgress() != null && State.get().getSaveInProgress()) {
             return false;
         }
@@ -74,7 +79,17 @@ public class Player {
             prepareSaveData();
 
             getSaveData().setPlayerName(playerName);
-            getSaveData().setPlayerChr(gameInfo.playerChr(playerName, getSaveData().isCustomQuest()));
+            Path playerChrPath;
+
+            if(external) {
+                playerChrPath = gameInfo.playerChrExternalPath(playerName);
+                logger.log(System.Logger.Level.INFO, "Loading external character: ''{0}''", playerChrPath);
+
+            } else {
+                playerChrPath = gameInfo.playerChr(playerName, getSaveData().isCustomQuest());
+            }
+
+            getSaveData().setPlayerChr(playerChrPath);
             PlayerParser playerParser = new PlayerParser(
                     new File(getSaveData().getPlayerChr().toString()),
                     playerName);
@@ -656,5 +671,4 @@ public class Player {
             getSaveData().reset();
         }
     }
-
 }

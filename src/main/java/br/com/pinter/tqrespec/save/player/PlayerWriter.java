@@ -181,7 +181,7 @@ public class PlayerWriter extends FileWriter {
     }
 
     public void copyCurrentSave(String toPlayerName) throws IOException {
-        copyCurrentSave(toPlayerName, null, null);
+        copyCurrentSave(toPlayerName, Platform.UNDEFINED, null);
     }
 
     public void copyCurrentSave(String toPlayerName, Platform conversionTarget, Path zipOutputPath) throws IOException {
@@ -191,13 +191,7 @@ public class PlayerWriter extends FileWriter {
         State.get().setSaveInProgress(true);
 
         try {
-            String path;
-            if (saveData.isCustomQuest()) {
-                path = gameInfo.getSaveDataUserPath();
-            } else {
-                path = gameInfo.getSaveDataMainPath();
-            }
-
+            String path = saveData.getPlayerPath().getParent().toString();
             String fromPlayerName = saveData.getPlayerName();
 
             Path playerSaveDirSource = Paths.get(path, "_" + fromPlayerName);
@@ -206,8 +200,8 @@ public class PlayerWriter extends FileWriter {
             Platform oldPlatform = getSaveData().getDataMap().getPlatform();
             boolean backupOnly = false;
 
-            if((conversionTarget == null && zipOutputPath == null && toPlayerName.equals(fromPlayerName))
-                    || (conversionTarget != null && conversionTarget.equals(oldPlatform))) {
+            if((conversionTarget.equals(Platform.UNDEFINED) && zipOutputPath == null && toPlayerName.equals(fromPlayerName))
+                    || conversionTarget.equals(oldPlatform)) {
                 State.get().setSaveInProgress(false);
                 throw new IllegalStateException("An expected error occurred during character copy");
             }
@@ -223,9 +217,18 @@ public class PlayerWriter extends FileWriter {
             if(!toPlayerName.equals(fromPlayerName)) {
                 // set name before conversion
                 fileDataMap.setString("myPlayerName", toPlayerName, true);
+                if(fileDataMap.getPlatform().equals(Platform.MOBILE) && conversionTarget.equals(Platform.UNDEFINED)) {
+                    //use new saveid
+                    fileDataMap.setString("mySaveId", saveId);
+                    toZipPath = "/__save"+saveId;
+                }
+            } else if(saveData.getPlatform().equals(Platform.MOBILE) && conversionTarget.equals(Platform.UNDEFINED)) {
+                //use current saveid for directory name
+                String currentSaveId = saveData.getDataMap().getString("mySaveId");
+                toZipPath = "/__save"+currentSaveId;
             }
 
-            if (conversionTarget != null) {
+            if (!conversionTarget.equals(Platform.UNDEFINED)) {
                 if(conversionTarget.equals(Platform.MOBILE)) {
                     toZipPath = "/__save" + saveId;
                 }
@@ -233,13 +236,13 @@ public class PlayerWriter extends FileWriter {
             }
 
             if (zipOutputPath != null) {
-                if(toPlayerName.equals(fromPlayerName) && conversionTarget == null) {
+                if(toPlayerName.equals(fromPlayerName) && conversionTarget.equals(Platform.UNDEFINED)) {
                     backupOnly = true;
                 }
                 try (FileSystem zipfs = FileSystems.newFileSystem(URI.create("jar:" + zipOutputPath.toUri()), Map.of("create", "true"))) {
                     Path dir = zipfs.getPath(toZipPath);
                     String excludeCopyRegex = null;
-                    if(conversionTarget != null && conversionTarget.equals(Platform.MOBILE)) {
+                    if(conversionTarget.equals(Platform.MOBILE)) {
                         excludeCopyRegex = "(?i)(?:^backup.*|^winsys.dxg$|^winsys.dxb$|^settings.txt$)";
                     }
                     Util.copyDirectoryRecurse(playerSaveDirSource, dir, false, zipfs, excludeCopyRegex);
@@ -250,7 +253,7 @@ public class PlayerWriter extends FileWriter {
                 }
             } else {
                 String excludeCopyRegex = "(?i)(?:^backup.*)";
-                if(conversionTarget != null && oldPlatform.equals(Platform.MOBILE)) {
+                if(!conversionTarget.equals(Platform.UNDEFINED) && oldPlatform.equals(Platform.MOBILE)) {
                     excludeCopyRegex = "(?i)(?:^backup.*|^.winsys.dxg$|^.winsys.dxb$|^SavingChar.txt$)";
                 }
                 Util.copyDirectoryRecurse(playerSaveDirSource, playerSaveDirTarget, false, excludeCopyRegex);

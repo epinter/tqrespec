@@ -48,6 +48,7 @@ public class Constants {
     public static final String VERSION_CHECK_URL = "https://epinter.github.io/version/tqrespec";
     public static final String DEV_GAMEDATA = Paths.get(System.getProperty("user.dir"), "gamedata").toString();
     public static final String PARENT_GAMEDATA = Paths.get(Paths.get(System.getProperty("user.dir")).getParent().toString(), "gamedata").toString();
+    public static final String EXT_SAVEDATA = Paths.get(System.getProperty("user.dir"), "savedata").toString();
     public static final int PROCESS_SCAN_INTERVAL_MS = 3000;
     public static final String ERROR_MSG_EXCEPTION = "Error: ";
     public static final String STASH_FILE = "winsys.dxb";

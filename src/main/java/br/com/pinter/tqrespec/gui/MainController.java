@@ -24,7 +24,9 @@ import br.com.pinter.tqrespec.core.*;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.player.Player;
 import br.com.pinter.tqrespec.save.player.PlayerWriter;
+import br.com.pinter.tqrespec.tqdata.Db;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
+import br.com.pinter.tqrespec.tqdata.PlayerCharacterFile;
 import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
@@ -54,6 +56,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.FileAlreadyExistsException;
+import java.util.Comparator;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -83,7 +86,7 @@ public class MainController implements Initializable {
     private VBox rootelement;
 
     @FXML
-    private ComboBox<String> characterCombo;
+    private ComboBox<PlayerCharacterFile> characterCombo;
 
     @FXML
     private Button saveButton;
@@ -96,6 +99,9 @@ public class MainController implements Initializable {
 
     @FXML
     private TabPane tabPane;
+
+    @Inject
+    private Db db;
 
     private double dragX;
     private double dragY;
@@ -193,17 +199,17 @@ public class MainController implements Initializable {
     public void addCharactersToCombo() {
         try {
             characterCombo.getSelectionModel().clearSelection();
-            characterCombo.getItems().setAll(gameInfo.getPlayerListMain());
-            characterCombo.getItems().sort(String::compareTo);
+            characterCombo.getItems().setAll(gameInfo.getPlayerCharacterList());
+            characterCombo.getItems().sort(Comparator.comparing(PlayerCharacterFile::getPlayerName));
         } catch (ClassCastException | UnsupportedOperationException | IllegalArgumentException e) {
             logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             throw new UnhandledRuntimeException(Constants.ERROR_MSG_EXCEPTION, e);
         }
     }
 
-    public void setCharacterCombo(String characterName) {
-        if (characterCombo.getItems().contains(characterName)) {
-            characterCombo.setValue(characterName);
+    public void setCharacterCombo(PlayerCharacterFile character) {
+        if (characterCombo.getItems().contains(character)) {
+            characterCombo.setValue(character);
         }
     }
 
@@ -382,8 +388,8 @@ public class MainController implements Initializable {
         characterCombo.setDisable(true);
         ComboBox<?> character = (ComboBox<?>) evt.getSource();
 
-        String playerName = (String) character.getSelectionModel().getSelectedItem();
-        if (StringUtils.isEmpty((playerName))) {
+        PlayerCharacterFile playerCharacterFile = (PlayerCharacterFile) character.getSelectionModel().getSelectedItem();
+        if (playerCharacterFile == null || StringUtils.isEmpty((playerCharacterFile.getPlayerName()))) {
             return;
         }
 
@@ -394,7 +400,7 @@ public class MainController implements Initializable {
         MyTask<Boolean> loadTask = new MyTask<>() {
             @Override
             protected Boolean call() {
-                return player.loadPlayer(playerName);
+                return player.loadPlayer(playerCharacterFile.getPlayerName(), playerCharacterFile.isExternal());
             }
         };
 
@@ -424,12 +430,21 @@ public class MainController implements Initializable {
         loadTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new MyEventHandler<>() {
             @Override
             public void handleEvent(WorkerStateEvent workerStateEvent) {
-                if (player.getSaveData().getPlatform().equals(br.com.pinter.tqrespec.save.Platform.MOBILE)) {
+                if (player.getSaveData().getPlatform().equals(br.com.pinter.tqrespec.save.Platform.MOBILE)
+                    && !db.getPlatform().equals(Db.Platform.MOBILE)) {
                     Toast.show((Stage) rootelement.getScene().getWindow(),
                             Util.getUIMessage("main.mobileSavegameToast_header"),
                             Util.getUIMessage("main.mobileSavegameToast_content"),
-                            3000);
+                            5000);
+                } else if (player.getSaveData().getPlatform().equals(br.com.pinter.tqrespec.save.Platform.WINDOWS)
+                        && !db.getPlatform().equals(Db.Platform.WINDOWS)) {
+                    reset();
+                    Toast.show((Stage) rootelement.getScene().getWindow(),
+                            Util.getUIMessage("main.mobileDatabaseToast_header"),
+                            Util.getUIMessage("main.mobileDatabaseToast_content"),
+                            12000);
                 }
+
             }
         });
 

@@ -279,9 +279,9 @@ public class CharactersViewController implements Initializable {
                 });
 
                 characters = new ArrayList<>();
-                for (String p : gameInfo.getPlayerListMain()) {
+                for (PlayerCharacterFile p : gameInfo.getPlayerCharacterList()) {
                     try {
-                        player.loadPlayer(p);
+                        player.loadPlayer(p.getPlayerName(), p.isExternal());
                     } catch (RuntimeException e) {
                         logger.log(System.Logger.Level.ERROR, String.format("Error loading character '%s'", p));
                         continue;

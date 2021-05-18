@@ -24,17 +24,29 @@ import br.com.pinter.tqdatabase.Database;
 import br.com.pinter.tqdatabase.Player;
 import br.com.pinter.tqdatabase.Skills;
 import br.com.pinter.tqdatabase.Teleports;
+import br.com.pinter.tqrespec.core.GameNotFoundException;
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.logging.Log;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 @Singleton
 public class Db {
     private static final System.Logger logger = Log.getLogger(Db.class.getName());
     private Database database;
+    private Db.Platform platform = Db.Platform.WINDOWS;
+    public enum Platform {
+        WINDOWS,
+        MOBILE
+    }
+
+    public Db.Platform getPlatform() {
+        return platform;
+    }
 
     @Inject
     private GameInfo gameInfo;
@@ -43,8 +55,15 @@ public class Db {
         try {
             if (database == null) {
                 database = new Database(gameInfo.getDatabasePath());
+                if(gameInfo.getInstallType().equals(InstallType.UNKNOWN)
+                        && !Path.of(gameInfo.getGamePath(),"FORCE_WINDOWS.txt").toFile().exists()
+                        && (recordExists("Records\\InGameUI\\Player Character\\Mobile\\CharStatsMobile.dbr")
+                        || recordExists("Records\\xpack\\ui\\hud\\hud_mobile.dbr"))) {
+                    logger.log(System.Logger.Level.INFO, "Mobile database detected. If this database is from Windows version, create the file to force detection: "+Path.of(gameInfo.getGamePath(),"FORCE_WINDOWS.txt").toFile());
+                    platform = Platform.MOBILE;
+                }
             }
-        } catch (IOException e) {
+        } catch (IOException | GameNotFoundException e) {
             logger.log(System.Logger.Level.ERROR, "", e);
             throw new UnhandledRuntimeException("Error loading database.", e);
         }

@@ -22,7 +22,6 @@ package br.com.pinter.tqrespec.tqdata;
 
 import br.com.pinter.tqrespec.Settings;
 import br.com.pinter.tqrespec.core.GameNotFoundException;
-import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
@@ -671,20 +670,36 @@ public class GameInfo {
         return null;
     }
 
-    public String[] getPlayerListMain() {
-        String savePath = this.getSaveDataMainPath();
+    public List<PlayerCharacterFile> getPlayerCharacterList() {
+        List<PlayerCharacterFile> ret = new ArrayList<>(getPlayerListFromPath(getSaveDataMainPath(), false));
+        ret.addAll(getPlayerListFromPath(getExternalSaveDataPath(), true));
+        return ret;
+    }
+
+    private List<PlayerCharacterFile> getPlayerListFromPath(String savePath, boolean external) {
+        if(savePath==null) {
+            return Collections.emptyList();
+        }
+
         File directory = new File(savePath);
-        ArrayList<String> playerList = new ArrayList<>();
+        List<PlayerCharacterFile> playerList = new ArrayList<>();
         if (directory.exists()) {
             for (File player : Objects.requireNonNull(directory.listFiles((File fileName) -> fileName.getName().startsWith("_")))) {
-                playerList.add(player.getName().replaceAll("^_", ""));
+                playerList.add(new PlayerCharacterFile(player.getName().replaceAll("^_", ""), external));
             }
         } else {
-            throw new UnhandledRuntimeException("No player found");
+            return Collections.emptyList();
         }
-        String[] ret = new String[playerList.size()];
-        playerList.toArray(ret);
-        return ret;
+        return playerList;
+    }
+
+    private String getExternalSaveDataPath() {
+        if (Paths.get(Constants.EXT_SAVEDATA).toFile().isDirectory()) {
+            logger.log(System.Logger.Level.DEBUG, "External save path found: "+Paths.get(Constants.EXT_SAVEDATA));
+            return Constants.EXT_SAVEDATA;
+        }
+
+        return null;
     }
 
     public Path playerPath(String playerName, boolean customQuest) {
@@ -701,6 +716,13 @@ public class GameInfo {
 
     public Path playerChr(String playerName, boolean customQuest) {
         return Paths.get(playerPath(playerName, customQuest).toString(), "Player.chr");
+    }
+
+    public Path playerChrExternalPath(String playerName) {
+        if(getExternalSaveDataPath() == null) {
+            return null;
+        }
+        return Paths.get(getExternalSaveDataPath(),"_"+playerName, "Player.chr");
     }
 
     public Locale getGameLanguage() {
@@ -788,6 +810,10 @@ public class GameInfo {
 
     public GameVersion getInstalledVersion() {
         return installedVersion;
+    }
+
+    public InstallType getInstallType() {
+        return installType;
     }
 
     public boolean isDlcRagnarok() {

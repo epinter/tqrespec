@@ -6,5 +6,6 @@ package br.com.pinter.tqrespec.save;
 
 public enum Platform {
     WINDOWS,
-    MOBILE
+    MOBILE,
+    UNDEFINED
 }

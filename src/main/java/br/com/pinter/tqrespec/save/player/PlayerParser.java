@@ -164,7 +164,7 @@ final class PlayerParser extends FileParser {
     @Override
     protected boolean readFile() throws IOException {
         if (!playerChr.exists()) {
-            logger.log(System.Logger.Level.DEBUG, "File ''{0}'' doesn't exists", playerChr.toString());
+            logger.log(System.Logger.Level.ERROR, "File ''{0}'' doesn't exists", playerChr.toString());
             throw new IOException("Couldn't load file");
         }
 
