@@ -63,9 +63,37 @@ If you have a mastery on level 24 and 7 skills with points allocated, you can cl
 
 When you click on the button near the character selection list, you will be able to see a table with all your characters, with attributes and stats. There's also an option to export the table to CSV.
 
+#### ***Android support***
+
+Characters from "Titan Quest: Legendary Edition" are supported, can be respeced or copied/converted. TQRespec is unable to access the savegames directly on mobile, so you will always have to copy from mobile and copy again to device when finished. The savegame directory can be copied from Android device to savedata directory in the same directory as TQRespec.exe, the structure is like this:
+
+~~~
+TQRespec/app
+TQRespec/runtime
+TQRespec/savedata/__save1
+TQRespec/savedata/_CharacterFromWindowsVersion
+TQRespec/TQRespec.exe
+~~~
+
+The characters are normally stored at Android/data/com.hg.titanquestedition/files/Preferences/SaveData/Main. The name of each savegame is "__save" and followed by a number, this number is the saveId.
+
+***IMPORTANT***: The game files (database and text) are ALWAYS needed. See above "Running without the game installed" to know where to copy the files. At this moment, the Android version is compatible with PC version. While (AT THIS MOMENT) there's no problem using a database from one platform on a savegame from another, we don't know when the compatibility will break. So is recommended to use Android database/text with Android savegame, and Windows database/text with Windows savegame.
+TQRespec will not block using PC files with mobile savegame, but will alert. And will block the usage of mobile database with PC savegames. The stash (additional storage) will not be supported, conversion and copy of mobile savegames completely ignores the stash. All items stored in the character are kept.
+
+The old mobile version of the game will not be supported.
+
+#### ***IOS support***
+
+The IOS version of the game is untested and unsupported at this time. If you want to use with IOS, open an issue and contribute testing, sending logs and feedback.
+
 #### ***Copy your character***
 
-If you want to change the name of you character, you can type the new name in the "New save" text field then click on "Copy To" button. A new character will be created, with progress, inventory with all items, attributes, skills, etc...
+If you want to change the name of you character, in the Misc tab you can type the new name in the "New character" text field, select the target platform then click on "Copy" button. A new character will be created, with progress, inventory with all items, attributes, skills, etc...
+
+There are three targets available for selection: Windows, Android and Backup:
+* The Windows target will make the new savegame compatible with Windows version of TQ, converting if necessary (when you are copying a mobile savegame to windows).
+* The Android target will make a zip file with the savegame prepared to run on Android device, converted if necessary. Differently from Windows version, the savegame directory is different from player name inside the game. TQRespec generates a random number for the save-id, although very unlikely it's not impossible a save-id generated is already present on your device, if this happens you can just copy again. Some data is not copied, see "Android Support" for details. 
+* The Backup target will make a zip file with the savegame. If you type a new name, it will be renamed before save. In the case of a mobile savegame, the save-id will be changed before save too.
 
 #### ***Saving and backup***
 

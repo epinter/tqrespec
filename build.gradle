@@ -345,6 +345,12 @@ task appimage(type: Exec) {
         }.forEach({
             f -> f.delete()
         })
+        copy {
+            from "${projectDir}/README.md"
+            into new File(buildDir, "app-image/${distAppName}")
+        }
+        new File(buildDir, "app-image/${distAppName}/savedata").mkdir()
+        new File(buildDir, "app-image/${distAppName}/gamedata").mkdir()
         new File(buildDir, "jre-image").deleteDir()
     }
 }
