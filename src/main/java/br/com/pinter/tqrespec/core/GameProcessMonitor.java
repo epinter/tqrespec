@@ -50,14 +50,16 @@ public class GameProcessMonitor implements Runnable {
                     if (Objects.nonNull(command)) {
                         Path processCommand = Paths.get(command);
                         Path gamePath = Paths.get(directory);
-                        if (processCommand.startsWith(gamePath) &&
+                        if (processCommand.getFileName().toString().equalsIgnoreCase("tq.exe")
+                                || (processCommand.startsWith(gamePath) &&
                                 processCommand.getFileName().toString().toLowerCase().endsWith(".exe")
-                                && !processCommand.getFileName().toString().equalsIgnoreCase("tqrespec.exe")) {
+                                && !processCommand.getFileName().toString().equalsIgnoreCase("tqrespec.exe"))) {
                             foundRunning.set(true);
                         }
                     }
                 });
                 State.get().setGameRunning(foundRunning.get());
+                //noinspection BusyWait
                 Thread.sleep(PROCESS_SCAN_INTERVAL_MS);
             } catch (InterruptedException ignored) {
                 //ignored
