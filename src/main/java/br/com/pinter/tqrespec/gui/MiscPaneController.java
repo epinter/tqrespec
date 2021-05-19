@@ -111,29 +111,23 @@ public class MiscPaneController implements Initializable {
         }
     }
 
+    private void filterCopyCharInput() {
+        String str = copyCharInput.getText();
+        copyCharInput.setText(StringUtils.stripAccents(str)
+                .replaceAll("[\\\\/:*?\"<>|;]", "")
+                .replaceAll("^(.{0,14}).*","$1"));
+    }
+
     @FXML
     public void copyCharInputChanged() {
         if (!player.isCharacterLoaded()) {
             return;
         }
 
-        String str = copyCharInput.getText();
         int caret = copyCharInput.getCaretPosition();
-        StringBuilder newStr = new StringBuilder();
 
-        for (char c : str.toCharArray()) {
-            //all characters above 0xFF needs to have accents stripped
-            if (c > 0xFF) {
-                newStr.append(StringUtils.stripAccents(Character.toString(c)).toCharArray()[0]);
-            } else {
-                newStr.append(Character.toString(c).replaceAll("[\\\\/:*?\"<>|;]", ""));
-            }
-            if (newStr.length() == 14) {
-                break;
-            }
-        }
+        filterCopyCharInput();
 
-        copyCharInput.setText(newStr.toString());
         copyCharInput.positionCaret(caret);
         if (copyCharInput.getText().isBlank()) {
             copyButton.setDisable(charNameBlankBlocked.get());
@@ -148,6 +142,8 @@ public class MiscPaneController implements Initializable {
 
     @FXML
     public void copyChar() {
+        filterCopyCharInput();
+
         if (mainController.gameRunningAlert()) {
             return;
         }
