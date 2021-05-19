@@ -29,6 +29,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -190,12 +191,12 @@ public class FileDataMap implements DeepCloneable {
     }
 
     private String readStringFromMap(int offset, Platform fromPlatform, boolean wide) {
-        byte[] data = Arrays.copyOfRange(changes.get(offset), 4, changes.get(offset).length-1);
+        byte[] data = Arrays.copyOfRange(changes.get(offset), 4, changes.get(offset).length);
 
         if(wide && fromPlatform.equals(Platform.MOBILE)) {
-            return decodeString(data, wide, 4);
+            return new String(data, Charset.forName("UTF-32LE"));
         } else if(wide && fromPlatform.equals(Platform.WINDOWS)) {
-            return decodeString(data, wide, 2);
+            return new String(data, StandardCharsets.UTF_16LE);
         }
         return new String(data, StandardCharsets.UTF_8);
     }
@@ -264,35 +265,24 @@ public class FileDataMap implements DeepCloneable {
         return utfSize;
     }
 
-    private String decodeString(byte[] str, boolean wide, int bytesPerChar) {
-        StringBuilder ret = new StringBuilder();
-        for (int i = 0; i < str.length; i=i+bytesPerChar) {
-            ret.append((char) str[i]);
-        }
-        return ret.toString();
-    }
-
     private byte[] encodeString(String str, boolean wide) {
         //allocate the number of characters * 2 so the buffer can hold the '0'
         ByteBuffer buffer = ByteBuffer.allocate(str.length() * getUtfSize(wide));
 
-        for (char c : str.toCharArray()) {
-            byte n;
+        for (char o : str.toCharArray()) {
+            char c = StringUtils.stripAccents(Character.toString(o)).toCharArray()[0];
 
-            //all characters above 0xFF needs to have accents stripped
-            if (c > 0xFF) {
-                n = (byte) StringUtils.stripAccents(Character.toString(c)).toCharArray()[0];
-            } else {
-                n = (byte) c;
-            }
             if (wide) {
+                byte n1 = (byte) (c & 0xFF);
+                byte n2 = (byte) (c >> 8);
+
                 if(platform.equals(Platform.WINDOWS)) {
-                    buffer.put(new byte[]{n, 0});
+                    buffer.put(new byte[]{n1, n2});
                 } else if(platform.equals(Platform.MOBILE)) {
-                    buffer.put(new byte[]{n, 0, 0, 0});
+                    buffer.put(new byte[]{n1, n2, 0, 0});
                 }
             } else {
-                buffer.put(new byte[]{n});
+                buffer.put(new byte[]{(byte) c});
             }
         }
         return buffer.array();
