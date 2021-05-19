@@ -20,11 +20,13 @@
 
 package br.com.pinter.tqrespec.save.player;
 
+import br.com.pinter.tqrespec.save.Platform;
 import br.com.pinter.tqrespec.save.stash.StashData;
 import br.com.pinter.tqrespec.save.stash.StashLoader;
 import br.com.pinter.tqrespec.save.stash.StashWriter;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.util.Constants;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,6 +39,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -98,9 +101,8 @@ class PlayerWriterTest {
             e.printStackTrace();
         }
 
-        Mockito.when(gameInfo.getSaveDataMainPath()).thenReturn("src/test/resources");
+        Mockito.when(mockSaveData.getPlayerPath()).thenReturn(Path.of(String.format("%s/_%s","src/test/resources", "savegame")));
         Mockito.when(mockSaveData.getPlayerName()).thenReturn(saveData.getPlayerName());
-        Mockito.when(mockSaveData.isCustomQuest()).thenReturn(saveData.isCustomQuest());
         Mockito.when(mockSaveData.getDataMap()).thenReturn(saveData.getDataMap());
         Mockito.when(mockSaveData.getBuffer()).thenReturn(saveData.getBuffer());
 
@@ -159,16 +161,19 @@ class PlayerWriterTest {
             e.printStackTrace();
         }
 
-        Mockito.when(gameInfo.getSaveDataMainPath()).thenReturn("src/test/resources");
+        Mockito.when(mockSaveData.getPlayerPath()).thenReturn(Path.of(String.format("%s/_%s","src/test/resources", "savegame")));
         Mockito.when(mockSaveData.getPlayerName()).thenReturn(saveData.getPlayerName());
-        Mockito.when(mockSaveData.isCustomQuest()).thenReturn(saveData.isCustomQuest());
         Mockito.when(mockSaveData.getDataMap()).thenReturn(saveData.getDataMap());
         Mockito.when(mockSaveData.getBuffer()).thenReturn(saveData.getBuffer());
     }
 
     private void copyAndParseSavegame() {
+        copyAndParseSavegame(Platform.UNDEFINED);
+    }
+
+    private void copyAndParseSavegame(Platform conversionTarget) {
         try {
-            playerWriter.copyCurrentSave("testcopy");
+            playerWriter.copyCurrentSave("testcopy", conversionTarget, null);
         } catch (IOException e) {
             logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
             fail();
@@ -225,6 +230,17 @@ class PlayerWriterTest {
 
         assertNotNull(playerCharacterClass);
         assertTrue(playerCharacterClass.equals("XXGenderX") && texture.equals("XXTextureX"));
+    }
+
+    @Test
+    void writeSaveId_Should_writeAndSaveIdFromSaveGame() {
+        prepareCopySavegame();
+
+        copyAndParseSavegame(Platform.MOBILE);
+
+        String parsedSaveId = saveData.getDataMap().getString("mySaveId");
+
+        assertTrue(StringUtils.isNotBlank(parsedSaveId));
     }
 
     @Test
