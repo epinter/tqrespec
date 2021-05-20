@@ -431,8 +431,8 @@ public abstract class FileParser {
     }
 
     byte[] readUid() {
-        byte[] buf = new byte[16];
-        getBuffer().get(buf, 0, 16);
+        byte[] buf = new byte[VariableType.UID.dataTypeSize()];
+        getBuffer().get(buf, 0, VariableType.UID.dataTypeSize());
         return buf;
     }
 

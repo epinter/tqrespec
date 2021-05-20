@@ -216,7 +216,7 @@ public class PlayerWriter extends FileWriter {
 
             if(!toPlayerName.equals(saveData.getDataMap().getCharacterName())) {
                 // set name before conversion
-                fileDataMap.setString("myPlayerName", toPlayerName, true);
+                fileDataMap.setString("myPlayerName", toPlayerName);
                 if(fileDataMap.getPlatform().equals(Platform.MOBILE) && conversionTarget.equals(Platform.UNDEFINED)) {
                     //use new saveid
                     fileDataMap.setString("mySaveId", saveId);

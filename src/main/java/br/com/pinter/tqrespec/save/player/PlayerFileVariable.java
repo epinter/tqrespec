@@ -173,7 +173,7 @@ public class PlayerFileVariable implements FileVariable {
 
     static PlayerFileVariable valueOf(Platform platform, String var) {
         if(variablesMap.get(platform) == null || variablesMap.get(platform).get(var) == null) {
-            throw new InvalidVariableException(String.format("variable '%s' not found for platform '%s'", var, platform));
+            throw new InvalidVariableException(String.format("variable '%s' not found for platform '%s'", var.replaceAll("[^a-zA-Z0-9-_\\[\\] ]*",""), platform));
         }
         return variablesMap.get(platform).get(var);
     }
