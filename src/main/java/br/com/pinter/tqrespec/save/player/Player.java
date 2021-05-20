@@ -627,7 +627,7 @@ public class Player {
         newVi.setValue(uid.getBytes());
         newVi.setKeyOffset(offset);
         newVi.setValOffset(offset + teleportUIDKeyLength);
-        newVi.setValSize(16);
+        newVi.setValSize(VariableType.UID.dataTypeSize());
         getSaveData().getDataMap().insertVariable(newVi.getKeyOffset(), newVi);
         getSaveData().getDataMap().incrementInt(uidSize);
     }

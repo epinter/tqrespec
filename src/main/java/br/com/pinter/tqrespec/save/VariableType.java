@@ -28,5 +28,20 @@ public enum VariableType {
     STRING_UTF_16_LE,
     STRING_UTF_32_LE,
     UID,
-    STREAM,
+    STREAM;
+
+    public int dataTypeSize() {
+        if(equals(STRING_UTF_16_LE)) {
+            return 2;
+        } else if(equals(STRING_UTF_32_LE)) {
+            return 4;
+        } else if(equals(STRING)){
+            return 1;
+        } else if(equals(FLOAT) || equals(INTEGER)) {
+            return 4;
+        } else if(equals(UID)) {
+            return 16;
+        }
+        throw new IllegalStateException("illegal data type for this method");
+    }
 }

@@ -40,8 +40,6 @@ public class VariableInfo implements Serializable {
     private byte[] valueByteArray = null;
     private VariableType variableType;
     private int blockOffset = -1;
-    public static final int UTF16LE_CHARBYTES = 2;
-    public static final int UTF32LE_CHARBYTES = 4;
 
     public String getName() {
         return name;
@@ -133,10 +131,8 @@ public class VariableInfo implements Serializable {
      */
     public int getValBytesLength() {
         int sz = valSize;
-        if (variableType == VariableType.STRING_UTF_16_LE) {
-            sz *= VariableInfo.UTF16LE_CHARBYTES;
-        } else if (variableType == VariableType.STRING_UTF_32_LE) {
-            sz *= VariableInfo.UTF32LE_CHARBYTES;
+        if (isString() ) {
+            sz *= variableType.dataTypeSize();
         }
         return sz;
     }
@@ -156,7 +152,8 @@ public class VariableInfo implements Serializable {
     private int getValuePrefix() {
         int valSizePrefix = 0;
 
-        if (variableType == VariableType.STRING || variableType == VariableType.STRING_UTF_16_LE || variableType == VariableType.STREAM) {
+        if (variableType == VariableType.STRING || variableType == VariableType.STRING_UTF_16_LE || variableType == VariableType.STRING_UTF_32_LE
+                || variableType == VariableType.STREAM) {
             valSizePrefix = 4;
         }
 
@@ -185,18 +182,12 @@ public class VariableInfo implements Serializable {
 
     public void setVariableType(VariableType variableType) {
         if(this.valSize == -1) {
-            if(variableType.equals(VariableType.FLOAT) || variableType.equals(VariableType.INTEGER)) {
-                valSize = 4;
-            } else if(variableType.equals(VariableType.UID)) {
-                valSize = 16;
+            if(variableType.equals(VariableType.FLOAT) || variableType.equals(VariableType.INTEGER) || variableType.equals(VariableType.UID)) {
+                valSize = variableType.dataTypeSize();
             } else if(variableType.equals(VariableType.STREAM) && valueByteArray != null) {
                 valSize = valueByteArray.length;
-            } else if(variableType == VariableType.STRING && valueString != null) {
-                valSize = valueString.length();
-            } else if(variableType == VariableType.STRING_UTF_16_LE && valueString != null) {
-                valSize = valueString.length() * UTF16LE_CHARBYTES;
-            } else if(variableType == VariableType.STRING_UTF_32_LE && valueString != null) {
-                valSize = valueString.length() * UTF32LE_CHARBYTES;
+            } else if(isString() && valueString != null) {
+                valSize = valueString.length() * variableType.dataTypeSize();
             }
         }
 
@@ -209,6 +200,18 @@ public class VariableInfo implements Serializable {
 
     public void setBlockOffset(int blockOffset) {
         this.blockOffset = blockOffset;
+    }
+
+    public boolean isString() {
+        return variableType == VariableType.STRING || variableType == VariableType.STRING_UTF_16_LE || variableType == VariableType.STRING_UTF_32_LE;
+    }
+
+    public boolean isFloat() {
+        return variableType == VariableType.FLOAT;
+    }
+
+    public boolean isInt() {
+        return variableType == VariableType.INTEGER;
     }
 
     public static Builder builder() {
@@ -298,18 +301,12 @@ public class VariableInfo implements Serializable {
             v.variableType = builderVariableType;
 
             if(v.valSize == -1) {
-                if(v.variableType.equals(VariableType.FLOAT) || v.variableType.equals(VariableType.INTEGER)) {
-                    v.valSize = 4;
-                } else if(v.variableType.equals(VariableType.UID)) {
-                    v.valSize = 16;
+                if(v.variableType.equals(VariableType.FLOAT) || v.variableType.equals(VariableType.INTEGER) || v.variableType.equals(VariableType.UID)) {
+                    v.valSize = v.variableType.dataTypeSize();
                 } else if(v.variableType.equals(VariableType.STREAM) && v.valueByteArray != null) {
                     v.valSize = v.valueByteArray.length;
-                } else if(v.variableType == VariableType.STRING && v.valueString != null) {
-                    v.valSize = v.valueString.length();
-                } else if(v.variableType == VariableType.STRING_UTF_16_LE && v.valueString != null) {
-                    v.valSize = v.valueString.length() * 2;
-                } else if(v.variableType == VariableType.STRING_UTF_32_LE && v.valueString != null) {
-                    v.valSize = v.valueString.length() * 4;
+                } else if(v.isString() && v.valueString != null) {
+                    v.valSize = v.valueString.length() * v.getVariableType().dataTypeSize();
                 }
             }
 
