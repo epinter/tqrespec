@@ -20,21 +20,19 @@
 
 package br.com.pinter.tqrespec.save.player;
 
-import br.com.pinter.tqrespec.save.BlockType;
-import br.com.pinter.tqrespec.save.FileBlockType;
-import br.com.pinter.tqrespec.save.FileVariable;
-import br.com.pinter.tqrespec.save.VariableType;
+import br.com.pinter.tqrespec.save.*;
 
 import java.util.HashMap;
 
 public class PlayerFileVariable implements FileVariable {
-    private static HashMap<String, PlayerFileVariable> map = new HashMap<>();
+    private static final HashMap<Platform,HashMap<String,PlayerFileVariable>> variablesMap = new HashMap<>();
 
     private final BlockType location;
     private final String var;
     private final VariableType type;
 
     static {
+        HashMap<String, PlayerFileVariable> map = new HashMap<>();
         map.put("headerVersion", new PlayerFileVariable("headerVersion", VariableType.INTEGER, PlayerBlockType.PLAYER_HEADER));
         map.put("playerCharacterClass", new PlayerFileVariable("playerCharacterClass", VariableType.STRING, PlayerBlockType.PLAYER_HEADER));
         map.put("uniqueId", new PlayerFileVariable("uniqueId", VariableType.UID, PlayerBlockType.PLAYER_HEADER));
@@ -47,7 +45,6 @@ public class PlayerFileVariable implements FileVariable {
 
         map.put("playerTexture", new PlayerFileVariable("playerTexture", VariableType.STRING, PlayerBlockType.PLAYER_MAIN));
         map.put("myPlayerName", new PlayerFileVariable("myPlayerName", VariableType.STRING_UTF_16_LE, PlayerBlockType.PLAYER_MAIN));
-        map.put("mySaveId", new PlayerFileVariable("mySaveId", VariableType.STRING, PlayerBlockType.PLAYER_MAIN));
         map.put("isInMainQuest", new PlayerFileVariable("isInMainQuest", VariableType.INTEGER, PlayerBlockType.PLAYER_MAIN));
         map.put("disableAutoPopV2", new PlayerFileVariable("disableAutoPopV2", VariableType.INTEGER, PlayerBlockType.PLAYER_MAIN));
         map.put("numTutorialPagesV2", new PlayerFileVariable("numTutorialPagesV2", VariableType.INTEGER, PlayerBlockType.PLAYER_MAIN));
@@ -158,6 +155,14 @@ public class PlayerFileVariable implements FileVariable {
         map.put("temp", new PlayerFileVariable("temp", VariableType.UNKNOWN, FileBlockType.MULTIPLE));
         map.put("temp__" + PlayerBlockType.PLAYER_ATTRIBUTES, new PlayerFileVariable("temp", VariableType.FLOAT, PlayerBlockType.PLAYER_ATTRIBUTES));
         map.put("temp__" + PlayerBlockType.PLAYER_MAIN, new PlayerFileVariable("temp", VariableType.INTEGER, PlayerBlockType.PLAYER_MAIN));
+
+        HashMap<String, PlayerFileVariable> mapMobile = new HashMap<>(map);
+        mapMobile.put("myPlayerName", new PlayerFileVariable("myPlayerName", VariableType.STRING_UTF_32_LE, PlayerBlockType.PLAYER_MAIN));
+        mapMobile.put("defaultText", new PlayerFileVariable("defaultText", VariableType.STRING_UTF_32_LE, FileBlockType.BODY));
+        mapMobile.put("greatestMonsterKilledName", new PlayerFileVariable("(*greatestMonsterKilledName)[i]", VariableType.STRING_UTF_32_LE, PlayerBlockType.PLAYER_STATS));
+        mapMobile.put("mySaveId", new PlayerFileVariable("mySaveId", VariableType.STRING, PlayerBlockType.PLAYER_MAIN));
+        variablesMap.put(Platform.WINDOWS, map);
+        variablesMap.put(Platform.MOBILE, mapMobile);
     }
 
     private PlayerFileVariable(String variable, VariableType type, BlockType location) {
@@ -166,8 +171,11 @@ public class PlayerFileVariable implements FileVariable {
         this.location = location;
     }
 
-    static PlayerFileVariable valueOf(String var) {
-        return map.get(var);
+    static PlayerFileVariable valueOf(Platform platform, String var) {
+        if(variablesMap.get(platform) == null || variablesMap.get(platform).get(var) == null) {
+            throw new InvalidVariableException(String.format("variable '%s' not found for platform '%s'", var, platform));
+        }
+        return variablesMap.get(platform).get(var);
     }
 
     @Override

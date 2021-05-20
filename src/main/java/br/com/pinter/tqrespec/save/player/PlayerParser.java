@@ -65,7 +65,7 @@ final class PlayerParser extends FileParser {
         while (this.getBuffer().position() <= headerEnd) {
             int keyOffset = getBuffer().position();
 
-            String name = readString();
+            String name = readStringKey();
 
             if (BEGIN_BLOCK.equals(name)) {
                 BlockInfo b = getBlockInfo().get(keyOffset);
@@ -85,7 +85,7 @@ final class PlayerParser extends FileParser {
 
             String logFmt = "name=%s; value=%s; type=%s";
 
-            PlayerFileVariable e = PlayerFileVariable.valueOf(name);
+            PlayerFileVariable e = PlayerFileVariable.valueOf(getDetectedPlatform(), name);
 
             if (e.var().equals(name) && e.location().equals(PlayerBlockType.PLAYER_HEADER)) {
                 readVar(name, variableInfo);
@@ -123,18 +123,18 @@ final class PlayerParser extends FileParser {
     }
 
     private void readIntegerFromHeader(HeaderInfo h, String name, int valueInt) {
-        if (name.equals(PlayerFileVariable.valueOf("headerVersion").var()))
+        if (name.equals(PlayerFileVariable.valueOf(getDetectedPlatform(), "headerVersion").var()))
             h.setHeaderVersion(GameVersion.fromValue(valueInt));
-        if (name.equals(PlayerFileVariable.valueOf("playerVersion").var()))
+        if (name.equals(PlayerFileVariable.valueOf(getDetectedPlatform(), "playerVersion").var()))
             h.setPlayerVersion(valueInt);
-        if (name.equals(PlayerFileVariable.valueOf("playerLevel").var()))
+        if (name.equals(PlayerFileVariable.valueOf(getDetectedPlatform(), "playerLevel").var()))
             h.setPlayerLevel(valueInt);
     }
 
     private void readStringFromHeader(HeaderInfo h, String name, String valueString) {
-        if (name.equals(PlayerFileVariable.valueOf("playerCharacterClass").var()))
+        if (name.equals(PlayerFileVariable.valueOf(getDetectedPlatform(), "playerCharacterClass").var()))
             h.setPlayerCharacterClass(valueString);
-        if (name.equals(PlayerFileVariable.valueOf("playerClassTag").var())) {
+        if (name.equals(PlayerFileVariable.valueOf(getDetectedPlatform(), "playerClassTag").var())) {
             h.setPlayerClassTag(valueString);
         }
     }
@@ -239,6 +239,16 @@ final class PlayerParser extends FileParser {
 
     @Override
     protected FileVariable getFileVariable(String var) {
-        return PlayerFileVariable.valueOf(var);
+        return PlayerFileVariable.valueOf(getDetectedPlatform(), var);
     }
+
+    @Override
+    protected FileVariable getPlatformFileVariable(Platform platform, String var) {
+        try {
+            return PlayerFileVariable.valueOf(platform, var);
+        } catch (InvalidVariableException e) {
+            return null;
+        }
+    }
+
 }

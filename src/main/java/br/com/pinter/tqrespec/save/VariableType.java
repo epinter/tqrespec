@@ -26,6 +26,7 @@ public enum VariableType {
     INTEGER,
     FLOAT,
     STRING_UTF_16_LE,
+    STRING_UTF_32_LE,
     UID,
     STREAM,
 }

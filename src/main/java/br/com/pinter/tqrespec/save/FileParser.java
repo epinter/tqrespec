@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -165,7 +166,7 @@ public abstract class FileParser {
 
         while (this.getBuffer().position() < block.getEnd() - END_BLOCK_SIZE) {
             int keyOffset = getBuffer().position();
-            String name = readString();
+            String name = readStringKey();
 
             skipSubBlock(block, name, keyOffset);
 
@@ -219,18 +220,25 @@ public abstract class FileParser {
         BlockType blockType = previous;
         FileVariable fileVariable;
         final String invalidVarMsg = "An invalid variable (%s) was found in block %s, aborting.";
-        try {
-            fileVariable = getFileVariable(filterFileVariableName(name));
+        String varName = filterFileVariableName(name);
+        fileVariable = getPlatformFileVariable(getDetectedPlatform(), varName);
+        if(fileVariable == null) {
+            //try to detect the platform based on current variable
+            for (Platform t: Platform.values()) {
+                if(getPlatformFileVariable(t, varName)!=null) {
+                    setDetectedPlatform(t);
+                    break;
+                }
+            }
+            fileVariable = getFileVariable(varName);
             if(fileVariable == null) {
                 throw new IllegalStateException(String.format(invalidVarMsg, name, block.getStart()));
             }
-            if (!fileVariable.location().equals(FileBlockType.BODY)
-                    && !fileVariable.location().equals(FileBlockType.UNKNOWN)
-                    && !fileVariable.location().equals(FileBlockType.MULTIPLE)) {
-                blockType = fileVariable.location();
-            }
-        } catch (ClassCastException e) {
-            throw new IllegalStateException(String.format(invalidVarMsg, name, block.getStart()), e);
+        }
+        if (!fileVariable.location().equals(FileBlockType.BODY)
+                && !fileVariable.location().equals(FileBlockType.UNKNOWN)
+                && !fileVariable.location().equals(FileBlockType.MULTIPLE)) {
+            blockType = fileVariable.location();
         }
 
         blockType = filterBlockType(blockType, name);
@@ -357,36 +365,31 @@ public abstract class FileParser {
     }
 
     void readString(VariableInfo variableInfo) {
-        this.readString(variableInfo, false);
-    }
-
-    void readString(VariableInfo variableInfo, boolean utf16le) {
         if (variableInfo.getValSize() != -1) {
             logger.log(System.Logger.Level.ERROR, BUG_VARIABLESIZE_ERROR_MSG);
-            return;
+            throw new IllegalStateException(BUG_VARIABLESIZE_ERROR_MSG);
         }
         int valOffset = getBuffer().position();
 
         try {
             int len = getBuffer().getInt();
-            variableInfo.setVariableType(VariableType.STRING);
             variableInfo.setValSize(len);
             if (len <= 0) {
                 return;
             }
-            if (utf16le) {
-                variableInfo.setVariableType(VariableType.STRING_UTF_16_LE);
-                if(detectedPlatform.equals(Platform.WINDOWS)) { // 2-byte string
-                    len *= 2;
-                } else if(detectedPlatform.equals(Platform.MOBILE)) { //4-byte string
-                    len *= 4;
-                }
+            String charset = "UTF-8";
+            if(variableInfo.getVariableType().equals(VariableType.STRING_UTF_16_LE)) {
+                charset = "UTF-16LE";
+            } else if(variableInfo.getVariableType().equals(VariableType.STRING_UTF_32_LE)) {
+                charset = "UTF-32LE";
             }
+
+            len = variableInfo.getValBytesLength();
 
             byte[] buf = new byte[len];
 
             getBuffer().get(buf, 0, len);
-            variableInfo.setValue(new String(buf, utf16le ? "UTF-16LE" : "UTF-8"));
+            variableInfo.setValue(new String(buf, charset));
             variableInfo.setValOffset(valOffset);
         } catch (IOException e) {
             logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
@@ -394,35 +397,29 @@ public abstract class FileParser {
     }
 
     void readInt(VariableInfo variableInfo) {
-        if (variableInfo.getValSize() != -1) {
+        if (variableInfo.getValSize() != -1 && variableInfo.getVariableType() == null) {
             logger.log(System.Logger.Level.ERROR, BUG_VARIABLESIZE_ERROR_MSG);
-            return;
+            throw new IllegalStateException(BUG_VARIABLESIZE_ERROR_MSG);
         }
-        int valOffset = getBuffer().position();
 
+        variableInfo.setValOffset(getBuffer().position());
         variableInfo.setValue(getBuffer().getInt());
-        variableInfo.setVariableType(VariableType.INTEGER);
-        variableInfo.setValSize(4);
-        variableInfo.setValOffset(valOffset);
     }
 
     void readFloat(VariableInfo variableInfo) {
-        if (variableInfo.getValSize() != -1) {
+        if (variableInfo.getValSize() != -1 && variableInfo.getVariableType() == null) {
             logger.log(System.Logger.Level.ERROR, BUG_VARIABLESIZE_ERROR_MSG);
-            return;
+            throw new IllegalStateException(BUG_VARIABLESIZE_ERROR_MSG);
         }
-        int valOffset = getBuffer().position();
 
+        variableInfo.setValOffset(getBuffer().position());
         variableInfo.setValue(getBuffer().getFloat());
-        variableInfo.setVariableType(VariableType.FLOAT);
-        variableInfo.setValSize(4);
-        variableInfo.setValOffset(valOffset);
     }
 
     void readUid(VariableInfo variableInfo) {
-        if (variableInfo.getValSize() != -1) {
+        if (variableInfo.getValSize() != -1 && variableInfo.getVariableType() == null) {
             logger.log(System.Logger.Level.ERROR, BUG_VARIABLESIZE_ERROR_MSG);
-            return;
+            throw new IllegalStateException(BUG_VARIABLESIZE_ERROR_MSG);
         }
         int valOffset = getBuffer().position();
 
@@ -430,8 +427,6 @@ public abstract class FileParser {
         byte[] buf = readUid();
 
         variableInfo.setValue(buf);
-        variableInfo.setVariableType(VariableType.UID);
-        variableInfo.setValSize(16);
         variableInfo.setValOffset(valOffset);
     }
 
@@ -444,14 +439,13 @@ public abstract class FileParser {
     void readStream(VariableInfo variableInfo) {
         if (variableInfo.getValSize() != -1) {
             logger.log(System.Logger.Level.ERROR, BUG_VARIABLESIZE_ERROR_MSG);
-            return;
+            throw new IllegalStateException(BUG_VARIABLESIZE_ERROR_MSG);
         }
         int valOffset = getBuffer().position();
 
         byte[] buf = readStream();
 
         variableInfo.setValue(buf);
-        variableInfo.setVariableType(VariableType.STREAM);
         variableInfo.setValSize(buf.length);
         variableInfo.setValOffset(valOffset);
     }
@@ -467,12 +461,7 @@ public abstract class FileParser {
         return buf;
     }
 
-    protected String readString() {
-        return this.readString(false);
-    }
-
-    @SuppressWarnings({"WeakerAccess", "SameParameterValue"})
-    String readString(boolean utf16le) {
+    protected String readStringKey() {
         byte[] buf = null;
         int len = -1;
         int offset = getBuffer().position();
@@ -481,15 +470,10 @@ public abstract class FileParser {
             if (len <= 0) {
                 return null;
             }
-            if (utf16le) {
-                len *= 2;
-            }
             buf = new byte[len];
 
             getBuffer().get(buf, 0, len);
-            return new String(buf, utf16le ? "UTF-16LE" : "UTF-8");
-        } catch (IOException e) {
-            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
+            return new String(buf, StandardCharsets.UTF_8);
         } catch (BufferUnderflowException e) {
             String bufStr = null;
             if (buf != null && buf.length < 50) {
@@ -497,10 +481,11 @@ public abstract class FileParser {
             }
             throw new UnhandledRuntimeException(String.format("Error parsing string. Invalid data(strlen=%d,buf=%s,position=%d).", len, bufStr, offset), e.getCause());
         }
-        return null;
     }
 
     protected abstract FileVariable getFileVariable(String var);
+
+    protected abstract FileVariable getPlatformFileVariable(Platform platform, String var);
 
     VariableInfo readVar(String name) {
         return readVar(name, new VariableInfo(), FileBlockType.UNKNOWN);
@@ -517,7 +502,7 @@ public abstract class FileParser {
     VariableInfo readVar(String name, VariableInfo variableInfo, BlockType fileBlock) {
         String varId = filterFileVariableName(name);
 
-        VariableType type = null;
+        VariableType type;
         FileVariable fileVariable = getFileVariable(varId);
         type = getFileVariable(varId).type();
 
@@ -533,14 +518,14 @@ public abstract class FileParser {
             type = fileVariableMultiple.type();
         }
 
+        variableInfo.setVariableType(type);
+
         if (type == VariableType.INTEGER) {
             readInt(variableInfo);
         } else if (type == VariableType.FLOAT) {
             readFloat(variableInfo);
-        } else if (type == VariableType.STRING) {
+        } else if (type == VariableType.STRING || type == VariableType.STRING_UTF_16_LE || type == VariableType.STRING_UTF_32_LE) {
             readString(variableInfo);
-        } else if (type == VariableType.STRING_UTF_16_LE) {
-            readString(variableInfo, true);
         } else if (type == VariableType.UID) {
             readUid(variableInfo);
         } else if (type == VariableType.STREAM) {

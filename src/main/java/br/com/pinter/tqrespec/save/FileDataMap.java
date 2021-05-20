@@ -110,7 +110,9 @@ public class FileDataMap implements DeepCloneable {
                     && (getBlockInfo().get(block).getVariables().get(variable).get(0).getVariableType()
                     == VariableType.STRING
                     || getBlockInfo().get(block).getVariables().get(variable).get(0).getVariableType()
-                    == VariableType.STRING_UTF_16_LE)) {
+                    == VariableType.STRING_UTF_16_LE
+                    || getBlockInfo().get(block).getVariables().get(variable).get(0).getVariableType()
+                    == VariableType.STRING_UTF_32_LE)) {
                 return (String) getBlockInfo().get(block).getVariables().get(variable).get(0).getValue();
             }
         }
@@ -137,11 +139,14 @@ public class FileDataMap implements DeepCloneable {
             for(BlockInfo b: getBlockInfo().values()) {
                 for (VariableInfo v : b.getVariables().values()) {
                     if(v.getVariableType().equals(VariableType.STRING_UTF_16_LE)) {
+                        if(v.getValSize() == 0)
+                            continue;
+
                         String oldValue;
                         if(changes.get(v.getValOffset()) != null) {
                             oldValue = readStringFromMap(v.getValOffset(), Platform.WINDOWS,true);
                         } else {
-                            oldValue = (String) v.getValue();
+                            oldValue = v.getValueString();
                         }
                         byte[] newValue = encodeString(oldValue,true);
                         byte[] len = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(oldValue.length()).array();
@@ -150,7 +155,7 @@ public class FileDataMap implements DeepCloneable {
                         System.arraycopy(newValue, 0, data, len.length, newValue.length);
 
                         changes.put(v.getValOffset(), data);
-                        valuesLengthIndex.put(v.getValOffset(), 4 + (v.getValSize() * 2));
+                        valuesLengthIndex.put(v.getValOffset(), 4 + v.getValBytesLength());
                     }
                 }
             }
@@ -160,12 +165,15 @@ public class FileDataMap implements DeepCloneable {
                     if (v.getName().equals("mySaveId")) {
                         removeVariable(v);
                     } else {
-                        if(v.getVariableType().equals(VariableType.STRING_UTF_16_LE)) {
+                        if(v.getVariableType().equals(VariableType.STRING_UTF_32_LE)) {
+                            if(v.getValSize() == 0)
+                                continue;
+
                             String oldValue;
                             if(changes.get(v.getValOffset()) != null) {
                                 oldValue = readStringFromMap(v.getValOffset(), Platform.MOBILE,true);
                             } else {
-                                oldValue = new String(((String) v.getValue()).getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_16LE);
+                                oldValue = v.getValueString();
                             }
                             byte[] newValue = encodeString(oldValue,true);
                             byte[] len = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(oldValue.length()).array();
@@ -174,7 +182,7 @@ public class FileDataMap implements DeepCloneable {
                             System.arraycopy(newValue, 0, data, len.length, newValue.length);
 
                             changes.put(v.getValOffset(), data);
-                            valuesLengthIndex.put(v.getValOffset(), 4 + (v.getValSize() * 4));
+                            valuesLengthIndex.put(v.getValOffset(), 4 + v.getValBytesLength());
                         }
                     }
                 }
@@ -183,22 +191,18 @@ public class FileDataMap implements DeepCloneable {
     }
 
     public String getCharacterName() {
-        if(platform.equals(Platform.MOBILE)) {
-            return new String((getString("myPlayerName")).getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_16LE);
-        } else {
             return getString("myPlayerName");
-        }
     }
 
     private String readStringFromMap(int offset, Platform fromPlatform, boolean wide) {
         byte[] data = Arrays.copyOfRange(changes.get(offset), 4, changes.get(offset).length);
 
         if(wide && fromPlatform.equals(Platform.MOBILE)) {
-            return new String(data, Charset.forName("UTF-32LE"));
+            return new String(new String(data, Charset.forName("UTF-32LE")).getBytes());
         } else if(wide && fromPlatform.equals(Platform.WINDOWS)) {
-            return new String(data, StandardCharsets.UTF_16LE);
+            return new String(new String(data, StandardCharsets.UTF_16LE).getBytes());
         }
-        return new String(data, StandardCharsets.UTF_8);
+        return new String(new String(data, StandardCharsets.UTF_8).getBytes());
     }
 
     public List<String> getStringValuesFromBlock(String variable) {
@@ -210,7 +214,7 @@ public class FileDataMap implements DeepCloneable {
                     if(vi.getValue() == null || !vi.getName().equals(variable)) {
                         continue;
                     }
-                    if(vi.getVariableType().equals(VariableType.STRING) || vi.getVariableType().equals(VariableType.STRING_UTF_16_LE)) {
+                    if(vi.getVariableType().equals(VariableType.STRING) || vi.getVariableType().equals(VariableType.STRING_UTF_16_LE) || vi.getVariableType().equals(VariableType.STRING_UTF_32_LE)) {
                         ret.add(vi.getValueString());
                     }
                 }
@@ -223,7 +227,7 @@ public class FileDataMap implements DeepCloneable {
         this.setString(variable, value, false);
     }
 
-    public void setString(String variable, String value, boolean utf16le) {
+    public void setString(String variable, String value, boolean wide) {
         if (getVariableLocation().get(variable) != null) {
             if (getVariableLocation().get(variable).size() > 1) {
                 throw new IllegalStateException(MULTIPLE_DEFINITIONS_ERROR);
@@ -233,10 +237,12 @@ public class FileDataMap implements DeepCloneable {
                     && (getBlockInfo().get(block).getVariables().get(variable).get(0).getVariableType()
                     == VariableType.STRING
                     || getBlockInfo().get(block).getVariables().get(variable).get(0).getVariableType()
-                    == VariableType.STRING_UTF_16_LE)) {
+                    == VariableType.STRING_UTF_16_LE
+                    || getBlockInfo().get(block).getVariables().get(variable).get(0).getVariableType()
+                    == VariableType.STRING_UTF_32_LE)) {
                 VariableInfo variableInfo = getBlockInfo().get(block).getVariables().get(variable).get(0);
                 byte[] str;
-                if (utf16le) {
+                if (wide) {
                     //encode string to the format the game uses, a wide character with second byte always 0
                     str = encodeString(value, true);
                 } else {
@@ -248,26 +254,23 @@ public class FileDataMap implements DeepCloneable {
                 System.arraycopy(str, 0, data, len.length, str.length);
 
                 changes.put(variableInfo.getValOffset(), data);
-                this.valuesLengthIndex.put(variableInfo.getValOffset(), 4 + (variableInfo.getValSize() * getUtfSize(utf16le)));
+                valuesLengthIndex.put(variableInfo.getValOffset(), 4 + variableInfo.getValBytesLength());
             }
         } else {
             throw new IllegalArgumentException(Util.getUIMessage(ALERT_INVALIDDATA, variable));
         }
     }
 
-    private int getUtfSize(boolean utf16le) {
-        int utfSize = 1;
-        if(utf16le && platform.equals(Platform.WINDOWS)) {
-            utfSize = 2;
-        } else if(utf16le && platform.equals(Platform.MOBILE)) {
-            utfSize = 4;
-        }
-        return utfSize;
-    }
-
     private byte[] encodeString(String str, boolean wide) {
         //allocate the number of characters * 2 so the buffer can hold the '0'
-        ByteBuffer buffer = ByteBuffer.allocate(str.length() * getUtfSize(wide));
+        int utfSize = 1;
+        if(wide && platform.equals(Platform.WINDOWS)) {
+            utfSize = VariableInfo.UTF16LE_CHARBYTES;
+        } else if(wide && platform.equals(Platform.MOBILE)) {
+            utfSize = VariableInfo.UTF32LE_CHARBYTES;
+        }
+
+        ByteBuffer buffer = ByteBuffer.allocate(str.length() * utfSize);
 
         for (char o : str.toCharArray()) {
             char c = StringUtils.stripAccents(Character.toString(o)).toCharArray()[0];

@@ -10,7 +10,6 @@ import br.com.pinter.tqrespec.core.WorkerThread;
 import br.com.pinter.tqrespec.save.Platform;
 import br.com.pinter.tqrespec.save.player.Player;
 import br.com.pinter.tqrespec.save.player.PlayerWriter;
-import br.com.pinter.tqrespec.tqdata.PlayerCharacterFile;
 import br.com.pinter.tqrespec.util.Util;
 import com.google.inject.Inject;
 import javafx.beans.property.BooleanProperty;
@@ -229,9 +228,11 @@ public class MiscPaneController implements Initializable {
                     Util.showError("Target Directory already exists!",
                             String.format("The specified target directory already exists. Aborting the copy to character '%s'",
                                     targetPlayerName));
+                    mainController.reset();
                 } else {
                     Util.showError(Util.getUIMessage("alert.errorcopying_header"),
                             Util.getUIMessage("alert.errorcopying_content", targetPlayerName));
+                    mainController.reset();
                 }
             }
         });

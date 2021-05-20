@@ -89,7 +89,7 @@ public class PlayerWriter extends FileWriter {
         }
 
         if (backupDirectory.canWrite()) {
-            URI zipUri = URI.create("jar:" + destPlayerZip.toURI().toString());
+            URI zipUri = URI.create("jar:" + destPlayerZip.toURI());
             HashMap<String, String> zipCreateOptions = new HashMap<>();
             zipCreateOptions.put("create", "true");
 
@@ -214,7 +214,7 @@ public class PlayerWriter extends FileWriter {
 
             FileDataMap fileDataMap = (FileDataMap) saveData.getDataMap().deepClone();
 
-            if(!toPlayerName.equals(fromPlayerName)) {
+            if(!toPlayerName.equals(saveData.getDataMap().getCharacterName())) {
                 // set name before conversion
                 fileDataMap.setString("myPlayerName", toPlayerName, true);
                 if(fileDataMap.getPlatform().equals(Platform.MOBILE) && conversionTarget.equals(Platform.UNDEFINED)) {

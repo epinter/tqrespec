@@ -20,6 +20,7 @@
 
 package br.com.pinter.tqrespec.save.player;
 
+import br.com.pinter.tqrespec.save.Platform;
 import br.com.pinter.tqrespec.save.UID;
 import br.com.pinter.tqrespec.save.VariableInfo;
 import br.com.pinter.tqrespec.tqdata.GameVersion;
@@ -294,7 +295,7 @@ class PlayerParserTest {
 
     @Test
     void readMonsterName_Should_readMonsterNameFromSavegame() {
-        assertEquals("{^r}Hades ~ God of the Dead", readStringVar(PlayerFileVariable.valueOf("greatestMonsterKilledName").var()));
+        assertEquals("{^r}Hades ~ God of the Dead", readStringVar(PlayerFileVariable.valueOf(Platform.WINDOWS, "greatestMonsterKilledName").var()));
     }
 
     private int readTempVar(String alias) {

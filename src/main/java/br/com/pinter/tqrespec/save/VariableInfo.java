@@ -24,6 +24,8 @@ import com.google.common.io.BaseEncoding;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 @SuppressWarnings("unused")
 public class VariableInfo implements Serializable {
@@ -38,7 +40,8 @@ public class VariableInfo implements Serializable {
     private byte[] valueByteArray = null;
     private VariableType variableType;
     private int blockOffset = -1;
-    private int utf16SizeBytes = 2;
+    public static final int UTF16LE_CHARBYTES = 2;
+    public static final int UTF32LE_CHARBYTES = 4;
 
     public String getName() {
         return name;
@@ -86,10 +89,20 @@ public class VariableInfo implements Serializable {
         this.valSize = valSize;
     }
 
+    public String getValuePlatformString() {
+        if (variableType == VariableType.STRING)
+            return valueString;
+        if (variableType == VariableType.STRING_UTF_16_LE)
+            return new String(valueString.getBytes(StandardCharsets.UTF_16LE));
+        if (variableType == VariableType.STRING_UTF_32_LE)
+            return new String(valueString.getBytes(Charset.forName("UTF-32LE")));
+        return null;
+    }
+
     public Object getValue() {
         if (variableType == VariableType.INTEGER)
             return valueInteger;
-        if (variableType == VariableType.STRING || variableType == VariableType.STRING_UTF_16_LE)
+        if (variableType == VariableType.STRING || variableType == VariableType.STRING_UTF_16_LE || variableType == VariableType.STRING_UTF_32_LE)
             return valueString;
         if (variableType == VariableType.FLOAT)
             return valueFloat;
@@ -104,7 +117,7 @@ public class VariableInfo implements Serializable {
     public String getValueString() {
         if (variableType == VariableType.INTEGER)
             return String.valueOf(valueInteger);
-        if (variableType == VariableType.STRING || variableType == VariableType.STRING_UTF_16_LE)
+        if (variableType == VariableType.STRING || variableType == VariableType.STRING_UTF_16_LE || variableType == VariableType.STRING_UTF_32_LE)
             return valueString;
         if (variableType == VariableType.FLOAT)
             return String.valueOf(valueFloat);
@@ -121,7 +134,9 @@ public class VariableInfo implements Serializable {
     public int getValBytesLength() {
         int sz = valSize;
         if (variableType == VariableType.STRING_UTF_16_LE) {
-            sz *= utf16SizeBytes;
+            sz *= VariableInfo.UTF16LE_CHARBYTES;
+        } else if (variableType == VariableType.STRING_UTF_32_LE) {
+            sz *= VariableInfo.UTF32LE_CHARBYTES;
         }
         return sz;
     }
@@ -169,6 +184,22 @@ public class VariableInfo implements Serializable {
     }
 
     public void setVariableType(VariableType variableType) {
+        if(this.valSize == -1) {
+            if(variableType.equals(VariableType.FLOAT) || variableType.equals(VariableType.INTEGER)) {
+                valSize = 4;
+            } else if(variableType.equals(VariableType.UID)) {
+                valSize = 16;
+            } else if(variableType.equals(VariableType.STREAM) && valueByteArray != null) {
+                valSize = valueByteArray.length;
+            } else if(variableType == VariableType.STRING && valueString != null) {
+                valSize = valueString.length();
+            } else if(variableType == VariableType.STRING_UTF_16_LE && valueString != null) {
+                valSize = valueString.length() * UTF16LE_CHARBYTES;
+            } else if(variableType == VariableType.STRING_UTF_32_LE && valueString != null) {
+                valSize = valueString.length() * UTF32LE_CHARBYTES;
+            }
+        }
+
         this.variableType = variableType;
     }
 
@@ -195,7 +226,6 @@ public class VariableInfo implements Serializable {
         private byte[] builderValueByteArray = null;
         private VariableType builderVariableType;
         private int builderBlockOffset = -1;
-        private int builderUtf16SizeBytes = 2;
 
         public Builder name(String builderName) {
             this.builderName = builderName;
@@ -252,16 +282,8 @@ public class VariableInfo implements Serializable {
             return this;
         }
 
-        public Builder utf16SizeBytes(int utf16SizeBytes) {
-            this.builderUtf16SizeBytes = utf16SizeBytes;
-            return this;
-        }
 
         public VariableInfo build() {
-            if(builderUtf16SizeBytes !=2 && builderUtf16SizeBytes != 4) {
-                builderUtf16SizeBytes = 2;
-            }
-
             VariableInfo v = new VariableInfo();
             v.name = builderName;
             v.blockOffset = builderBlockOffset;
@@ -274,7 +296,6 @@ public class VariableInfo implements Serializable {
             v.valueFloat = builderValueFloat;
             v.valueByteArray = builderValueByteArray;
             v.variableType = builderVariableType;
-            v.utf16SizeBytes = builderUtf16SizeBytes;
 
             if(v.valSize == -1) {
                 if(v.variableType.equals(VariableType.FLOAT) || v.variableType.equals(VariableType.INTEGER)) {
@@ -286,7 +307,9 @@ public class VariableInfo implements Serializable {
                 } else if(v.variableType == VariableType.STRING && v.valueString != null) {
                     v.valSize = v.valueString.length();
                 } else if(v.variableType == VariableType.STRING_UTF_16_LE && v.valueString != null) {
-                    v.valSize = v.valueString.length() * builderUtf16SizeBytes;
+                    v.valSize = v.valueString.length() * 2;
+                } else if(v.variableType == VariableType.STRING_UTF_32_LE && v.valueString != null) {
+                    v.valSize = v.valueString.length() * 4;
                 }
             }
 

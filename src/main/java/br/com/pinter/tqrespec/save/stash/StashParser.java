@@ -89,4 +89,10 @@ public class StashParser extends FileParser {
     protected FileVariable getFileVariable(String var) {
         return StashFileVariable.valueOf(var);
     }
+
+    @Override
+    protected FileVariable getPlatformFileVariable(Platform platform, String var) {
+        return getFileVariable(var);
+    }
+
 }
