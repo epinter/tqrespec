@@ -583,6 +583,34 @@ public class Player {
         return ret;
     }
 
+    public void removeTeleport(int difficulty, UID uid) {
+        TeleportDifficulty teleportDifficulty = getTeleportUidFromDifficulty(difficulty);
+
+        if (difficulty > getDifficulty()) {
+            throw new UnhandledRuntimeException(String.format("character doesn't have the difficulty %d unlocked", difficulty));
+        }
+
+        if (teleportDifficulty == null) {
+            throw new UnhandledRuntimeException("error creating teleport");
+        }
+
+        VariableInfo uidSize = teleportDifficulty.getBlockInfo().getVariables().get(Constants.Save.VAR_TELEPORTUIDSSIZE).get(difficulty);
+
+        List<VariableInfo> toRemove = new ArrayList<>();
+        for (VariableInfo stagingVar : teleportDifficulty.getBlockInfo().getStagingVariables().values()) {
+            if (stagingVar.getVariableType().equals(VariableType.UID) && stagingVar.getName().equals(Constants.Save.VAR_TELEPORTUID)
+                    && (new UID((byte[]) stagingVar.getValue())).equals(uid)) {
+                logger.log(System.Logger.Level.ERROR, "------------- removing portal " + uid + ".");
+                toRemove.add(stagingVar);
+            }
+        }
+
+        for(VariableInfo v: toRemove) {
+            getSaveData().getDataMap().removeVariable(v.getKeyOffset(), v);
+            getSaveData().getDataMap().decrementInt(uidSize);
+        }
+    }
+
     public void insertTeleport(int difficulty, UID uid) {
         TeleportDifficulty teleportDifficulty = getTeleportUidFromDifficulty(difficulty);
 
@@ -608,7 +636,7 @@ public class Player {
         for (VariableInfo vi : teleportDifficulty.getTeleportList()) {
             if (vi.getVariableType().equals(VariableType.UID) && vi.getName().equals(Constants.Save.VAR_TELEPORTUID)) {
                 MapTeleport currentTeleport = DefaultMapTeleport.get(new UID((byte[]) vi.getValue()));
-                if (currentTeleport.getUid().equals(uid)) {
+                if (currentTeleport != null && currentTeleport.getUid().equals(uid)) {
                     logger.log(System.Logger.Level.ERROR, "------------- portal " + uid + "already exists");
                     return;
                 }
