@@ -24,11 +24,15 @@ import com.google.common.io.BaseEncoding;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Objects;
 
 @SuppressWarnings("unused")
-public class VariableInfo implements Serializable {
+public class VariableInfo implements DeepCloneable, Serializable {
     private String name = null;
     private String alias = null;
     private int keyOffset = -1;
@@ -43,6 +47,21 @@ public class VariableInfo implements Serializable {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        VariableInfo that = (VariableInfo) o;
+        return valSize == that.valSize && blockOffset == that.blockOffset && name.equals(that.name) && Objects.equals(alias, that.alias) && Objects.equals(valueString, that.valueString) && Objects.equals(valueInteger, that.valueInteger) && Objects.equals(valueFloat, that.valueFloat) && Arrays.equals(valueByteArray, that.valueByteArray) && variableType == that.variableType;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(name, alias, valSize, valueString, valueInteger, valueFloat, variableType, blockOffset);
+        result = 31 * result + Arrays.hashCode(valueByteArray);
+        return result;
     }
 
     public String getName() {
@@ -114,19 +133,35 @@ public class VariableInfo implements Serializable {
     }
 
     public void setValue(String value) {
+        if(!isString()) {
+            throw new IllegalArgumentException("invalid value type");
+        }
         this.valueString = value;
+        valSize = valueString.length();
     }
 
     public void setValue(int value) {
+        if(!isInt()) {
+            throw new IllegalArgumentException("invalid value type");
+        }
         this.valueInteger = value;
+        valSize = variableType.dataTypeSize();
     }
 
     public void setValue(float value) {
+        if(!isFloat()) {
+            throw new IllegalArgumentException("invalid value type");
+        }
         this.valueFloat = value;
+        valSize = variableType.dataTypeSize();
     }
 
     public void setValue(byte[] value) {
+        if(!isUid() && !isStream()) {
+            throw new IllegalArgumentException("invalid value type");
+        }
         this.valueByteArray = value;
+        valSize = valueByteArray.length;
     }
 
     /**
@@ -191,7 +226,7 @@ public class VariableInfo implements Serializable {
             } else if (variableType.equals(VariableType.STREAM) && valueByteArray != null) {
                 valSize = valueByteArray.length;
             } else if (isString() && valueString != null) {
-                valSize = valueString.length() * variableType.dataTypeSize();
+                valSize = valueString.length();
             }
         }
 
@@ -218,9 +253,58 @@ public class VariableInfo implements Serializable {
         return variableType == VariableType.INTEGER;
     }
 
+    public boolean isUid() {
+        return variableType == VariableType.UID;
+    }
+
+    public boolean isStream() {
+        return variableType == VariableType.STREAM;
+    }
+
     @Override
     public String toString() {
         return String.format("name={%s}; alias={%s}; value={%s}; keyOffset={%d}, valOffset={%d}; valSize={%d}; variableType: {%s}", this.name, alias, this.getValue(), this.keyOffset, this.valOffset, this.valSize, variableType);
+    }
+
+    private byte[] encodeString() {
+        //allocate the number of characters * 2 so the buffer can hold the '0'
+        ByteBuffer buffer = ByteBuffer.allocate(valueString.length() * variableType.dataTypeSize());
+
+        for (char o : valueString.toCharArray()) {
+            char c = StringUtils.stripAccents(Character.toString(o)).toCharArray()[0];
+
+            if (!variableType.equals(VariableType.STRING)) {
+                byte n1 = (byte) (c & 0xFF);
+                byte n2 = (byte) (c >> 8);
+
+                if (variableType.equals(VariableType.STRING_UTF_16_LE)) {
+                    buffer.put(new byte[]{n1, n2});
+                } else if (variableType.equals(VariableType.STRING_UTF_32_LE)) {
+                    buffer.put(new byte[]{n1, n2, 0, 0});
+                }
+            } else {
+                buffer.put(new byte[]{(byte) c});
+            }
+        }
+        return buffer.array();
+    }
+
+    public byte[] bytes() {
+        if(variableType.equals(VariableType.INTEGER)) {
+                return ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(valueInteger).array();
+        } else if(variableType.equals(VariableType.FLOAT)) {
+                return ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putFloat(valueFloat).array();
+        }else if(variableType.equals(VariableType.STRING) || variableType.equals(VariableType.STRING_UTF_16_LE) || variableType.equals(VariableType.STRING_UTF_32_LE)) {
+            byte[] str = encodeString();
+            byte[] len = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(valueString.length()).array();
+            byte[] data = new byte[4 + str.length];
+            System.arraycopy(len, 0, data, 0, len.length);
+            System.arraycopy(str, 0, data, len.length, str.length);
+            return data;
+        } else if(variableType.equals(VariableType.UID) ||variableType.equals(VariableType.STREAM)) {
+            return valueByteArray;
+        }
+        return new byte[0];
     }
 
     public static class Builder {
@@ -312,7 +396,7 @@ public class VariableInfo implements Serializable {
                 } else if (v.variableType.equals(VariableType.STREAM) && v.valueByteArray != null) {
                     v.valSize = v.valueByteArray.length;
                 } else if (v.isString() && v.valueString != null) {
-                    v.valSize = v.valueString.length() * v.getVariableType().dataTypeSize();
+                    v.valSize = v.valueString.length();
                 }
             }
 

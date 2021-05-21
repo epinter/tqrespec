@@ -75,7 +75,7 @@ public abstract class FileWriter {
             //copy changed bytes to output buffer
             byte[] c = fileDataMap.getBytes(offset);
             outBuffer.write(c);
-            int previousValueLength = fileDataMap.getValuesLengthIndex().get(offset);
+            int previousValueLength = fileDataMap.getPreviousValueLength(offset);
             //skip the number of bytes of original value, to position the cursor at the next variable/block
             getSaveData().getBuffer().position(
                     getSaveData().getBuffer().position() + previousValueLength);

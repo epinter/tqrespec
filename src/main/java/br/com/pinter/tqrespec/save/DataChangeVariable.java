@@ -1,0 +1,172 @@
+/*
+ * Copyright (C) 2021 Emerson Pinter - All Rights Reserved
+ */
+
+/*    This file is part of TQ Respec.
+
+    TQ Respec is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    TQ Respec is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with TQ Respec.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
+package br.com.pinter.tqrespec.save;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.Serializable;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+public class DataChangeVariable implements DataChange, Serializable {
+    private final VariableInfo oldVariable;
+    private final List<VariableInfo> variables = new ArrayList<>();
+    private final List<String> addVars = new ArrayList<>();
+    private byte[] padding = new byte[0];
+    private boolean paddingAfter = true;
+
+    public DataChangeVariable(VariableInfo oldVariable, VariableInfo variable) {
+        this.oldVariable = oldVariable;
+        this.variables.add(variable);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DataChangeVariable that = (DataChangeVariable) o;
+        return Objects.equals(oldVariable, that.oldVariable) && variables.equals(that.variables);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(oldVariable, variables);
+    }
+
+    @Override
+    public boolean isVariable() {
+        return true;
+    }
+
+    @Override
+    public byte[] data() {
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            if (!paddingAfter)
+                bos.write(padding);
+
+            for (VariableInfo v : variables) {
+                if (v.getValOffset() != oldVariable.getValOffset()) {
+                    throw new IllegalArgumentException("invalid offset " + v);
+                }
+                if(addVars.contains(v.getName())) {
+                    ByteBuffer varKey = ByteBuffer.allocate(v.getName().getBytes().length+4).order(ByteOrder.LITTLE_ENDIAN);
+
+                    varKey.putInt(v.getName().length());
+                    varKey.put(v.getName().getBytes());
+                    bos.write(varKey.array());
+                }
+                bos.write(v.bytes());
+            }
+
+            if (paddingAfter)
+                bos.write(padding);
+
+            return bos.toByteArray();
+        } catch (IOException e) {
+            throw new IllegalStateException("Error writing to buffer");
+        }
+    }
+
+    public List<String> getAddVars() {
+        return addVars;
+    }
+
+    @Override
+    public int previousValueLength() {
+        return oldVariable.getValuePrefix() + oldVariable.getValBytesLength();
+    }
+
+    @Override
+    public int offset() {
+        return oldVariable.getValOffset();
+    }
+
+    public VariableInfo getVariable(VariableInfo variable) {
+        for(VariableInfo v:variables) {
+            if(v.getName().equals(variable.getName()) && v.getBlockOffset() == variable.getBlockOffset()
+                    && v.getVariableType().equals(variable.getVariableType())) {
+                return v;
+            }
+        }
+
+        return null;
+    }
+
+    public int getSize() {
+        return variables.size();
+    }
+
+    public List<VariableInfo> getVariables() {
+        return variables;
+    }
+
+    public VariableInfo getOldVariable() {
+        return oldVariable;
+    }
+
+    @Override
+    public void insertPadding(byte[] data) {
+        insertPadding(data, true);
+    }
+
+    @Override
+    public void insertPadding(byte[] data, boolean before) {
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            if (before) {
+                bos.write(data);
+                bos.write(padding);
+            } else {
+                bos.write(padding);
+                bos.write(data);
+            }
+            padding = bos.toByteArray();
+        } catch (IOException e) {
+            throw new IllegalStateException("Error writing to buffer");
+        }
+
+    }
+
+    @Override
+    public void setPaddingAfter(boolean paddingAfter) {
+        this.paddingAfter = paddingAfter;
+    }
+
+    @Override
+    public String toString() {
+        return "DataChangeVariable{" +
+                "oldVariable=" + oldVariable +
+                ", variable=" + variables +
+                '}';
+    }
+
+    public void clear() {
+        addVars.clear();
+        variables.clear();
+        padding = new byte[0];
+        paddingAfter = true;
+    }
+}
