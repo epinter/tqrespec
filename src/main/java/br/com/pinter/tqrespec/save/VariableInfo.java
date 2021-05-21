@@ -149,7 +149,7 @@ public class VariableInfo implements Serializable {
         return valOffset - keyOffset + getValBytesLength() + getValuePrefix();
     }
 
-    private int getValuePrefix() {
+    int getValuePrefix() {
         int valSizePrefix = 0;
 
         if (variableType == VariableType.STRING || variableType == VariableType.STRING_UTF_16_LE || variableType == VariableType.STRING_UTF_32_LE

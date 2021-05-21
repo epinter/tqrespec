@@ -20,7 +20,6 @@
 
 package br.com.pinter.tqrespec.save;
 
-import br.com.pinter.tqrespec.save.player.PlayerFileVariable;
 import br.com.pinter.tqrespec.util.Util;
 import org.apache.commons.lang3.StringUtils;
 
@@ -56,7 +55,7 @@ public class FileDataMap implements DeepCloneable {
         return Objects.hash(super.hashCode(), changes, valuesLengthIndex);
     }
 
-    public Map<Integer, Integer> getValuesLengthIndex() {
+    Map<Integer, Integer> getValuesLengthIndex() {
         return valuesLengthIndex;
     }
 
@@ -80,7 +79,11 @@ public class FileDataMap implements DeepCloneable {
         return changes.get(offset);
     }
 
-    public Set<Integer> changesKeySet() {
+    public byte[] getBytes(VariableInfo variableInfo) {
+        return changes.get(variableInfo.getValOffset());
+    }
+
+    Set<Integer> changesKeySet() {
         return changes.keySet();
     }
 
@@ -119,6 +122,20 @@ public class FileDataMap implements DeepCloneable {
         if (getVariableLocation().get(variable).size() > 1) {
             throw new IllegalStateException(MULTIPLE_DEFINITIONS_ERROR);
         }
+    }
+
+    private void storeChange(VariableInfo variable, byte[] newData) {
+        changes.put(variable.getValOffset(), newData);
+        valuesLengthIndex.put(variable.getValOffset(), variable.getValuePrefix() + variable.getValBytesLength());
+    }
+
+    private void storeChange(int offset, byte[] newData, int previousLength) {
+        changes.put(offset, newData);
+        valuesLengthIndex.put(offset, previousLength);
+    }
+
+    private boolean hasChange(VariableInfo variable) {
+        return changes.get(variable.getValOffset()) != null;
     }
 
     private VariableInfo getFirst(int block, String variable) {
@@ -168,7 +185,7 @@ public class FileDataMap implements DeepCloneable {
                             continue;
 
                         String oldValue;
-                        if(changes.get(v.getValOffset()) != null) {
+                        if(hasChange(v)) {
                             oldValue = readStringFromMap(v.getValOffset(), Platform.WINDOWS, true);
                         } else {
                             oldValue = v.getValueString();
@@ -178,9 +195,7 @@ public class FileDataMap implements DeepCloneable {
                         byte[] data = new byte[4 + newValue.length];
                         System.arraycopy(len, 0, data, 0, len.length);
                         System.arraycopy(newValue, 0, data, len.length, newValue.length);
-
-                        changes.put(v.getValOffset(), data);
-                        valuesLengthIndex.put(v.getValOffset(), 4 + v.getValBytesLength());
+                        storeChange(v, data);
                     }
                 }
             }
@@ -195,7 +210,7 @@ public class FileDataMap implements DeepCloneable {
                                 continue;
 
                             String oldValue;
-                            if(changes.get(v.getValOffset()) != null) {
+                            if(hasChange(v)) {
                                 oldValue = readStringFromMap(v.getValOffset(), Platform.MOBILE, true);
                             } else {
                                 oldValue = v.getValueString();
@@ -205,9 +220,7 @@ public class FileDataMap implements DeepCloneable {
                             byte[] data = new byte[4 + newValue.length];
                             System.arraycopy(len, 0, data, 0, len.length);
                             System.arraycopy(newValue, 0, data, len.length, newValue.length);
-
-                            changes.put(v.getValOffset(), data);
-                            valuesLengthIndex.put(v.getValOffset(), 4 + v.getValBytesLength());
+                            storeChange(v, data);
                         }
                     }
                 }
@@ -220,7 +233,7 @@ public class FileDataMap implements DeepCloneable {
     }
 
     private String readStringFromMap(int offset, Platform fromPlatform, boolean wide) {
-        byte[] data = Arrays.copyOfRange(changes.get(offset), 4, changes.get(offset).length);
+        byte[] data = Arrays.copyOfRange(getBytes(offset), 4, getBytes(offset).length);
 
         if(wide && fromPlatform.equals(Platform.MOBILE)) {
             return new String(new String(data, Charset.forName("UTF-32LE")).getBytes());
@@ -228,6 +241,14 @@ public class FileDataMap implements DeepCloneable {
             return new String(new String(data, StandardCharsets.UTF_16LE).getBytes());
         }
         return new String(new String(data, StandardCharsets.UTF_8).getBytes());
+    }
+
+    private Float readFloatFromMap(VariableInfo variable) {
+        return ByteBuffer.wrap(getBytes(variable)).order(ByteOrder.LITTLE_ENDIAN).getFloat();
+    }
+
+    private Integer readIntegerFromMap(VariableInfo variable) {
+        return ByteBuffer.wrap(getBytes(variable)).order(ByteOrder.LITTLE_ENDIAN).getInt();
     }
 
     public List<String> getStringValuesFromBlock(String variable) {
@@ -258,9 +279,7 @@ public class FileDataMap implements DeepCloneable {
             byte[] data = new byte[4 + str.length];
             System.arraycopy(len, 0, data, 0, len.length);
             System.arraycopy(str, 0, data, len.length, str.length);
-
-            changes.put(variableInfo.getValOffset(), data);
-            valuesLengthIndex.put(variableInfo.getValOffset(), 4 + variableInfo.getValBytesLength());
+            storeChange(variableInfo, data);
         } else {
             throw new IllegalArgumentException(Util.getUIMessage(ALERT_INVALIDDATA, variable));
         }
@@ -289,12 +308,11 @@ public class FileDataMap implements DeepCloneable {
         return buffer.array();
     }
 
-    public void setFloat(VariableInfo variable, int value) {
+    private void setFloat(VariableInfo variable, int value) {
         if (getBlockInfo().get(variable.getBlockOffset()) != null) {
             if (variable.isFloat()) {
                 byte[] data = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putFloat(value).array();
-                changes.put(variable.getValOffset(), data);
-                this.valuesLengthIndex.put(variable.getValOffset(), variable.getValSize());
+                storeChange(variable, data);
             } else {
                 throw new NumberFormatException(String.format(INVALID_DATA_TYPE, variable));
             }
@@ -303,17 +321,17 @@ public class FileDataMap implements DeepCloneable {
         }
     }
 
-    public float getFloat(String variable) {
+    public Float getFloat(String variable) {
         VariableInfo v = getFirst(variable);
         if(v != null && v.isFloat()) {
-            if (changes.get(v.getValOffset()) != null) {
-                return ByteBuffer.wrap(changes.get(v.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getFloat();
+            if (hasChange(v)) {
+                return readFloatFromMap(v);
             } else {
                 return (Float) v.getValue();
             }
         }
 
-        return -1;
+        throw new IllegalStateException("invalid variable: "+variable);
     }
 
     public void setInt(int blockStart, String variable, int value) {
@@ -328,8 +346,7 @@ public class FileDataMap implements DeepCloneable {
 
             if(variableInfo.isInt()) {
                 byte[] data = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(value).array();
-                changes.put(variableInfo.getValOffset(), data);
-                this.valuesLengthIndex.put(variableInfo.getValOffset(), variableInfo.getValSize());
+                storeChange(variableInfo, data);
             } else {
                 throw new NumberFormatException(String.format(INVALID_DATA_TYPE, variable));
             }
@@ -347,8 +364,7 @@ public class FileDataMap implements DeepCloneable {
 
         if(variableInfo.isInt()) {
             byte[] data = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(value).array();
-            changes.put(variableInfo.getValOffset(), data);
-            this.valuesLengthIndex.put(variableInfo.getValOffset(), variableInfo.getValSize());
+            storeChange(variableInfo, data);
         } else {
             throw new NumberFormatException(String.format(INVALID_DATA_TYPE, variable));
         }
@@ -356,8 +372,8 @@ public class FileDataMap implements DeepCloneable {
 
     public void incrementInt(VariableInfo variable) {
         int value = (int) variable.getValue();
-        if(changes.get(variable.getValOffset())!=null) {
-            byte[] currentData = changes.get(variable.getValOffset());
+        if(hasChange(variable)) {
+            byte[] currentData = getBytes(variable);
             int currentValue = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).put(currentData).rewind().getInt();
             value = currentValue + 1;
         } else {
@@ -366,8 +382,7 @@ public class FileDataMap implements DeepCloneable {
         if (getBlockInfo().get(variable.getBlockOffset()) != null) {
             if (variable.getVariableType() == VariableType.INTEGER && variable.getValSize() == 4) {
                 byte[] data = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(value).array();
-                changes.put(variable.getValOffset(), data);
-                this.valuesLengthIndex.put(variable.getValOffset(), variable.getValSize());
+                storeChange(variable, data);
             } else {
                 throw new NumberFormatException(String.format(INVALID_DATA_TYPE, variable));
             }
@@ -376,12 +391,11 @@ public class FileDataMap implements DeepCloneable {
         }
     }
 
-    public void setInt(VariableInfo variable, int value) {
+    void setInt(VariableInfo variable, int value) {
         if (getBlockInfo().get(variable.getBlockOffset()) != null) {
             if (variable.isInt()) {
                 byte[] data = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(value).array();
-                changes.put(variable.getValOffset(), data);
-                this.valuesLengthIndex.put(variable.getValOffset(), variable.getValSize());
+                storeChange( variable, data);
             } else {
                 throw new NumberFormatException(String.format(INVALID_DATA_TYPE, variable));
             }
@@ -390,48 +404,56 @@ public class FileDataMap implements DeepCloneable {
         }
     }
 
-    public Integer getInt(VariableInfo variable) {
-        if (variable.isInt() && changes.get(variable.getValOffset()) != null) {
-            return ByteBuffer.wrap(changes.get(variable.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getInt();
-        } else {
-            return (Integer) variable.getValue();
+    Integer getInt(VariableInfo variable) {
+        if(variable != null && variable.isInt()) {
+            if (hasChange(variable)) {
+                return readIntegerFromMap(variable);
+            } else {
+                return (Integer) variable.getValue();
+            }
         }
+
+        throw new IllegalStateException("invalid variable: "+variable);
     }
 
-    public Float getFloat(VariableInfo variable) {
-        if (variable.isFloat() && changes.get(variable.getValOffset()) != null) {
-            return ByteBuffer.wrap(changes.get(variable.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getFloat();
-        } else {
-            return (Float) variable.getValue();
+    Float getFloat(VariableInfo variable) {
+        if(variable != null && variable.isFloat()) {
+            if (hasChange(variable)) {
+                return readFloatFromMap(variable);
+            } else {
+                return (Float) variable.getValue();
+            }
         }
+
+        throw new IllegalStateException("invalid variable: "+variable);
     }
 
     public Integer getInt(int blockStart, String variable) {
         if (getBlockInfo().get(blockStart) != null) {
             VariableInfo v = getFirst(blockStart, variable);
             if(v != null && v.isInt()) {
-                if (changes.get(v.getValOffset()) != null) {
-                    return ByteBuffer.wrap(changes.get(v.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getInt();
+                if (hasChange(v)) {
+                    return readIntegerFromMap(v);
                 } else {
                     return (Integer) v.getValue();
                 }
             }
         }
 
-        return -1;
+        throw new IllegalStateException(String.format("invalid variable='%s'; blockStart='%s'", variable, blockStart));
     }
 
     public Integer getInt(String variable) {
         VariableInfo v = getFirst(variable);
         if(v != null && v.isInt()) {
-            if (changes.get(v.getValOffset()) != null) {
-                return ByteBuffer.wrap(changes.get(v.getValOffset())).order(ByteOrder.LITTLE_ENDIAN).getInt();
+            if (hasChange(v)) {
+                return readIntegerFromMap(v);
             } else {
                 return (Integer) v.getValue();
             }
         }
 
-        return -1;
+        throw new IllegalStateException("invalid variable: "+variable);
     }
 
     public List<Integer> getIntValuesFromBlock(String variable) {
@@ -453,7 +475,7 @@ public class FileDataMap implements DeepCloneable {
     }
 
     @SuppressWarnings("unused")
-    public List<UID> getUIDValuesFromBlock(String variable) {
+    List<UID> getUIDValuesFromBlock(String variable) {
         List<UID> ret = new ArrayList<>();
         if (getVariableLocation().get(variable) != null) {
             int block = getVariableLocation().get(variable).get(0);
@@ -476,34 +498,32 @@ public class FileDataMap implements DeepCloneable {
         //we shouldnt leave var changes in the list, the block will disappear
         // and nothing should be changed
         for (VariableInfo v : current.getVariables().values()) {
-            if (changes.get(v.getValOffset()) != null) {
+            if (hasChange(v)) {
                 changes.remove(v.getValOffset());
             }
         }
-        changes.put(current.getStart(), new byte[0]);
-        this.valuesLengthIndex.put(current.getStart(), current.getSize());
+        storeChange(current.getStart(), new byte[0], current.getSize());
     }
 
     void removeVariable(VariableInfo variable) {
-        changes.put(variable.getKeyOffset(), new byte[0]);
-        valuesLengthIndex.put(variable.getKeyOffset(), variable.getVariableBytesLength());
+        storeChange(variable.getKeyOffset(), new byte[0], variable.getVariableBytesLength());
     }
 
     public void insertVariable(int offset, VariableInfo variable) {
         insertVariable(offset, variable, false);
     }
 
-    public void insertVariable(int offset, VariableInfo variable, boolean overwrite) {
+    void insertVariable(int offset, VariableInfo variable, boolean overwrite) {
         int bufSize = variable.getVariableBytesLength();
 
-        if(changes.get(offset) != null && !overwrite) {
-            bufSize += changes.get(offset).length;
+        if(getBytes(offset) != null && !overwrite) {
+            bufSize += getBytes(offset).length;
         }
 
         ByteBuffer v = ByteBuffer.allocate(bufSize).order(ByteOrder.LITTLE_ENDIAN);
 
-        if(changes.get(offset) != null && !overwrite) {
-            v.put(changes.get(offset));
+        if(getBytes(offset) != null && !overwrite) {
+            v.put(getBytes(offset));
         }
 
         v.putInt(variable.getName().length());
@@ -518,15 +538,14 @@ public class FileDataMap implements DeepCloneable {
             throw new IllegalStateException("not implemented");
         }
 
-        changes.put(offset, v.array());
-        valuesLengthIndex.put(offset, 0);
+        storeChange(offset, v.array(), 0);
 
         BlockInfo block = this.blockInfo.get(variable.getBlockOffset());
 
         block.getStagingVariables().put(variable.getName(), variable);
     }
 
-    public List<VariableInfo> getTempVariableInfo(String var) {
+    List<VariableInfo> getTempVariableInfo(String var) {
         List<Integer> temp = variableLocation.get("temp");
         for (Integer blockStart : temp) {
             BlockInfo b = blockInfo.get(blockStart);
