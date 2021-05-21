@@ -20,7 +20,10 @@
 
 package br.com.pinter.tqrespec.save;
 
-import com.google.common.collect.*;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -70,6 +73,10 @@ public class BlockInfo implements Serializable {
         return variables;
     }
 
+    public void setVariables(ImmutableListMultimap<String, VariableInfo> variables) {
+        this.variables = variables;
+    }
+
     public ImmutableList<VariableInfo> getVariableByAlias(String alias) {
         ArrayList<VariableInfo> ret = new ArrayList<>();
         for (VariableInfo v : variables.values()) {
@@ -78,10 +85,6 @@ public class BlockInfo implements Serializable {
             }
         }
         return ImmutableList.copyOf(ret);
-    }
-
-    public void setVariables(ImmutableListMultimap<String, VariableInfo> variables) {
-        this.variables = variables;
     }
 
     public BlockType getBlockType() {
@@ -93,7 +96,7 @@ public class BlockInfo implements Serializable {
     }
 
     public Multimap<String, VariableInfo> getStagingVariables() {
-        if(stagingVariables == null) {
+        if (stagingVariables == null) {
             // stagingVariables content is lost during deepClone
             stagingVariables = MultimapBuilder.hashKeys().arrayListValues().build();
         }

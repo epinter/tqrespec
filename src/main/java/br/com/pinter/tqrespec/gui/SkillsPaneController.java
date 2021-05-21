@@ -49,59 +49,42 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class SkillsPaneController implements Initializable {
-    @Inject
-    private Db db;
-
-    @Inject
-    private Txt txt;
-
-    @Inject
-    private Player player;
-
-    @FXML
-    private ListView<SkillListViewItem> firstMasteryListView;
-
-    @FXML
-    private ListView<SkillListViewItem> secondMasteryListView;
-
-    @FXML
-    private Label firstMasteryLabel;
-
-    @FXML
-    private Label secondMasteryLabel;
-
-    @FXML
-    private Button reclaimSkillsFirstButton;
-
-    @FXML
-    private Button reclaimSkillsSecondButton;
-
-    @FXML
-    private Label freeSkillPointsLabel;
-
-    @FXML
-    private MenuItem reclaimMasteryFirstItem;
-
-    @FXML
-    private MenuItem reclaimMasterySecondItem;
-
-    @FXML
-    private MenuItem removeMasteryFirstItem;
-
-    @FXML
-    private MenuItem removeMasterySecondItem;
-
-    @FXML
-    private MenuButton firstMasteryButton;
-
-    @FXML
-    private MenuButton secondMasteryButton;
-
+    private final BooleanProperty saveDisabled = new SimpleBooleanProperty();
     @FXML
     public GridPane skillsGridPane;
-
+    @Inject
+    private Db db;
+    @Inject
+    private Txt txt;
+    @Inject
+    private Player player;
+    @FXML
+    private ListView<SkillListViewItem> firstMasteryListView;
+    @FXML
+    private ListView<SkillListViewItem> secondMasteryListView;
+    @FXML
+    private Label firstMasteryLabel;
+    @FXML
+    private Label secondMasteryLabel;
+    @FXML
+    private Button reclaimSkillsFirstButton;
+    @FXML
+    private Button reclaimSkillsSecondButton;
+    @FXML
+    private Label freeSkillPointsLabel;
+    @FXML
+    private MenuItem reclaimMasteryFirstItem;
+    @FXML
+    private MenuItem reclaimMasterySecondItem;
+    @FXML
+    private MenuItem removeMasteryFirstItem;
+    @FXML
+    private MenuItem removeMasterySecondItem;
+    @FXML
+    private MenuButton firstMasteryButton;
+    @FXML
+    private MenuButton secondMasteryButton;
     private SimpleStringProperty currentSkillPoints = null;
-    private final BooleanProperty saveDisabled = new SimpleBooleanProperty();
     private SimpleStringProperty currentFirstMasteryLevel = null;
     private SimpleStringProperty currentSecondMasteryLevel = null;
 
@@ -128,16 +111,16 @@ public class SkillsPaneController implements Initializable {
         return saveDisabled.get();
     }
 
-    public BooleanProperty saveDisabledProperty() {
-        return saveDisabled;
-    }
-
     public void setSaveDisabled(boolean saveDisabled) {
         this.saveDisabled.set(saveDisabled);
     }
 
+    public BooleanProperty saveDisabledProperty() {
+        return saveDisabled;
+    }
+
     public void loadCharEventHandler() {
-        if(player.isMissingSkills()) {
+        if (player.isMissingSkills()) {
             Toast.show((Stage) skillsGridPane.getParent().getScene().getWindow(),
                     Util.getUIMessage("alert.missingSkill_header"),
                     Util.getUIMessage("alert.missingSkill_content", player.getPlayerSavegameName(), Constants.LOGFILE),

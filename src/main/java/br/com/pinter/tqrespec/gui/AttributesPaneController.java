@@ -49,101 +49,71 @@ import java.util.ResourceBundle;
 @SuppressWarnings("unused")
 public class AttributesPaneController implements Initializable {
     private static final System.Logger logger = Log.getLogger(AttributesPaneController.class.getName());
-
+    private final BooleanProperty saveDisabled = new SimpleBooleanProperty();
     @FXML
     private Label strengthLabel;
-
     @FXML
     private Label intelligenceLabel;
-
     @FXML
     private Label dexterityLabel;
-
     @FXML
     private Label energyLabel;
-
     @FXML
     private Label healthLabel;
-
     @FXML
     private Label availPointsLabel;
-
     @FXML
     private Label experienceLabel;
-
     @FXML
     private Label charLevelLabel;
-
     @FXML
     private Label goldLabel;
-
     @FXML
     private Label charClassLabel;
-
     @FXML
     private Label difficultyLabel;
-
     @Inject
     private Db db;
-
     @Inject
     private Txt txt;
-
     @Inject
     private Player player;
-
     @FXML
     private Spinner<Integer> strSpinner;
-
     @FXML
     private Spinner<Integer> intSpinner;
-
     @FXML
     private Spinner<Integer> dexSpinner;
-
     @FXML
     private Spinner<Integer> lifeSpinner;
-
     @FXML
     private Spinner<Integer> manaSpinner;
-
     @FXML
     private Label availPointsText;
-
     @FXML
     private Label experienceText;
-
     @FXML
     private Label charLevelText;
-
     @FXML
     private Label charClassText;
-
     @FXML
     private Label goldText;
-
     @FXML
     private Label difficultyText;
-
     @FXML
     private ComboBox<String> gender;
-
     private IntegerProperty currentStr = new SimpleIntegerProperty();
     private IntegerProperty currentInt = new SimpleIntegerProperty();
     private IntegerProperty currentDex = new SimpleIntegerProperty();
     private IntegerProperty currentLife = new SimpleIntegerProperty();
     private IntegerProperty currentMana = new SimpleIntegerProperty();
     private IntegerProperty currentAvail = new SimpleIntegerProperty();
-
     private ObjectProperty<Integer> strProperty;
     private ObjectProperty<Integer> intProperty;
     private ObjectProperty<Integer> dexProperty;
     private ObjectProperty<Integer> lifeProperty;
     private ObjectProperty<Integer> manaProperty;
     private ObjectProperty<Integer> availProperty;
-
-    private final BooleanProperty saveDisabled = new SimpleBooleanProperty();
-
     private int strStep;
     private int strMin;
     private int intStep;
@@ -177,12 +147,12 @@ public class AttributesPaneController implements Initializable {
         return saveDisabled.get();
     }
 
-    public BooleanProperty saveDisabledProperty() {
-        return saveDisabled;
-    }
-
     public void setSaveDisabled(boolean saveDisabled) {
         this.saveDisabled.set(saveDisabled);
+    }
+
+    public BooleanProperty saveDisabledProperty() {
+        return saveDisabled;
     }
 
     public int getCurrentAvail() {
@@ -415,9 +385,9 @@ public class AttributesPaneController implements Initializable {
 
         gender.getItems().setAll(Util.getUIMessage("main.gender.male"), Util.getUIMessage("main.gender.female"));
         int genderSelection;
-        if(player.getGender().equals(Gender.FEMALE)) {
+        if (player.getGender().equals(Gender.FEMALE)) {
             genderSelection = 1;
-        }else {
+        } else {
             genderSelection = 0;
         }
         gender.getSelectionModel().clearAndSelect(genderSelection);
@@ -435,7 +405,7 @@ public class AttributesPaneController implements Initializable {
     @FXML
     public void genderSelect(ActionEvent e) {
         int selected = gender.getSelectionModel().getSelectedIndex();
-        if(selected == 0) {
+        if (selected == 0) {
             player.setGender(Gender.MALE);
         } else if (selected == 1) {
             player.setGender(Gender.FEMALE);

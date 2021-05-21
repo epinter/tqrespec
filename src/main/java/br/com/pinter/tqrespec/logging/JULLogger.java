@@ -31,8 +31,8 @@ import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 public class JULLogger implements System.Logger {
-    private String name;
     private final Logger logger;
+    private String name;
 
     public JULLogger(String name) {
         this.name = name;

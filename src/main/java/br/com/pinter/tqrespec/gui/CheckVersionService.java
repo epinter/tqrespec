@@ -19,12 +19,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 public class CheckVersionService extends Service<Version> {
-    @Inject
-    private HostServices hostServices;
-
     private final String url;
     private final String currentVersion;
     private final Control control;
+    @Inject
+    private HostServices hostServices;
 
     public CheckVersionService(String currentVersion, String url, Control control) {
         this.url = url;

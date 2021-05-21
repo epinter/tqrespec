@@ -25,11 +25,7 @@ import br.com.pinter.tqrespec.save.*;
 import java.util.HashMap;
 
 public class PlayerFileVariable implements FileVariable {
-    private static final HashMap<Platform,HashMap<String,PlayerFileVariable>> variablesMap = new HashMap<>();
-
-    private final BlockType location;
-    private final String var;
-    private final VariableType type;
+    private static final HashMap<Platform, HashMap<String, PlayerFileVariable>> variablesMap = new HashMap<>();
 
     static {
         HashMap<String, PlayerFileVariable> map = new HashMap<>();
@@ -165,6 +161,10 @@ public class PlayerFileVariable implements FileVariable {
         variablesMap.put(Platform.MOBILE, mapMobile);
     }
 
+    private final BlockType location;
+    private final String var;
+    private final VariableType type;
+
     private PlayerFileVariable(String variable, VariableType type, BlockType location) {
         this.var = variable;
         this.type = type;
@@ -172,8 +172,8 @@ public class PlayerFileVariable implements FileVariable {
     }
 
     static PlayerFileVariable valueOf(Platform platform, String var) {
-        if(variablesMap.get(platform) == null || variablesMap.get(platform).get(var) == null) {
-            throw new InvalidVariableException(String.format("variable '%s' not found for platform '%s'", var.replaceAll("[^a-zA-Z0-9-_\\[\\] ]*",""), platform));
+        if (variablesMap.get(platform) == null || variablesMap.get(platform).get(var) == null) {
+            throw new InvalidVariableException(String.format("variable '%s' not found for platform '%s'", var.replaceAll("[^a-zA-Z0-9-_\\[\\] ]*", ""), platform));
         }
         return variablesMap.get(platform).get(var);
     }

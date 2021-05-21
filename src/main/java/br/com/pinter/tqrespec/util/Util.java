@@ -37,7 +37,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.FileTime;
 import java.text.MessageFormat;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -56,7 +55,7 @@ public class Util {
     }
 
     public static String getBuildVersion() {
-        if(StringUtils.isNotBlank(buildVersion)) {
+        if (StringUtils.isNotBlank(buildVersion)) {
             return buildVersion;
         }
         String implementationVersion = Util.class.getPackage().getImplementationVersion();
@@ -71,7 +70,7 @@ public class Util {
     }
 
     public static String getBuildTitle() {
-        if(StringUtils.isNotBlank(buildTitle)) {
+        if (StringUtils.isNotBlank(buildTitle)) {
             return buildTitle;
         }
         String implementationTitle = Util.class.getPackage().getImplementationTitle();
@@ -86,7 +85,7 @@ public class Util {
     }
 
     private static Attributes readManifest() {
-        if(!Util.class.getModule().isNamed()) {
+        if (!Util.class.getModule().isNamed()) {
             return null;
         }
 
@@ -131,7 +130,7 @@ public class Util {
     }
 
     public static String getUIMessage(String message) {
-        ResourceBundle ui = ResourceBundle.getBundle("i18n.UI",State.get().getLocale());
+        ResourceBundle ui = ResourceBundle.getBundle("i18n.UI", State.get().getLocale());
         if (ui.containsKey(message)) {
             return ui.getString(message);
         }
@@ -139,7 +138,7 @@ public class Util {
     }
 
     public static String getUIMessage(String message, Object... parameters) {
-        ResourceBundle ui = ResourceBundle.getBundle("i18n.UI",State.get().getLocale());
+        ResourceBundle ui = ResourceBundle.getBundle("i18n.UI", State.get().getLocale());
         if (ui.containsKey(message)) {
             return MessageFormat.format(ui.getString(message), parameters);
         }
@@ -165,7 +164,7 @@ public class Util {
                 Path targetDir = fileSystem.getPath(target.toString(), source.relativize(dir).toString());
 
                 try {
-                    if(excludeRegex!=null && dir.getFileName().toString().matches(excludeRegex)) {
+                    if (excludeRegex != null && dir.getFileName().toString().matches(excludeRegex)) {
                         return FileVisitResult.SKIP_SUBTREE;
                     }
                     Files.copy(dir, targetDir, COPY_ATTRIBUTES);
@@ -173,7 +172,7 @@ public class Util {
                     //ignore
                 } catch (IOException e) {
                     logger.log(System.Logger.Level.ERROR, "Unable to create directory ''{0}''", targetDir);
-                    throw new IOException("Unable to create directory "+targetDir);
+                    throw new IOException("Unable to create directory " + targetDir);
                 }
 
                 return FileVisitResult.CONTINUE;
@@ -184,7 +183,7 @@ public class Util {
                 Path targetFile = fileSystem.getPath(target.toString(), source.relativize(file).toString());
 
                 try {
-                    if(excludeRegex!=null && file.getFileName().toString().matches(excludeRegex)) {
+                    if (excludeRegex != null && file.getFileName().toString().matches(excludeRegex)) {
                         return FileVisitResult.CONTINUE;
                     }
                     Files.copy(file, targetFile, replace ? new CopyOption[]{COPY_ATTRIBUTES, REPLACE_EXISTING}
@@ -225,12 +224,12 @@ public class Util {
     }
 
     public static String cleanTagString(String value) {
-        if(StringUtils.isBlank(value)) {
+        if (StringUtils.isBlank(value)) {
             return value;
         }
 
-        return value.replaceAll("(?:\\{[^}]+\\})*([^{}:]*)(?:\\{[^}]+\\})*","$1")
-                .replace(":","")
+        return value.replaceAll("(?:\\{[^}]+\\})*([^{}:]*)(?:\\{[^}]+\\})*", "$1")
+                .replace(":", "")
                 .trim();
     }
 
@@ -248,16 +247,16 @@ public class Util {
         if (!txt.isTagStringValid(tag))
             return;
 
-        String text = capitalized?txt.getCapitalizedString(tag):txt.getString(tag);
+        String text = capitalized ? txt.getCapitalizedString(tag) : txt.getString(tag);
 
-        if(needsClean) {
+        if (needsClean) {
             text = Util.cleanTagString(text);
         }
-        if(control instanceof Labeled) {
-            logger.log(System.Logger.Level.DEBUG,"settext control labeled");
+        if (control instanceof Labeled) {
+            logger.log(System.Logger.Level.DEBUG, "settext control labeled");
             setLabeledText(control, text);
-        }else if(control instanceof Tab) {
-            logger.log(System.Logger.Level.DEBUG,"settext control tab");
+        } else if (control instanceof Tab) {
+            logger.log(System.Logger.Level.DEBUG, "settext control tab");
             setTabText(control, text);
         } else {
             throw new UnsupportedOperationException("BUG: trying to set text on unsupported control");

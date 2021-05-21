@@ -124,13 +124,13 @@ public class Toast {
     }
 
     public static void cancel() {
-        if(instance!=null && instance.stage !=null) {
+        if (instance != null && instance.stage != null) {
             instance.stage.close();
         }
     }
 
     public static void show(Stage stage, String header, String content, int delay) {
-        if(instance!=null && instance.stage !=null) {
+        if (instance != null && instance.stage != null) {
             instance.stage.close();
         }
         instance = new Toast(stage, header, content, delay);

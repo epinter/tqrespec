@@ -33,7 +33,7 @@ public class StashLoader {
     }
 
     public boolean loadStash(Path playerPath, String playerName) {
-        if(!Files.exists(playerPath.resolve(Constants.STASH_FILE))) {
+        if (!Files.exists(playerPath.resolve(Constants.STASH_FILE))) {
             return false;
         }
         StashParser stashParser = new StashParser(playerPath.toString());

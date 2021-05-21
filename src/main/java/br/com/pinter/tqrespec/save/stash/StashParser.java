@@ -46,7 +46,7 @@ public class StashParser extends FileParser {
 
     @Override
     protected boolean readFile() throws IOException {
-        if(!Files.exists(Paths.get(getStashFileName()))) {
+        if (!Files.exists(Paths.get(getStashFileName()))) {
             return false;
         }
         try (FileChannel in = new FileInputStream(getStashFileName()).getChannel()) {

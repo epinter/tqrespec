@@ -31,10 +31,10 @@ import java.nio.channels.FileLock;
 import java.nio.file.Files;
 
 public class SingleInstanceLock {
+    private static final System.Logger logger = Log.getLogger(SingleInstanceLock.class.getName());
+    private final File lockFile = new File(System.getProperty("java.io.tmpdir"), "tqrespec.pid");
     private FileChannel fileChannel;
     private FileLock lock;
-    private final File lockFile = new File(System.getProperty("java.io.tmpdir"), "tqrespec.pid");
-    private static final System.Logger logger = Log.getLogger(SingleInstanceLock.class.getName());
 
     public SingleInstanceLock() {
         if (lockFile.exists()) {

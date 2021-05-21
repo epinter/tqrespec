@@ -64,7 +64,7 @@ public class AppPreloader extends Preloader {
         versionText.getStyleClass().add(Constants.UI.PRELOADER_VERSION_STYLE);
         StackPane bottomPane = new StackPane(versionText);
         bottomPane.getStyleClass().add(Constants.UI.PRELOADER_BOTTOM_STYLE);
-        StackPane.setAlignment(versionText,Pos.BOTTOM_RIGHT);
+        StackPane.setAlignment(versionText, Pos.BOTTOM_RIGHT);
         pane.setBottom(bottomPane);
 
         return scene;

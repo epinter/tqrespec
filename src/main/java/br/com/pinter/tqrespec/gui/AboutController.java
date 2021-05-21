@@ -89,8 +89,8 @@ public class AboutController implements Initializable {
         aboutVersion.setText(Util.getUIMessage("about.version", Util.getBuildVersion()));
 
         String translators = Util.getUIMessage("main.translators");
-        if(StringUtils.isNotBlank(translators)) {
-            aboutText.appendText("\n\n"+Util.getUIMessage("main.translators"));
+        if (StringUtils.isNotBlank(translators)) {
+            aboutText.appendText("\n\n" + Util.getUIMessage("main.translators"));
         }
 
         stage.show();

@@ -292,7 +292,7 @@ public class PlayerCharacter {
     public MapTeleport getLastMapTeleport() {
         List<MapTeleport> mapTeleports = getDefaultMapTeleports().get(getDifficulty());
 
-        if(!mapTeleports.isEmpty()) {
+        if (!mapTeleports.isEmpty()) {
             return mapTeleports.get(mapTeleports.size() - 1);
         }
         return null;

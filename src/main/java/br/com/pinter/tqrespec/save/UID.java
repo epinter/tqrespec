@@ -38,27 +38,6 @@ public class UID {
         this.value = convertUidByteToString(value);
     }
 
-    public byte[] getBytes() {
-        return convertUidStringToByte(value);
-    }
-
-    public String getUid() {
-        return value;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        UID uid = (UID) o;
-        return value.equals(uid.value);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(value);
-    }
-
     public static String convertUidByteToString(byte[] uid) {
         ByteBuffer uidP1 = ByteBuffer.wrap(Arrays.copyOfRange(uid, 0, 4)).order(ByteOrder.LITTLE_ENDIAN);
         ByteBuffer uidP2 = ByteBuffer.wrap(Arrays.copyOfRange(uid, 4, 8)).order(ByteOrder.LITTLE_ENDIAN);
@@ -101,6 +80,27 @@ public class UID {
         System.arraycopy(uidP1.array(), 0, ret, 12, 4);
 
         return ret;
+    }
+
+    public byte[] getBytes() {
+        return convertUidStringToByte(value);
+    }
+
+    public String getUid() {
+        return value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UID uid = (UID) o;
+        return value.equals(uid.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 
     @Override

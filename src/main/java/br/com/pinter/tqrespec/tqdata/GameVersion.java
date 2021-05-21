@@ -37,8 +37,8 @@ public enum GameVersion {
 
     public static GameVersion fromValue(int version) {
         Optional<GameVersion> first = Arrays.stream(GameVersion.values()).filter(f -> f.value() == version).findFirst();
-        if(first.isEmpty()) {
-            throw new EnumConstantNotPresentException(GameVersion.class,String.valueOf(version));
+        if (first.isEmpty()) {
+            throw new EnumConstantNotPresentException(GameVersion.class, String.valueOf(version));
         }
         return first.get();
     }

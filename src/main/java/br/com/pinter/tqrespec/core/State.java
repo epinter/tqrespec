@@ -31,11 +31,14 @@ import java.util.logging.Level;
 public class State {
     private static final Object lock = new Object();
     private static State instance = null;
-    private Locale locale = Locale.ENGLISH;
     private final SimpleBooleanProperty saveInProgress = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty gameRunning = new SimpleBooleanProperty(false);
     private final Map<String, Level> debugPrefix = new HashMap<>();
     private final AtomicReference<MyTask<?>> lastCursorWaitTask = new AtomicReference<>();
+    private Locale locale = Locale.ENGLISH;
+
+    private State() {
+    }
 
     public static State get() {
         State c = instance;
@@ -49,9 +52,6 @@ public class State {
             }
         }
         return instance;
-    }
-
-    private State() {
     }
 
     public Boolean getSaveInProgress() {
@@ -87,7 +87,7 @@ public class State {
     }
 
     public Locale getLocale() {
-        if(locale == null) {
+        if (locale == null) {
             locale = Locale.ENGLISH;
         }
         return locale;

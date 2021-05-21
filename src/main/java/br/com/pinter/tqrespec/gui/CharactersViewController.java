@@ -178,7 +178,7 @@ public class CharactersViewController implements Initializable {
 
     @FXML
     public void closeWindow(@SuppressWarnings("unused") MouseEvent evt) {
-        if(loadingCharacters.get()) {
+        if (loadingCharacters.get()) {
             return;
         }
         charactersTable.scrollToColumnIndex(0);

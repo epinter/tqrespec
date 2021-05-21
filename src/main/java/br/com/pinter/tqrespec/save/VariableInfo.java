@@ -41,6 +41,10 @@ public class VariableInfo implements Serializable {
     private VariableType variableType;
     private int blockOffset = -1;
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public String getName() {
         return name;
     }
@@ -109,6 +113,22 @@ public class VariableInfo implements Serializable {
         return null;
     }
 
+    public void setValue(String value) {
+        this.valueString = value;
+    }
+
+    public void setValue(int value) {
+        this.valueInteger = value;
+    }
+
+    public void setValue(float value) {
+        this.valueFloat = value;
+    }
+
+    public void setValue(byte[] value) {
+        this.valueByteArray = value;
+    }
+
     /**
      * Returns value as a string. Bytes are converted to hex-string.
      */
@@ -131,7 +151,7 @@ public class VariableInfo implements Serializable {
      */
     public int getValBytesLength() {
         int sz = valSize;
-        if (isString() ) {
+        if (isString()) {
             sz *= variableType.dataTypeSize();
         }
         return sz;
@@ -160,33 +180,17 @@ public class VariableInfo implements Serializable {
         return valSizePrefix;
     }
 
-    public void setValue(String value) {
-        this.valueString = value;
-    }
-
-    public void setValue(int value) {
-        this.valueInteger = value;
-    }
-
-    public void setValue(float value) {
-        this.valueFloat = value;
-    }
-
-    public void setValue(byte[] value) {
-        this.valueByteArray = value;
-    }
-
     public VariableType getVariableType() {
         return variableType;
     }
 
     public void setVariableType(VariableType variableType) {
-        if(this.valSize == -1) {
-            if(variableType.equals(VariableType.FLOAT) || variableType.equals(VariableType.INTEGER) || variableType.equals(VariableType.UID)) {
+        if (this.valSize == -1) {
+            if (variableType.equals(VariableType.FLOAT) || variableType.equals(VariableType.INTEGER) || variableType.equals(VariableType.UID)) {
                 valSize = variableType.dataTypeSize();
-            } else if(variableType.equals(VariableType.STREAM) && valueByteArray != null) {
+            } else if (variableType.equals(VariableType.STREAM) && valueByteArray != null) {
                 valSize = valueByteArray.length;
-            } else if(isString() && valueString != null) {
+            } else if (isString() && valueString != null) {
                 valSize = valueString.length() * variableType.dataTypeSize();
             }
         }
@@ -214,9 +218,11 @@ public class VariableInfo implements Serializable {
         return variableType == VariableType.INTEGER;
     }
 
-    public static Builder builder() {
-        return new Builder();
+    @Override
+    public String toString() {
+        return String.format("name={%s}; alias={%s}; value={%s}; keyOffset={%d}, valOffset={%d}; valSize={%d}; variableType: {%s}", this.name, alias, this.getValue(), this.keyOffset, this.valOffset, this.valSize, variableType);
     }
+
     public static class Builder {
         private String builderName = null;
         private String builderAlias = null;
@@ -300,25 +306,20 @@ public class VariableInfo implements Serializable {
             v.valueByteArray = builderValueByteArray;
             v.variableType = builderVariableType;
 
-            if(v.valSize == -1) {
-                if(v.variableType.equals(VariableType.FLOAT) || v.variableType.equals(VariableType.INTEGER) || v.variableType.equals(VariableType.UID)) {
+            if (v.valSize == -1) {
+                if (v.variableType.equals(VariableType.FLOAT) || v.variableType.equals(VariableType.INTEGER) || v.variableType.equals(VariableType.UID)) {
                     v.valSize = v.variableType.dataTypeSize();
-                } else if(v.variableType.equals(VariableType.STREAM) && v.valueByteArray != null) {
+                } else if (v.variableType.equals(VariableType.STREAM) && v.valueByteArray != null) {
                     v.valSize = v.valueByteArray.length;
-                } else if(v.isString() && v.valueString != null) {
+                } else if (v.isString() && v.valueString != null) {
                     v.valSize = v.valueString.length() * v.getVariableType().dataTypeSize();
                 }
             }
 
-            if(v.valOffset == -1) {
+            if (v.valOffset == -1) {
                 v.valOffset = builderKeyOffset + 4 + v.name.length();
             }
             return v;
         }
-    }
-
-    @Override
-    public String toString() {
-        return String.format("name={%s}; alias={%s}; value={%s}; keyOffset={%d}, valOffset={%d}; valSize={%d}; variableType: {%s}", this.name, alias, this.getValue(), this.keyOffset, this.valOffset, this.valSize, variableType);
     }
 }

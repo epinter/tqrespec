@@ -33,14 +33,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @Singleton
 public class CurrentPlayerData implements FileDataHolder {
+    private final LinkedHashMap<String, PlayerSkill> playerSkills = new LinkedHashMap<>();
+    private final AtomicBoolean missingSkills = new AtomicBoolean(false);
     private String playerName = null;
     private Path playerChr = null;
     private boolean customQuest = false;
-    private final LinkedHashMap<String, PlayerSkill> playerSkills = new LinkedHashMap<>();
     private FileDataMap dataMap = new FileDataMap();
     private HeaderInfo headerInfo = new HeaderInfo();
     private ByteBuffer buffer = null;
-    private final AtomicBoolean missingSkills = new AtomicBoolean(false);
 
     @Override
     public String getPlayerName() {

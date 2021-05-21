@@ -40,22 +40,20 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
 public abstract class FileParser {
+    protected static final String BEGIN_BLOCK = "begin_block";
+    protected static final String END_BLOCK = "end_block";
     private static final System.Logger logger = Log.getLogger(FileParser.class.getName());
-
     private static final byte[] BEGIN_BLOCK_BYTES = new byte[]{0x0B, 0x00, 0x00, 0x00, 0x62, 0x65, 0x67, 0x69, 0x6E, 0x5F, 0x62, 0x6C, 0x6F, 0x63, 0x6B};
+    protected static final int BEGIN_BLOCK_SIZE = BEGIN_BLOCK_BYTES.length + 4;
     private static final byte[] END_BLOCK_BYTES = new byte[]{0x09, 0x00, 0x00, 0x00, 0x65, 0x6E, 0x64, 0x5F, 0x62, 0x6C, 0x6F, 0x63, 0x6B};
+    protected static final int END_BLOCK_SIZE = END_BLOCK_BYTES.length + 4;
+    private static final String BUG_VARIABLESIZE_ERROR_MSG = "BUG: variable size != 0";
+    private final ListMultimap<String, VariableInfo> specialVariableStore = MultimapBuilder.hashKeys().arrayListValues().build();
     private ConcurrentHashMap<Integer, BlockInfo> blockInfoTable = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, List<Integer>> variableLocation = new ConcurrentHashMap<>();
     private List<Integer> blocksIgnore = new ArrayList<>();
     private ByteBuffer buffer = null;
-    protected static final int BEGIN_BLOCK_SIZE = BEGIN_BLOCK_BYTES.length + 4;
-    protected static final int END_BLOCK_SIZE = END_BLOCK_BYTES.length + 4;
-    protected static final String BEGIN_BLOCK = "begin_block";
-    protected static final String END_BLOCK = "end_block";
-    private static final String BUG_VARIABLESIZE_ERROR_MSG = "BUG: variable size != 0";
     private Platform detectedPlatform = Platform.WINDOWS;
-    private final ListMultimap<String, VariableInfo> specialVariableStore = MultimapBuilder.hashKeys().arrayListValues().build();
-
 
     public ConcurrentMap<Integer, BlockInfo> getBlockInfo() {
         return blockInfoTable;
@@ -128,7 +126,7 @@ public abstract class FileParser {
      * @throws IOException
      */
     public void fillBuffer() throws IOException {
-        if(readFile()) {
+        if (readFile()) {
             prepareBufferForRead();
         }
     }
@@ -146,8 +144,8 @@ public abstract class FileParser {
     /**
      * Reads a file into the buffer
      *
-     * @throws IOException
      * @return
+     * @throws IOException
      */
     protected abstract boolean readFile() throws IOException;
 
@@ -204,8 +202,8 @@ public abstract class FileParser {
     /**
      * Method called by parseBlock to skips child blocks processing.
      *
-     * @param block Current block
-     * @param name Variable name
+     * @param block     Current block
+     * @param name      Variable name
      * @param keyOffset Key offset for current variable
      */
     protected void skipSubBlock(BlockInfo block, String name, int keyOffset) {
@@ -222,16 +220,16 @@ public abstract class FileParser {
         final String invalidVarMsg = "An invalid variable (%s) was found in block %s, aborting.";
         String varName = filterFileVariableName(name);
         fileVariable = getPlatformFileVariable(getDetectedPlatform(), varName);
-        if(fileVariable == null) {
+        if (fileVariable == null) {
             //try to detect the platform based on current variable
-            for (Platform t: Platform.values()) {
-                if(getPlatformFileVariable(t, varName)!=null) {
+            for (Platform t : Platform.values()) {
+                if (getPlatformFileVariable(t, varName) != null) {
                     setDetectedPlatform(t);
                     break;
                 }
             }
             fileVariable = getFileVariable(varName);
-            if(fileVariable == null) {
+            if (fileVariable == null) {
                 throw new IllegalStateException(String.format(invalidVarMsg, name, block.getStart()));
             }
         }
@@ -247,10 +245,10 @@ public abstract class FileParser {
     }
 
     /**
-     *  Used to change or execute something related to blocktypes
+     * Used to change or execute something related to blocktypes
      *
      * @param blockType BlockType
-     * @param name Variable name
+     * @param name      Variable name
      * @return The new block type
      */
     protected BlockType filterBlockType(BlockType blockType, String name) {
@@ -261,7 +259,7 @@ public abstract class FileParser {
      * Prepare data related to special variables. It's called at the end of parseBlock's variable processing.
      *
      * @param variableInfo The variable object
-     * @param name The name found by parseBlock
+     * @param name         The name found by parseBlock
      */
     protected abstract void prepareBlockSpecialVariable(VariableInfo variableInfo, String name);
 
@@ -274,6 +272,7 @@ public abstract class FileParser {
 
     /**
      * Getter for specialVariableStore
+     *
      * @return specialVariableStore
      */
     public ListMultimap<String, VariableInfo> getSpecialVariableStore() {
@@ -378,9 +377,9 @@ public abstract class FileParser {
                 return;
             }
             String charset = "UTF-8";
-            if(variableInfo.getVariableType().equals(VariableType.STRING_UTF_16_LE)) {
+            if (variableInfo.getVariableType().equals(VariableType.STRING_UTF_16_LE)) {
                 charset = "UTF-16LE";
-            } else if(variableInfo.getVariableType().equals(VariableType.STRING_UTF_32_LE)) {
+            } else if (variableInfo.getVariableType().equals(VariableType.STRING_UTF_32_LE)) {
                 charset = "UTF-32LE";
             }
 
@@ -510,7 +509,7 @@ public abstract class FileParser {
             FileVariable fileVariableMultiple = getFileVariable(
                     String.format("%s__%s", name, fileBlock.name()));
 
-            if(fileVariableMultiple == null) {
+            if (fileVariableMultiple == null) {
                 String msg = String.format("Variable definition for '%s' not found.", varId);
                 logger.log(System.Logger.Level.ERROR, "Variable definition for ''{0}'' not found.", varId);
                 throw new UnhandledRuntimeException(msg);

@@ -44,6 +44,10 @@ public class Version implements Comparable<Version> {
     private String url3;
     private int lastCheck = -2;
 
+    public Version(String version) {
+        this.versionNumber = version;
+    }
+
     public String getVersion() {
         return versionNumber;
     }
@@ -62,10 +66,6 @@ public class Version implements Comparable<Version> {
 
     public String getUrl3() {
         return url3;
-    }
-
-    public Version(String version) {
-        this.versionNumber = version;
     }
 
     public int getLastCheck() {

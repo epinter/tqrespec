@@ -26,7 +26,6 @@ import br.com.pinter.tqrespec.save.FileWriter;
 import br.com.pinter.tqrespec.util.Constants;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 
 public class StashWriter extends FileWriter {
     private static final System.Logger logger = Log.getLogger(StashWriter.class.getName());

@@ -20,7 +20,6 @@
 
 package br.com.pinter.tqrespec.util;
 
-import br.com.pinter.tqrespec.save.Platform;
 import com.google.common.collect.ImmutableMap;
 import javafx.scene.text.Font;
 
@@ -30,9 +29,6 @@ import java.util.Locale;
 import java.util.Map;
 
 public class Constants {
-    private Constants() {
-    }
-
     public static final String APPNAME = "TQRespec";
     public static final String LOGFILE = new File(System.getProperty("java.io.tmpdir"), "tqrespec.log").getAbsolutePath();
     public static final String LOGLEVELS = "br.com.pinter.tqrespec=INFO;br.com.pinter.tqdatabase=INFO";
@@ -54,46 +50,44 @@ public class Constants {
     public static final String STASH_FILE = "winsys.dxb";
     public static final String STASH_FILE_BACKUP = "winsys.dxg";
     public static final int MAX_CHARACTER_NAME_LENGTH = 14;
-
     /**
      * Maps Game Options language to i18n locale
      */
-    public static final Map<String, Locale> GAMELANGUAGE_LOCALE = ImmutableMap.<String,Locale>builder()
-        .put("English", new Locale("en"))
-        .put("Portuguese", new Locale("pt", "BR"))
-        .put("Chinese", new Locale("ch"))
-        .put("German", new Locale("de"))
-        .put("Spanish", new Locale("es"))
-        .put("French", new Locale("fr"))
-        .put("Italian", new Locale("it"))
-        .put("Japanese", new Locale("ja"))
-        .put("Korean", new Locale("ko"))
-        .put("Polish", new Locale("pl"))
-        .put("Russian", new Locale("ru"))
-        .put("Ukrainian", new Locale("uk")).build();
-
+    public static final Map<String, Locale> GAMELANGUAGE_LOCALE = ImmutableMap.<String, Locale>builder()
+            .put("English", new Locale("en"))
+            .put("Portuguese", new Locale("pt", "BR"))
+            .put("Chinese", new Locale("ch"))
+            .put("German", new Locale("de"))
+            .put("Spanish", new Locale("es"))
+            .put("French", new Locale("fr"))
+            .put("Italian", new Locale("it"))
+            .put("Japanese", new Locale("ja"))
+            .put("Korean", new Locale("ko"))
+            .put("Polish", new Locale("pl"))
+            .put("Russian", new Locale("ru"))
+            .put("Ukrainian", new Locale("uk")).build();
     /**
      * Maps Locale to Text files
      */
-    public static final Map<Locale,String> LOCALE_TEXT = ImmutableMap.<Locale,String>builder()
-        .put(new Locale("en"), "EN")
-        .put(new Locale("pt", "BR"), "BR")
-        .put(new Locale("ch"), "CH")
-        .put(new Locale("cz"), "CZ")
-        .put(new Locale("de"), "DE")
-        .put(new Locale("es"), "ES")
-        .put(new Locale("fr"), "FR")
-        .put(new Locale("it"), "IT")
-        .put(new Locale("ja"), "JA")
-        .put(new Locale("ko"), "KO")
-        .put(new Locale("pl"), "PL")
-        .put(new Locale("ru"), "RU")
-        .put(new Locale("uk"), "UK").build();
+    public static final Map<Locale, String> LOCALE_TEXT = ImmutableMap.<Locale, String>builder()
+            .put(new Locale("en"), "EN")
+            .put(new Locale("pt", "BR"), "BR")
+            .put(new Locale("ch"), "CH")
+            .put(new Locale("cz"), "CZ")
+            .put(new Locale("de"), "DE")
+            .put(new Locale("es"), "ES")
+            .put(new Locale("fr"), "FR")
+            .put(new Locale("it"), "IT")
+            .put(new Locale("ja"), "JA")
+            .put(new Locale("ko"), "KO")
+            .put(new Locale("pl"), "PL")
+            .put(new Locale("ru"), "RU")
+            .put(new Locale("uk"), "UK").build();
+
+    private Constants() {
+    }
 
     public static class Save {
-        private Save() {
-        }
-
         public static final String SKILL_NAME = "skillName";
         public static final String SKILL_ENABLED = "skillEnabled";
         public static final String SKILL_ACTIVE = "skillActive";
@@ -109,12 +103,12 @@ public class Constants {
         public static final String FEMALE_DEFAULT_TEXTURE = "Creatures\\pc\\female\\femalepc01_tan.tex";
         public static final String VAR_TELEPORTUIDSSIZE = "teleportUIDsSize";
         public static final String VAR_TELEPORTUID = "teleportUID";
+        private Save() {
+        }
 
     }
 
     public static class UI {
-        private UI() { }
-
         public static final String MAIN_FXML = "/fxml/main.fxml";
         public static final String ABOUT_FXML = "/fxml/about.fxml";
         public static final String MAIN_CSS = "/fxml/main.css";
@@ -135,11 +129,11 @@ public class Constants {
         public static final int TOOLTIP_SHOWDURATION_MILLIS = 9000;
         public static final double TOOLTIP_MAXWIDTH = 500d;
         public static final Font TOOLTIP_FONT = Font.font("Albertus MT", 16d);
-        public static final String TAG_STRLABEL= "tagCStrength";
-        public static final String TAG_INTLABEL= "tagCIntelligence";
-        public static final String TAG_DEXLABEL= "tagCDexterity";
+        public static final String TAG_STRLABEL = "tagCStrength";
+        public static final String TAG_INTLABEL = "tagCIntelligence";
+        public static final String TAG_DEXLABEL = "tagCDexterity";
         public static final String TAG_ENERGYLABEL = "tagCEnergy";
-        public static final String TAG_HEALTHLABEL= "tagCHealth";
+        public static final String TAG_HEALTHLABEL = "tagCHealth";
         public static final String TAG_CHARLEVELLABEL = "tagSCharLevel";
         public static final String TAG_XPLABEL = "tagHUDXP_Current";
         public static final String TAG_CLASSLABEL = "tagSCharClass";
@@ -154,14 +148,16 @@ public class Constants {
         public static final String TAG_STAT_MONSTERSKILLED = "tagCMonsterKills";
         public static final String TAG_STAT_GREATESTDAMAGE = "tagCHighestDamage";
         public static final String TAG_STAT_GREATESTMONSTER = "tagCHighestMonster";
+        private UI() {
+        }
     }
 
     public static class Msg {
-        private Msg() { }
-
         public static final String MAIN_GAMENOTDETECTED = "main.gameNotDetected";
         public static final String MAIN_CHOOSEGAMEDIRECTORY = "main.chooseGameDirectory";
         public static final String CHARACTERS_TITLE_MASTERY = "characters.masteryTitle";
         public static final String CHARACTERS_NAMENUMBER_FORMAT = "%s (%d)";
+        private Msg() {
+        }
     }
 }

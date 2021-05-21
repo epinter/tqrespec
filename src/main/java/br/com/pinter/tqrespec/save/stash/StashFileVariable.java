@@ -55,6 +55,16 @@ public class StashFileVariable implements FileVariable {
     private final String var;
     private final VariableType type;
 
+    private StashFileVariable(String variable, VariableType type, BlockType location) {
+        this.var = variable;
+        this.type = type;
+        this.location = location;
+    }
+
+    static StashFileVariable valueOf(String var) {
+        return map.get(var);
+    }
+
     @Override
     public String var() {
         return var;
@@ -68,15 +78,5 @@ public class StashFileVariable implements FileVariable {
     @Override
     public BlockType location() {
         return location;
-    }
-
-    private StashFileVariable(String variable, VariableType type, BlockType location) {
-        this.var = variable;
-        this.type = type;
-        this.location = location;
-    }
-
-    static StashFileVariable valueOf(String var) {
-        return map.get(var);
     }
 }

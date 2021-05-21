@@ -185,7 +185,7 @@ public class PlayerWriter extends FileWriter {
     }
 
     public void copyCurrentSave(String toPlayerName, Platform conversionTarget, Path zipOutputPath) throws IOException {
-        if(StringUtils.isBlank(toPlayerName)) {
+        if (StringUtils.isBlank(toPlayerName)) {
             throw new IllegalArgumentException("character name can't be empty");
         }
         State.get().setSaveInProgress(true);
@@ -200,7 +200,7 @@ public class PlayerWriter extends FileWriter {
             Platform oldPlatform = getSaveData().getDataMap().getPlatform();
             boolean backupOnly = false;
 
-            if((conversionTarget.equals(Platform.UNDEFINED) && zipOutputPath == null && toPlayerName.equals(fromPlayerName))
+            if ((conversionTarget.equals(Platform.UNDEFINED) && zipOutputPath == null && toPlayerName.equals(fromPlayerName))
                     || conversionTarget.equals(oldPlatform)) {
                 State.get().setSaveInProgress(false);
                 throw new IllegalStateException("An expected error occurred during character copy");
@@ -209,51 +209,51 @@ public class PlayerWriter extends FileWriter {
             String saveId = RandomStringUtils.randomNumeric(10);
             if (zipOutputPath == null && Files.exists(playerSaveDirTarget)) {
                 State.get().setSaveInProgress(false);
-                throw new FileAlreadyExistsException("Target directory already exists: "+playerSaveDirTarget);
+                throw new FileAlreadyExistsException("Target directory already exists: " + playerSaveDirTarget);
             }
 
             FileDataMap fileDataMap = (FileDataMap) saveData.getDataMap().deepClone();
 
-            if(!toPlayerName.equals(saveData.getDataMap().getCharacterName())) {
+            if (!toPlayerName.equals(saveData.getDataMap().getCharacterName())) {
                 // set name before conversion
                 fileDataMap.setString("myPlayerName", toPlayerName);
-                if(fileDataMap.getPlatform().equals(Platform.MOBILE) && conversionTarget.equals(Platform.UNDEFINED)) {
+                if (fileDataMap.getPlatform().equals(Platform.MOBILE) && conversionTarget.equals(Platform.UNDEFINED)) {
                     //use new saveid
                     fileDataMap.setString("mySaveId", saveId);
-                    toZipPath = "/__save"+saveId;
+                    toZipPath = "/__save" + saveId;
                 }
-            } else if(saveData.getPlatform().equals(Platform.MOBILE) && conversionTarget.equals(Platform.UNDEFINED)) {
+            } else if (saveData.getPlatform().equals(Platform.MOBILE) && conversionTarget.equals(Platform.UNDEFINED)) {
                 //use current saveid for directory name
                 String currentSaveId = saveData.getDataMap().getString("mySaveId");
-                toZipPath = "/__save"+currentSaveId;
+                toZipPath = "/__save" + currentSaveId;
             }
 
             if (!conversionTarget.equals(Platform.UNDEFINED)) {
-                if(conversionTarget.equals(Platform.MOBILE)) {
+                if (conversionTarget.equals(Platform.MOBILE)) {
                     toZipPath = "/__save" + saveId;
                 }
                 fileDataMap.convertTo(conversionTarget, saveId);
             }
 
             if (zipOutputPath != null) {
-                if(toPlayerName.equals(fromPlayerName) && conversionTarget.equals(Platform.UNDEFINED)) {
+                if (toPlayerName.equals(fromPlayerName) && conversionTarget.equals(Platform.UNDEFINED)) {
                     backupOnly = true;
                 }
                 try (FileSystem zipfs = FileSystems.newFileSystem(URI.create("jar:" + zipOutputPath.toUri()), Map.of("create", "true"))) {
                     Path dir = zipfs.getPath(toZipPath);
                     String excludeCopyRegex = null;
-                    if(conversionTarget.equals(Platform.MOBILE)) {
+                    if (conversionTarget.equals(Platform.MOBILE)) {
                         excludeCopyRegex = "(?i)(?:^backup.*|^winsys.dxg$|^winsys.dxb$|^settings.txt$)";
                     }
                     Util.copyDirectoryRecurse(playerSaveDirSource, dir, false, zipfs, excludeCopyRegex);
-                    if(!backupOnly) {
+                    if (!backupOnly) {
                         Files.deleteIfExists(zipfs.getPath(dir.toString(), "Player.chr"));
                         writeBuffer(dir.toString(), "Player.chr", fileDataMap, zipfs);
                     }
                 }
             } else {
                 String excludeCopyRegex = "(?i)(?:^backup.*)";
-                if(!conversionTarget.equals(Platform.UNDEFINED) && oldPlatform.equals(Platform.MOBILE)) {
+                if (!conversionTarget.equals(Platform.UNDEFINED) && oldPlatform.equals(Platform.MOBILE)) {
                     excludeCopyRegex = "(?i)(?:^backup.*|^.winsys.dxg$|^.winsys.dxb$|^SavingChar.txt$)";
                 }
                 Util.copyDirectoryRecurse(playerSaveDirSource, playerSaveDirTarget, false, excludeCopyRegex);

@@ -23,11 +23,11 @@ package br.com.pinter.tqrespec.tqdata;
 import br.com.pinter.tqrespec.save.UID;
 
 public abstract class MapTeleport {
-    private String name;
     private final int order;
     private final UID uid;
     private final String recordId;
     private final int act;
+    private String name;
 
     protected MapTeleport(int order, UID uid, int act, String recordId) {
         this.order = order;

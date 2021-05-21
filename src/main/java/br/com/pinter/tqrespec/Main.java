@@ -74,24 +74,18 @@ import java.util.logging.Level;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class Main extends Application {
-    @Inject
-    private Db db;
-
-    @Inject
-    private Txt txt;
-
-    @Inject
-    private FXMLLoader fxmlLoader;
-
-    @Inject
-    private GameInfo gameInfo;
-
-    private System.Logger logger;
-
-    private StringExpression initialFontBinding;
-
     private final AtomicDouble progress = new AtomicDouble(0.0);
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    @Inject
+    private Db db;
+    @Inject
+    private Txt txt;
+    @Inject
+    private FXMLLoader fxmlLoader;
+    @Inject
+    private GameInfo gameInfo;
+    private System.Logger logger;
+    private StringExpression initialFontBinding;
     private Future<?> processBarTask;
 
     public static void main(String... args) {
@@ -131,10 +125,10 @@ public class Main extends Application {
             gameInfo.setManualGamePath(selectedDirectory.getPath());
             return;
         } catch (GameNotFoundException e) {
-            logger.log(System.Logger.Level.ERROR,"Error", e);
+            logger.log(System.Logger.Level.ERROR, "Error", e);
         }
 
-        if(GameVersion.TQIT.equals(gameInfo.getInstalledVersion())) {
+        if (GameVersion.TQIT.equals(gameInfo.getInstalledVersion())) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setHeaderText(Util.getUIMessage("alert.chooseTQBaseDir_header"));
             alert.setContentText(Util.getUIMessage("alert.chooseTQBaseDir_content"));
@@ -151,13 +145,13 @@ public class Main extends Application {
             }
 
             try {
-                gameInfo.setManualTqBaseGamePath(selectedDirectory.getPath(),tqSelectedDirectory.getPath());
+                gameInfo.setManualTqBaseGamePath(selectedDirectory.getPath(), tqSelectedDirectory.getPath());
                 return;
             } catch (GameNotFoundException e) {
-                logger.log(System.Logger.Level.ERROR,Constants.Msg.MAIN_GAMENOTDETECTED, e);
+                logger.log(System.Logger.Level.ERROR, Constants.Msg.MAIN_GAMENOTDETECTED, e);
             }
         }
-        Util.showError(Util.getUIMessage(Constants.Msg.MAIN_GAMENOTDETECTED),null);
+        Util.showError(Util.getUIMessage(Constants.Msg.MAIN_GAMENOTDETECTED), null);
         Platform.exit();
         System.exit(0);
     }
@@ -171,7 +165,7 @@ public class Main extends Application {
 
         } catch (FileNotFoundException e) {
             Util.showError(Util.getUIMessage(Constants.Msg.MAIN_GAMENOTDETECTED), Util.getUIMessage(Constants.Msg.MAIN_CHOOSEGAMEDIRECTORY));
-            logger.log(System.Logger.Level.ERROR, "game path not detected, showing DirectoryChooser",e);
+            logger.log(System.Logger.Level.ERROR, "game path not detected, showing DirectoryChooser", e);
             chooseDirectory(primaryStage);
         }
 
@@ -186,7 +180,7 @@ public class Main extends Application {
                 progressSet(0.95, 1.0);
                 db.teleports().preload();
                 txt.preload();
-                progressSet(1.0,1.0);
+                progressSet(1.0, 1.0);
                 db.player().preload();
 
                 try {
@@ -213,24 +207,24 @@ public class Main extends Application {
     }
 
     private void progressSet(double forceStart, double end) {
-        if(processBarTask != null) {
+        if (processBarTask != null) {
             processBarTask.cancel(false);
         }
 
-        if(forceStart >= progress.get()) {
+        if (forceStart >= progress.get()) {
             progress.set(forceStart);
         }
         notifyPreloader(new Preloader.ProgressNotification(progress.get()));
 
-        if(forceStart == 1.0) {
+        if (forceStart == 1.0) {
             executorService.shutdown();
             return;
         }
 
         processBarTask = executorService.submit(() -> {
-            for(double start = progress.get() ; progress.get() < end; progress.getAndAdd((end-start)/20)) {
+            for (double start = progress.get(); progress.get() < end; progress.getAndAdd((end - start) / 20)) {
                 try {
-                    TimeUnit.MILLISECONDS.sleep(Math.round((1-(end-start))*1000));
+                    TimeUnit.MILLISECONDS.sleep(Math.round((1 - (end - start)) * 1000));
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
@@ -285,7 +279,7 @@ public class Main extends Application {
         Parent root;
         try {
             Locale gameLanguage = gameInfo.getGameLanguage();
-            if(gameLanguage != null) {
+            if (gameLanguage != null) {
                 State.get().setLocale(gameLanguage);
             }
             fxmlLoader.setResources(ResourceBundle.getBundle("i18n.UI", State.get().getLocale()));

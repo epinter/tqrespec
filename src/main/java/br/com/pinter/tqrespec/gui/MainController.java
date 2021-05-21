@@ -49,110 +49,80 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import javafx.util.Duration;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.FileAlreadyExistsException;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 @SuppressWarnings("unused")
 public class MainController implements Initializable {
+    public static final BooleanProperty mainFormInitialized = new SimpleBooleanProperty();
     private static final System.Logger logger = Log.getLogger(MainController.class.getName());
-
+    public final BooleanProperty saveDisabled = new SimpleBooleanProperty();
+    @FXML
+    public GridPane pointsPane;
+    @FXML
+    public AttributesPaneController pointsPaneController;
+    @FXML
+    public GridPane skillsPane;
+    @FXML
+    public SkillsPaneController skillsPaneController;
+    @FXML
+    public GridPane miscPane;
+    @FXML
+    public MiscPaneController miscPaneController;
+    @FXML
+    public Button resetButton;
+    @FXML
+    public Button charactersButton;
+    @FXML
+    public Tab skillsTab;
+    @FXML
+    public Tab attributesTab;
+    @FXML
+    public Tab miscTab;
     @Inject
     private FXMLLoader fxmlLoaderAbout;
-
     @Inject
     private FXMLLoader fxmlLoaderCharacter;
-
     @Inject
     private Player player;
-
     @Inject
     private PlayerWriter playerWriter;
-
     @Inject
     private HostServices hostServices;
-
     @Inject
     private GameInfo gameInfo;
-
     @FXML
     private VBox rootelement;
-
     @FXML
     private ComboBox<PlayerCharacterFile> characterCombo;
-
     @FXML
     private Button saveButton;
-
     @FXML
     private Label mainFormTitle;
-
     @FXML
     private Hyperlink versionCheck;
-
     @FXML
     private TabPane tabPane;
-
     @Inject
     private Db db;
-
     private double dragX;
     private double dragY;
     private boolean isMoving = false;
-
-    public static final BooleanProperty mainFormInitialized = new SimpleBooleanProperty();
-
-    @FXML
-    public GridPane pointsPane;
-
-    @FXML
-    public AttributesPaneController pointsPaneController;
-
-    @FXML
-    public GridPane skillsPane;
-
-    @FXML
-    public SkillsPaneController skillsPaneController;
-
-    @FXML
-    public GridPane miscPane;
-
-    @FXML
-    public MiscPaneController miscPaneController;
-
-    @FXML
-    public Button resetButton;
-
-    @FXML
-    public Button charactersButton;
-
-    @FXML
-    public Tab skillsTab;
-
-    @FXML
-    public Tab attributesTab;
-
-    @FXML
-    public Tab miscTab;
-
     @Inject
     private Txt txt;
 
-    public final BooleanProperty saveDisabled = new SimpleBooleanProperty();
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        logger.log(System.Logger.Level.DEBUG, "isLocaleLanguageEmpty: "+resources.getLocale().getLanguage().isEmpty());
+        logger.log(System.Logger.Level.DEBUG, "isLocaleLanguageEmpty: " + resources.getLocale().getLanguage().isEmpty());
         if (!State.get().getLocale().equals(Locale.ENGLISH) && resources.getLocale().getLanguage().isEmpty()) {
-            Util.tryTagText(txt, attributesTab, Constants.UI.TAG_ATTRIBUTESTAB ,false, true);
-            Util.tryTagText(txt, skillsTab, Constants.UI.TAG_SKILLSTAB ,false, true);
+            Util.tryTagText(txt, attributesTab, Constants.UI.TAG_ATTRIBUTESTAB, false, true);
+            Util.tryTagText(txt, skillsTab, Constants.UI.TAG_SKILLSTAB, false, true);
         }
         mainFormTitle.setText(String.format("%s v%s", Util.getBuildTitle(), Util.getBuildVersion()));
         mainFormInitialized.addListener(((observable, oldValue, newValue) -> new WorkerThread(new MyTask<>() {
@@ -217,7 +187,7 @@ public class MainController implements Initializable {
         assert characterCombo == null : "fx:id=\"characterCombo\" not found in FXML.";
         addCharactersToCombo();
         tabPane.addEventHandler(MouseEvent.MOUSE_ENTERED, e -> {
-            if(State.get().getLastCursorWaitTask() != null && State.get().getLastCursorWaitTask().isRunning()) {
+            if (State.get().getLastCursorWaitTask() != null && State.get().getLastCursorWaitTask().isRunning()) {
                 tabPane.setCursor(Cursor.WAIT);
             }
         });
@@ -230,7 +200,7 @@ public class MainController implements Initializable {
 
     @FXML
     public void openAboutWindow(MouseEvent evt) throws IOException {
-        if(State.get().getSaveInProgress()) {
+        if (State.get().getSaveInProgress()) {
             return;
         }
 
@@ -247,7 +217,7 @@ public class MainController implements Initializable {
 
     @FXML
     public void openCharactersWindow(ActionEvent evt) throws IOException {
-        if(State.get().getSaveInProgress()) {
+        if (State.get().getSaveInProgress()) {
             return;
         }
 
@@ -265,7 +235,7 @@ public class MainController implements Initializable {
 
     @FXML
     public void resetButtonClicked(ActionEvent event) {
-        if(!State.get().getSaveInProgress()) {
+        if (!State.get().getSaveInProgress()) {
             reset();
         }
     }
@@ -431,7 +401,7 @@ public class MainController implements Initializable {
             @Override
             public void handleEvent(WorkerStateEvent workerStateEvent) {
                 if (player.getSaveData().getPlatform().equals(br.com.pinter.tqrespec.save.Platform.MOBILE)
-                    && !db.getPlatform().equals(Db.Platform.MOBILE)) {
+                        && !db.getPlatform().equals(Db.Platform.MOBILE)) {
                     Toast.show((Stage) rootelement.getScene().getWindow(),
                             Util.getUIMessage("main.mobileSavegameToast_header"),
                             Util.getUIMessage("main.mobileSavegameToast_content"),

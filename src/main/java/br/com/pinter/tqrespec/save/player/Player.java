@@ -59,7 +59,7 @@ public class Player {
     private CurrentPlayerData saveData;
 
     public CurrentPlayerData getSaveData() {
-            return saveData;
+        return saveData;
     }
 
     public void prepareSaveData() {
@@ -81,7 +81,7 @@ public class Player {
             getSaveData().setPlayerName(playerName);
             Path playerChrPath;
 
-            if(external) {
+            if (external) {
                 playerChrPath = gameInfo.playerChrExternalPath(playerName);
                 logger.log(System.Logger.Level.INFO, "Loading external character: ''{0}''", playerChrPath);
 
@@ -144,10 +144,10 @@ public class Player {
         List<Skill> playerMasteries = getPlayerMasteries();
         Map<String, PlayerSkill> playerSkills = getPlayerSkills();
 
-        for (Skill skill: playerMasteries) {
+        for (Skill skill : playerMasteries) {
             PlayerSkill ps = playerSkills.get(skill.getRecordPath());
-            if(ps == null) {
-                logger.log(System.Logger.Level.ERROR, "Error, skill not found while loading character: "+skill.getRecordPath());
+            if (ps == null) {
+                logger.log(System.Logger.Level.ERROR, "Error, skill not found while loading character: " + skill.getRecordPath());
                 continue;
             }
             int level = ps.getSkillLevel();
@@ -156,7 +156,7 @@ public class Player {
             mastery.setLevel(level);
             mastery.setDisplayName(skill.getSkillDisplayName());
 
-            if(skill.isMastery()) {
+            if (skill.isMastery()) {
                 playerCharacter.getMasteries().add(mastery);
             }
         }
@@ -190,7 +190,7 @@ public class Player {
                 sb.setBlockStart(b.getStart());
                 if (sb.getSkillName() != null) {
                     if (!db.recordExists(sb.getSkillName())) {
-                        logger.log(System.Logger.Level.WARNING,"The character \"{0}\" have the skill \"{1}\", but this" +
+                        logger.log(System.Logger.Level.WARNING, "The character \"{0}\" have the skill \"{1}\", but this" +
                                 " skill was not found in the game database. Please check if the game installed is compatible" +
                                 " with your save game.", getPlayerSavegameName(), sb.getSkillName());
                         getSaveData().setMissingSkills(true);
@@ -420,23 +420,23 @@ public class Player {
     }
 
     public String getStatGreatestMonsterKilledName() {
-        List<String> monsters =  getSaveData().getDataMap().getStringValuesFromBlock(
+        List<String> monsters = getSaveData().getDataMap().getStringValuesFromBlock(
                 (PlayerFileVariable.valueOf(getSaveData().getPlatform(), "greatestMonsterKilledName").var()))
                 .stream().filter(v -> v != null && !v.isEmpty()).collect(Collectors.toList());
-        if(monsters.isEmpty()) {
+        if (monsters.isEmpty()) {
             return null;
         }
-        return monsters.get(monsters.size()-1);
+        return monsters.get(monsters.size() - 1);
     }
 
     public int getStatGreatestMonsterKilledLevel() {
         List<Integer> monsterLevels = getSaveData().getDataMap().getIntValuesFromBlock(
-                PlayerFileVariable.valueOf(getSaveData().getPlatform(),"greatestMonsterKilledLevel").var())
+                PlayerFileVariable.valueOf(getSaveData().getPlatform(), "greatestMonsterKilledLevel").var())
                 .stream().filter(v -> v != 0).collect(Collectors.toList());
-        if(monsterLevels.isEmpty()) {
+        if (monsterLevels.isEmpty()) {
             return -1;
         }
-        return monsterLevels.get(monsterLevels.size()-1);
+        return monsterLevels.get(monsterLevels.size() - 1);
     }
 
     public int getStatNumberOfDeaths() {
@@ -502,22 +502,22 @@ public class Player {
     public Gender getGender() {
         String playerCharacterClass = getSaveData().getPlayerCharacterClass();
 
-        if(playerCharacterClass.isEmpty()) {
+        if (playerCharacterClass.isEmpty()) {
             throw new IllegalArgumentException("Error reading playerCharacterClass");
         }
 
-        if(Constants.Save.VALUE_PC_CLASS_FEMALE.equals(playerCharacterClass)) {
+        if (Constants.Save.VALUE_PC_CLASS_FEMALE.equals(playerCharacterClass)) {
             return Gender.FEMALE;
         }
 
-        return  Gender.MALE;
+        return Gender.MALE;
     }
 
     public void setGender(Gender gender) {
         String newTexture;
         Pc pc;
 
-        if(gender.equals(Gender.FEMALE)) {
+        if (gender.equals(Gender.FEMALE)) {
             getSaveData().getDataMap().setString(Constants.Save.PLAYER_CHARACTER_CLASS, Constants.Save.VALUE_PC_CLASS_FEMALE);
             pc = db.player().getPc(Pc.Gender.FEMALE);
             newTexture = Constants.Save.FEMALE_DEFAULT_TEXTURE;
@@ -527,7 +527,7 @@ public class Player {
             newTexture = Constants.Save.MALE_DEFAULT_TEXTURE;
         }
 
-        if(pc.getPlayerTextures()!=null && !pc.getPlayerTextures().isEmpty()) {
+        if (pc.getPlayerTextures() != null && !pc.getPlayerTextures().isEmpty()) {
             newTexture = pc.getPlayerTextures().get(0);
         }
 
@@ -535,10 +535,10 @@ public class Player {
 
         //try to match new gender with old texture color
         Matcher matcher = Pattern.compile("(?i).*_([^.]+)\\.tex$").matcher(currentTexture);
-        if(matcher.matches()) {
+        if (matcher.matches()) {
             String color = matcher.group(1);
-            for(String textureFile: pc.getPlayerTextures()) {
-                if(textureFile.toLowerCase().contains(color.toLowerCase())) {
+            for (String textureFile : pc.getPlayerTextures()) {
+                if (textureFile.toLowerCase().contains(color.toLowerCase())) {
                     newTexture = textureFile;
                 }
             }
@@ -553,12 +553,12 @@ public class Player {
 
     public List<MapTeleport> getDefaultMapTeleports(int difficulty) {
         List<MapTeleport> ret = new ArrayList<>();
-        if(getTeleports().size() >= difficulty+1) {
+        if (getTeleports().size() >= difficulty + 1) {
             for (VariableInfo t : getTeleports().get(difficulty).getTeleportList()) {
                 UID tpUid = new UID((byte[]) t.getValue());
                 MapTeleport mapTeleport = DefaultMapTeleport.get(tpUid);
-                if(mapTeleport == null) {
-                    logger.log(System.Logger.Level.WARNING,String.format("teleport not found with uid = '%s' character=(%s) difficulty=%d",tpUid, getPlayerSavegameName(),difficulty));
+                if (mapTeleport == null) {
+                    logger.log(System.Logger.Level.WARNING, String.format("teleport not found with uid = '%s' character=(%s) difficulty=%d", tpUid, getPlayerSavegameName(), difficulty));
                     continue;
                 }
                 Teleport teleport = db.teleports().getTeleport(mapTeleport.getRecordId());
@@ -575,7 +575,7 @@ public class Player {
 
         for (int i = 0; i <= getDifficulty(); i++) {
             TeleportDifficulty teleports = getTeleportUidFromDifficulty(i);
-            if(teleports != null) {
+            if (teleports != null) {
                 ret.add(teleports);
             }
         }
@@ -586,36 +586,36 @@ public class Player {
     public void insertTeleport(int difficulty, UID uid) {
         TeleportDifficulty teleportDifficulty = getTeleportUidFromDifficulty(difficulty);
 
-        if(difficulty > getDifficulty()) {
+        if (difficulty > getDifficulty()) {
             throw new UnhandledRuntimeException(String.format("character doesn't have the difficulty %d unlocked", difficulty));
         }
 
-        if(teleportDifficulty == null) {
+        if (teleportDifficulty == null) {
             throw new UnhandledRuntimeException("error creating teleport");
         }
-        int teleportUIDsSizeKeyLength = 4+Constants.Save.VAR_TELEPORTUIDSSIZE.length();
-        int teleportUIDKeyLength = 4+Constants.Save.VAR_TELEPORTUID.length();
+        int teleportUIDsSizeKeyLength = 4 + Constants.Save.VAR_TELEPORTUIDSSIZE.length();
+        int teleportUIDKeyLength = 4 + Constants.Save.VAR_TELEPORTUID.length();
 
-        int offset = teleportDifficulty.getOffset()+(teleportUIDsSizeKeyLength+4);
-            for(VariableInfo stagingVar:teleportDifficulty.getBlockInfo().getStagingVariables().values()) {
-                if(stagingVar.getVariableType().equals(VariableType.UID) && stagingVar.getName().equals(Constants.Save.VAR_TELEPORTUID)
-                        && (new UID((byte[]) stagingVar.getValue())).equals(uid)) {
-                    logger.log(System.Logger.Level.ERROR,"------------- portal "+uid+"already exists");
-                    break;
+        int offset = teleportDifficulty.getOffset() + (teleportUIDsSizeKeyLength + 4);
+        for (VariableInfo stagingVar : teleportDifficulty.getBlockInfo().getStagingVariables().values()) {
+            if (stagingVar.getVariableType().equals(VariableType.UID) && stagingVar.getName().equals(Constants.Save.VAR_TELEPORTUID)
+                    && (new UID((byte[]) stagingVar.getValue())).equals(uid)) {
+                logger.log(System.Logger.Level.ERROR, "------------- portal " + uid + "already exists");
+                break;
+            }
+        }
+
+        for (VariableInfo vi : teleportDifficulty.getTeleportList()) {
+            if (vi.getVariableType().equals(VariableType.UID) && vi.getName().equals(Constants.Save.VAR_TELEPORTUID)) {
+                MapTeleport currentTeleport = DefaultMapTeleport.get(new UID((byte[]) vi.getValue()));
+                if (currentTeleport.getUid().equals(uid)) {
+                    logger.log(System.Logger.Level.ERROR, "------------- portal " + uid + "already exists");
+                    return;
                 }
             }
+        }
 
-            for (VariableInfo vi : teleportDifficulty.getTeleportList()) {
-                if (vi.getVariableType().equals(VariableType.UID) && vi.getName().equals(Constants.Save.VAR_TELEPORTUID)) {
-                    MapTeleport currentTeleport = DefaultMapTeleport.get(new UID((byte[]) vi.getValue()));
-                    if(currentTeleport.getUid().equals(uid)) {
-                        logger.log(System.Logger.Level.ERROR,"------------- portal "+uid+"already exists");
-                        return;
-                    }
-                }
-            }
-
-        if(offset <= 200) {
+        if (offset <= 200) {
             throw new UnhandledRuntimeException("error creating teleport, offset not found");
         }
 
@@ -667,7 +667,7 @@ public class Player {
 
     public void reset() {
         State.get().setSaveInProgress(null);
-        if(getSaveData()!=null) {
+        if (getSaveData() != null) {
             getSaveData().reset();
         }
     }

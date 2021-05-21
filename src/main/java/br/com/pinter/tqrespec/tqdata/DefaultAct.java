@@ -37,15 +37,15 @@ public enum DefaultAct {
         this.value = value;
     }
 
-    public int getValue() {
-        return value;
-    }
-
     public static int get(DefaultAct v) {
         Optional<DefaultAct> first = Arrays.stream(DefaultAct.values()).filter((f -> f.value == v.getValue())).findFirst();
-        if(first.isEmpty()) {
-            throw new EnumConstantNotPresentException(DefaultAct.class,String.valueOf(v));
+        if (first.isEmpty()) {
+            throw new EnumConstantNotPresentException(DefaultAct.class, String.valueOf(v));
         }
-        return first.get().getValue()   ;
+        return first.get().getValue();
+    }
+
+    public int getValue() {
+        return value;
     }
 }

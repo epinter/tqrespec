@@ -37,25 +37,18 @@ import java.util.ResourceBundle;
 
 public class MiscPaneController implements Initializable {
     private final BooleanProperty saveDisabled = new SimpleBooleanProperty();
-
+    private final BooleanProperty charNameBlankBlocked = new SimpleBooleanProperty(false);
+    public MainController mainController;
     @FXML
     private Button copyButton;
-
     @FXML
     private TextField copyCharInput;
-
     @FXML
     private ComboBox<CopyTarget> copyTargetCombo;
-
     @Inject
     private Player player;
-
     @Inject
     private PlayerWriter playerWriter;
-
-    public MainController mainController;
-
-    private final BooleanProperty charNameBlankBlocked = new SimpleBooleanProperty(false);
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -114,7 +107,7 @@ public class MiscPaneController implements Initializable {
         String str = copyCharInput.getText();
         copyCharInput.setText(StringUtils.stripAccents(str)
                 .replaceAll("[\\\\/:*?\"<>|;]", "")
-                .replaceAll("^(.{0,14}).*","$1"));
+                .replaceAll("^(.{0,14}).*", "$1"));
     }
 
     @FXML

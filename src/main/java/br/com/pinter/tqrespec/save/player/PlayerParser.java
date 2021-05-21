@@ -20,7 +20,6 @@
 
 package br.com.pinter.tqrespec.save.player;
 
-import br.com.pinter.tqrespec.save.BlockType;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.*;
 import br.com.pinter.tqrespec.tqdata.GameVersion;
@@ -40,8 +39,8 @@ final class PlayerParser extends FileParser {
     private static final System.Logger logger = Log.getLogger(PlayerParser.class.getName());
 
     private final String player;
-    private HeaderInfo headerInfo = new HeaderInfo();
     private final File playerChr;
+    private HeaderInfo headerInfo = new HeaderInfo();
 
     PlayerParser(File playerChr, String playerName) {
         this.playerChr = playerChr;
@@ -151,7 +150,7 @@ final class PlayerParser extends FileParser {
 
         headerInfo = parseHeader();
 
-        if (!EnumSet.of(GameVersion.TQIT,GameVersion.TQAE).contains(headerInfo.getHeaderVersion())) {
+        if (!EnumSet.of(GameVersion.TQIT, GameVersion.TQAE).contains(headerInfo.getHeaderVersion())) {
             throw new IncompatibleSavegameException(
                     String.format("Incompatible player '%s' (headerVersion must be 2 or 3)", this.player));
         }
@@ -184,7 +183,7 @@ final class PlayerParser extends FileParser {
 
     @Override
     protected void preprocessVariable(String name, int keyOffset, BlockType blockType) {
-        if(name.equals("mySaveId") && blockType.equals(PlayerBlockType.PLAYER_MAIN)) {
+        if (name.equals("mySaveId") && blockType.equals(PlayerBlockType.PLAYER_MAIN)) {
             logger.log(System.Logger.Level.INFO, "Mobile savegame detected: ''{0}''", playerChr);
             setDetectedPlatform(Platform.MOBILE);
         }

@@ -46,32 +46,32 @@ import java.util.regex.Pattern;
 
 @Singleton
 public class GameInfo {
-    private final System.Logger logger = Log.getLogger(GameInfo.class.getName());
-    private String gamePath = null;
-    private InstallType installType = InstallType.UNKNOWN;
-    private Path tqBasePath = null;
-    private HashMap<String, String> gameOptions;
-    private final List<Path> resourcesText = new ArrayList<>();
-    private final List<Path> databases = new ArrayList<>();
-    private GameVersion installedVersion = GameVersion.UNKNOWN;
-    private boolean dlcRagnarok = false;
-    private boolean dlcAtlantis = false;
     private static final String DATABASE_DIR = "Database";
     private static final String DATABASE_FILE = "database.arz";
     private static final String TEXT_FILE = "Text_EN.arc";
     private static final String RESOURCES_DIR = "Resources";
     private static final String REG_KEY_VALVE_STEAM = "SOFTWARE\\Valve\\Steam";
+    private final System.Logger logger = Log.getLogger(GameInfo.class.getName());
+    private final List<Path> resourcesText = new ArrayList<>();
+    private final List<Path> databases = new ArrayList<>();
+    private String gamePath = null;
+    private InstallType installType = InstallType.UNKNOWN;
+    private Path tqBasePath = null;
+    private HashMap<String, String> gameOptions;
+    private GameVersion installedVersion = GameVersion.UNKNOWN;
+    private boolean dlcRagnarok = false;
+    private boolean dlcAtlantis = false;
 
     private boolean isValidGamePath(Path path) {
-        if(path == null) {
+        if (path == null) {
             return false;
         }
-        return Paths.get(path.toString(),DATABASE_DIR).toFile().isDirectory()
-                && Paths.get(path.toString(),RESOURCES_DIR).toFile().isDirectory();
+        return Paths.get(path.toString(), DATABASE_DIR).toFile().isDirectory()
+                && Paths.get(path.toString(), RESOURCES_DIR).toFile().isDirectory();
     }
 
     private boolean gamePathFileExists(Path basePath, String... path) {
-        return Paths.get(basePath.toString(),DATABASE_DIR).toFile().isDirectory() && Paths.get(basePath.toString(), path).toFile().exists();
+        return Paths.get(basePath.toString(), DATABASE_DIR).toFile().isDirectory() && Paths.get(basePath.toString(), path).toFile().exists();
     }
 
     private boolean existsTqitExe(Path basePath) {
@@ -327,7 +327,7 @@ public class GameInfo {
             logger.log(System.Logger.Level.DEBUG, "Installed: found");
             installType = InstallType.WINDOWS;
             installedVersion = getGameVersion(installedPathFallback);
-            if(!GameVersion.UNKNOWN.equals(installedVersion)) {
+            if (!GameVersion.UNKNOWN.equals(installedVersion)) {
                 return installedPathFallback;
             }
         }
@@ -372,10 +372,10 @@ public class GameInfo {
     }
 
     private InstallType detectTqItInstallType(Path path) {
-        if(isTqitDisc(path)) {
+        if (isTqitDisc(path)) {
             //disc tqit (one disc tq and other disc tqit)
             return InstallType.LEGACY_DISC;
-        } else if(isTqitSteam(path)) {
+        } else if (isTqitSteam(path)) {
             //steam tqit
             return InstallType.STEAM;
         } else {
@@ -390,7 +390,7 @@ public class GameInfo {
             Settings.setLastDetectedGamePath(gamePath);
             Settings.setLastDetectedGameVersion(installedVersion);
             Settings.setLastDetectedInstallType(installType);
-            if(tqBasePath!=null) {
+            if (tqBasePath != null) {
                 Settings.setLastDetectedTqBasePath(tqBasePath.toString());
             } else {
                 Settings.setLastDetectedTqBasePath(null);
@@ -406,15 +406,15 @@ public class GameInfo {
         Path manualPath = Paths.get(path);
         if (isValidGamePath(manualPath) && (isTqAe(manualPath) || isTqitDisc(manualPath) || isTqitSteam(manualPath))) {
             installedVersion = getGameVersion(manualPath);
-            if(GameVersion.TQIT.equals(installedVersion)) {
+            if (GameVersion.TQIT.equals(installedVersion)) {
                 detectTqBasePath(manualPath);
             }
-            if(InstallType.UNKNOWN.equals(installType)) {
+            if (InstallType.UNKNOWN.equals(installType)) {
                 installType = InstallType.MANUAL;
             }
-            logger.log(System.Logger.Level.INFO,"Path manually set: path:{0};version:{1}:type:{2}",manualPath,installedVersion,installType);
+            logger.log(System.Logger.Level.INFO, "Path manually set: path:{0};version:{1}:type:{2}", manualPath, installedVersion, installType);
         } else {
-            logger.log(System.Logger.Level.ERROR,"Path ''{0}'' is invalid", manualPath);
+            logger.log(System.Logger.Level.ERROR, "Path ''{0}'' is invalid", manualPath);
             throw new GameNotFoundException(Util.getUIMessage(Constants.Msg.MAIN_GAMENOTDETECTED));
         }
     }
@@ -422,14 +422,14 @@ public class GameInfo {
     public void setManualTqBaseGamePath(String tqItPath, String tqPath) throws GameNotFoundException {
         Path manualTqPath = Paths.get(tqPath);
         Path manualTqItPath = Paths.get(tqItPath);
-        if(isValidGamePath(manualTqPath) && isTqPath(manualTqPath)) {
+        if (isValidGamePath(manualTqPath) && isTqPath(manualTqPath)) {
             tqBasePath = manualTqPath;
             installedVersion = GameVersion.TQIT;
             installType = detectTqItInstallType(manualTqItPath);
             setGamePath(tqItPath);
-            logger.log(System.Logger.Level.INFO,"Path manually set: path:{0};version:{1}:type:{2}",manualTqItPath,installedVersion,installType);
+            logger.log(System.Logger.Level.INFO, "Path manually set: path:{0};version:{1}:type:{2}", manualTqItPath, installedVersion, installType);
         } else {
-            logger.log(System.Logger.Level.ERROR,"Path ''{0}'' is invalid", manualTqPath);
+            logger.log(System.Logger.Level.ERROR, "Path ''{0}'' is invalid", manualTqPath);
             throw new GameNotFoundException(Util.getUIMessage(Constants.Msg.MAIN_GAMENOTDETECTED));
         }
     }
@@ -455,7 +455,7 @@ public class GameInfo {
     }
 
     private String setDevGamePath(String path) {
-        if(Paths.get(path,DATABASE_DIR).toFile().isDirectory() && Paths.get(path,"Text").toFile().isDirectory()) {
+        if (Paths.get(path, DATABASE_DIR).toFile().isDirectory() && Paths.get(path, "Text").toFile().isDirectory()) {
             addDatabasePath(Paths.get(path, DATABASE_DIR, DATABASE_FILE));
             addTextPath(Paths.get(path, "Text"));
             dlcRagnarok = true;
@@ -475,7 +475,7 @@ public class GameInfo {
         String lastUsedTqBase = Settings.getLastDetectedTqBasePath();
         GameVersion lastUsedVersion = GameVersion.fromValue(Settings.getLastDetectedGameVersion());
         InstallType lastUsedInstallType = InstallType.fromValue(Settings.getLastDetectedInstallType());
-        if(StringUtils.isNotBlank(lastUsedPath)
+        if (StringUtils.isNotBlank(lastUsedPath)
                 && GameVersion.UNKNOWN.equals(lastUsedVersion) && InstallType.UNKNOWN.equals(lastUsedInstallType)) {
             removeSavedDetectedGame();
         }
@@ -484,10 +484,10 @@ public class GameInfo {
                 && !GameVersion.UNKNOWN.equals(lastUsedVersion) && !InstallType.UNKNOWN.equals(lastUsedInstallType)) {
             installedVersion = lastUsedVersion;
             installType = lastUsedInstallType;
-            if(StringUtils.isNotBlank(lastUsedTqBase) && isValidGamePath(Paths.get(lastUsedTqBase))
+            if (StringUtils.isNotBlank(lastUsedTqBase) && isValidGamePath(Paths.get(lastUsedTqBase))
                     && GameVersion.TQIT.equals(installedVersion)) {
                 tqBasePath = Paths.get(lastUsedTqBase);
-                if(!isValidGamePath(tqBasePath)) {
+                if (!isValidGamePath(tqBasePath)) {
                     removeSavedDetectedGame();
                     throw new GameNotFoundException("TQ base game not found for steam-version of TQIT: " + gamePath);
                 }
@@ -514,7 +514,7 @@ public class GameInfo {
 
         if (StringUtils.isEmpty(gamePath)) {
             String lastUsedGamePath = getLastUsedGamePath();
-            if(StringUtils.isNotBlank(lastUsedGamePath)) {
+            if (StringUtils.isNotBlank(lastUsedGamePath)) {
                 return lastUsedGamePath;
             }
         }
@@ -535,8 +535,8 @@ public class GameInfo {
     }
 
     private boolean isTqPath(Path path) {
-        return gamePathFileExists(path,"Text", TEXT_FILE)
-                && gamePathFileExists(path,"Titan Quest.exe")
+        return gamePathFileExists(path, "Text", TEXT_FILE)
+                && gamePathFileExists(path, "Titan Quest.exe")
                 && !existsXpack(path);
     }
 
@@ -551,8 +551,8 @@ public class GameInfo {
     }
 
     private boolean isTqitSteam(Path path) {
-        return gamePathFileExists(path,"Text", TEXT_FILE)
-                && gamePathFileExists(path,RESOURCES_DIR, TEXT_FILE)
+        return gamePathFileExists(path, "Text", TEXT_FILE)
+                && gamePathFileExists(path, RESOURCES_DIR, TEXT_FILE)
                 && existsXpack(path)
                 && existsTqitExe(path)
                 && existsLegacyTqExe(path)
@@ -561,16 +561,16 @@ public class GameInfo {
     }
 
     private boolean isTqAe(Path path) {
-        return !gamePathFileExists(path,RESOURCES_DIR, TEXT_FILE)
+        return !gamePathFileExists(path, RESOURCES_DIR, TEXT_FILE)
                 && !existsTqitExe(path)
-                && gamePathFileExists(path,"Text", TEXT_FILE)
+                && gamePathFileExists(path, "Text", TEXT_FILE)
                 && existsXpack(path);
     }
 
     private GameVersion getGameVersion(Path path) {
-        if(isTqitSteam(path) || isTqitDisc(path)) {
+        if (isTqitSteam(path) || isTqitDisc(path)) {
             return GameVersion.TQIT;
-        } else if(isTqAe(path)){
+        } else if (isTqAe(path)) {
             return GameVersion.TQAE;
         }
         return GameVersion.UNKNOWN;
@@ -605,18 +605,18 @@ public class GameInfo {
             addTextPath(Paths.get(tqBasePath.toString(), "Text"));
             addTextPath(Paths.get(gamePath, RESOURCES_DIR));
             logger.log(System.Logger.Level.DEBUG, "legacy disc");
-        } else if (GameVersion.TQAE.equals(installedVersion)){
+        } else if (GameVersion.TQAE.equals(installedVersion)) {
             addDatabasePath(Paths.get(gamePath, DATABASE_DIR, DATABASE_FILE));
             addTextPath(Paths.get(gamePath, "Text"));
-            if(existsXpack2(Paths.get(gamePath))) {
+            if (existsXpack2(Paths.get(gamePath))) {
                 dlcRagnarok = true;
             }
-            if(existsXpack3(Paths.get(gamePath))) {
+            if (existsXpack3(Paths.get(gamePath))) {
                 dlcAtlantis = true;
             }
         } else {
             gamePath = null;
-            throw new GameNotFoundException(String.format("Can't find TQIT or TQAE (%s,%s)", installedVersion,installType));
+            throw new GameNotFoundException(String.format("Can't find TQIT or TQAE (%s,%s)", installedVersion, installType));
         }
     }
 
@@ -677,7 +677,7 @@ public class GameInfo {
     }
 
     private List<PlayerCharacterFile> getPlayerListFromPath(String savePath, boolean external) {
-        if(savePath==null) {
+        if (savePath == null) {
             return Collections.emptyList();
         }
 
@@ -695,7 +695,7 @@ public class GameInfo {
 
     private String getExternalSaveDataPath() {
         if (Paths.get(Constants.EXT_SAVEDATA).toFile().isDirectory()) {
-            logger.log(System.Logger.Level.DEBUG, "External save path found: "+Paths.get(Constants.EXT_SAVEDATA));
+            logger.log(System.Logger.Level.DEBUG, "External save path found: " + Paths.get(Constants.EXT_SAVEDATA));
             return Constants.EXT_SAVEDATA;
         }
 
@@ -719,10 +719,10 @@ public class GameInfo {
     }
 
     public Path playerChrExternalPath(String playerName) {
-        if(getExternalSaveDataPath() == null) {
+        if (getExternalSaveDataPath() == null) {
             return null;
         }
-        return Paths.get(getExternalSaveDataPath(),"_"+playerName, "Player.chr");
+        return Paths.get(getExternalSaveDataPath(), "_" + playerName, "Player.chr");
     }
 
     public Locale getGameLanguage() {
@@ -747,12 +747,12 @@ public class GameInfo {
         gameOptions = new HashMap<>();
 
         String saveSetingsPath = getSaveSetingsPath();
-        if(StringUtils.isBlank(saveSetingsPath)) {
+        if (StringUtils.isBlank(saveSetingsPath)) {
             throw new IOException("savegame path not found");
         }
 
         Path optionsPath = Paths.get(saveSetingsPath, "options.txt");
-        if(!Files.exists(optionsPath)) {
+        if (!Files.exists(optionsPath)) {
             throw new IOException("options.txt not found");
         }
         FileChannel optionsFile = FileChannel.open(optionsPath);
