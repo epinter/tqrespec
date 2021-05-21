@@ -254,4 +254,78 @@ class PlayerWriterTest {
         assertEquals(121, saveData.getDataMap().getInt("modifierPoints"), 0);
     }
 
+    @Test
+    void writeStr_Should_writeAndReadStrFromSaveGame() {
+        prepareCopySavegame();
+
+        saveData.getDataMap().setTempAttr("str", 300);
+
+        copyAndParseSavegame();
+
+        assertEquals(300, saveData.getDataMap().getTempAttr("str"), 0);
+    }
+
+    @Test
+    void writeIntl_Should_writeAndReadIntlFromSaveGame() {
+        prepareCopySavegame();
+
+        saveData.getDataMap().setTempAttr("int", 320);
+
+        copyAndParseSavegame();
+
+        assertEquals(320, saveData.getDataMap().getTempAttr("int"), 0);
+    }
+
+    @Test
+    void writeDex_Should_writeAndReadDexFromSaveGame() {
+        prepareCopySavegame();
+
+        saveData.getDataMap().setTempAttr("dex", 350);
+
+        copyAndParseSavegame();
+
+        assertEquals(350, saveData.getDataMap().getTempAttr("dex"), 0);
+    }
+
+    @Test
+    void writeLife_Should_writeAndReadLifeFromSaveGame() {
+        prepareCopySavegame();
+
+        saveData.getDataMap().setTempAttr("life", 420);
+
+        copyAndParseSavegame();
+
+        assertEquals(420, saveData.getDataMap().getTempAttr("life"), 0);
+    }
+
+    @Test
+    void writeMana_Should_writeAndReadLifeFromSaveGame() {
+        prepareCopySavegame();
+
+        saveData.getDataMap().setTempAttr("mana", 30000);
+
+        copyAndParseSavegame();
+
+        assertEquals(30000, saveData.getDataMap().getTempAttr("mana"), 0);
+    }
+
+    @Test
+    void readPlayerName_Should_writeAndReadPlayerNameFromSaveGame() {
+        prepareCopySavegame();
+
+        copyAndParseSavegame();
+
+        assertEquals("testcopy", saveData.getDataMap().getCharacterName());
+    }
+
+    @Test
+    void readPlayerNameMobile_Should_writeAndReadPlayerNameMobileFromSaveGame() {
+        prepareCopySavegame();
+
+        copyAndParseSavegame(Platform.MOBILE);
+
+        assertEquals("testcopy", saveData.getDataMap().getCharacterName());
+    }
+
+
 }
