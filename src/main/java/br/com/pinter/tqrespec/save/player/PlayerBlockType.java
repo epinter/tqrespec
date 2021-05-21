@@ -38,4 +38,9 @@ public class PlayerBlockType extends FileBlockType {
     public PlayerBlockType(int value, String name) {
         super(value, name);
     }
+
+    @Override
+    public String toString() {
+        return name();
+    }
 }

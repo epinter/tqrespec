@@ -24,7 +24,7 @@ public class PlayerLoader extends Player {
     private CurrentPlayerData saveDataPrivate;
 
     @Override
-    public void prepareSaveData() {
+    protected void prepareSaveData() {
         saveDataPrivate = new CurrentPlayerData();
     }
 

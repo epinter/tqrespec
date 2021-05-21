@@ -62,7 +62,7 @@ public class Player {
         return saveData;
     }
 
-    public void prepareSaveData() {
+    protected void prepareSaveData() {
         reset();
     }
 
@@ -175,7 +175,7 @@ public class Player {
                 int parent = getSaveData().getDataMap().getBlockInfo().get(blockOffset).getParentOffset();
                 BlockInfo b = getSaveData().getDataMap().getBlockInfo().get(blockOffset);
                 if (parent < 0 || !getSaveData().getDataMap().getBlockInfo().get(parent).getVariables().containsKey("max")
-                        || (getSaveData().getDataMap().getBytes(b.getStart()) != null && getSaveData().getDataMap().getBytes(b.getStart()).length == 0)) {
+                        || getSaveData().getDataMap().isRemoved(b.getStart())) {
                     //new block size is zero (was removed) or no parent
                     continue;
                 }
@@ -239,8 +239,7 @@ public class Player {
         boolean update = false;
 
         for (PlayerSkill b : getSaveData().getPlayerSkills().values()) {
-            if (getSaveData().getDataMap().getBytes(b.getBlockStart()) != null
-                    && getSaveData().getDataMap().getBytes(b.getBlockStart()).length == 0) {
+            if (getSaveData().getDataMap().isRemoved(b.getBlockStart())) {
                 //new block size is zero, was removed, ignore
                 update = true;
             }
@@ -284,8 +283,7 @@ public class Player {
             getSaveData().getDataMap().removeBlock(blockStart);
             getSaveData().getDataMap().setInt("max", getVariableValueInteger("max") - 1);
 
-            if (getSaveData().getDataMap().getBytes(blockStart) != null
-                    && getSaveData().getDataMap().getBytes(blockStart).length == 0) {
+            if (getSaveData().getDataMap().isRemoved(blockStart)) {
                 prepareSkillsList();
             }
         }
@@ -311,8 +309,7 @@ public class Player {
             getSaveData().getDataMap().setInt("max", getVariableValueInteger("max") - 1);
         }
 
-        if (getSaveData().getDataMap().getBytes(blockStart) != null
-                && getSaveData().getDataMap().getBytes(blockStart).length == 0) {
+        if (getSaveData().getDataMap().isRemoved(blockStart)) {
             prepareSkillsList();
         }
     }
@@ -656,7 +653,7 @@ public class Player {
         newVi.setKeyOffset(offset);
         newVi.setValOffset(offset + teleportUIDKeyLength);
         newVi.setValSize(VariableType.UID.dataTypeSize());
-        getSaveData().getDataMap().insertVariable(newVi.getKeyOffset(), newVi);
+        getSaveData().getDataMap().insertVariable(newVi);
         getSaveData().getDataMap().incrementInt(uidSize);
     }
 

@@ -44,6 +44,7 @@ public class VariableInfo implements DeepCloneable, Serializable {
     private byte[] valueByteArray = null;
     private VariableType variableType;
     private int blockOffset = -1;
+    private static final String INVALID_VALUE_TYPE_MSG = "invalid value type";
 
     public static Builder builder() {
         return new Builder();
@@ -134,7 +135,7 @@ public class VariableInfo implements DeepCloneable, Serializable {
 
     public void setValue(String value) {
         if(!isString()) {
-            throw new IllegalArgumentException("invalid value type");
+            throw new IllegalArgumentException(INVALID_VALUE_TYPE_MSG);
         }
         this.valueString = value;
         valSize = valueString.length();
@@ -142,7 +143,7 @@ public class VariableInfo implements DeepCloneable, Serializable {
 
     public void setValue(int value) {
         if(!isInt()) {
-            throw new IllegalArgumentException("invalid value type");
+            throw new IllegalArgumentException(INVALID_VALUE_TYPE_MSG);
         }
         this.valueInteger = value;
         valSize = variableType.dataTypeSize();
@@ -150,7 +151,7 @@ public class VariableInfo implements DeepCloneable, Serializable {
 
     public void setValue(float value) {
         if(!isFloat()) {
-            throw new IllegalArgumentException("invalid value type");
+            throw new IllegalArgumentException(INVALID_VALUE_TYPE_MSG);
         }
         this.valueFloat = value;
         valSize = variableType.dataTypeSize();
@@ -158,7 +159,7 @@ public class VariableInfo implements DeepCloneable, Serializable {
 
     public void setValue(byte[] value) {
         if(!isUid() && !isStream()) {
-            throw new IllegalArgumentException("invalid value type");
+            throw new IllegalArgumentException(INVALID_VALUE_TYPE_MSG);
         }
         this.valueByteArray = value;
         valSize = valueByteArray.length;

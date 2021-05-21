@@ -23,7 +23,7 @@ import org.apache.commons.lang3.exception.CloneFailedException;
 
 import java.io.*;
 
-public interface DeepCloneable extends Serializable {
+interface DeepCloneable extends Serializable {
     default Object deepClone() {
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

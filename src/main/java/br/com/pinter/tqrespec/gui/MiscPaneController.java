@@ -38,7 +38,7 @@ import java.util.ResourceBundle;
 public class MiscPaneController implements Initializable {
     private final BooleanProperty saveDisabled = new SimpleBooleanProperty();
     private final BooleanProperty charNameBlankBlocked = new SimpleBooleanProperty(false);
-    public MainController mainController;
+    private MainController mainController;
     @FXML
     private Button copyButton;
     @FXML

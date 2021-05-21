@@ -26,12 +26,10 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class DataChangeRaw implements DataChange, Serializable {
+class DataChangeRaw extends DataChange implements Serializable {
     private final byte[] data;
     private final int previouslength;
     private final int offset;
-    private byte[] padding = new byte[0];
-    private boolean paddingAfter = true;
 
     public DataChangeRaw(int offset, byte[] data, int previousLength) {
         this.offset = offset;
@@ -60,16 +58,21 @@ public class DataChangeRaw implements DataChange, Serializable {
     }
 
     @Override
+    public boolean isEmpty() {
+        return data.length == 0 && getPadding().length == 0;
+    }
+
+    @Override
     public byte[] data() {
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            if (!paddingAfter)
-                bos.write(padding);
+            if (!isPaddingAfter())
+                bos.write(getPadding());
 
             bos.write(data);
 
-            if (paddingAfter)
-                bos.write(padding);
+            if (isPaddingAfter())
+                bos.write(getPadding());
 
             return bos.toByteArray();
         } catch (IOException e) {
@@ -85,33 +88,5 @@ public class DataChangeRaw implements DataChange, Serializable {
     @Override
     public int offset() {
         return offset;
-    }
-
-    @Override
-    public void insertPadding(byte[] data) {
-        insertPadding(data, true);
-    }
-
-    @Override
-    public void insertPadding(byte[] data, boolean before) {
-        try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            if (before) {
-                bos.write(data);
-                bos.write(padding);
-            } else {
-                bos.write(padding);
-                bos.write(data);
-            }
-            padding = bos.toByteArray();
-        } catch (IOException e) {
-            throw new IllegalStateException("Error writing to buffer");
-        }
-
-    }
-
-    @Override
-    public void setPaddingAfter(boolean paddingAfter) {
-        this.paddingAfter = paddingAfter;
     }
 }

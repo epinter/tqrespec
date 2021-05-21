@@ -255,7 +255,7 @@ public class MainController implements Initializable {
         tabPane.getSelectionModel().select(attributesTab);
     }
 
-    public void setCursorWaitOnTask(MyTask<?> task) {
+    public void setCursorWaitOnTask(MyTask<Integer> task) {
         tabPane.setCursor(Cursor.WAIT);
         State.get().setLastCursorWaitTask(task);
         task.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, e -> restoreDefaultCursor());

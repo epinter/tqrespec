@@ -22,10 +22,12 @@ package br.com.pinter.tqrespec.save.player;
 
 import br.com.pinter.tqrespec.save.*;
 
+import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.Map;
 
 public class PlayerFileVariable implements FileVariable {
-    private static final HashMap<Platform, HashMap<String, PlayerFileVariable>> variablesMap = new HashMap<>();
+    private static final Map<Platform, HashMap<String, PlayerFileVariable>> variablesMap = new EnumMap<>(Platform.class);
 
     static {
         HashMap<String, PlayerFileVariable> map = new HashMap<>();

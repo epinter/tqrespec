@@ -20,25 +20,61 @@
 
 package br.com.pinter.tqrespec.save;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 
-public interface DataChange extends Serializable {
-    default boolean isRaw() {
+abstract class DataChange implements Serializable {
+    private byte[] padding = new byte[0];
+    private boolean paddingAfter = true;
+
+    public boolean isRaw() {
         return !isVariable();
     }
 
-    boolean isVariable();
+    public abstract boolean isVariable();
 
-    byte[] data();
+    public abstract byte[] data();
 
-    int previousValueLength();
+    public abstract int previousValueLength();
 
-    int offset();
+    public abstract int offset();
 
-    void insertPadding(byte[] data);
+    public void insertPadding(byte[] data) {
+        insertPadding(data, true);
+    }
 
-    void insertPadding(byte[] data, boolean before);
+    public abstract boolean isEmpty();
 
-    void setPaddingAfter(boolean paddingAfter);
+    public byte[] getPadding() {
+        return padding;
+    }
+
+    public void setPadding(byte[] padding) {
+        this.padding = padding;
+    }
+
+    public boolean isPaddingAfter() {
+        return paddingAfter;
+    }
+
+    public void setPaddingAfter(boolean paddingAfter) {
+        this.paddingAfter = paddingAfter;
+    }
+
+    public void insertPadding(byte[] data, boolean before) {
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            if (before) {
+                bos.write(data);
+                bos.write(padding);
+            } else {
+                bos.write(padding);
+                bos.write(data);
+            }
+            padding = bos.toByteArray();
+        } catch (IOException e) {
+            throw new IllegalStateException("Error writing to buffer");
+        }
+    }
 }

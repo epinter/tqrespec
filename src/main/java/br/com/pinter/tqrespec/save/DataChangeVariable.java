@@ -30,12 +30,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class DataChangeVariable implements DataChange, Serializable {
+class DataChangeVariable extends DataChange implements Serializable {
     private final VariableInfo oldVariable;
     private final List<VariableInfo> variables = new ArrayList<>();
     private final List<String> addVars = new ArrayList<>();
-    private byte[] padding = new byte[0];
-    private boolean paddingAfter = true;
 
     public DataChangeVariable(VariableInfo oldVariable, VariableInfo variable) {
         this.oldVariable = oldVariable;
@@ -64,8 +62,8 @@ public class DataChangeVariable implements DataChange, Serializable {
     public byte[] data() {
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            if (!paddingAfter)
-                bos.write(padding);
+            if (!isPaddingAfter())
+                bos.write(getPadding());
 
             for (VariableInfo v : variables) {
                 if (v.getValOffset() != oldVariable.getValOffset()) {
@@ -81,8 +79,8 @@ public class DataChangeVariable implements DataChange, Serializable {
                 bos.write(v.bytes());
             }
 
-            if (paddingAfter)
-                bos.write(padding);
+            if (isPaddingAfter())
+                bos.write(getPadding());
 
             return bos.toByteArray();
         } catch (IOException e) {
@@ -128,45 +126,14 @@ public class DataChangeVariable implements DataChange, Serializable {
     }
 
     @Override
-    public void insertPadding(byte[] data) {
-        insertPadding(data, true);
-    }
-
-    @Override
-    public void insertPadding(byte[] data, boolean before) {
-        try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            if (before) {
-                bos.write(data);
-                bos.write(padding);
-            } else {
-                bos.write(padding);
-                bos.write(data);
-            }
-            padding = bos.toByteArray();
-        } catch (IOException e) {
-            throw new IllegalStateException("Error writing to buffer");
-        }
-
-    }
-
-    @Override
-    public void setPaddingAfter(boolean paddingAfter) {
-        this.paddingAfter = paddingAfter;
-    }
-
-    @Override
-    public String toString() {
-        return "DataChangeVariable{" +
-                "oldVariable=" + oldVariable +
-                ", variable=" + variables +
-                '}';
+    public boolean isEmpty() {
+        return variables.isEmpty() && getPadding().length == 0;
     }
 
     public void clear() {
         addVars.clear();
         variables.clear();
-        padding = new byte[0];
-        paddingAfter = true;
+        setPadding(new byte[0]);
+        setPaddingAfter(true);
     }
 }

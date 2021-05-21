@@ -34,7 +34,7 @@ public class State {
     private final SimpleBooleanProperty saveInProgress = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty gameRunning = new SimpleBooleanProperty(false);
     private final Map<String, Level> debugPrefix = new HashMap<>();
-    private final AtomicReference<MyTask<?>> lastCursorWaitTask = new AtomicReference<>();
+    private final AtomicReference<MyTask<Integer>> lastCursorWaitTask = new AtomicReference<>();
     private Locale locale = Locale.ENGLISH;
 
     private State() {
@@ -97,11 +97,11 @@ public class State {
         this.locale = locale;
     }
 
-    public MyTask<?> getLastCursorWaitTask() {
+    public MyTask<Integer> getLastCursorWaitTask() {
         return lastCursorWaitTask.get();
     }
 
-    public State setLastCursorWaitTask(MyTask<?> lastCursorWaitTask) {
+    public State setLastCursorWaitTask(MyTask<Integer> lastCursorWaitTask) {
         this.lastCursorWaitTask.set(lastCursorWaitTask);
         return this;
     }

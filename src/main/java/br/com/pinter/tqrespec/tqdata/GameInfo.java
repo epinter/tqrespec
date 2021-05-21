@@ -715,14 +715,14 @@ public class GameInfo {
     }
 
     public Path playerChr(String playerName, boolean customQuest) {
-        return Paths.get(playerPath(playerName, customQuest).toString(), "Player.chr");
+        return Paths.get(playerPath(playerName, customQuest).toString(), Constants.PLAYERCHR);
     }
 
     public Path playerChrExternalPath(String playerName) {
         if (getExternalSaveDataPath() == null) {
             return null;
         }
-        return Paths.get(getExternalSaveDataPath(), "_" + playerName, "Player.chr");
+        return Paths.get(getExternalSaveDataPath(), "_" + playerName, Constants.PLAYERCHR);
     }
 
     public Locale getGameLanguage() {

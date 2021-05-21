@@ -185,6 +185,7 @@ public class PlayerWriter extends FileWriter {
     }
 
     public void copyCurrentSave(String toPlayerName, Platform conversionTarget, Path zipOutputPath) throws IOException {
+        String mobSavePrefix = "/__save";
         if (StringUtils.isBlank(toPlayerName)) {
             throw new IllegalArgumentException("character name can't be empty");
         }
@@ -220,17 +221,17 @@ public class PlayerWriter extends FileWriter {
                 if (fileDataMap.getPlatform().equals(Platform.MOBILE) && conversionTarget.equals(Platform.UNDEFINED)) {
                     //use new saveid
                     fileDataMap.setString("mySaveId", saveId);
-                    toZipPath = "/__save" + saveId;
+                    toZipPath = mobSavePrefix + saveId;
                 }
             } else if (saveData.getPlatform().equals(Platform.MOBILE) && conversionTarget.equals(Platform.UNDEFINED)) {
                 //use current saveid for directory name
                 String currentSaveId = saveData.getDataMap().getString("mySaveId");
-                toZipPath = "/__save" + currentSaveId;
+                toZipPath = mobSavePrefix + currentSaveId;
             }
 
             if (!conversionTarget.equals(Platform.UNDEFINED)) {
                 if (conversionTarget.equals(Platform.MOBILE)) {
-                    toZipPath = "/__save" + saveId;
+                    toZipPath = mobSavePrefix + saveId;
                 }
                 fileDataMap.convertTo(conversionTarget, saveId);
             }
@@ -247,8 +248,8 @@ public class PlayerWriter extends FileWriter {
                     }
                     Util.copyDirectoryRecurse(playerSaveDirSource, dir, false, zipfs, excludeCopyRegex);
                     if (!backupOnly) {
-                        Files.deleteIfExists(zipfs.getPath(dir.toString(), "Player.chr"));
-                        writeBuffer(dir.toString(), "Player.chr", fileDataMap, zipfs);
+                        Files.deleteIfExists(zipfs.getPath(dir.toString(), Constants.PLAYERCHR));
+                        writeBuffer(dir.toString(), Constants.PLAYERCHR, fileDataMap, zipfs);
                     }
                 }
             } else {
@@ -257,7 +258,7 @@ public class PlayerWriter extends FileWriter {
                     excludeCopyRegex = "(?i)(?:^backup.*|^.winsys.dxg$|^.winsys.dxb$|^SavingChar.txt$)";
                 }
                 Util.copyDirectoryRecurse(playerSaveDirSource, playerSaveDirTarget, false, excludeCopyRegex);
-                writeBuffer(playerSaveDirTarget.toString(), "Player.chr", fileDataMap);
+                writeBuffer(playerSaveDirTarget.toString(), Constants.PLAYERCHR, fileDataMap);
                 StashLoader stashLoader = new StashLoader();
                 if (stashLoader.loadStash(playerSaveDirTarget, toPlayerName)) {
                     StashWriter stashWriter = new StashWriter(stashLoader.getSaveData());

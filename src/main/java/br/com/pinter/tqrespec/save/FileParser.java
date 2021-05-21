@@ -359,7 +359,7 @@ public abstract class FileParser {
         }
         if (!queueBegin.isEmpty()) {
             logger.log(System.Logger.Level.ERROR, queueBegin::toString);
-            throw new UnhandledRuntimeException(String.format("BUG: Error building map: '%s' data block(s) not closed", queueBegin.size()));
+            throw new UnhandledRuntimeException(String.format("Error building file map: '%s' data block(s) not closed. Corrupted file ?", queueBegin.size()));
         }
     }
 

@@ -5,8 +5,8 @@
 package br.com.pinter.tqrespec.tqdata;
 
 public class PlayerCharacterFile {
-    private String playerName;
-    private boolean external;
+    private final String playerName;
+    private final boolean external;
 
     public PlayerCharacterFile(String playerName, boolean external) {
         this.playerName = playerName;

@@ -39,12 +39,14 @@ public class Constants {
     public static final String GAME_DIRECTORY_STEAM = Paths.get("common", "Titan Quest Anniversary Edition").toString();
     public static final String INITIAL_FONT_SIZE = "1";
     public static final String SAVEDATA = "SaveData";
+    public static final String PLAYERCHR = "Player.chr";
     public static final String SETTINGS = "Settings";
+    public static final String JAVA_USERDIR = System.getProperty("user.dir");
     public static final String BACKUP_DIRECTORY = Paths.get(SAVEDATA, "TQRespec Backup").toString();
     public static final String VERSION_CHECK_URL = "https://epinter.github.io/version/tqrespec";
-    public static final String DEV_GAMEDATA = Paths.get(System.getProperty("user.dir"), "gamedata").toString();
-    public static final String PARENT_GAMEDATA = Paths.get(Paths.get(System.getProperty("user.dir")).getParent().toString(), "gamedata").toString();
-    public static final String EXT_SAVEDATA = Paths.get(System.getProperty("user.dir"), "savedata").toString();
+    public static final String DEV_GAMEDATA = Paths.get(JAVA_USERDIR, "gamedata").toString();
+    public static final String PARENT_GAMEDATA = Paths.get(Paths.get(JAVA_USERDIR).getParent().toString(), "gamedata").toString();
+    public static final String EXT_SAVEDATA = Paths.get(JAVA_USERDIR, "savedata").toString();
     public static final int PROCESS_SCAN_INTERVAL_MS = 3000;
     public static final String ERROR_MSG_EXCEPTION = "Error: ";
     public static final String STASH_FILE = "winsys.dxb";
