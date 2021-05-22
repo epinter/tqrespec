@@ -20,6 +20,7 @@
 
 package br.com.pinter.tqrespec.save;
 
+import com.fasterxml.jackson.annotation.*;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Multimap;
@@ -32,10 +33,18 @@ public class BlockInfo implements Serializable {
     private int start = -1;
     private int end = -1;
     private int size = -1;
+    @JsonIgnore
     private ImmutableListMultimap<String, VariableInfo> variables = ImmutableListMultimap.of();
+    @JsonIgnore
     private transient Multimap<String, VariableInfo> stagingVariables = MultimapBuilder.hashKeys().arrayListValues().build();
+    @JsonIgnore
     private int parentOffset = -1;
     private BlockType blockType = FileBlockType.UNKNOWN;
+
+    @JsonProperty("blockType")
+    public String jsonBlockType() {
+        return blockType.toString();
+    }
 
     public int getStart() {
         return start;

@@ -21,7 +21,6 @@
 package br.com.pinter.tqrespec.save.stash;
 
 import br.com.pinter.tqrespec.save.BlockType;
-import br.com.pinter.tqrespec.save.FileBlockType;
 import br.com.pinter.tqrespec.save.FileVariable;
 import br.com.pinter.tqrespec.save.VariableType;
 

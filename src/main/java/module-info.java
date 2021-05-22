@@ -36,6 +36,9 @@ module br.com.pinter.tqrespec {
     requires static com.google.guice;
     requires static com.google.common;
     requires static com.sun.jna.platform;
+    requires static com.fasterxml.jackson.core;
+    requires static com.fasterxml.jackson.databind;
+    requires static com.fasterxml.jackson.annotation;
     exports br.com.pinter.tqrespec;
     exports br.com.pinter.tqrespec.core;
     exports br.com.pinter.tqrespec.gui;
@@ -52,4 +55,6 @@ module br.com.pinter.tqrespec {
     opens fxml;
     opens i18n;
     opens icon;
+    exports br.com.pinter.tqrespec.save.exporter;
+    opens br.com.pinter.tqrespec.save.exporter to com.google.guice, javafx.fxml;
 }

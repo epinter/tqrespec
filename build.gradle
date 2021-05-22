@@ -69,6 +69,9 @@ dependencies {
     implementation group: 'net.java.dev.jna', name: 'jna-platform', version: '5.3.1'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
     implementation group: 'org.apache.commons', name: 'commons-text', version: '1.9'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.12.3'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.12.3'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
 
     implementation project(':tqdatabase')
 
