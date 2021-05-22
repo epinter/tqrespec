@@ -63,7 +63,7 @@ public class UID {
 
     public static byte[] convertUidStringToByte(String uid) {
         if(StringUtils.isBlank(uid)) {
-            return null;
+            return new byte[0];
         }
 
         String[] p = StringUtils.split(uid, "-");

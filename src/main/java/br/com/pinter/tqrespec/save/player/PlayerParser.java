@@ -59,6 +59,7 @@ final class PlayerParser extends FileParser {
         block.setStart(0);
         block.setEnd(headerEnd);
         block.setSize(headerEnd + 1);
+        block.setBlockType(PlayerBlockType.PLAYER_HEADER);
 
         HeaderInfo h = new HeaderInfo();
         while (this.getBuffer().position() <= headerEnd) {

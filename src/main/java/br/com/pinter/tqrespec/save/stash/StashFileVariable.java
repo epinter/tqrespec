@@ -21,6 +21,7 @@
 package br.com.pinter.tqrespec.save.stash;
 
 import br.com.pinter.tqrespec.save.BlockType;
+import br.com.pinter.tqrespec.save.FileBlockType;
 import br.com.pinter.tqrespec.save.FileVariable;
 import br.com.pinter.tqrespec.save.VariableType;
 
@@ -30,13 +31,13 @@ public class StashFileVariable implements FileVariable {
     private static HashMap<String, StashFileVariable> map = new HashMap<>();
 
     static {
-        map.put("stashVersion", new StashFileVariable("stashVersion", VariableType.INTEGER, StashBlockType.BODY));
-        map.put("fName", new StashFileVariable("fName", VariableType.STRING, StashBlockType.BODY));
-        map.put("sackWidth", new StashFileVariable("sackWidth", VariableType.INTEGER, StashBlockType.BODY));
-        map.put("sackHeight", new StashFileVariable("sackHeight", VariableType.INTEGER, StashBlockType.BODY));
-        map.put("numItems", new StashFileVariable("numItems", VariableType.INTEGER, StashBlockType.BODY));
+        map.put("stashVersion", new StashFileVariable("stashVersion", VariableType.INTEGER, StashBlockType.STASH_MAIN));
+        map.put("fName", new StashFileVariable("fName", VariableType.STRING, StashBlockType.STASH_MAIN));
+        map.put("sackWidth", new StashFileVariable("sackWidth", VariableType.INTEGER, StashBlockType.STASH_MAIN));
+        map.put("sackHeight", new StashFileVariable("sackHeight", VariableType.INTEGER, StashBlockType.STASH_MAIN));
+        map.put("numItems", new StashFileVariable("numItems", VariableType.INTEGER, StashBlockType.STASH_MAIN));
 
-        map.put("stackCount", new StashFileVariable("stackCount", VariableType.INTEGER, StashBlockType.STASH_ITEM_PREFIX));
+        map.put("stackCount", new StashFileVariable("stackCount", VariableType.INTEGER, StashBlockType.STASH_MAIN));
         map.put("baseName", new StashFileVariable("baseName", VariableType.STRING, StashBlockType.STASH_ITEM));
         map.put("prefixName", new StashFileVariable("prefixName", VariableType.STRING, StashBlockType.STASH_ITEM));
         map.put("suffixName", new StashFileVariable("suffixName", VariableType.STRING, StashBlockType.STASH_ITEM));
@@ -47,8 +48,8 @@ public class StashFileVariable implements FileVariable {
         map.put("relicName2", new StashFileVariable("relicName2", VariableType.STRING, StashBlockType.STASH_ITEM));
         map.put("relicBonus2", new StashFileVariable("relicBonus2", VariableType.STRING, StashBlockType.STASH_ITEM));
         map.put("var2", new StashFileVariable("var2", VariableType.INTEGER, StashBlockType.STASH_ITEM));
-        map.put("xOffset", new StashFileVariable("xOffset", VariableType.INTEGER, StashBlockType.STASH_ITEM_SUFFIX));
-        map.put("yOffset", new StashFileVariable("yOffset", VariableType.INTEGER, StashBlockType.STASH_ITEM_SUFFIX));
+        map.put("xOffset", new StashFileVariable("xOffset", VariableType.INTEGER, StashBlockType.STASH_MAIN));
+        map.put("yOffset", new StashFileVariable("yOffset", VariableType.INTEGER, StashBlockType.STASH_MAIN));
     }
 
     private final BlockType location;
