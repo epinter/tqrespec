@@ -49,14 +49,23 @@ public class UID {
         int p2 = uidP2.getInt();
         int p1 = uidP1.getInt();
 
-        return String.format("%d-%d-%d-%d",
+        String uidStr = String.format("%d-%d-%d-%d",
                 p4 & 0xFFFFFFFFL,
                 p3 & 0xFFFFFFFFL,
                 p2 & 0xFFFFFFFFL,
                 p1 & 0xFFFFFFFFL);
+
+        if("0-0-0-0".equals(uidStr) || StringUtils.isBlank(uidStr)) {
+            return null;
+        }
+        return uidStr;
     }
 
     public static byte[] convertUidStringToByte(String uid) {
+        if(StringUtils.isBlank(uid)) {
+            return null;
+        }
+
         String[] p = StringUtils.split(uid, "-");
         long p4 = Long.parseLong(p[3]);
         long p3 = Long.parseLong(p[2]);
