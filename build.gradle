@@ -65,16 +65,17 @@ repositories {
 dependencies {
     implementation fileTree(dir: 'libs', include: '*.jar')
     implementation fileTree(dir: javafxSdkLibDir, include: '*.jar')
-    implementation group: 'com.google.inject', name: 'guice', version: '4.2.3'
+    implementation group: 'com.google.inject', name: 'guice', version: '5.0.1'
     implementation group: 'net.java.dev.jna', name: 'jna-platform', version: '5.3.1'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
     implementation group: 'org.apache.commons', name: 'commons-text', version: '1.9'
+
     implementation project(':tqdatabase')
 
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.7.1'
     testImplementation 'org.mockito:mockito-core:3.9.0'
     testImplementation 'org.mockito:mockito-junit-jupiter:3.9.0'
-    testImplementation group: 'com.google.inject', name: 'guice', version: '4.2.3'
+    testImplementation group: 'com.google.inject', name: 'guice', version: '5.0.1'
 }
 
 test {
@@ -129,6 +130,7 @@ if (moduleInfoPresent) {
         doFirst {
             jvmArgs = [
                     '-XX:+UseSerialGC',
+                    '-Dguice_bytecode_gen_option=DISABLED',
                     '-XX:MinHeapFreeRatio=10', '-XX:MaxHeapFreeRatio=15',
                     '--add-reads', "${moduleName}=ALL-UNNAMED",
                     '--add-opens', 'javafx.base/com.sun.javafx.reflect=ALL-UNNAMED',
@@ -285,6 +287,7 @@ task appimage(type: Exec) {
                 '--description', 'The respec tool for Titan Quest game',
                 '--java-options',
                 '-XX:+UseSerialGC ' +
+                        '-Dguice_bytecode_gen_option=DISABLED ' +
                         '-XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=15 ' +
                         "--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED " +
                         "--add-opens ${moduleName}/${mainPackageName}=ALL-UNNAMED " +
@@ -312,6 +315,7 @@ task appimage(type: Exec) {
                 '--main-class', mainClassName,
                 '--java-options',
                 '-XX:+UseSerialGC ' +
+                        '-Dguice_bytecode_gen_option=DISABLED ' +
                         '-XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=15 ' +
                         '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED ' +
                         '--add-opens java.base/java.lang=ALL-UNNAMED '
