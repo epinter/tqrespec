@@ -47,6 +47,7 @@ import java.util.regex.Pattern;
 @Singleton
 public class GameInfo {
     private static final String DATABASE_DIR = "Database";
+    private static final String TEXT_DIR = "Text";
     private static final String DATABASE_FILE = "database.arz";
     private static final String TEXT_FILE = "Text_EN.arc";
     private static final String RESOURCES_DIR = "Resources";
@@ -68,6 +69,14 @@ public class GameInfo {
         }
         return Paths.get(path.toString(), DATABASE_DIR).toFile().isDirectory()
                 && Paths.get(path.toString(), RESOURCES_DIR).toFile().isDirectory();
+    }
+
+    private boolean isValidLocalPath(Path path) {
+        if (path == null) {
+            return false;
+        }
+        return Paths.get(path.toString(), DATABASE_DIR, DATABASE_FILE).toFile().isFile()
+                && Paths.get(path.toString(), TEXT_DIR).toFile().isDirectory();
     }
 
     private boolean gamePathFileExists(Path basePath, String... path) {
@@ -455,9 +464,9 @@ public class GameInfo {
     }
 
     private String setDevGamePath(String path) {
-        if (Paths.get(path, DATABASE_DIR).toFile().isDirectory() && Paths.get(path, "Text").toFile().isDirectory()) {
+        if (Paths.get(path, DATABASE_DIR).toFile().isDirectory() && Paths.get(path, TEXT_DIR).toFile().isDirectory()) {
             addDatabasePath(Paths.get(path, DATABASE_DIR, DATABASE_FILE));
-            addTextPath(Paths.get(path, "Text"));
+            addTextPath(Paths.get(path, TEXT_DIR));
             dlcRagnarok = true;
             dlcAtlantis = true;
             gamePath = path;
@@ -504,11 +513,11 @@ public class GameInfo {
             return setDevGamePath(Constants.DEV_GAMEDATA);
         }
 
-        if (Paths.get(Constants.DEV_GAMEDATA, DATABASE_DIR).toFile().isDirectory()) {
-            logger.log(System.Logger.Level.INFO, "Dev game path found");
+        if (isValidLocalPath(Paths.get(Constants.DEV_GAMEDATA))) {
+            logger.log(System.Logger.Level.INFO, "Local gamedata path found");
             return setDevGamePath(Constants.DEV_GAMEDATA);
-        } else if (Paths.get(Constants.PARENT_GAMEDATA, DATABASE_DIR).toFile().isDirectory()) {
-            logger.log(System.Logger.Level.INFO, "Parent game path found");
+        } else if (isValidLocalPath(Paths.get(Constants.PARENT_GAMEDATA))) {
+            logger.log(System.Logger.Level.INFO, "Parent gamedata path found");
             return setDevGamePath(Constants.PARENT_GAMEDATA);
         }
 
@@ -535,7 +544,7 @@ public class GameInfo {
     }
 
     private boolean isTqPath(Path path) {
-        return gamePathFileExists(path, "Text", TEXT_FILE)
+        return gamePathFileExists(path, TEXT_DIR, TEXT_FILE)
                 && gamePathFileExists(path, "Titan Quest.exe")
                 && !existsXpack(path);
     }
@@ -551,7 +560,7 @@ public class GameInfo {
     }
 
     private boolean isTqitSteam(Path path) {
-        return gamePathFileExists(path, "Text", TEXT_FILE)
+        return gamePathFileExists(path, TEXT_DIR, TEXT_FILE)
                 && gamePathFileExists(path, RESOURCES_DIR, TEXT_FILE)
                 && existsXpack(path)
                 && existsTqitExe(path)
@@ -563,7 +572,7 @@ public class GameInfo {
     private boolean isTqAe(Path path) {
         return !gamePathFileExists(path, RESOURCES_DIR, TEXT_FILE)
                 && !existsTqitExe(path)
-                && gamePathFileExists(path, "Text", TEXT_FILE)
+                && gamePathFileExists(path, TEXT_DIR, TEXT_FILE)
                 && existsXpack(path);
     }
 
@@ -596,18 +605,18 @@ public class GameInfo {
         if (GameVersion.TQIT.equals(installedVersion) && InstallType.STEAM.equals(installType)) {
             addDatabasePath(Paths.get(tqBasePath.toString(), DATABASE_DIR, DATABASE_FILE));
             addDatabasePath(Paths.get(gamePath, DATABASE_DIR, DATABASE_FILE));
-            addTextPath(Paths.get(gamePath, "Text"));
+            addTextPath(Paths.get(gamePath, TEXT_DIR));
             addTextPath(Paths.get(gamePath, RESOURCES_DIR));
             logger.log(System.Logger.Level.DEBUG, "steam tqit");
         } else if (GameVersion.TQIT.equals(installedVersion) && InstallType.LEGACY_DISC.equals(installType)) {
             addDatabasePath(Paths.get(tqBasePath.toString(), DATABASE_DIR, DATABASE_FILE));
             addDatabasePath(Paths.get(gamePath, DATABASE_DIR, DATABASE_FILE));
-            addTextPath(Paths.get(tqBasePath.toString(), "Text"));
+            addTextPath(Paths.get(tqBasePath.toString(), TEXT_DIR));
             addTextPath(Paths.get(gamePath, RESOURCES_DIR));
             logger.log(System.Logger.Level.DEBUG, "legacy disc");
         } else if (GameVersion.TQAE.equals(installedVersion)) {
             addDatabasePath(Paths.get(gamePath, DATABASE_DIR, DATABASE_FILE));
-            addTextPath(Paths.get(gamePath, "Text"));
+            addTextPath(Paths.get(gamePath, TEXT_DIR));
             if (existsXpack2(Paths.get(gamePath))) {
                 dlcRagnarok = true;
             }
