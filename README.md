@@ -28,7 +28,8 @@ Keep in mind that this software make modifications to your save game (more speci
 
 ![TQRespec Screenshot 1](assets/screenshot_attributes.png "Attributes")
 ![TQRespec Screenshot 2](assets/screenshot_skills.png "Skills")
-![TQRespec Screenshot 3](assets/screenshot_characters.png "Characters")
+![TQRespec Screenshot 3](assets/screenshot_misc.png "Misc")
+![TQRespec Screenshot 4](assets/screenshot_characters.png "Characters")
 
 #### ***Running without the game installed***
 

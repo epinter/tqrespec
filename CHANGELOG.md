@@ -1,4 +1,24 @@
 # Changelog
+## [0.10.0] - 2021-05-22
+### Added
+- Support for respec attributes of mobile save games (TQ Legendary Edition for Android)
+- Support for skills points reclaim of mobile save games (TQ Legendary Edition for Android)
+- Support for copy and convert mobile savegames to Windows (TQ Legendary Edition for Android)
+- Support for copy and convert Windows savegames to mobile (TQ Legendary Edition for Android)
+- Savedata directory to work on savegames outside 'My Games' (Android or Windows)
+- Backup feature (takes a full backup of the selected character)
+- Export Player.chr to JSON (for debugging or analysis)
+
+### Changed
+- Gamedata directory is now considered before game installation. Files placed there will override detected game.
+- Always monitor TQ.exe to disable save.
+- Completely refactor binary file patching system to simplify and improve extendability
+- Improve parsing system and data type detection
+- UI changed to accomodate new mobile features
+
+### Fixed
+- Minor UI bug fixed
+
 ## [0.9.2] - 2021-04-30
 ### Added
 - Copy character's storage when copying character ([#1](https://github.com/epinter/tqrespec/issues/1))
