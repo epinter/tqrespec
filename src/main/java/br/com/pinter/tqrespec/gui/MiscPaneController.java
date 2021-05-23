@@ -8,6 +8,7 @@ import br.com.pinter.tqrespec.core.MyEventHandler;
 import br.com.pinter.tqrespec.core.MyTask;
 import br.com.pinter.tqrespec.core.WorkerThread;
 import br.com.pinter.tqrespec.save.Platform;
+import br.com.pinter.tqrespec.save.exporter.Exporter;
 import br.com.pinter.tqrespec.save.player.Player;
 import br.com.pinter.tqrespec.save.player.PlayerWriter;
 import br.com.pinter.tqrespec.util.Util;
@@ -45,6 +46,8 @@ public class MiscPaneController implements Initializable {
     private TextField copyCharInput;
     @FXML
     private ComboBox<CopyTarget> copyTargetCombo;
+    @FXML
+    private Button exportJsonButton;
     @Inject
     private Player player;
     @Inject
@@ -72,6 +75,8 @@ public class MiscPaneController implements Initializable {
                 setText(Util.getUIMessage("main.copyTarget." + platform));
             }
         });
+        exportJsonButton.setGraphic(Icon.FA_FILE_EXPORT.create());
+        exportJsonButton.setTooltip(Util.simpleTooltip(Util.getUIMessage("misc.tooltipExportJson")));
     }
 
     public void setMainController(MainController mainController) {
@@ -94,6 +99,7 @@ public class MiscPaneController implements Initializable {
         }
         copyCharInput.setDisable(disable);
         copyTargetCombo.setDisable(disable);
+        exportJsonButton.setDisable(disable);
     }
 
     public void loadCharEventHandler() {
@@ -161,7 +167,7 @@ public class MiscPaneController implements Initializable {
 
         if (selectedTarget.equals(CopyTarget.MOBILE) || selectedTarget.equals(CopyTarget.BACKUP)) {
             FileChooser zipChooser = new FileChooser();
-            zipChooser.setTitle("title");
+            zipChooser.setTitle(Util.getUIMessage("misc.copyFileChooserTitle"));
             zipChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("ZIP", "*.zip"));
             zipChooser.setInitialFileName(String.format("%s-%s-%s.zip",
                     targetPlayerName,
@@ -233,6 +239,37 @@ public class MiscPaneController implements Initializable {
         new WorkerThread(copyCharTask).start();
     }
 
+    public void exportJson() {
+        FileChooser jsonChooser = new FileChooser();
+        jsonChooser.setTitle(Util.getUIMessage("misc.exportJsonFileChooserTitle"));
+        jsonChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON", "*.json"));
+        jsonChooser.setInitialFileName(String.format("%s-%s.json",
+                player.getCharacterName(),
+                new SimpleDateFormat("yyyyMMdd").format(new Date())
+        ));
+        File selectedFile = jsonChooser.showSaveDialog(exportJsonButton.getScene().getWindow());
+        if (selectedFile == null) {
+            Util.showError("Error exporting json", "Aborted");
+            mainController.reset();
+            return;
+        }
+
+        MyTask<Integer> exportJsonTask = new MyTask<>() {
+            @Override
+            protected Integer call() {
+                try {
+                    new Exporter(selectedFile, player.getSaveData().getDataMap()).writeJson();
+                    return 1;
+                } catch (IOException e) {
+                    return 0;
+                }
+            }
+        };
+
+        mainController.setCursorWaitOnTask(exportJsonTask);
+        new WorkerThread(exportJsonTask).start();
+    }
+
     public void copyTargetSelected() {
         if (!player.isCharacterLoaded()) {
             return;
@@ -247,6 +284,7 @@ public class MiscPaneController implements Initializable {
     }
 
     public void reset() {
+        exportJsonButton.setDisable(true);
         copyCharInput.clear();
         copyCharInput.setDisable(true);
         charNameBlankBlocked.set(false);
