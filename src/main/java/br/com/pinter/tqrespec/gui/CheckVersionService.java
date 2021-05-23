@@ -4,6 +4,7 @@
 
 package br.com.pinter.tqrespec.gui;
 
+import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
 import br.com.pinter.tqrespec.util.Version;
 import com.google.inject.Inject;
@@ -19,20 +20,24 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 public class CheckVersionService extends Service<Version> {
-    private final String url;
-    private final String currentVersion;
-    private final Control control;
+    private Control control;
+
     @Inject
     private HostServices hostServices;
 
-    public CheckVersionService(String currentVersion, String url, Control control) {
-        this.url = url;
-        this.currentVersion = currentVersion;
+    public CheckVersionService withControl(Control control) {
         this.control = control;
+        return this;
     }
 
     @Override
     protected Task<Version> createTask() {
+        String url = Constants.VERSION_CHECK_URL;
+        String currentVersion = Util.getBuildVersion();
+        if (control == null) {
+            throw new IllegalArgumentException("null parameter received");
+        }
+
         Task<Version> task = new Task<>() {
             @Override
             protected Version call() {

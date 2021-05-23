@@ -31,7 +31,6 @@ import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Constants;
 import br.com.pinter.tqrespec.util.Util;
 import com.google.inject.Inject;
-import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -94,7 +93,7 @@ public class MainController implements Initializable {
     @Inject
     private PlayerWriter playerWriter;
     @Inject
-    private HostServices hostServices;
+    private CheckVersionService checkVersionService;
     @Inject
     private GameInfo gameInfo;
     @FXML
@@ -163,7 +162,7 @@ public class MainController implements Initializable {
             }
         });
 
-        new CheckVersionService(Util.getBuildVersion(), Constants.VERSION_CHECK_URL, versionCheck).start();
+        checkVersionService.withControl(versionCheck).start();
     }
 
     public void addCharactersToCombo() {
