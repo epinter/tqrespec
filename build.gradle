@@ -27,7 +27,7 @@ sourceSets {
 
 OperatingSystem OS = DefaultNativePlatform.currentOperatingSystem
 ext.distAppName = 'TQRespec'
-version = '0.10.0'
+version = '0.10.1'
 sourceCompatibility = 14
 ext.moduleName = 'br.com.pinter.tqrespec'
 ext.mainPackageName = 'br.com.pinter.tqrespec'
@@ -112,6 +112,7 @@ jar {
 }
 
 task copyMetaInf(type: Copy) {
+    group = 'tqrespec'
     from fileTree(new File(sourceSets.main.output.resourcesDir, '/META-INF'))
     into new File(sourceSets.main.java.outputDir, '/META-INF')
 }
@@ -167,6 +168,7 @@ if (moduleInfoPresent) {
 }
 
 task copyToLib(type: Copy) {
+    group = 'tqrespec'
     doFirst {
         mkdir "$buildDir/jardist"
     }
@@ -180,12 +182,14 @@ copyToLib.dependsOn(jar)
 classes.dependsOn('copyMetaInf')
 
 task copyJarsToModuleDeps(type: Copy) {
+    group = 'tqrespec'
     from project(':tqdatabase').configurations.compileClasspath
     from project.configurations.compileClasspath
     into patchjarDir
 }
 
 task patchModulesJar(type: PatchJarModuleTask) {
+    group = 'tqrespec'
     dependsOn 'copyJarsToModuleDeps'
     delete = true
     tempPatchDir = new File(buildDir, '/temppatch')
@@ -194,6 +198,7 @@ task patchModulesJar(type: PatchJarModuleTask) {
 }
 
 task copyAppimageFiles(type: Copy) {
+    group = 'tqrespec'
     dependsOn(jar)
     dependsOn 'tqdatabase:jar'
     doFirst {
@@ -210,6 +215,7 @@ task copyAppimageFiles(type: Copy) {
 }
 
 task copyAppimageModules(type: Copy) {
+    group = 'tqrespec'
     if (patchJars) {
         dependsOn(patchModulesJar)
     }
@@ -230,6 +236,7 @@ task copyAppimageModules(type: Copy) {
 }
 
 task jlink(type: Exec) {
+    group = 'tqrespec'
     dependsOn clean
     dependsOn 'copyToLib'
     if (patchJars) {
@@ -263,6 +270,7 @@ task jlink(type: Exec) {
 }
 
 task archiveAppimage(type: Zip) {
+    group = 'tqrespec'
     dependsOn 'appimage'
     doLast {
         println("Creating archive '${appArchiveName}'")
@@ -273,6 +281,7 @@ task archiveAppimage(type: Zip) {
 }
 
 task appimage(type: Exec) {
+    group = 'tqrespec'
     dependsOn 'jlink'
     workingDir buildDir
     if (moduleInfoPresent) {

@@ -1,4 +1,12 @@
 # Changelog
+## [0.10.1] - 2021-05-27
+### Changed
+- Add quest files to automatic backup (backup size increased)
+- Support new mobile savegame format
+
+### Fixed
+- Fix update link to properly open web browser.
+
 ## [0.10.0] - 2021-05-22
 ### Added
 - Support for respec attributes of mobile save games (TQ Legendary Edition for Android)
