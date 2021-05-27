@@ -159,6 +159,7 @@ public class PlayerFileVariable implements FileVariable {
         mapMobile.put("defaultText", new PlayerFileVariable("defaultText", VariableType.STRING_UTF_32_LE, FileBlockType.BODY));
         mapMobile.put("greatestMonsterKilledName", new PlayerFileVariable("(*greatestMonsterKilledName)[i]", VariableType.STRING_UTF_32_LE, PlayerBlockType.PLAYER_STATS));
         mapMobile.put("mySaveId", new PlayerFileVariable("mySaveId", VariableType.STRING, PlayerBlockType.PLAYER_MAIN));
+        mapMobile.put("currentDifficulty", new PlayerFileVariable("currentDifficulty", VariableType.INTEGER, PlayerBlockType.PLAYER_HEADER));
         variablesMap.put(Platform.WINDOWS, map);
         variablesMap.put(Platform.MOBILE, mapMobile);
     }

@@ -40,7 +40,7 @@ final class PlayerParser extends FileParser {
 
     private final String player;
     private final File playerChr;
-    private HeaderInfo headerInfo = new HeaderInfo();
+    private HeaderInfo headerInfo;
 
     PlayerParser(File playerChr, String playerName) {
         this.playerChr = playerChr;
@@ -51,7 +51,7 @@ final class PlayerParser extends FileParser {
         return headerInfo;
     }
 
-    HeaderInfo parseHeader() {
+    HeaderInfo parseHeader() throws IncompatibleSavegameException {
         ArrayListMultimap<String, VariableInfo> variables = ArrayListMultimap.create();
 
         BlockInfo block = new BlockInfo();
@@ -85,7 +85,23 @@ final class PlayerParser extends FileParser {
 
             String logFmt = "name=%s; value=%s; type=%s";
 
-            PlayerFileVariable e = PlayerFileVariable.valueOf(getDetectedPlatform(), name);
+            PlayerFileVariable e = null;
+            try {
+                e = PlayerFileVariable.valueOf(getDetectedPlatform(), name);
+            } catch (InvalidVariableException exception) {
+                logger.log(System.Logger.Level.ERROR, "", exception);
+                logger.log(System.Logger.Level.ERROR, "Variable ''{0}'' not found for {1}, trying {2} ",
+                        name, getDetectedPlatform(), Platform.MOBILE);;
+                if(Platform.WINDOWS.equals(getDetectedPlatform()) && PlayerFileVariable.valueOf(Platform.MOBILE, name)!=null
+                        && h.getHeaderVersion().equals(GameVersion.TQLE)) {
+                    e = PlayerFileVariable.valueOf(Platform.MOBILE, name);
+                    setDetectedPlatform(Platform.MOBILE);
+                }
+            }
+
+            if(e == null) {
+                throw new IncompatibleSavegameException("Invalid variable '{}'");
+            }
 
             if (e.var().equals(name) && e.location().equals(PlayerBlockType.PLAYER_HEADER)) {
                 readVar(name, variableInfo);
@@ -119,12 +135,21 @@ final class PlayerParser extends FileParser {
         }
         getBlockInfo().put(block.getStart(), block);
         block.setVariables(ImmutableListMultimap.copyOf(variables));
+        if(block.getVariables().containsKey("currentDifficulty") && h.getHeaderVersion().equals(GameVersion.TQLE)) {
+            setDetectedPlatform(Platform.MOBILE);
+        }
         return h;
     }
 
-    private void readIntegerFromHeader(HeaderInfo h, String name, int valueInt) {
-        if (name.equals(PlayerFileVariable.valueOf(getDetectedPlatform(), "headerVersion").var()))
-            h.setHeaderVersion(GameVersion.fromValue(valueInt));
+    private void readIntegerFromHeader(HeaderInfo h, String name, int valueInt) throws IncompatibleSavegameException {
+        try {
+            if (name.equals(PlayerFileVariable.valueOf(getDetectedPlatform(), "headerVersion").var()))
+                h.setHeaderVersion(GameVersion.fromValue(valueInt));
+        } catch (EnumConstantNotPresentException e) {
+            throw new IncompatibleSavegameException(
+                    String.format("Incompatible character '%s' (unknown headerVersion)", this.player));
+
+        }
         if (name.equals(PlayerFileVariable.valueOf(getDetectedPlatform(), "playerVersion").var()))
             h.setPlayerVersion(valueInt);
         if (name.equals(PlayerFileVariable.valueOf(getDetectedPlatform(), "playerLevel").var()))
@@ -151,13 +176,13 @@ final class PlayerParser extends FileParser {
 
         headerInfo = parseHeader();
 
-        if (!EnumSet.of(GameVersion.TQIT, GameVersion.TQAE).contains(headerInfo.getHeaderVersion())) {
+        if (!EnumSet.of(GameVersion.TQIT, GameVersion.TQAE, GameVersion.TQLE).contains(headerInfo.getHeaderVersion())) {
             throw new IncompatibleSavegameException(
-                    String.format("Incompatible player '%s' (headerVersion must be 2 or 3)", this.player));
+                    String.format("Incompatible character '%s' (unknown headerVersion)", this.player));
         }
         if (headerInfo.getPlayerVersion() != 5) {
             throw new IncompatibleSavegameException(
-                    String.format("Incompatible player '%s' (playerVersion must be == 5)", this.player));
+                    String.format("Incompatible character '%s' (playerVersion must be == 5)", this.player));
         }
     }
 
@@ -184,8 +209,9 @@ final class PlayerParser extends FileParser {
 
     @Override
     protected void preprocessVariable(String name, int keyOffset, BlockType blockType) {
-        if (name.equals("mySaveId") && blockType.equals(PlayerBlockType.PLAYER_MAIN)) {
-            logger.log(System.Logger.Level.INFO, "Mobile savegame detected: ''{0}''", playerChr);
+        if (! Platform.MOBILE.equals(getDetectedPlatform())
+                && ((name.equals("mySaveId") && blockType.equals(PlayerBlockType.PLAYER_MAIN))
+                || headerInfo.getHeaderVersion().equals(GameVersion.TQLE))) {
             setDetectedPlatform(Platform.MOBILE);
         }
     }

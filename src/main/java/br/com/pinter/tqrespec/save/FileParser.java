@@ -81,6 +81,10 @@ public abstract class FileParser {
 
     protected void setDetectedPlatform(Platform detectedPlatform) {
         this.detectedPlatform = detectedPlatform;
+        if(detectedPlatform.equals(Platform.MOBILE)) {
+            logger.log(System.Logger.Level.INFO, "Mobile savegame detected");
+        }
+
     }
 
     void reset() {

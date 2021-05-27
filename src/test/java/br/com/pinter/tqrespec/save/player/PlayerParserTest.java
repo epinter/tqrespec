@@ -174,15 +174,16 @@ class PlayerParserTest {
             playerParser.buildBlocksTable();
             playerParser.prepareForParse();
             playerParser.prepareBufferForRead();
+
+            HeaderInfo headerInfo = playerParser.parseHeader();
+            assertNotNull(headerInfo);
+            assertTrue(headerInfo.getHeaderVersion() == GameVersion.TQIT || headerInfo.getHeaderVersion() == GameVersion.TQAE);
+            assertEquals(5, headerInfo.getPlayerVersion());
+            assertTrue(headerInfo.getPlayerLevel() > 0);
         } catch (Exception e) {
             logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
         }
 
-        HeaderInfo headerInfo = playerParser.parseHeader();
-        assertNotNull(headerInfo);
-        assertTrue(headerInfo.getHeaderVersion() == GameVersion.TQIT || headerInfo.getHeaderVersion() == GameVersion.TQAE);
-        assertTrue(headerInfo.getPlayerVersion() > 0);
-        assertTrue(headerInfo.getPlayerLevel() > 0);
     }
 
     @Test

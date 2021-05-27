@@ -27,7 +27,8 @@ public enum GameVersion {
     UNKNOWN(0),
     TQ(1),
     TQIT(2),
-    TQAE(3);
+    TQAE(3),
+    TQLE(4);
 
     private final int value;
 

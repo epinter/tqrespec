@@ -83,11 +83,10 @@ public class Player {
 
             if (external) {
                 playerChrPath = gameInfo.playerChrExternalPath(playerName);
-                logger.log(System.Logger.Level.INFO, "Loading external character: ''{0}''", playerChrPath);
-
             } else {
                 playerChrPath = gameInfo.playerChr(playerName, getSaveData().isCustomQuest());
             }
+            logger.log(System.Logger.Level.INFO, "Loading character ''{0}''", playerChrPath);
 
             getSaveData().setPlayerChr(playerChrPath);
             PlayerParser playerParser = new PlayerParser(
