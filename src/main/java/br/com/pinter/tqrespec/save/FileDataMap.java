@@ -289,8 +289,15 @@ public class FileDataMap implements DeepCloneable {
     private void convertMobileToWindows() {
         for (VariableInfo v :
                 getBlockInfo().values().stream().flatMap(b -> b.getVariables().values().stream()).collect(Collectors.toList())) {
-            if (v.getName().equals("mySaveId")) {
+            if (v.getName().equals("mySaveId") || v.getName().equals("currentDifficulty")) {
                 removeVariable(v);
+            } else if(v.getName().equals("headerVersion")) {
+                VariableInfo newVar = (VariableInfo) v.deepClone();
+                if (hasChange(v)) {
+                    newVar = getFirstChange(v);
+                }
+                newVar.setValue(3);
+                storeChange(v, newVar);
             } else {
                 if (v.getVariableType().equals(VariableType.STRING_UTF_32_LE)) {
                     if (v.getValSize() == 0)

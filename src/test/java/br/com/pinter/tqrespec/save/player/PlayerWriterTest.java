@@ -72,15 +72,15 @@ class PlayerWriterTest {
                     " copy the savegame to execute the tests", playerChr));
         }
 
-        playerParser = new PlayerParser(playerChr,
-                "savegame");
+        playerParser = new PlayerParser(playerChr, "savegame");
     }
 
     @Test
     void copyAndSet_Should_copySavegameAndTestNewValue() {
+        String savegame = "savegame";
         try {
             saveData.reset();
-            saveData.setPlayerName("savegame");
+            saveData.setPlayerName(savegame);
             saveData.setBuffer(playerParser.load());
             saveData.getDataMap().setBlockInfo(playerParser.getBlockInfo());
             saveData.setHeaderInfo(playerParser.getHeaderInfo());
@@ -101,7 +101,7 @@ class PlayerWriterTest {
             e.printStackTrace();
         }
 
-        Mockito.when(mockSaveData.getPlayerPath()).thenReturn(Path.of(String.format("%s/_%s","src/test/resources", "savegame")));
+        Mockito.when(mockSaveData.getPlayerPath()).thenReturn(Path.of(String.format("%s/_%s","src/test/resources", savegame)));
         Mockito.when(mockSaveData.getPlayerName()).thenReturn(saveData.getPlayerName());
         Mockito.when(mockSaveData.getDataMap()).thenReturn(saveData.getDataMap());
         Mockito.when(mockSaveData.getBuffer()).thenReturn(saveData.getBuffer());
@@ -138,13 +138,22 @@ class PlayerWriterTest {
     }
 
     private void prepareCopySavegame() {
+        prepareCopySavegame("savegame");
+    }
+
+    private void prepareCopySavegame(String savegame) {
         try {
+            playerParser = new PlayerParser(new File(String.format("src/test/resources/_%s/Player.chr",savegame)), savegame);
             saveData.reset();
-            saveData.setPlayerName("savegame");
+            saveData.setPlayerName(savegame);
             saveData.setBuffer(playerParser.load());
+            saveData.setPlatform(playerParser.getDetectedPlatform());
             saveData.getDataMap().setBlockInfo(playerParser.getBlockInfo());
+            System.out.println("SAVEGAME " + savegame);
+            System.out.println("PLATFORM " + playerParser.getDetectedPlatform());
             saveData.setHeaderInfo(playerParser.getHeaderInfo());
             saveData.getDataMap().setVariableLocation(playerParser.getVariableLocation());
+            System.out.println("PLAYER " + saveData.getDataMap().getCharacterName());
         } catch (Exception e) {
             logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
             fail();
@@ -161,7 +170,7 @@ class PlayerWriterTest {
             e.printStackTrace();
         }
 
-        Mockito.when(mockSaveData.getPlayerPath()).thenReturn(Path.of(String.format("%s/_%s","src/test/resources", "savegame")));
+        Mockito.when(mockSaveData.getPlayerPath()).thenReturn(Path.of(String.format("%s/_%s","src/test/resources", savegame)));
         Mockito.when(mockSaveData.getPlayerName()).thenReturn(saveData.getPlayerName());
         Mockito.when(mockSaveData.getDataMap()).thenReturn(saveData.getDataMap());
         Mockito.when(mockSaveData.getBuffer()).thenReturn(saveData.getBuffer());
@@ -187,6 +196,7 @@ class PlayerWriterTest {
             saveData.reset();
             saveData.setPlayerName("testcopy");
             saveData.setBuffer(playerParser.load());
+            saveData.setPlatform(playerParser.getDetectedPlatform());
             saveData.getDataMap().setBlockInfo(playerParser.getBlockInfo());
             saveData.setHeaderInfo(playerParser.getHeaderInfo());
             saveData.getDataMap().setVariableLocation(playerParser.getVariableLocation());
@@ -327,5 +337,20 @@ class PlayerWriterTest {
         assertEquals("testcopy", saveData.getDataMap().getCharacterName());
     }
 
+    @Test
+    void copyMobilePlayer_Should_copyAndParse() {
+        prepareCopySavegame("mobile");
 
+        copyAndParseSavegame(Platform.WINDOWS);
+
+        try {
+            Files.copy(Path.of("src/test/resources/_testcopy"), Path.of("src/test/resources/a.chr"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertEquals("testcopy", saveData.getDataMap().getCharacterName());
+        assertEquals(3, saveData.getDataMap().getInt(0,"headerVersion"));
+        assertNull(saveData.getDataMap().getString("currentDifficulty"));
+        assertNull(saveData.getDataMap().getString("mySaveId"));
+    }
 }
