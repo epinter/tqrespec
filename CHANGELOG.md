@@ -1,4 +1,11 @@
 # Changelog
+## [0.10.2] - 2021-06-09
+### Changed
+- Changed UI string text from 'Android' to 'Mobile'
+
+### Fixed
+- Fix manual path chooser (shown when game installation isn't found)
+
 ## [0.10.1] - 2021-05-27
 ### Changed
 - Add quest files to automatic backup (backup size increased)
