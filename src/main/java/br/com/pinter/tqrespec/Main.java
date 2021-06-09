@@ -123,34 +123,29 @@ public class Main extends Application {
 
         try {
             gameInfo.setManualGamePath(selectedDirectory.getPath());
+            if (GameVersion.TQIT.equals(gameInfo.getInstalledVersion())) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setHeaderText(Util.getUIMessage("alert.chooseTQBaseDir_header"));
+                alert.setContentText(Util.getUIMessage("alert.chooseTQBaseDir_content"));
+                alert.initOwner(primaryStage);
+                alert.setTitle(Util.getBuildTitle());
+                alert.showAndWait();
+                DirectoryChooser tqDirectoryChooser = new DirectoryChooser();
+                tqDirectoryChooser.setTitle(Util.getUIMessage(Constants.Msg.MAIN_CHOOSEGAMEDIRECTORY));
+                File tqSelectedDirectory = tqDirectoryChooser.showDialog(primaryStage);
+
+                if (tqSelectedDirectory == null) {
+                    Platform.exit();
+                    System.exit(1);
+                }
+
+                gameInfo.setManualTqBaseGamePath(selectedDirectory.getPath(), tqSelectedDirectory.getPath());
+            }
             return;
         } catch (GameNotFoundException e) {
             logger.log(System.Logger.Level.ERROR, "Error", e);
         }
 
-        if (GameVersion.TQIT.equals(gameInfo.getInstalledVersion())) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setHeaderText(Util.getUIMessage("alert.chooseTQBaseDir_header"));
-            alert.setContentText(Util.getUIMessage("alert.chooseTQBaseDir_content"));
-            alert.initOwner(primaryStage);
-            alert.setTitle(Util.getBuildTitle());
-            alert.showAndWait();
-            DirectoryChooser tqDirectoryChooser = new DirectoryChooser();
-            tqDirectoryChooser.setTitle(Util.getUIMessage(Constants.Msg.MAIN_CHOOSEGAMEDIRECTORY));
-            File tqSelectedDirectory = tqDirectoryChooser.showDialog(primaryStage);
-
-            if (tqSelectedDirectory == null) {
-                Platform.exit();
-                System.exit(1);
-            }
-
-            try {
-                gameInfo.setManualTqBaseGamePath(selectedDirectory.getPath(), tqSelectedDirectory.getPath());
-                return;
-            } catch (GameNotFoundException e) {
-                logger.log(System.Logger.Level.ERROR, Constants.Msg.MAIN_GAMENOTDETECTED, e);
-            }
-        }
         Util.showError(Util.getUIMessage(Constants.Msg.MAIN_GAMENOTDETECTED), null);
         Platform.exit();
         System.exit(0);

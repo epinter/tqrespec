@@ -421,6 +421,7 @@ public class GameInfo {
             if (InstallType.UNKNOWN.equals(installType)) {
                 installType = InstallType.MANUAL;
             }
+            setGamePath(manualPath.toString());
             logger.log(System.Logger.Level.INFO, "Path manually set: path:{0};version:{1}:type:{2}", manualPath, installedVersion, installType);
         } else {
             logger.log(System.Logger.Level.ERROR, "Path ''{0}'' is invalid", manualPath);
