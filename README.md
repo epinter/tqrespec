@@ -38,9 +38,21 @@ This application uses game data. If you want to run it on a PC that doesn't have
 ~~~
 TQRespec/app
 TQRespec/runtime
-TQRespec/gamedata/Database
-TQRespec/gamedata/Text
 TQRespec/TQRespec.exe
+TQRespec/gamedata/Database/database.arz
+TQRespec/gamedata/Text/Text_BR.arc
+TQRespec/gamedata/Text/Text_CH.arc
+TQRespec/gamedata/Text/Text_CZ.arc
+TQRespec/gamedata/Text/Text_DE.arc
+TQRespec/gamedata/Text/Text_EN.arc
+TQRespec/gamedata/Text/Text_ES.arc
+TQRespec/gamedata/Text/Text_FR.arc
+TQRespec/gamedata/Text/Text_IT.arc
+TQRespec/gamedata/Text/Text_JA.arc
+TQRespec/gamedata/Text/Text_KO.arc
+TQRespec/gamedata/Text/Text_PL.arc
+TQRespec/gamedata/Text/Text_RU.arc
+TQRespec/gamedata/Text/Text_UK.arc
 ~~~
 
 Where Database and Text folders (with its contents) are copied from the game.
@@ -85,7 +97,7 @@ The old mobile version of the game will not be supported.
 
 #### ***IOS support***
 
-The IOS version of the game is untested and unsupported at this time. If you want to use with IOS, open an issue and contribute testing, sending logs and feedback.
+Users of the IOS version of the game reported it works like Android. The savegame is located in TitanQuest, inside iCloud.
 
 #### ***Copy your character***
 
