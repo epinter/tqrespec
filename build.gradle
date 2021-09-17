@@ -21,17 +21,16 @@ buildscript {
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
 sourceSets {
-    main.output.resourcesDir = main.java.outputDir
+    main.output.resourcesDir = main.java.classesDirectory.get()
 }
-
 
 OperatingSystem OS = DefaultNativePlatform.currentOperatingSystem
 ext.distAppName = 'TQRespec'
 version = '0.10.2'
-sourceCompatibility = 14
+sourceCompatibility = JavaVersion.VERSION_17
 ext.moduleName = 'br.com.pinter.tqrespec'
 ext.mainPackageName = 'br.com.pinter.tqrespec'
-ext.javahome = System.properties['java.home']
+ext.javahome = System.getProperty("java.home")
 ext.moduleInfoPresent = false
 ext.osArch = System.getProperty("os.arch").toLowerCase()
 ext.javafxSdkDir = file(String.format("%s/sdk/javafx-sdk-%s-%s-%s", projectDir, sourceCompatibility, OS.toFamilyName().toLowerCase(), osArch))
@@ -50,9 +49,9 @@ if (!file(javafxSdkDir).directory) {
 }
 
 if (project.hasProperty('buildVersion')) {
-    project.version = project.properties['buildVersion']
+    project.version = project.properties.get("buildVersion")
 }
-if(osArch.equals("amd64")) {
+if(osArch == "amd64") {
     ext.appArchiveName = "${distAppName}-${project.version}.zip"
 } else {
     ext.appArchiveName = "${distAppName}-${project.version}_${osArch}.zip"
@@ -101,6 +100,7 @@ if (OS.isWindows()) {
 }
 
 jar {
+    //noinspection GroovyAssignabilityCheck
     manifest {
         attributes('Class-Path': configurations.runtimeClasspath.collect { it.getName() }.join(' '),
                 'Implementation-Title': distAppName,
@@ -114,7 +114,7 @@ jar {
 task copyMetaInf(type: Copy) {
     group = 'tqrespec'
     from fileTree(new File(sourceSets.main.output.resourcesDir, '/META-INF'))
-    into new File(sourceSets.main.java.outputDir, '/META-INF')
+    into sourceSets.main.java.classesDirectory.get().dir('/META-INF')
 }
 
 if (moduleInfoPresent) {
