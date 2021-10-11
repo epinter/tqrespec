@@ -178,6 +178,10 @@ public class CharactersViewController implements Initializable {
 
     @FXML
     public void closeWindow(@SuppressWarnings("unused") MouseEvent evt) {
+        close();
+    }
+
+    public void close() {
         if (loadingCharacters.get()) {
             return;
         }
@@ -259,11 +263,6 @@ public class CharactersViewController implements Initializable {
             stage.initStyle(StageStyle.UNDECORATED);
         }
 
-        stage.addEventHandler(KeyEvent.KEY_PRESSED, (event -> {
-            if (event.getCode() == KeyCode.ESCAPE) {
-                stage.close();
-            }
-        }));
         stage.setTitle(Util.getUIMessage("characters.title", Util.getBuildTitle()));
         charFormTitle.setText(Util.getUIMessage("characters.title", Util.getBuildTitle()));
 
@@ -298,8 +297,14 @@ public class CharactersViewController implements Initializable {
                 return null;
             }
         }).start());
+        stage.addEventHandler(KeyEvent.KEY_PRESSED, (event -> {
+            if (event.getCode() == KeyCode.ESCAPE) {
+                close();
+            }
+        }));
 
         exportButton.setGraphic(Icon.FA_FILE_EXPORT.create());
+
         stage.show();
     }
 
