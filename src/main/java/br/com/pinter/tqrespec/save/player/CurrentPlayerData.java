@@ -27,13 +27,14 @@ import com.google.inject.Singleton;
 
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Singleton
 public class CurrentPlayerData implements FileDataHolder {
-    private final LinkedHashMap<String, PlayerSkill> playerSkills = new LinkedHashMap<>();
+    private final Map<String, PlayerSkill> playerSkills = Collections.synchronizedMap(new LinkedHashMap<>());
     private final AtomicBoolean missingSkills = new AtomicBoolean(false);
     private String playerName = null;
     private Path playerChr = null;

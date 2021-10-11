@@ -614,7 +614,8 @@ public class FileDataMap implements DeepCloneable {
     }
 
     List<VariableInfo> getTempVariableInfo(String var) {
-        List<Integer> temp = variableLocation.get("temp");
+        List<Integer> temp = variableLocation.get("temp") != null ? variableLocation.get("temp") : List.of();
+
         for (Integer blockStart : temp) {
             BlockInfo b = blockInfo.get(blockStart);
             if (!b.getVariableByAlias(var).isEmpty()) {
