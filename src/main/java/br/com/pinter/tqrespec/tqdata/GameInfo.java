@@ -109,6 +109,7 @@ public class GameInfo {
 
     private Path getGameSteamPath() {
         Path steamLibraryPath = getSteamLibraryPath();
+        logger.log(System.Logger.Level.DEBUG, "LibraryPathFound -- ''{0}''", steamLibraryPath);
         if (steamLibraryPath != null) {
             Path steamGamePath = Paths.get(steamLibraryPath.toString(), Constants.GAME_DIRECTORY_STEAM).toAbsolutePath();
             if (isValidGamePath(steamGamePath)) {
@@ -139,33 +140,19 @@ public class GameInfo {
         }
 
         try {
-            Path steamappsPath = Paths.get(steamPath, "SteamApps").toAbsolutePath();
-            Path steamGamePath = Paths.get(steamappsPath.toString(), Constants.GAME_DIRECTORY_STEAM).toAbsolutePath();
-            if (isValidGamePath(steamGamePath)) {
-                return steamappsPath;
-            }
+            Path steamLibraryFolderVdf = Paths.get(steamPath, "SteamApps", "libraryfolders.vdf").toAbsolutePath();
 
-            Pattern regexOuter = Pattern.compile(".*LibraryFolders.*\\{(.*)}.*", Pattern.DOTALL);
-            Pattern regexInner = Pattern.compile("\\s*\"\\d\"\\s+\"([^\"]+)\".*");
+            List<String> libraryPaths = getLibraryPathsFromSteam(steamLibraryFolderVdf.toString());
 
-            ArrayList<String> libraryFolderList = new ArrayList<>();
-            String steamConfig = Files.readString(Paths.get(steamappsPath.toString(), "libraryfolders.vdf"));
+            logger.log(System.Logger.Level.DEBUG, "libraryFolderList -- ''{0}''", libraryPaths);
 
-            Matcher outer = regexOuter.matcher(steamConfig);
-            if (outer.find()) {
-                String content = outer.group(1);
-                Matcher inner = regexInner.matcher(content);
-                while (inner.find()) {
-                    if (inner.group(1) != null && !inner.group(1).isEmpty()) {
-                        libraryFolderList.add(inner.group(1));
-                    }
-                }
-            }
+            for (String directory : libraryPaths) {
+                logger.log(System.Logger.Level.DEBUG, "Trying library -- ''{0}''", directory);
 
-            for (String libraryFolder : libraryFolderList) {
-                Path libraryPath = Paths.get(libraryFolder, "SteamApps").toAbsolutePath();
+                Path libraryPath = Paths.get(directory, "SteamApps").toAbsolutePath();
                 Path libraryGamePath = Paths.get(libraryPath.toString(), Constants.GAME_DIRECTORY_STEAM).toAbsolutePath();
                 if (isValidGamePath(libraryGamePath)) {
+                    logger.log(System.Logger.Level.DEBUG, "VALID PATH FOUND!! -- ''{0}''", libraryGamePath);
                     return libraryPath;
                 }
             }
@@ -173,6 +160,66 @@ public class GameInfo {
             logger.log(System.Logger.Level.DEBUG, Constants.ERROR_MSG_EXCEPTION, e);
         }
         return null;
+    }
+
+    private List<String> getLibraryPathsFromSteam(String configPath) {
+        Pattern regexLibraryFolders = Pattern.compile("\"LibraryFolders\"\\s*[\\n\\s.]*\\{(.*)}[\\n\\s\\W]*",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+
+        Pattern regexAppsLibraries = Pattern.compile("\\s*(?<=\"\\d{1,10}\")[\\n\\s]*\\{([^}]*(?:(?<=\\{).*(?=}))*[^}]+})[\\n\\s]*}[\\n\\s\\W]*",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+
+        Pattern regexLibraryPath = Pattern.compile("\"path\"\\s*\"([^\"]*)\"[\\n\\W]*", Pattern.CASE_INSENSITIVE);
+
+        Pattern regexAppId = Pattern.compile("\"(\\d{1,10})\"\\s*\"([^\"]*)\"[\\n\\W]*");
+
+        Pattern regexApps = Pattern.compile("(?<=\"apps\")[\\n\\s]*\\{((?:(?<=\\{).*(?=}))*[^}]+)}[\\n\\s\\W]*",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+
+        Pattern regexInner = Pattern.compile("\"\\d{1,10}\"[\\n\\s]*(?<!\\{)\"([^\"]+)\"");
+
+        String steamConfig;
+        try {
+            steamConfig = Files.readString(Paths.get(configPath));
+        } catch (IOException e) {
+            return Collections.emptyList();
+        }
+
+        List<String> librariesPath = new ArrayList<>();
+        Matcher matcherFile = regexLibraryFolders.matcher(steamConfig);
+        if (matcherFile.find()) {
+            String libraryFoldersContent = matcherFile.group(1);
+            Matcher matcherLibrary = regexAppsLibraries.matcher(libraryFoldersContent);
+            if (matcherLibrary.find()) {
+                matcherLibrary.results().forEach(l -> {
+                    Matcher matcherApp = regexApps.matcher(l.group(1));
+                    matcherApp.results().forEach(a -> {
+                        Matcher matcherAppId = regexAppId.matcher(a.group(1));
+                        matcherAppId.results().forEach(id -> {
+                            if (StringUtils.equals(id.group(1), "475150")) {
+                                logger.log(System.Logger.Level.DEBUG, "Steam AppId found ''{0}''", id.group(1));
+                            }
+                        });
+                    });
+                    Matcher matcherPath = regexLibraryPath.matcher(l.group(1));
+                    if (matcherPath.find()) {
+                        if (Files.isDirectory(Path.of(matcherPath.group(1)))) {
+                            librariesPath.add(matcherPath.group(1));
+                        }
+                    }
+                });
+            }
+
+            if (librariesPath.isEmpty()) {
+                Matcher inner = regexInner.matcher(libraryFoldersContent);
+                while (inner.find()) {
+                    if (inner.group(1) != null && !inner.group(1).isEmpty()) {
+                        librariesPath.add(inner.group(1));
+                    }
+                }
+            }
+        }
+        return librariesPath;
     }
 
     private Path getGameGogPath() {
@@ -307,6 +354,7 @@ public class GameInfo {
     }
 
     private Path detectInstallation() throws GameNotFoundException {
+        //search AE in Windows registry
         Path installedPath = getGameInstalledPath(Constants.REGEX_REGISTRY_INSTALL);
         if (isValidGamePath(installedPath)) {
             logger.log(System.Logger.Level.DEBUG, "Installed: found");
@@ -315,6 +363,7 @@ public class GameInfo {
             return installedPath;
         }
 
+        //search AE in Steam
         Path gameSteam = getGameSteamPath();
         if (isValidGamePath(gameSteam)) {
             logger.log(System.Logger.Level.DEBUG, "SteamLibrary: found");
@@ -323,6 +372,7 @@ public class GameInfo {
             return gameSteam;
         }
 
+        //search AE in GOG
         Path gogPath = getGameGogPath();
         if (isValidGamePath(gogPath)) {
             logger.log(System.Logger.Level.DEBUG, "Gog: found");
@@ -331,6 +381,7 @@ public class GameInfo {
             return gogPath;
         }
 
+        //try Windows registry with more generic name, and guess the version
         Path installedPathFallback = getGameInstalledPath(Constants.REGEX_REGISTRY_INSTALL_FALLBACK);
         if (isValidGamePath(installedPathFallback)) {
             logger.log(System.Logger.Level.DEBUG, "Installed: found");
@@ -341,6 +392,7 @@ public class GameInfo {
             }
         }
 
+        //search AE in MS Store
         Path microsoftStorePath = getGameMicrosoftStorePath();
         if (isValidGamePath(microsoftStorePath)) {
             logger.log(System.Logger.Level.DEBUG, "Package: found");
