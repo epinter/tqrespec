@@ -177,7 +177,12 @@ public abstract class FileParser {
             }
 
             //pass current blockType (detected from previous variable read), so we can distinguish variables that repeat
-            blockType = validateBlockType(block, name, blockType);
+            try {
+                blockType = validateBlockType(block, name, blockType);
+            } catch (InvalidVariableException e) {
+                logger.log(System.Logger.Level.ERROR, "Invalid variable ''{0}'' at block ''{1}'', offset ''{2}''", name, block.getStart(), keyOffset);
+                throw e;
+            }
 
             preprocessVariable(name, keyOffset, blockType);
 
@@ -232,6 +237,7 @@ public abstract class FileParser {
                     break;
                 }
             }
+
             fileVariable = getFileVariable(varName);
             if (fileVariable == null) {
                 throw new IllegalStateException(String.format(invalidVarMsg, name, block.getStart()));
