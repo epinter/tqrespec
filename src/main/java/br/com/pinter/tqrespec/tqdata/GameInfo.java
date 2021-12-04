@@ -166,14 +166,14 @@ public class GameInfo {
         Pattern regexLibraryFolders = Pattern.compile("\"LibraryFolders\"\\s*[\\n\\s.]*\\{(.*)}[\\n\\s\\W]*",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
-        Pattern regexAppsLibraries = Pattern.compile("\\s*(?<=\"\\d{1,10}\")[\\n\\s]*\\{([^}]*(?:(?<=\\{).*(?=}))*[^}]+})[\\n\\s]*}[\\n\\s\\W]*",
+        Pattern regexAppsLibraries = Pattern.compile("\\s*(?<=\"\\d{1,10}\")[\\n\\s]*\\{([^}]*(?:(?<=\\{).*(?=})){0,100}[^}]+})[\\n\\s]*}[\\n\\s\\W]*",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
         Pattern regexLibraryPath = Pattern.compile("\"path\"\\s*\"([^\"]*)\"[\\n\\W]*", Pattern.CASE_INSENSITIVE);
 
         Pattern regexAppId = Pattern.compile("\"(\\d{1,10})\"\\s*\"([^\"]*)\"[\\n\\W]*");
 
-        Pattern regexApps = Pattern.compile("(?<=\"apps\")[\\n\\s]*\\{((?:(?<=\\{).*(?=}))*[^}]+)}[\\n\\s\\W]*",
+        Pattern regexApps = Pattern.compile("(?<=\"apps\")[\\n\\s]*\\{((?:(?<=\\{).*(?=})){0,100}[^}]+)}[\\n\\s\\W]*",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
         Pattern regexInner = Pattern.compile("\"\\d{1,10}\"[\\n\\s]*(?<!\\{)\"([^\"]+)\"");
@@ -202,10 +202,8 @@ public class GameInfo {
                         });
                     });
                     Matcher matcherPath = regexLibraryPath.matcher(l.group(1));
-                    if (matcherPath.find()) {
-                        if (Files.isDirectory(Path.of(matcherPath.group(1)))) {
-                            librariesPath.add(matcherPath.group(1));
-                        }
+                    if (matcherPath.find() && Files.isDirectory(Path.of(matcherPath.group(1)))) {
+                        librariesPath.add(matcherPath.group(1));
                     }
                 });
             }

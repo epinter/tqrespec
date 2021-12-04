@@ -45,6 +45,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public class PlayerWriter extends FileWriter {
     private static final System.Logger logger = Log.getLogger(PlayerWriter.class.getName());
@@ -149,31 +150,34 @@ public class PlayerWriter extends FileWriter {
     }
 
     public void addLevelsFilesToFs(FileSystem fs, Path playerDir, Path targetOnFs) throws IOException {
-        Files.walk(playerDir)
-                .forEach(p -> {
-                            if (playerDir.relativize(p).startsWith("Levels_World_World01.map") && p.toFile().isDirectory()) {
-                                try {
-                                    Files.createDirectory(fs.getPath(targetOnFs.toString(), playerDir.relativize(p).toString()));
-                                } catch (IOException e) {
-                                    logger.log(System.Logger.Level.ERROR, "Error adding path to zip: " + p, e);
-                                }
+        try (Stream<Path> levelsDirs = Files.walk(playerDir)) {
+            levelsDirs.forEach(p -> {
+                        if (playerDir.relativize(p).startsWith("Levels_World_World01.map") && p.toFile().isDirectory()) {
+                            try {
+                                Files.createDirectory(fs.getPath(targetOnFs.toString(), playerDir.relativize(p).toString()));
+                            } catch (IOException e) {
+                                logger.log(System.Logger.Level.ERROR, "Error adding path to zip: " + p, e);
                             }
-                        }
-                );
-        Files.walk(playerDir)
-                .forEach(p -> {
-                    PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher("glob:**/Levels_World_World01.map/**/*.{que,dat,myw}");
-                    if (playerDir.relativize(p).startsWith("Levels_World_World01.map")) {
-                        try {
-                            if (pathMatcher.matches(p)) {
-                                Files.copy(p, fs.getPath(targetOnFs.toString(), playerDir.relativize(p).toString()));
-                                copyFileTimes(p, fs.getPath(targetOnFs.toString(), playerDir.relativize(p).toString()));
-                            }
-                        } catch (IOException e) {
-                            logger.log(System.Logger.Level.ERROR, "Error adding path to zip: " + p, e);
                         }
                     }
-                });
+            );
+        }
+
+        try (Stream<Path> levelsFiles = Files.walk(playerDir)) {
+            levelsFiles.forEach(p -> {
+                PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher("glob:**/Levels_World_World01.map/**/*.{que,dat,myw}");
+                if (playerDir.relativize(p).startsWith("Levels_World_World01.map")) {
+                    try {
+                        if (pathMatcher.matches(p)) {
+                            Files.copy(p, fs.getPath(targetOnFs.toString(), playerDir.relativize(p).toString()));
+                            copyFileTimes(p, fs.getPath(targetOnFs.toString(), playerDir.relativize(p).toString()));
+                        }
+                    } catch (IOException e) {
+                        logger.log(System.Logger.Level.ERROR, "Error adding path to zip: " + p, e);
+                    }
+                }
+            });
+        }
     }
 
     private void copyFileTimes(Path src, Path dst) throws IOException {
