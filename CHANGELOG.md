@@ -1,4 +1,15 @@
 # Changelog
+## [0.11.0] - 2021-12-04
+### Added
+- Add support for TQ v2.10.19520 (released with Eternal Embers) 
+
+### Changed
+- Java upgraded to 17
+
+### Fixed
+- Fix minor UI bug
+- Update Steam game detection process
+
 ## [0.10.2] - 2021-06-09
 ### Changed
 - Changed UI string text from 'Android' to 'Mobile'
