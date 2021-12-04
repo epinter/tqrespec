@@ -106,9 +106,6 @@
          <GridPane.margin>
             <Insets bottom="5.0" left="10.0" top="5.0" />
          </GridPane.margin>
-         <padding>
-            <Insets left="10.0" right="10.0" />
-         </padding>
       </ComboBox>
     </children>
     <padding>

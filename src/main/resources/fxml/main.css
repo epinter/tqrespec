@@ -195,65 +195,57 @@
     -fx-effect: dropshadow( one-pass-box , black , 0, 0.0 , 0 , 1 );
 }
 
-/* character combobox */
-.tq-charactercombo:hover {
+.combo-box:hover {
         -fx-background: -fx-accent;
         -fx-background-color: -fx-selection-bar;
         -fx-text-fill: -fx-selection-bar-text;
 }
 
-.tq-charactercombo {
-	-fx-font-family: 'Albertus MT Light';
-	-fx-font-size: 1.3em;
+.combo-box {
+    -fx-cursor: hand;
 }
 
-.tq-charactercombo .arrow {
+.combo-box .arrow {
     -fx-background-color: #ffd993 ;
 }
-.tq-charactercombo .arrow-button{
+.combo-box .arrow-button{
     -fx-background-color: #443823;
 }
 
-.tq-charactercombo:showing > .arrow-button {
+.combo-box:showing > .arrow-button {
     -fx-color: #ffd993;
 }
 
-.tq-charactercombo:hover > .arrow-button > .arrow{
+.combo-box:hover > .arrow-button > .arrow {
     -fx-background-insets: 1 0 -1 0, 0;
     -fx-background-color: #f6f0d0;
 }
 
-.tq-charactercombo .combo-box-popup .list-view .list-cell:hover {
+.combo-box .combo-box-popup .list-view .list-cell:hover {
     -fx-background-color: -fx-accent;
+    -fx-text-fill: #000000;
     -fx-cursor: hand;
 }
 
+.combo-box .list-cell{
+    -fx-background-color: #443823;
+    -fx-text-fill: #ffffff;
+}
+
+.tq-charactercombo {
+	-fx-font-size: 1.3em;
+}
+
 .tq-charactercombo .list-cell{
-    -fx-background-color: #443823;
-    -fx-text-fill: #ffffff;
 	-fx-font-size: 1.2em;
-    -fx-font-family: 'Albertus MT';
 }
 
-.tq-charactercombo .combo-box-popup .list-view{
-    -fx-background-color: #443823;
-    -fx-text-fill: #ffffff;
-	-fx-font-size: 1.2em;
-    -fx-font-family: 'Albertus MT';
+.tq-gendercombo {
+	-fx-font-size: 1.3em;
 }
 
-.tq-charactercombo .combo-box-popup .list-view .list-cell {
-    -fx-background-color: #f6f0d0;
-    -fx-text-fill: #000000;
+.tq-gendercombo .list-cell{
 	-fx-font-size: 1.2em;
-    -fx-font-family: 'Albertus MT';
-}
-
-.tq-charactercombo:hover .combo-box-popup .list-view .list-cell {
-    -fx-background-color: #443823;
-    -fx-text-fill: #ffffff;
-	-fx-font-size: 1.2em;
-    -fx-font-family: 'Albertus MT';
 }
 /************/
 
@@ -475,61 +467,3 @@
     -fx-text-alignment: left;
 
 }
-
-/* gender combobox */
-.tq-gendercombo {
-	-fx-font-family: 'Albertus MT Light';
-	-fx-font-size: 1.3em;
-}
-
-.tq-gendercombo .arrow {
-    -fx-background-color: #ffd993 ;
-}
-.tq-gendercombo .arrow-button{
-    -fx-background-color: #443823;
-}
-
-.tq-gendercombo:showing > .arrow-button {
-    -fx-color: #ffd993;
-}
-
-.tq-gendercombo:hover > .arrow-button > .arrow{
-    -fx-background-insets: 1 0 -1 0, 0;
-    -fx-background-color: #f6f0d0;
-}
-
-.tq-gendercombo .combo-box-popup .list-view .list-cell:hover {
-    -fx-background-color: -fx-accent;
-    -fx-cursor: hand;
-}
-
-.tq-gendercombo .list-cell{
-    -fx-background-color: #443823;
-    -fx-text-fill: #ffffff;
-	-fx-font-size: 1.2em;
-    -fx-font-family: 'Albertus MT';
-    -fx-padding: 0 0 0 0;
-}
-
-.tq-gendercombo .combo-box-popup .list-view{
-    -fx-background-color: #443823;
-    -fx-text-fill: #ffffff;
-	-fx-font-size: 1.2em;
-    -fx-font-family: 'Albertus MT';
-
-}
-
-.tq-gendercombo .combo-box-popup .list-view .list-cell {
-    -fx-background-color: #f6f0d0;
-    -fx-text-fill: #000000;
-	-fx-font-size: 1.2em;
-    -fx-font-family: 'Albertus MT';
-}
-
-.tq-gendercombo:hover .combo-box-popup .list-view .list-cell {
-    -fx-background-color: #443823;
-    -fx-text-fill: #ffffff;
-	-fx-font-size: 1.2em;
-    -fx-font-family: 'Albertus MT';
-}
-/************/
