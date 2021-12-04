@@ -57,6 +57,7 @@ public class ExceptionHandler {
         }
         header = header.replaceAll("^java.lang.RuntimeException: (.*)", "$1");
         header = header.replaceAll("^br.com.pinter.tqrespec.core.UnhandledRuntimeException: (.*)", "$1");
+        header = header.replaceAll("^br.com.pinter.tqrespec.(.*)", "$1");
 
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.initModality(Modality.APPLICATION_MODAL);
