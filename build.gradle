@@ -134,7 +134,7 @@ if (moduleInfoPresent) {
         inputs.property("moduleName", moduleName)
         doFirst {
             jvmArgs = [
-                    '-XX:+UseZGC','-Xmx1G',
+                    '-XX:+UseSerialGC',
                     '-Dguice_bytecode_gen_option=DISABLED',
                     '-XX:MinHeapFreeRatio=10', '-XX:MaxHeapFreeRatio=15',
                     '--add-reads', "${moduleName}=ALL-UNNAMED",
@@ -159,7 +159,7 @@ if (moduleInfoPresent) {
     run {
         doFirst {
             jvmArgs = [
-                    '-XX:+UseZGC','-Xmx1G',
+                    '-XX:+UseSerialGC',
                     '-XX:MinHeapFreeRatio=10', '-XX:MaxHeapFreeRatio=15',
                     '--module-path', "${javafxSdkLibDir}",
                     '--add-modules', 'javafx.base,javafx.fxml,javafx.graphics,javafx.controls',
@@ -299,7 +299,7 @@ task appimage(type: Exec) {
                 '--input', "${buildDir}/appimage-files",
                 '--description', 'The respec tool for Titan Quest game',
                 '--java-options',
-                '-XX:+UseZGC -Xmx1G ' +
+                '-XX:+UseSerialGC ' +
                         '-Dguice_bytecode_gen_option=DISABLED ' +
                         '-XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=15 ' +
                         "--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED " +
@@ -327,7 +327,7 @@ task appimage(type: Exec) {
                 '--main-jar', jar.outputs.files.collect { it.getName() }.get(0),
                 '--main-class', mainClassName,
                 '--java-options',
-                '-XX:+UseZGC -Xmx1G ' +
+                '-XX:+UseSerialGC ' +
                         '-Dguice_bytecode_gen_option=DISABLED ' +
                         '-XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=15 ' +
                         '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED ' +
