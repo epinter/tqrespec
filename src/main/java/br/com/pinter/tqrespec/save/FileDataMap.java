@@ -20,6 +20,7 @@
 
 package br.com.pinter.tqrespec.save;
 
+import br.com.pinter.tqrespec.tqdata.GameVersion;
 import br.com.pinter.tqrespec.util.Util;
 
 import java.nio.ByteBuffer;
@@ -282,6 +283,15 @@ public class FileDataMap implements DeepCloneable {
                 }
                 newVar.setVariableType(VariableType.STRING_UTF_32_LE);
                 storeChange(v, newVar);
+            } else if (v.getName().equals("boostedCharacterForX4")) {
+                removeVariable(v);
+            } else if (v.getName().equals("playerVersion") && getInt("playerVersion") > 5) {
+                VariableInfo newVar = (VariableInfo) v.deepClone();
+                if (hasChange(v)) {
+                    newVar = getFirstChange(v);
+                }
+                newVar.setValue(5);
+                storeChange(v, newVar);
             }
         }
     }
@@ -296,7 +306,7 @@ public class FileDataMap implements DeepCloneable {
                 if (hasChange(v)) {
                     newVar = getFirstChange(v);
                 }
-                newVar.setValue(3);
+                newVar.setValue(GameVersion.TQAE.value());
                 storeChange(v, newVar);
             } else {
                 if (v.getVariableType().equals(VariableType.STRING_UTF_32_LE)) {

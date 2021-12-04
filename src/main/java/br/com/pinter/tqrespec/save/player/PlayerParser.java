@@ -91,7 +91,7 @@ final class PlayerParser extends FileParser {
             } catch (InvalidVariableException exception) {
                 logger.log(System.Logger.Level.ERROR, "", exception);
                 logger.log(System.Logger.Level.ERROR, "Variable ''{0}'' not found for {1}, trying {2} ",
-                        name, getDetectedPlatform(), Platform.MOBILE);;
+                        name, getDetectedPlatform(), Platform.MOBILE);
                 if(Platform.WINDOWS.equals(getDetectedPlatform()) && PlayerFileVariable.valueOf(Platform.MOBILE, name)!=null
                         && h.getHeaderVersion().equals(GameVersion.TQLE)) {
                     e = PlayerFileVariable.valueOf(Platform.MOBILE, name);
@@ -129,7 +129,8 @@ final class PlayerParser extends FileParser {
                         , name));
             }
             variables.put(variableInfo.getName(), variableInfo);
-            if (variableInfo.getName().equals("playerCharacterClass")) {
+            if (variableInfo.getName().equals("playerCharacterClass")
+                || variableInfo.getName().equals("playerVersion")) {
                 putVarIndex(variableInfo.getName(), block.getStart());
             }
         }
@@ -180,9 +181,10 @@ final class PlayerParser extends FileParser {
             throw new IncompatibleSavegameException(
                     String.format("Incompatible character '%s' (unknown headerVersion)", this.player));
         }
-        if (headerInfo.getPlayerVersion() != 5) {
+
+        if (headerInfo.getPlayerVersion() < 5) {
             throw new IncompatibleSavegameException(
-                    String.format("Incompatible character '%s' (playerVersion must be == 5)", this.player));
+                    String.format("Incompatible character '%s' (playerVersion must be >= 5)", this.player));
         }
     }
 

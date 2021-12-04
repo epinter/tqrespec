@@ -60,6 +60,7 @@ public class PlayerFileVariable implements FileVariable {
         map.put("itemsFoundOverLifetimeUniqueTotal", new PlayerFileVariable("itemsFoundOverLifetimeUniqueTotal", VariableType.INTEGER, PlayerBlockType.PLAYER_MAIN));
         map.put("itemsFoundOverLifetimeRandomizedTotal", new PlayerFileVariable("itemsFoundOverLifetimeRandomizedTotal", VariableType.INTEGER, PlayerBlockType.PLAYER_MAIN));
         map.put("hasBeenInGame", new PlayerFileVariable("hasBeenInGame", VariableType.INTEGER, PlayerBlockType.PLAYER_MAIN));
+        map.put("boostedCharacterForX4", new PlayerFileVariable("boostedCharacterForX4", VariableType.INTEGER, PlayerBlockType.PLAYER_MAIN));
         map.put("versionRespawnPoint", new PlayerFileVariable("versionRespawnPoint", VariableType.INTEGER, PlayerBlockType.PLAYER_MAIN));
         map.put("money", new PlayerFileVariable("money", VariableType.INTEGER, PlayerBlockType.PLAYER_MAIN));
         map.put("teleportUID", new PlayerFileVariable("teleportUID", VariableType.UID, PlayerBlockType.PLAYER_MAIN));
