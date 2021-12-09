@@ -18,7 +18,7 @@ You can download TQRespec from the releases page, [here](https://github.com/epin
 
 #### ***Requirements***
 
-This software requires **Microsoft Windows (64-bit recommended)**. You don't need to have java or any other software installed, but if you have problems like missing dlls, check if you have Microsoft Visual C++ Redist 2015-2019 installed.
+This software requires **Microsoft Windows (64-bit recommended)**. You don't need to have java or any other software installed, but if you have problems like missing dlls, check if you have [Microsoft Visual C++ Redist 2015-2022](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist) installed.
 
 ## **How to use**
 
@@ -88,10 +88,10 @@ TQRespec/savedata/_CharacterFromWindowsVersion
 TQRespec/TQRespec.exe
 ~~~
 
-The characters are normally stored at Android/data/com.hg.titanquestedition/files/Preferences/SaveData/Main. The name of each savegame is "__save" and followed by a number, this number is the saveId.
+The characters are normally stored at Android/data/com.hg.titanquestedition/files/Preferences/SaveData/Main. The name of each savegame is "__save" and followed by a number, this number is the saveId. Please don't ask about savegame access on mobile phones, there's nothing that can be done on TQRespec. The security features being implemented in mobile operating systems are limiting user access more than before.
 
 ***IMPORTANT***: The game files (database and text) are ALWAYS needed. See above "Running without the game installed" to know where to copy the files. At this moment, the Android version is compatible with PC version. While (AT THIS MOMENT) there's no problem using a database from one platform on a savegame from another, we don't know when the compatibility will break. So is recommended to use Android database/text with Android savegame, and Windows database/text with Windows savegame.
-TQRespec will not block using PC files with mobile savegame, but will alert. And will block the usage of mobile database with PC savegames. The stash (additional storage) will not be supported, conversion and copy of mobile savegames completely ignores the stash. All items stored in the character are kept.
+TQRespec will not block using PC files with mobile savegame, but will alert. And will block the usage of mobile database with PC savegames. After the release of Eternal Embers on PC and not on mobile, the character's copy will still work, but if you copy a character with skills from Eternal Embers the result is uncertain. The stash (additional storage) will not be supported, conversion and copy of mobile savegames completely ignores the stash. All items stored in the character are kept.
 
 The old mobile version of the game will not be supported.
 
@@ -118,7 +118,7 @@ All the languages available in-game are supported. Some interface strings can't 
 
 ## ***Project and source code***
 
-TQRespec is developed in Java language, using OpenJFX to provide graphical user interface, and a few more other open source dependencies. The current version is built using OpenJDK 14.
+TQRespec is developed in Java language, using OpenJFX to provide graphical user interface, and a few more other open source dependencies. The current version is built using OpenJDK 17.
 The software was made to work in Microsoft Windows operating system, since the game runs only in Windows. But because Java is multi-platform, this project is prepared to allow you to develop and test under Linux. To do so, you will need to have this structure inside the project (./gamedata):
 ~~~
 gamedata/SaveData/Main/_savegame/Player.chr
