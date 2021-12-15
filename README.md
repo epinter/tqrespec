@@ -131,7 +131,7 @@ gamedata/Text/Text_EN.arc
 
 Before building it, you need to have OpenJFX(JavaFX) SDK inside the ./sdk subdirectory. A repository with the needed files can be found [here](https://github.com/epinter/openjfx-sdk). Just clone it inside sdk directory.
 
-With JDK 14 installed, you can build executing the 'clean' and 'build' gradle tasks with the command:
+With JDK installed, you can build executing the 'clean' and 'build' gradle tasks with the command:
 
 ~~~
 gradlew clean
@@ -153,6 +153,8 @@ gradlew run
 #### ***Startup***
 This software can fail to start if the game is not detected. Game is detected searching for Uninstall information from Windows, and data from your Steam installation. If you can't start, get the error message inside the "Show details" and open an issue. Or maybe you can find some help in the discussion at Steam Guides.
 If your game path is not detected, you still can run TQRespec copying the game data, to do so follow the instructions [Running without the game installed](https://github.com/epinter/tqrespec#running-without-the-game-installed).
+
+TQRespec uses the Java Preferences API to store the last detected game path. If you have problem to launch TQRespec, you can try to delete everything inside this key of Windows registry: **"Computer\HKEY_CURRENT_USER\SOFTWARE\JavaSoft\Prefs\br\com\pinter\tqrespec"**, be very careful when dealing with the registry.
 
 
 #### ***Errors and reporting***
@@ -192,3 +194,9 @@ TQRespec.exe --debug=9
 
 ### ***Note***
 Contributions are always welcome. They will be accepted or rejected depending on the scope and predefined objectives of the project. Look at the open [issues](https://github.com/epinter/tqrespec/issues) and milestones to know how you can help. Feel free to open an issue and suggest a feature you want to see available.
+
+## **Thanks**
+
+### ***THQ and [Iron Lore](https://en.wikipedia.org/wiki/Iron_Lore_Entertainment) for creation of this game that we love since 2006, and [THQ Nordic](https://www.thqnordic.com) for all the content and improvements***
+
+### ***[Jetbrains](https://www.jetbrains.com/idea) for their amazing IDE!***
