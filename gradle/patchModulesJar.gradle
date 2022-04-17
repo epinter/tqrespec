@@ -34,6 +34,7 @@ class PatchJarModuleTask extends DefaultTask {
     @Internal
     private List<String> patchedModules = new ArrayList<>()
 
+    @SuppressWarnings('unused')
     List<String> getPatchedModules() {
         return patchedModules
     }
@@ -61,10 +62,9 @@ class PatchJarModuleTask extends DefaultTask {
     String readPackageName(String filename) {
         if (debug) System.out.println("Verifying jar " + filename)
 
-        Process jar = null
         ProcessBuilder processBuilder = new ProcessBuilder()
         processBuilder.command(JAR, "-d", "-f", filename)
-        jar = processBuilder.start()
+        Process jar = processBuilder.start()
 
 
         BufferedReader stdout = new BufferedReader(new InputStreamReader(jar.getInputStream()))
@@ -89,7 +89,7 @@ class PatchJarModuleTask extends DefaultTask {
     @TaskAction
     void start() {
         if (debug == null) {
-            debug = false;
+            debug = false
         }
 
         fileTempPatchDir = new File(tempPatchDir)
@@ -104,7 +104,7 @@ class PatchJarModuleTask extends DefaultTask {
 
         new File(tempJarDir).eachFile {
             if (it.getName().endsWith(".jar")) {
-                String packageName = readPackageName(it.getPath());
+                String packageName = readPackageName(it.getPath())
                 if (packageName != null) {
                     System.out.println(String.format("Package found '%s' on file '%s', generating module-info", packageName, it.getName()))
                     packageMap.put(it.getPath(), packageName)
@@ -128,7 +128,7 @@ class PatchJarModuleTask extends DefaultTask {
         if (first.isPresent()) {
             return first.get().key
         }
-        return null;
+        return null
     }
 
     List<String> getModuleDeps(String packageName) {
@@ -144,7 +144,7 @@ class PatchJarModuleTask extends DefaultTask {
             }
         }
 
-        return ret;
+        return ret
     }
 
     boolean processFile(File file) {
@@ -152,7 +152,7 @@ class PatchJarModuleTask extends DefaultTask {
 
         if (processed.contains(file.getName())) {
             if (debug) System.out.printf("File %s already processed, skipping\n", file.getName())
-            return;
+            return true
         }
 
         if (debug) System.out.printf("***** Processing file %s\n", file.getPath())
@@ -170,15 +170,13 @@ class PatchJarModuleTask extends DefaultTask {
             })
         }
 
-        ProcessBuilder processBuilder = new ProcessBuilder()
-
         if (packageName == null) {
             throw new IllegalStateException("package name not found :" + file)
         }
 
         processed.add(file.getName())
 
-        processBuilder = new ProcessBuilder()
+        ProcessBuilder processBuilder = new ProcessBuilder()
         processBuilder.directory(fileTempJarDir)
         String addModules = ""
 
@@ -209,7 +207,7 @@ class PatchJarModuleTask extends DefaultTask {
         }
 
 
-        List<String> command = new ArrayList<>();
+        List<String> command = new ArrayList<>()
         command.add(JDEPS)
         if (!modulePath.isEmpty()) {
             command.add("--module-path")
@@ -234,7 +232,7 @@ class PatchJarModuleTask extends DefaultTask {
             if (delete) {
                 new File(filename).delete()
             }
-            return
+            return false
         }
         if (debug) System.out.println("jdeps finished for " + packageName)
 
@@ -250,7 +248,7 @@ class PatchJarModuleTask extends DefaultTask {
         javac.waitFor()
         if (javac.exitValue() != 0) {
             new File(filename).delete()
-            return
+            return false
         }
         if (debug) System.out.println("javac finished")
 
@@ -266,7 +264,7 @@ class PatchJarModuleTask extends DefaultTask {
             if (delete) {
                 new File(filename).delete()
             }
-            return
+            return false
         }
         fileTempPatchDir.deleteDir()
         if (debug) System.out.println("jar update finished")
@@ -278,7 +276,6 @@ class PatchJarModuleTask extends DefaultTask {
             System.out.printf("***** JAR file '%s' (%s) discarded\n", filename, packageName)
             return false
         }
-
     }
 
 }

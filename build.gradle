@@ -272,8 +272,9 @@ task jlink(type: Exec) {
     workingDir buildDir
 
     doFirst {
-        def addModulesJlink = ""
+        def addModulesJlink
         if (moduleInfoPresent) {
+            //noinspection GroovyAccessibility
             addModulesJlink = String.join(",",
                     "br.com.pinter.tqdatabase",
                     "${moduleName}",
