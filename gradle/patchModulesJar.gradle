@@ -7,15 +7,36 @@ ext.PatchJarModuleTask = PatchJarModuleTask
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-
-
 class PatchJarModuleTask extends DefaultTask {
-    boolean debug
+    @Input
+    @Optional
+    Boolean debug = false
+    @Input
     boolean delete = true
+    @Input
     String tempPatchDir
+    @Input
     String tempJarDir
-    Map<String, String> moduleDeps
-    List<String> patchedModules = new ArrayList<>()
+    @Input
+    @Optional
+    Map<String, List<String>> moduleDeps
+
+    @Internal
+    List<String> processed = new ArrayList<>()
+
+    @Internal
+    Map<String, String> packageMap = new HashMap<>()
+
+    @Input
+    @Optional
+    Map<String, List<String>> moduleDepsPath
+
+    @Internal
+    private List<String> patchedModules = new ArrayList<>()
+
+    List<String> getPatchedModules() {
+        return patchedModules
+    }
 
     private File fileTempPatchDir
     private File fileTempJarDir
@@ -25,7 +46,7 @@ class PatchJarModuleTask extends DefaultTask {
 
     static void printStream(InputStream stream) {
         stream.eachLine {
-            System.err.println(it)
+            System.out.println("[output] " + it)
         }
     }
 
@@ -37,27 +58,8 @@ class PatchJarModuleTask extends DefaultTask {
                 OperatingSystemFamily.WINDOWS ? ".exe" : "")
     }
 
-    @TaskAction
-    void start() {
-        fileTempPatchDir = new File(tempPatchDir)
-        fileTempJarDir = new File(tempJarDir)
-
-        fileTempPatchDir.deleteDir()
-        fileTempPatchDir.mkdir()
-
-        if (!fileTempJarDir.exists()) {
-            fileTempJarDir.mkdir()
-        }
-
-        new File(tempJarDir).eachFile {
-            if (it.getName().endsWith(".jar")) {
-                processFile(it.getPath())
-            }
-        }
-    }
-
-    boolean processFile(String filename) {
-        if (debug) System.err.println("Verifying jar " + filename)
+    String readPackageName(String filename) {
+        if (debug) System.out.println("Verifying jar " + filename)
 
         Process jar = null
         ProcessBuilder processBuilder = new ProcessBuilder()
@@ -80,13 +82,101 @@ class PatchJarModuleTask extends DefaultTask {
         }
         jar.waitFor()
 
-        if (packageName != null) {
-            System.out.println(String.format("Package found '%s' on file '%s', generating module-info", packageName, filename))
-        } else {
-            if (debug) System.out.println(String.format("No automatic module found on file '%s', ignoring", filename))
-            new File(filename).delete()
-            return
+        return packageName
+    }
+
+
+    @TaskAction
+    void start() {
+        if (debug == null) {
+            debug = false;
         }
+
+        fileTempPatchDir = new File(tempPatchDir)
+        fileTempJarDir = new File(tempJarDir)
+
+        fileTempPatchDir.deleteDir()
+        fileTempPatchDir.mkdir()
+
+        if (!fileTempJarDir.exists()) {
+            fileTempJarDir.mkdir()
+        }
+
+        new File(tempJarDir).eachFile {
+            if (it.getName().endsWith(".jar")) {
+                String packageName = readPackageName(it.getPath());
+                if (packageName != null) {
+                    System.out.println(String.format("Package found '%s' on file '%s', generating module-info", packageName, it.getName()))
+                    packageMap.put(it.getPath(), packageName)
+                } else {
+                    if (debug) System.out.println(String.format("No automatic module found on file '%s', ignoring", it.getName()))
+                    it.delete()
+                    return
+                }
+            }
+        }
+
+        new File(tempJarDir).eachFile {
+            if (it.getName().endsWith(".jar")) {
+                processFile(it)
+            }
+        }
+    }
+
+    String getJarFromPackage(String packageName) {
+        def first = packageMap.entrySet().stream().filter(e -> { e.value == packageName }).findFirst()
+        if (first.isPresent()) {
+            return first.get().key
+        }
+        return null;
+    }
+
+    List<String> getModuleDeps(String packageName) {
+        final List<String> ret = new ArrayList<>()
+        if (moduleDeps != null && moduleDeps.size() > 0 && moduleDeps.get(packageName) != null) {
+            for (Map.Entry<String, List<String>> entry : moduleDeps.entrySet()) {
+                if (entry.key == packageName && entry.value != null && !entry.value.isEmpty()) {
+                    entry.value.forEach(d -> {
+                        ret.add(d)
+                        ret.addAll(getModuleDeps(d))
+                    })
+                }
+            }
+        }
+
+        return ret;
+    }
+
+    boolean processFile(File file) {
+        String filename = file.getPath()
+
+        if (processed.contains(file.getName())) {
+            if (debug) System.out.printf("File %s already processed, skipping\n", file.getName())
+            return;
+        }
+
+        if (debug) System.out.printf("***** Processing file %s\n", file.getPath())
+
+        String packageName = packageMap.get(file.getPath())
+
+        if (moduleDeps.get(packageName) != null) {
+            moduleDeps.get(packageName).forEach(dep -> {
+                packageMap.entrySet().stream().filter((e) -> {
+                    dep == e.value
+                }).forEach((e2) -> {
+                    if (debug) System.out.printf("processing dependency: %s / %s=%s\n", dep, e2.key, e2.value)
+                    processFile(new File(e2.key))
+                })
+            })
+        }
+
+        ProcessBuilder processBuilder = new ProcessBuilder()
+
+        if (packageName == null) {
+            throw new IllegalStateException("package name not found :" + file)
+        }
+
+        processed.add(file.getName())
 
         processBuilder = new ProcessBuilder()
         processBuilder.directory(fileTempJarDir)
@@ -94,14 +184,45 @@ class PatchJarModuleTask extends DefaultTask {
 
         if (moduleDeps != null && moduleDeps.size() > 0 && moduleDeps.get(packageName) != null) {
             addModules = "--add-modules="
-            for (Map.Entry<String, String> entry : moduleDeps.entrySet()) {
+            for (Map.Entry<String, List<String>> entry : moduleDeps.entrySet()) {
                 if (entry.key == packageName && entry.value != null && !entry.value.isEmpty()) {
-                    addModules += entry.value.replace(" ", "")
+                    addModules += String.join(",", entry.value).replaceAll(" ", "")
                 }
             }
         }
-        processBuilder.command(JDEPS, "--module-path", tempJarDir, addModules, "--generate-module-info", tempPatchDir, filename)
-        if (debug) System.err.println("Running: " + processBuilder.command())
+
+        List<String> modulePath = new ArrayList<>()
+        if (moduleDepsPath != null && moduleDepsPath.size() > 0 && moduleDepsPath.get(packageName) != null) {
+            for (Map.Entry<String, List<String>> entry : moduleDepsPath.entrySet()) {
+                if (entry.key == packageName && entry.value != null && !entry.value.isEmpty()) {
+                    modulePath.add(String.join(File.pathSeparator, entry.value))
+                }
+            }
+        } else {
+            List<String> deps = getModuleDeps(packageName)
+            deps.stream().forEach(dep -> {
+                String jar = getJarFromPackage(dep)
+                if (jar != null) {
+                    modulePath.add(jar)
+                }
+            })
+        }
+
+
+        List<String> command = new ArrayList<>();
+        command.add(JDEPS)
+        if (!modulePath.isEmpty()) {
+            command.add("--module-path")
+            command.add(String.join(File.pathSeparator, modulePath))
+        }
+        if (addModules != "") {
+            command.add(addModules)
+        }
+
+        command.addAll(List.of("--generate-module-info", tempPatchDir, filename))
+
+        processBuilder.command(command)
+        if (debug) System.out.println("Running: " + processBuilder.command())
 
         Process jdeps = processBuilder.start()
         printStream(jdeps.getInputStream())
@@ -109,19 +230,20 @@ class PatchJarModuleTask extends DefaultTask {
         jdeps.waitFor()
 
         if (jdeps.exitValue() != 0) {
-            if(delete) {
+            if (debug) System.out.println("jdeps exited with error for " + packageName)
+            if (delete) {
                 new File(filename).delete()
             }
             return
         }
-        if (debug) System.err.println("jdeps finished")
+        if (debug) System.out.println("jdeps finished for " + packageName)
 
         processBuilder = new ProcessBuilder()
         processBuilder.directory(fileTempPatchDir)
         processBuilder.command(JAVAC, "--module-path", tempJarDir, "--patch-module", String.format("%s=%s", packageName, filename),
                 String.format("%s/module-info.java", packageName), "-nowarn", "-d", ".")
 
-        if (debug) System.err.println("Running: " + processBuilder.command())
+        if (debug) System.out.println("Running: " + processBuilder.command())
         Process javac = processBuilder.start()
         printStream(javac.getInputStream())
         printStream(javac.getErrorStream())
@@ -130,12 +252,12 @@ class PatchJarModuleTask extends DefaultTask {
             new File(filename).delete()
             return
         }
-        if (debug) System.err.println("javac finished")
+        if (debug) System.out.println("javac finished")
 
         processBuilder = new ProcessBuilder()
         processBuilder.directory(fileTempPatchDir)
         processBuilder.command(JAR, "--update", "--file", filename, "module-info.class")
-        if (debug) System.err.println("Running: " + processBuilder.command())
+        if (debug) System.out.println("Running: " + processBuilder.command())
         Process jarUpdate = processBuilder.start()
         printStream(jarUpdate.getInputStream())
         printStream(jarUpdate.getErrorStream())
@@ -147,13 +269,13 @@ class PatchJarModuleTask extends DefaultTask {
             return
         }
         fileTempPatchDir.deleteDir()
-        if (debug) System.err.println("jar update finished")
+        if (debug) System.out.println("jar update finished")
         if (new File(filename).exists()) {
-            System.err.printf("JAR file '%s' (%s) patched\n", filename, packageName)
+            System.out.printf("***** JAR file '%s' (%s) patched\n", filename, packageName)
             patchedModules.add(packageName)
             return true
         } else {
-            System.err.printf("JAR file '%s' (%s) discarded\n", filename, packageName)
+            System.out.printf("***** JAR file '%s' (%s) discarded\n", filename, packageName)
             return false
         }
 
