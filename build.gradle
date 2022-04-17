@@ -135,7 +135,6 @@ if (moduleInfoPresent) {
         doFirst {
             options.compilerArgs = [
                     '--module-path', classpath.asPath,
-                    '--patch-module', "$moduleName=" + files(sourceSets.main.resources.srcDirs).asPath,
             ]
             classpath = files()
         }
@@ -151,7 +150,6 @@ if (moduleInfoPresent) {
                     '--module-path', classpath.asPath,
                     '--class-path', classpath.asPath,
                     '--module', moduleName,
-                    '--patch-module', "$moduleName=" + files(sourceSets.main.output.resourcesDir).asPath,
             ]
             classpath = files()
         }
