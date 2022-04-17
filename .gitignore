@@ -1,7 +1,6 @@
 gamedata/
 savedata/
 libs/
-tqdatabase/
 src/test/resources/_testcopy/
 *.arz
 *.arc

@@ -1,3 +1,6 @@
 [submodule "sdk"]
 	path = sdk
 	url = https://github.com/epinter/openjfx-sdk
+[submodule "tqdatabase"]
+	path = tqdatabase
+	url = https://github.com/epinter/tqdatabase
