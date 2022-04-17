@@ -37,7 +37,7 @@ import java.util.Properties;
 public class Version implements Comparable<Version> {
     private static final System.Logger logger = Log.getLogger(Version.class.getName());
 
-    private String versionNumber;
+    private final String versionNumber;
     private String urlPage;
     private String url1;
     private String url2;

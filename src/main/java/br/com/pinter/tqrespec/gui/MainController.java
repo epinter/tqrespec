@@ -28,8 +28,8 @@ import br.com.pinter.tqrespec.tqdata.Db;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.tqdata.PlayerCharacterFile;
 import br.com.pinter.tqrespec.tqdata.Txt;
+import br.com.pinter.tqrespec.util.Build;
 import br.com.pinter.tqrespec.util.Constants;
-import br.com.pinter.tqrespec.util.Util;
 import com.google.inject.Inject;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -110,6 +110,8 @@ public class MainController implements Initializable {
     private TabPane tabPane;
     @Inject
     private Db db;
+    @Inject
+    private UIUtils uiUtils;
     private double dragX;
     private double dragY;
     private boolean isMoving = false;
@@ -120,10 +122,10 @@ public class MainController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         logger.log(System.Logger.Level.DEBUG, "isLocaleLanguageEmpty: " + resources.getLocale().getLanguage().isEmpty());
         if (!State.get().getLocale().equals(Locale.ENGLISH) && resources.getLocale().getLanguage().isEmpty()) {
-            Util.tryTagText(txt, attributesTab, Constants.UI.TAG_ATTRIBUTESTAB, false, true);
-            Util.tryTagText(txt, skillsTab, Constants.UI.TAG_SKILLSTAB, false, true);
+            ResourceHelper.tryTagText(txt, attributesTab, Constants.UI.TAG_ATTRIBUTESTAB, false, true);
+            ResourceHelper.tryTagText(txt, skillsTab, Constants.UI.TAG_SKILLSTAB, false, true);
         }
-        mainFormTitle.setText(String.format("%s v%s", Util.getBuildTitle(), Util.getBuildVersion()));
+        mainFormTitle.setText(String.format("%s v%s", Build.title(), Build.version()));
         mainFormInitialized.addListener(((observable, oldValue, newValue) -> new WorkerThread(new MyTask<>() {
             @Override
             protected Void call() {
@@ -145,18 +147,18 @@ public class MainController implements Initializable {
 
         //set icons
         resetButton.setGraphic(Icon.FA_UNDO.create(1.4));
-        resetButton.setTooltip(Util.simpleTooltip(Util.getUIMessage("main.resetButtonTooltip")));
+        resetButton.setTooltip(uiUtils.simpleTooltip(ResourceHelper.getMessage("main.resetButtonTooltip")));
         saveButton.setGraphic(Icon.FA_SAVE.create());
         charactersButton.setGraphic(Icon.FA_USERS.create(1.4));
-        charactersButton.setTooltip(Util.simpleTooltip(Util.getUIMessage("main.charactersButtonTooltip")));
+        charactersButton.setTooltip(uiUtils.simpleTooltip(ResourceHelper.getMessage("main.charactersButtonTooltip")));
 
         State.get().gameRunningProperty().addListener((value, oldV, newV) -> {
             if (BooleanUtils.isTrue(newV)) {
                 Platform.runLater(() -> {
                     reset();
                     Toast.show((Stage) rootelement.getScene().getWindow(),
-                            Util.getUIMessage("alert.errorgamerunning_header"),
-                            Util.getUIMessage("alert.errorgamerunning_content"),
+                            ResourceHelper.getMessage("alert.errorgamerunning_header"),
+                            ResourceHelper.getMessage("alert.errorgamerunning_content"),
                             8000);
                 });
             }
@@ -194,7 +196,7 @@ public class MainController implements Initializable {
 
     @FXML
     public void close(MouseEvent evt) {
-        Util.closeApplication();
+        uiUtils.closeApplication();
     }
 
     @FXML
@@ -205,7 +207,7 @@ public class MainController implements Initializable {
 
         Parent root;
         if (fxmlLoaderAbout.getRoot() == null) {
-            fxmlLoaderAbout.setLocation(getClass().getResource(Constants.UI.ABOUT_FXML));
+            fxmlLoaderAbout.setLocation(ResourceHelper.getResourceUrl(Constants.UI.ABOUT_FXML));
             fxmlLoaderAbout.setResources(ResourceBundle.getBundle("i18n.UI", State.get().getLocale()));
             fxmlLoaderAbout.load();
         } else {
@@ -223,7 +225,7 @@ public class MainController implements Initializable {
         reset();
         Parent root;
         if (fxmlLoaderCharacter.getRoot() == null) {
-            fxmlLoaderCharacter.setLocation(getClass().getResource("/fxml/characters.fxml"));
+            fxmlLoaderCharacter.setLocation(ResourceHelper.getResourceUrl("/fxml/characters.fxml"));
             fxmlLoaderCharacter.setResources(ResourceBundle.getBundle("i18n.UI", State.get().getLocale()));
             fxmlLoaderCharacter.load();
         } else {
@@ -268,8 +270,8 @@ public class MainController implements Initializable {
 
     public boolean gameRunningAlert() {
         if (BooleanUtils.isTrue(State.get().getGameRunning())) {
-            Util.showError(Util.getUIMessage("alert.errorgamerunning_header"),
-                    Util.getUIMessage("alert.errorgamerunning_content"));
+            uiUtils.showError(ResourceHelper.getMessage("alert.errorgamerunning_header"),
+                    ResourceHelper.getMessage("alert.errorgamerunning_content"));
             return true;
         }
         return false;
@@ -308,8 +310,8 @@ public class MainController implements Initializable {
                     setCursorWaitOnTask(saveGameTask);
                     new WorkerThread(saveGameTask).start();
                 } else {
-                    Util.showError(Util.getUIMessage("alert.errorbackup_header"),
-                            Util.getUIMessage("alert.errorbackup_content", Constants.BACKUP_DIRECTORY));
+                    uiUtils.showError(ResourceHelper.getMessage("alert.errorbackup_header"),
+                            ResourceHelper.getMessage("alert.errorbackup_content", Constants.BACKUP_DIRECTORY));
                     setAllControlsDisable(false);
                 }
             }
@@ -320,8 +322,8 @@ public class MainController implements Initializable {
             @Override
             public void handleEvent(WorkerStateEvent workerStateEvent) {
                 if ((int) saveGameTask.getValue() != 2) {
-                    Util.showError(Util.getUIMessage("alert.errorsaving_header"),
-                            Util.getUIMessage("alert.errorsaving_content", Constants.BACKUP_DIRECTORY));
+                    uiUtils.showError(ResourceHelper.getMessage("alert.errorsaving_header"),
+                            ResourceHelper.getMessage("alert.errorsaving_content", Constants.BACKUP_DIRECTORY));
                 }
                 setAllControlsDisable(false);
                 reset();
@@ -402,15 +404,15 @@ public class MainController implements Initializable {
                 if (player.getSaveData().getPlatform().equals(br.com.pinter.tqrespec.save.Platform.MOBILE)
                         && !db.getPlatform().equals(Db.Platform.MOBILE)) {
                     Toast.show((Stage) rootelement.getScene().getWindow(),
-                            Util.getUIMessage("main.mobileSavegameToast_header"),
-                            Util.getUIMessage("main.mobileSavegameToast_content"),
+                            ResourceHelper.getMessage("main.mobileSavegameToast_header"),
+                            ResourceHelper.getMessage("main.mobileSavegameToast_content"),
                             5000);
                 } else if (player.getSaveData().getPlatform().equals(br.com.pinter.tqrespec.save.Platform.WINDOWS)
                         && !db.getPlatform().equals(Db.Platform.WINDOWS)) {
                     reset();
                     Toast.show((Stage) rootelement.getScene().getWindow(),
-                            Util.getUIMessage("main.mobileDatabaseToast_header"),
-                            Util.getUIMessage("main.mobileDatabaseToast_content"),
+                            ResourceHelper.getMessage("main.mobileDatabaseToast_header"),
+                            ResourceHelper.getMessage("main.mobileDatabaseToast_content"),
                             12000);
                 }
 

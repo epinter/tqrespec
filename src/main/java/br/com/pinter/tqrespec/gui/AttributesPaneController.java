@@ -27,7 +27,6 @@ import br.com.pinter.tqrespec.save.player.Player;
 import br.com.pinter.tqrespec.tqdata.Db;
 import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Constants;
-import br.com.pinter.tqrespec.util.Util;
 import com.google.inject.Inject;
 import javafx.application.Platform;
 import javafx.beans.property.*;
@@ -102,6 +101,9 @@ public class AttributesPaneController implements Initializable {
     private Label difficultyText;
     @FXML
     private ComboBox<String> gender;
+    @Inject
+    private UIUtils uiUtils;
+
     private IntegerProperty currentStr = new SimpleIntegerProperty();
     private IntegerProperty currentInt = new SimpleIntegerProperty();
     private IntegerProperty currentDex = new SimpleIntegerProperty();
@@ -128,18 +130,18 @@ public class AttributesPaneController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         if (!State.get().getLocale().equals(Locale.ENGLISH) && resourceBundle.getLocale().getLanguage().isEmpty()) {
-            Util.tryTagText(txt, strengthLabel, Constants.UI.TAG_STRLABEL, true, false);
-            Util.tryTagText(txt, intelligenceLabel, Constants.UI.TAG_INTLABEL, true, false);
-            Util.tryTagText(txt, dexterityLabel, Constants.UI.TAG_DEXLABEL, true, false);
-            Util.tryTagText(txt, energyLabel, Constants.UI.TAG_ENERGYLABEL, true, false);
-            Util.tryTagText(txt, healthLabel, Constants.UI.TAG_HEALTHLABEL, true, false);
-            Util.tryTagText(txt, experienceLabel, Constants.UI.TAG_XPLABEL, true, false);
-            Util.tryTagText(txt, goldLabel, Constants.UI.TAG_GOLDLABEL, true, false);
-            Util.tryTagText(txt, charLevelLabel, Constants.UI.TAG_CHARLEVELLABEL, true, false);
-            Util.tryTagText(txt, charClassLabel, Constants.UI.TAG_CLASSLABEL, true, false);
-            Util.tryTagText(txt, difficultyLabel, Constants.UI.TAG_DIFFICULTYLABEL, true, false);
-            Util.tryTagText(txt, charClassLabel, Constants.UI.TAG_CLASSLABEL, true, false);
-            Util.tryTagText(txt, availPointsLabel, Constants.UI.TAG_AVAILPOINTSLABEL, true, true);
+            ResourceHelper.tryTagText(txt, strengthLabel, Constants.UI.TAG_STRLABEL, true, false);
+            ResourceHelper.tryTagText(txt, intelligenceLabel, Constants.UI.TAG_INTLABEL, true, false);
+            ResourceHelper.tryTagText(txt, dexterityLabel, Constants.UI.TAG_DEXLABEL, true, false);
+            ResourceHelper.tryTagText(txt, energyLabel, Constants.UI.TAG_ENERGYLABEL, true, false);
+            ResourceHelper.tryTagText(txt, healthLabel, Constants.UI.TAG_HEALTHLABEL, true, false);
+            ResourceHelper.tryTagText(txt, experienceLabel, Constants.UI.TAG_XPLABEL, true, false);
+            ResourceHelper.tryTagText(txt, goldLabel, Constants.UI.TAG_GOLDLABEL, true, false);
+            ResourceHelper.tryTagText(txt, charLevelLabel, Constants.UI.TAG_CHARLEVELLABEL, true, false);
+            ResourceHelper.tryTagText(txt, charClassLabel, Constants.UI.TAG_CLASSLABEL, true, false);
+            ResourceHelper.tryTagText(txt, difficultyLabel, Constants.UI.TAG_DIFFICULTYLABEL, true, false);
+            ResourceHelper.tryTagText(txt, charClassLabel, Constants.UI.TAG_CLASSLABEL, true, false);
+            ResourceHelper.tryTagText(txt, availPointsLabel, Constants.UI.TAG_AVAILPOINTSLABEL, true, true);
         }
     }
 
@@ -355,8 +357,8 @@ public class AttributesPaneController implements Initializable {
         int mana = player.getMana();
         int modifier = player.getModifierPoints();
         if (modifier < 0 || str < 0 || dex < 0 || inl < 0 || life < 0 || mana < 0) {
-            Util.showError(Util.getUIMessage("alert.errorloadingchar_header"),
-                    Util.getUIMessage("alert.errorloadingchar_content", life, mana, str, inl, dex));
+            uiUtils.showError(ResourceHelper.getMessage("alert.errorloadingchar_header"),
+                    ResourceHelper.getMessage("alert.errorloadingchar_content", life, mana, str, inl, dex));
             clearProperties();
             return;
         }
@@ -374,16 +376,16 @@ public class AttributesPaneController implements Initializable {
 
         String difficultyTextValue = String.format("%s%02d", Constants.UI.PREFIXTAG_DIFFICULTYLABEL, difficulty + 1);
         if (txt.isTagStringValid(difficultyTextValue)) {
-            difficultyText.setText(Util.cleanTagString(txt.getString(difficultyTextValue)));
+            difficultyText.setText(ResourceHelper.cleanTagString(txt.getString(difficultyTextValue)));
         } else {
-            difficultyText.setText(Util.getUIMessage(String.format("difficulty.%d", difficulty)));
+            difficultyText.setText(ResourceHelper.getMessage(String.format("difficulty.%d", difficulty)));
         }
 
         experienceText.setText(NumberFormat.getInstance().format(xp));
         charLevelText.setText(String.valueOf(level));
         goldText.setText(NumberFormat.getInstance().format(gold));
 
-        gender.getItems().setAll(Util.getUIMessage("main.gender.male"), Util.getUIMessage("main.gender.female"));
+        gender.getItems().setAll(ResourceHelper.getMessage("main.gender.male"), ResourceHelper.getMessage("main.gender.female"));
         int genderSelection;
         if (player.getGender().equals(Gender.FEMALE)) {
             genderSelection = 1;
@@ -395,8 +397,8 @@ public class AttributesPaneController implements Initializable {
         gender.getSelectionModel().selectedIndexProperty().addListener((o, oldValue, newValue) -> {
             if (oldValue.intValue() >= 0 && newValue.intValue() >= 0) {
                 Platform.runLater(() -> Toast.show((Stage) gender.getScene().getWindow(),
-                        Util.getUIMessage("alert.genderchange_header"),
-                        Util.getUIMessage("alert.genderchange_content"),
+                        ResourceHelper.getMessage("alert.genderchange_header"),
+                        ResourceHelper.getMessage("alert.genderchange_content"),
                         4000));
             }
         });

@@ -26,7 +26,6 @@ import br.com.pinter.tqrespec.save.player.PlayerSkill;
 import br.com.pinter.tqrespec.tqdata.Db;
 import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Constants;
-import br.com.pinter.tqrespec.util.Util;
 import com.google.inject.Inject;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
@@ -84,6 +83,9 @@ public class SkillsPaneController implements Initializable {
     private MenuButton firstMasteryButton;
     @FXML
     private MenuButton secondMasteryButton;
+    @Inject
+    private UIUtils uiUtils;
+
     private SimpleStringProperty currentSkillPoints = null;
     private SimpleStringProperty currentFirstMasteryLevel = null;
     private SimpleStringProperty currentSecondMasteryLevel = null;
@@ -122,8 +124,8 @@ public class SkillsPaneController implements Initializable {
     public void loadCharEventHandler() {
         if (player.isMissingSkills()) {
             Toast.show((Stage) skillsGridPane.getParent().getScene().getWindow(),
-                    Util.getUIMessage("alert.missingSkill_header"),
-                    Util.getUIMessage("alert.missingSkill_content", player.getPlayerSavegameName(), Constants.LOGFILE),
+                    ResourceHelper.getMessage("alert.missingSkill_header"),
+                    ResourceHelper.getMessage("alert.missingSkill_content", player.getPlayerSavegameName(), Constants.LOGFILE),
                     Constants.UI.TOAST_WARNING_TIMEOUT);
         }
         currentSkillPoints = new SimpleStringProperty();
@@ -132,7 +134,7 @@ public class SkillsPaneController implements Initializable {
 
         freeSkillPointsBinding = Bindings.createStringBinding(() -> {
                     if (currentSkillPoints != null && currentSkillPoints.getValue() != null) {
-                        return Util.getUIMessage("skills.availableSkillPoints",
+                        return ResourceHelper.getMessage("skills.availableSkillPoints",
                                 currentSkillPoints.getValue());
                     } else {
                         return "";
@@ -142,13 +144,13 @@ public class SkillsPaneController implements Initializable {
         );
         freeSkillPointsLabel.textProperty().bind(freeSkillPointsBinding);
 
-        reclaimMasteryFirstBinding = Bindings.createStringBinding(() -> Util.getUIMessage("skills.reclaimMasteryPoints",
+        reclaimMasteryFirstBinding = Bindings.createStringBinding(() -> ResourceHelper.getMessage("skills.reclaimMasteryPoints",
                 currentFirstMasteryLevel.getValue()),
                 currentFirstMasteryLevel
         );
         reclaimMasteryFirstItem.textProperty().bind(reclaimMasteryFirstBinding);
 
-        reclaimMasterySecondBinding = Bindings.createStringBinding(() -> Util.getUIMessage("skills.reclaimMasteryPoints",
+        reclaimMasterySecondBinding = Bindings.createStringBinding(() -> ResourceHelper.getMessage("skills.reclaimMasteryPoints",
                 currentSecondMasteryLevel.getValue()),
                 currentSecondMasteryLevel
         );
@@ -380,7 +382,7 @@ public class SkillsPaneController implements Initializable {
     public boolean isMasteryEmpty(Skill mastery) {
         List<Skill> list = player.getPlayerSkillsFromMastery(mastery);
         if (!list.isEmpty()) {
-            Util.showInformation(Util.getUIMessage("skills.removeSkillsBefore"), null);
+            uiUtils.showInformation(ResourceHelper.getMessage("skills.removeSkillsBefore"), null);
             return false;
         }
         return true;

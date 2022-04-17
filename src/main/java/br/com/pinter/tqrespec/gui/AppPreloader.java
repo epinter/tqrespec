@@ -20,8 +20,8 @@
 
 package br.com.pinter.tqrespec.gui;
 
+import br.com.pinter.tqrespec.util.Build;
 import br.com.pinter.tqrespec.util.Constants;
-import br.com.pinter.tqrespec.util.Util;
 import javafx.application.Preloader;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -34,17 +34,18 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.apache.commons.lang3.SystemUtils;
 
-@SuppressWarnings("RedundantThrows")
+import java.io.IOException;
+
 public class AppPreloader extends Preloader {
     private ProgressBar bar;
     private Stage stage;
 
     private Scene createPreloaderScene() {
-        Font.loadFont(getClass().getResourceAsStream("/fxml/albertus-mt.ttf"), 16);
+        Font.loadFont(ResourceHelper.getResource("/fxml/albertus-mt.ttf"), 16);
 
         BorderPane pane = new BorderPane();
         Scene scene = new Scene(pane, Constants.UI.PRELOADER_WIDTH, Constants.UI.PRELOADER_HEIGHT);
-        pane.getStylesheets().add(Constants.UI.PRELOADER_CSS);
+        pane.getStylesheets().add(ResourceHelper.getResource(Constants.UI.PRELOADER_CSS));
         pane.getStyleClass().add(Constants.UI.PRELOADER_PANE_STYLE);
 
         Label title = new Label();
@@ -60,7 +61,7 @@ public class AppPreloader extends Preloader {
         bar.setMaxWidth(Constants.UI.PRELOADER_WIDTH - 30d);
         pane.setCenter(bar);
 
-        Label versionText = new Label(Util.getBuildVersion());
+        Label versionText = new Label(Build.version());
         versionText.getStyleClass().add(Constants.UI.PRELOADER_VERSION_STYLE);
         StackPane bottomPane = new StackPane(versionText);
         bottomPane.getStyleClass().add(Constants.UI.PRELOADER_BOTTOM_STYLE);
@@ -72,11 +73,11 @@ public class AppPreloader extends Preloader {
     }
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) throws IOException {
         this.stage = stage;
-        this.stage.getIcons().addAll(IconHelper.getAppIcons());
+        this.stage.getIcons().addAll(ResourceHelper.getAppIcons());
         this.stage.setScene(createPreloaderScene());
-        this.stage.setTitle(Util.getBuildTitle());
+        this.stage.setTitle(Build.title());
 
         if (SystemUtils.IS_OS_WINDOWS) {
             this.stage.initStyle(StageStyle.TRANSPARENT);

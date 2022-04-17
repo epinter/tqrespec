@@ -22,9 +22,9 @@ package br.com.pinter.tqrespec.tqdata;
 
 import br.com.pinter.tqrespec.Settings;
 import br.com.pinter.tqrespec.core.GameNotFoundException;
+import br.com.pinter.tqrespec.gui.ResourceHelper;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.util.Constants;
-import br.com.pinter.tqrespec.util.Util;
 import com.google.inject.Singleton;
 import com.sun.jna.platform.win32.*;
 import org.apache.commons.lang3.StringUtils;
@@ -475,7 +475,7 @@ public class GameInfo {
             logger.log(System.Logger.Level.INFO, "Path manually set: path:{0};version:{1}:type:{2}", manualPath, installedVersion, installType);
         } else {
             logger.log(System.Logger.Level.ERROR, "Path ''{0}'' is invalid", manualPath);
-            throw new GameNotFoundException(Util.getUIMessage(Constants.Msg.MAIN_GAMENOTDETECTED));
+            throw new GameNotFoundException(ResourceHelper.getMessage(Constants.Msg.MAIN_GAMENOTDETECTED));
         }
     }
 
@@ -490,7 +490,7 @@ public class GameInfo {
             logger.log(System.Logger.Level.INFO, "Path manually set: path:{0};version:{1}:type:{2}", manualTqItPath, installedVersion, installType);
         } else {
             logger.log(System.Logger.Level.ERROR, "Path ''{0}'' is invalid", manualTqPath);
-            throw new GameNotFoundException(Util.getUIMessage(Constants.Msg.MAIN_GAMENOTDETECTED));
+            throw new GameNotFoundException(ResourceHelper.getMessage(Constants.Msg.MAIN_GAMENOTDETECTED));
         }
     }
 
@@ -510,7 +510,7 @@ public class GameInfo {
             logger.log(System.Logger.Level.INFO, "GameVersion:''{0}'';InstallType:''{1}''", installedVersion, installType);
             return gamePath;
         } else {
-            throw new GameNotFoundException(Util.getUIMessage(Constants.Msg.MAIN_GAMENOTDETECTED));
+            throw new GameNotFoundException(ResourceHelper.getMessage(Constants.Msg.MAIN_GAMENOTDETECTED));
         }
     }
 
@@ -589,7 +589,7 @@ public class GameInfo {
         logger.log(System.Logger.Level.DEBUG, "Game data found: ''{0}''", gamePath);
         if (StringUtils.isEmpty(gamePath)) {
             removeSavedDetectedGame();
-            throw new GameNotFoundException(Util.getUIMessage(Constants.Msg.MAIN_GAMENOTDETECTED));
+            throw new GameNotFoundException(ResourceHelper.getMessage(Constants.Msg.MAIN_GAMENOTDETECTED));
         }
         return gamePath;
     }
@@ -650,7 +650,7 @@ public class GameInfo {
 
     private void searchGamepathResources() throws GameNotFoundException {
         if (gamePath == null) {
-            throw new GameNotFoundException(Util.getUIMessage(Constants.Msg.MAIN_GAMENOTDETECTED));
+            throw new GameNotFoundException(ResourceHelper.getMessage(Constants.Msg.MAIN_GAMENOTDETECTED));
         }
 
         if (GameVersion.TQIT.equals(installedVersion) && InstallType.STEAM.equals(installType)) {

@@ -20,7 +20,7 @@
 
 package br.com.pinter.tqrespec.gui;
 
-import br.com.pinter.tqrespec.util.Util;
+import br.com.pinter.tqrespec.util.Build;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
@@ -61,7 +61,7 @@ public class AboutController implements Initializable {
         scene.setFill(Color.TRANSPARENT);
         stage.initModality(Modality.APPLICATION_MODAL);
 
-        stage.getIcons().addAll(IconHelper.getAppIcons());
+        stage.getIcons().addAll(ResourceHelper.getAppIcons());
 
         //disable maximize
         stage.resizableProperty().setValue(Boolean.FALSE);
@@ -84,13 +84,13 @@ public class AboutController implements Initializable {
                 stage.close();
             }
         }));
-        stage.setTitle(Util.getUIMessage("about.title", Util.getBuildTitle()));
-        aboutFormTitle.setText(Util.getUIMessage("about.title", Util.getBuildTitle()));
-        aboutVersion.setText(Util.getUIMessage("about.version", Util.getBuildVersion()));
+        stage.setTitle(ResourceHelper.getMessage("about.title", Build.title()));
+        aboutFormTitle.setText(ResourceHelper.getMessage("about.title", Build.title()));
+        aboutVersion.setText(ResourceHelper.getMessage("about.version", Build.version()));
 
-        String translators = Util.getUIMessage("main.translators");
+        String translators = ResourceHelper.getMessage("main.translators");
         if (StringUtils.isNotBlank(translators)) {
-            aboutText.appendText("\n\n" + Util.getUIMessage("main.translators"));
+            aboutText.appendText("\n\n" + ResourceHelper.getMessage("main.translators"));
         }
 
         stage.show();

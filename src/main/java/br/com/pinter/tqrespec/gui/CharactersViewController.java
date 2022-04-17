@@ -26,8 +26,8 @@ import br.com.pinter.tqrespec.core.WorkerThread;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.player.PlayerLoader;
 import br.com.pinter.tqrespec.tqdata.*;
+import br.com.pinter.tqrespec.util.Build;
 import br.com.pinter.tqrespec.util.Constants;
-import br.com.pinter.tqrespec.util.Util;
 import com.google.inject.Inject;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -236,7 +236,7 @@ public class CharactersViewController implements Initializable {
         scene.setFill(Color.TRANSPARENT);
         stage.initModality(Modality.APPLICATION_MODAL);
 
-        stage.getIcons().addAll(IconHelper.getAppIcons());
+        stage.getIcons().addAll(ResourceHelper.getAppIcons());
 
         //disable maximize
         stage.resizableProperty().setValue(Boolean.FALSE);
@@ -263,8 +263,8 @@ public class CharactersViewController implements Initializable {
             stage.initStyle(StageStyle.UNDECORATED);
         }
 
-        stage.setTitle(Util.getUIMessage("characters.title", Util.getBuildTitle()));
-        charFormTitle.setText(Util.getUIMessage("characters.title", Util.getBuildTitle()));
+        stage.setTitle(ResourceHelper.getMessage("characters.title", Build.title()));
+        charFormTitle.setText(ResourceHelper.getMessage("characters.title", Build.title()));
 
         stage.addEventHandler(WindowEvent.WINDOW_SHOWING, e -> new WorkerThread(new MyTask<>() {
             @Override
@@ -272,7 +272,7 @@ public class CharactersViewController implements Initializable {
                 loadingCharacters.set(true);
 
                 Platform.runLater(() -> {
-                    charactersTable.setPlaceholder(new Label(Util.getUIMessage("characters.loadingPlaceholder")));
+                    charactersTable.setPlaceholder(new Label(ResourceHelper.getMessage("characters.loadingPlaceholder")));
                     rootElement.getScene().setCursor(Cursor.WAIT);
 
                 });
@@ -310,26 +310,26 @@ public class CharactersViewController implements Initializable {
 
     private void setupTable() {
         //setup tableview
-        setupTableColumnString(colName, Util.getUIMessage("characters.characterName"), "name");
-        setupTableColumnInteger(colLevel, Util.getUIMessage("main.charlevel"), "level");
-        setupTableColumnString(colGender, Util.getUIMessage("main.gender"), null);
+        setupTableColumnString(colName, ResourceHelper.getMessage("characters.characterName"), "name");
+        setupTableColumnInteger(colLevel, ResourceHelper.getMessage("main.charlevel"), "level");
+        setupTableColumnString(colGender, ResourceHelper.getMessage("main.gender"), null);
         colGender.setCellValueFactory(f -> new SimpleStringProperty(
-                Util.getUIMessage("main.gender." + f.getValue().getGender().name().toLowerCase())));
+                ResourceHelper.getMessage("main.gender." + f.getValue().getGender().name().toLowerCase())));
 
-        setupTableColumnString(colClass, Util.getUIMessage("main.charclass"), "characterClass");
-        setupTableColumnString(colDifficulty, Util.getUIMessage("main.difficulty"), null);
-        setupTableColumnInteger(colExperience, Util.getUIMessage("main.experience"), "experience");
-        setupTableColumnInteger(colGold, Util.getUIMessage("main.gold"), "gold");
-        setupTableColumnInteger(colLife, Util.getUIMessage("main.health"), "statLife");
-        setupTableColumnInteger(colMana, Util.getUIMessage("main.energy"), "statMana");
-        setupTableColumnInteger(colStr, Util.getUIMessage("main.strength"), "statStr");
-        setupTableColumnInteger(colInt, Util.getUIMessage("main.intelligence"), "statInt");
-        setupTableColumnInteger(colDex, Util.getUIMessage("main.dexterity"), "statDex");
-        setupTableColumnInteger(colAvailableAttr, Util.getUIMessage("characters.attributePoints"), "statAvailableAttrPoints");
-        setupTableColumnInteger(colAvailableSkill, Util.getUIMessage("characters.skillPoints"), "statAvailableSkillPoints");
-        setupTableColumnString(colMasteryOne, Util.getUIMessage(Constants.Msg.CHARACTERS_TITLE_MASTERY), null);
-        setupTableColumnString(colMasteryTwo, Util.getUIMessage(Constants.Msg.CHARACTERS_TITLE_MASTERY), null);
-        setupTableColumnString(colLastTeleport, Util.getUIMessage("characters.lastTeleport"), null);
+        setupTableColumnString(colClass, ResourceHelper.getMessage("main.charclass"), "characterClass");
+        setupTableColumnString(colDifficulty, ResourceHelper.getMessage("main.difficulty"), null);
+        setupTableColumnInteger(colExperience, ResourceHelper.getMessage("main.experience"), "experience");
+        setupTableColumnInteger(colGold, ResourceHelper.getMessage("main.gold"), "gold");
+        setupTableColumnInteger(colLife, ResourceHelper.getMessage("main.health"), "statLife");
+        setupTableColumnInteger(colMana, ResourceHelper.getMessage("main.energy"), "statMana");
+        setupTableColumnInteger(colStr, ResourceHelper.getMessage("main.strength"), "statStr");
+        setupTableColumnInteger(colInt, ResourceHelper.getMessage("main.intelligence"), "statInt");
+        setupTableColumnInteger(colDex, ResourceHelper.getMessage("main.dexterity"), "statDex");
+        setupTableColumnInteger(colAvailableAttr, ResourceHelper.getMessage("characters.attributePoints"), "statAvailableAttrPoints");
+        setupTableColumnInteger(colAvailableSkill, ResourceHelper.getMessage("characters.skillPoints"), "statAvailableSkillPoints");
+        setupTableColumnString(colMasteryOne, ResourceHelper.getMessage(Constants.Msg.CHARACTERS_TITLE_MASTERY), null);
+        setupTableColumnString(colMasteryTwo, ResourceHelper.getMessage(Constants.Msg.CHARACTERS_TITLE_MASTERY), null);
+        setupTableColumnString(colLastTeleport, ResourceHelper.getMessage("characters.lastTeleport"), null);
 
         colMasteryOne.setCellValueFactory(f -> {
             if (f.getValue().getMasteries() != null && !f.getValue().getMasteries().isEmpty()) {
@@ -354,9 +354,9 @@ public class CharactersViewController implements Initializable {
             String difficultyTextValue = String.format("%s%02d",
                     Constants.UI.PREFIXTAG_DIFFICULTYLABEL, f.getValue().getDifficulty() + 1);
             if (txt.isTagStringValid(difficultyTextValue)) {
-                difficultyText = Util.cleanTagString(txt.getString(difficultyTextValue));
+                difficultyText = ResourceHelper.cleanTagString(txt.getString(difficultyTextValue));
             } else {
-                difficultyText = Util.getUIMessage(String.format("difficulty.%d", f.getValue().getDifficulty()));
+                difficultyText = ResourceHelper.getMessage(String.format("difficulty.%d", f.getValue().getDifficulty()));
             }
             return new SimpleStringProperty(difficultyText);
         });
@@ -382,12 +382,12 @@ public class CharactersViewController implements Initializable {
             return null;
         });
 
-        setupTableColumnInteger(colExperienceFromKills, Util.getUIMessage("characters.experienceFromKills"), "experienceFromKills");
-        setupTableColumnInteger(colHealthPotionsUsed, Util.getUIMessage("characters.healthPotionsUsed"), "healthPotionsUsed");
-        setupTableColumnInteger(colManaPotionsUsed, Util.getUIMessage("characters.manaPotionsUsed"), "manaPotionsUsed");
-        setupTableColumnInteger(colNumHitsReceived, Util.getUIMessage("characters.numHitsReceived"), "numHitsReceived");
-        setupTableColumnInteger(colNumHitsInflicted, Util.getUIMessage("characters.numHitsInflicted"), "numHitsInflicted");
-        setupTableColumnInteger(colCriticalHitsInflicted, Util.getUIMessage("characters.criticalHitsInflicted"), "criticalHitsInflicted");
+        setupTableColumnInteger(colExperienceFromKills, ResourceHelper.getMessage("characters.experienceFromKills"), "experienceFromKills");
+        setupTableColumnInteger(colHealthPotionsUsed, ResourceHelper.getMessage("characters.healthPotionsUsed"), "healthPotionsUsed");
+        setupTableColumnInteger(colManaPotionsUsed, ResourceHelper.getMessage("characters.manaPotionsUsed"), "manaPotionsUsed");
+        setupTableColumnInteger(colNumHitsReceived, ResourceHelper.getMessage("characters.numHitsReceived"), "numHitsReceived");
+        setupTableColumnInteger(colNumHitsInflicted, ResourceHelper.getMessage("characters.numHitsInflicted"), "numHitsInflicted");
+        setupTableColumnInteger(colCriticalHitsInflicted, ResourceHelper.getMessage("characters.criticalHitsInflicted"), "criticalHitsInflicted");
 
         colLastTeleport.setCellValueFactory(f -> {
             MapTeleport mapTeleport = f.getValue().getLastMapTeleport();
@@ -436,7 +436,7 @@ public class CharactersViewController implements Initializable {
 
     public void exportCsv() {
         FileChooser csvChooser = new FileChooser();
-        csvChooser.setTitle(Util.getUIMessage("characters.fileChooserTitle"));
+        csvChooser.setTitle(ResourceHelper.getMessage("characters.fileChooserTitle"));
         csvChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV", "*.csv"));
         File csvFile = csvChooser.showSaveDialog(rootElement.getScene().getWindow());
 
@@ -447,46 +447,46 @@ public class CharactersViewController implements Initializable {
         List<String[]> csvRows = new ArrayList<>();
 
         String[] header = new String[]{
-                Util.getUIMessage("characters.characterName"),
-                Util.getUIMessage("main.charlevel"),
-                Util.getUIMessage("main.gender"),
-                Util.getUIMessage("main.charclass"),
-                Util.getUIMessage("main.difficulty"),
-                Util.getUIMessage("main.experience"),
-                Util.getUIMessage("main.gold"),
-                Util.getUIMessage("main.health"),
-                Util.getUIMessage("main.energy"),
-                Util.getUIMessage("main.strength"),
-                Util.getUIMessage("main.intelligence"),
-                Util.getUIMessage("main.dexterity"),
-                Util.getUIMessage("characters.attributePoints"),
-                Util.getUIMessage("characters.skillPoints"),
-                Util.getUIMessage(Constants.Msg.CHARACTERS_TITLE_MASTERY),
-                Util.getUIMessage(Constants.Msg.CHARACTERS_TITLE_MASTERY),
-                Util.getUIMessage("characters.lastTeleport"),
+                ResourceHelper.getMessage("characters.characterName"),
+                ResourceHelper.getMessage("main.charlevel"),
+                ResourceHelper.getMessage("main.gender"),
+                ResourceHelper.getMessage("main.charclass"),
+                ResourceHelper.getMessage("main.difficulty"),
+                ResourceHelper.getMessage("main.experience"),
+                ResourceHelper.getMessage("main.gold"),
+                ResourceHelper.getMessage("main.health"),
+                ResourceHelper.getMessage("main.energy"),
+                ResourceHelper.getMessage("main.strength"),
+                ResourceHelper.getMessage("main.intelligence"),
+                ResourceHelper.getMessage("main.dexterity"),
+                ResourceHelper.getMessage("characters.attributePoints"),
+                ResourceHelper.getMessage("characters.skillPoints"),
+                ResourceHelper.getMessage(Constants.Msg.CHARACTERS_TITLE_MASTERY),
+                ResourceHelper.getMessage(Constants.Msg.CHARACTERS_TITLE_MASTERY),
+                ResourceHelper.getMessage("characters.lastTeleport"),
                 txt.getString(Constants.UI.TAG_STAT_ELAPSEDTIME),
                 txt.getString(Constants.UI.TAG_STAT_TOTALDEATHS),
                 txt.getString(Constants.UI.TAG_STAT_MONSTERSKILLED),
                 txt.getString(Constants.UI.TAG_STAT_GREATESTDAMAGE),
                 txt.getString(Constants.UI.TAG_STAT_GREATESTMONSTER),
-                Util.getUIMessage("characters.experienceFromKills"),
-                Util.getUIMessage("characters.healthPotionsUsed"),
-                Util.getUIMessage("characters.manaPotionsUsed"),
-                Util.getUIMessage("characters.numHitsReceived"),
-                Util.getUIMessage("characters.numHitsInflicted"),
-                Util.getUIMessage("characters.criticalHitsInflicted")
+                ResourceHelper.getMessage("characters.experienceFromKills"),
+                ResourceHelper.getMessage("characters.healthPotionsUsed"),
+                ResourceHelper.getMessage("characters.manaPotionsUsed"),
+                ResourceHelper.getMessage("characters.numHitsReceived"),
+                ResourceHelper.getMessage("characters.numHitsInflicted"),
+                ResourceHelper.getMessage("characters.criticalHitsInflicted")
         };
         csvRows.add(header);
 
         for (PlayerCharacter p : characters) {
-            String gender = Util.getUIMessage("main.gender." + p.getGender().name().toLowerCase());
+            String gender = ResourceHelper.getMessage("main.gender." + p.getGender().name().toLowerCase());
             String difficultyText;
             String difficultyTextValue = String.format("%s%02d",
                     Constants.UI.PREFIXTAG_DIFFICULTYLABEL, p.getDifficulty() + 1);
             if (txt.isTagStringValid(difficultyTextValue)) {
-                difficultyText = Util.cleanTagString(txt.getString(difficultyTextValue));
+                difficultyText = ResourceHelper.cleanTagString(txt.getString(difficultyTextValue));
             } else {
-                difficultyText = Util.getUIMessage(String.format("difficulty.%d", p.getDifficulty()));
+                difficultyText = ResourceHelper.getMessage(String.format("difficulty.%d", p.getDifficulty()));
             }
 
             String lastTeleport = "";

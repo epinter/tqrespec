@@ -1408,18 +1408,18 @@ public enum Icon {
     FA_YOUTUBE_SQUARE('\uf431'),
     FA_ZHIHU('\uf63f');
 
-    private Character c;
+    private final Character c;
 
     Icon(Character c) {
         this.c = c;
     }
 
     public Text create() {
-        return IconHelper.createIcon(this);
+        return ResourceHelper.createIcon(this);
     }
 
     public Text create(double sizeEm) {
-        return IconHelper.createIcon(this, sizeEm);
+        return ResourceHelper.createIcon(this, sizeEm);
     }
 
     @Override

@@ -60,9 +60,6 @@ module br.com.pinter.tqrespec {
     opens br.com.pinter.tqrespec.save.stash to com.google.guice, javafx.fxml;
     opens br.com.pinter.tqrespec.tqdata to com.google.guice, javafx.fxml;
     opens br.com.pinter.tqrespec.util to com.google.guice, javafx.fxml;
-    opens fxml;
-    opens i18n;
-    opens icon;
     exports br.com.pinter.tqrespec.save.exporter;
     opens br.com.pinter.tqrespec.save.exporter to com.google.guice, javafx.fxml;
 }

@@ -4,8 +4,8 @@
 
 package br.com.pinter.tqrespec.gui;
 
+import br.com.pinter.tqrespec.util.Build;
 import br.com.pinter.tqrespec.util.Constants;
-import br.com.pinter.tqrespec.util.Util;
 import br.com.pinter.tqrespec.util.Version;
 import com.google.inject.Inject;
 import javafx.application.HostServices;
@@ -33,7 +33,7 @@ public class CheckVersionService extends Service<Version> {
     @Override
     protected Task<Version> createTask() {
         String url = Constants.VERSION_CHECK_URL;
-        String currentVersion = Util.getBuildVersion();
+        String currentVersion = Build.version();
         if (control == null) {
             throw new IllegalArgumentException("null parameter received");
         }
@@ -69,7 +69,7 @@ public class CheckVersionService extends Service<Version> {
                 };
                 new Thread(openUrl).start();
             });
-            ((Hyperlink) control).setText(Util.getUIMessage("about.newversion"));
+            ((Hyperlink) control).setText(ResourceHelper.getMessage("about.newversion"));
         });
 
         return task;

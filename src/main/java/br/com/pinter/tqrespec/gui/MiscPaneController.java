@@ -11,7 +11,6 @@ import br.com.pinter.tqrespec.save.Platform;
 import br.com.pinter.tqrespec.save.exporter.Exporter;
 import br.com.pinter.tqrespec.save.player.Player;
 import br.com.pinter.tqrespec.save.player.PlayerWriter;
-import br.com.pinter.tqrespec.util.Util;
 import com.google.inject.Inject;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -52,19 +51,21 @@ public class MiscPaneController implements Initializable {
     private Player player;
     @Inject
     private PlayerWriter playerWriter;
+    @Inject
+    private UIUtils uiUtils;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         copyButton.setGraphic(Icon.FA_COPY.create());
-        copyTargetCombo.setTooltip(Util.simpleTooltip(Util.getUIMessage("main.tooltipCopyTarget")));
+        copyTargetCombo.setTooltip(uiUtils.simpleTooltip(ResourceHelper.getMessage("main.tooltipCopyTarget")));
         copyTargetCombo.setItems(FXCollections.observableList(Arrays.asList(CopyTarget.values())));
         copyTargetCombo.getSelectionModel().select(CopyTarget.WINDOWS);
         copyTargetCombo.setCellFactory(f -> new ListCell<>() {
             @Override
             protected void updateItem(CopyTarget copyTarget, boolean empty) {
                 super.updateItem(copyTarget, empty);
-                setText(empty ? "" : Util.getUIMessage("main.copyTarget." + copyTarget));
-                setTooltip(Util.simpleTooltip(Util.getUIMessage("main.tooltipCopyTarget." + copyTarget)));
+                setText(empty ? "" : ResourceHelper.getMessage("main.copyTarget." + copyTarget));
+                setTooltip(uiUtils.simpleTooltip(ResourceHelper.getMessage("main.tooltipCopyTarget." + copyTarget)));
             }
         });
         copyTargetCombo.setButtonCell(new ListCell<>() {
@@ -72,11 +73,11 @@ public class MiscPaneController implements Initializable {
             public void updateIndex(int i) {
                 super.updateIndex(i);
                 CopyTarget platform = getListView().getItems().get(i);
-                setText(Util.getUIMessage("main.copyTarget." + platform));
+                setText(ResourceHelper.getMessage("main.copyTarget." + platform));
             }
         });
         exportJsonButton.setGraphic(Icon.FA_FILE_EXPORT.create());
-        exportJsonButton.setTooltip(Util.simpleTooltip(Util.getUIMessage("misc.tooltipExportJson")));
+        exportJsonButton.setTooltip(uiUtils.simpleTooltip(ResourceHelper.getMessage("misc.tooltipExportJson")));
     }
 
     public void setMainController(MainController mainController) {
@@ -167,7 +168,7 @@ public class MiscPaneController implements Initializable {
 
         if (selectedTarget.equals(CopyTarget.MOBILE) || selectedTarget.equals(CopyTarget.BACKUP)) {
             FileChooser zipChooser = new FileChooser();
-            zipChooser.setTitle(Util.getUIMessage("misc.copyFileChooserTitle"));
+            zipChooser.setTitle(ResourceHelper.getMessage("misc.copyFileChooserTitle"));
             zipChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("ZIP", "*.zip"));
             zipChooser.setInitialFileName(String.format("%s-%s-%s.zip",
                     targetPlayerName,
@@ -177,7 +178,7 @@ public class MiscPaneController implements Initializable {
             selectedFile = zipChooser.showSaveDialog(copyCharInput.getScene().getWindow());
 
             if (selectedFile == null || selectedFile.exists()) {
-                Util.showError("Error copying character", "Aborted");
+                uiUtils.showError("Error copying character", "Aborted");
                 mainController.reset();
                 return;
             }
@@ -224,13 +225,13 @@ public class MiscPaneController implements Initializable {
                     mainController.addCharactersToCombo();
                     mainController.reset();
                 } else if (copyCharTask.getValue() == 3) {
-                    Util.showError("Target Directory already exists!",
+                    uiUtils.showError("Target Directory already exists!",
                             String.format("The specified target directory already exists. Aborting the copy to character '%s'",
                                     targetPlayerName));
                     mainController.reset();
                 } else {
-                    Util.showError(Util.getUIMessage("alert.errorcopying_header"),
-                            Util.getUIMessage("alert.errorcopying_content", targetPlayerName));
+                    uiUtils.showError(ResourceHelper.getMessage("alert.errorcopying_header"),
+                            ResourceHelper.getMessage("alert.errorcopying_content", targetPlayerName));
                     mainController.reset();
                 }
             }
@@ -241,7 +242,7 @@ public class MiscPaneController implements Initializable {
 
     public void exportJson() {
         FileChooser jsonChooser = new FileChooser();
-        jsonChooser.setTitle(Util.getUIMessage("misc.exportJsonFileChooserTitle"));
+        jsonChooser.setTitle(ResourceHelper.getMessage("misc.exportJsonFileChooserTitle"));
         jsonChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON", "*.json"));
         jsonChooser.setInitialFileName(String.format("%s-%s.json",
                 player.getCharacterName(),
@@ -249,7 +250,7 @@ public class MiscPaneController implements Initializable {
         ));
         File selectedFile = jsonChooser.showSaveDialog(exportJsonButton.getScene().getWindow());
         if (selectedFile == null) {
-            Util.showError("Error exporting json", "Aborted");
+            uiUtils.showError("Error exporting json", "Aborted");
             mainController.reset();
             return;
         }

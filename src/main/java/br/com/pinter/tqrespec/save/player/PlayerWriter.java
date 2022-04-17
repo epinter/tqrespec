@@ -32,7 +32,6 @@ import br.com.pinter.tqrespec.save.stash.StashLoader;
 import br.com.pinter.tqrespec.save.stash.StashWriter;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.util.Constants;
-import br.com.pinter.tqrespec.util.Util;
 import com.google.inject.Inject;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -46,6 +45,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.stream.Stream;
+
+import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class PlayerWriter extends FileWriter {
     private static final System.Logger logger = Log.getLogger(PlayerWriter.class.getName());
@@ -276,7 +278,7 @@ public class PlayerWriter extends FileWriter {
                     if (conversionTarget.equals(Platform.MOBILE)) {
                         excludeCopyRegex = "(?i)(?:^backup.*|^winsys.dxg$|^winsys.dxb$|^settings.txt$)";
                     }
-                    Util.copyDirectoryRecurse(playerSaveDirSource, dir, false, zipfs, excludeCopyRegex);
+                    copyDirectoryRecurse(playerSaveDirSource, dir, false, zipfs, excludeCopyRegex);
                     if (!backupOnly) {
                         Files.deleteIfExists(zipfs.getPath(dir.toString(), Constants.PLAYERCHR));
                         writeBuffer(dir.toString(), Constants.PLAYERCHR, fileDataMap, zipfs);
@@ -287,7 +289,7 @@ public class PlayerWriter extends FileWriter {
                 if (!conversionTarget.equals(Platform.UNDEFINED) && oldPlatform.equals(Platform.MOBILE)) {
                     excludeCopyRegex = "(?i)(?:^backup.*|^.winsys.dxg$|^.winsys.dxb$|^SavingChar.txt$)";
                 }
-                Util.copyDirectoryRecurse(playerSaveDirSource, playerSaveDirTarget, false, excludeCopyRegex);
+                copyDirectoryRecurse(playerSaveDirSource, playerSaveDirTarget, false, excludeCopyRegex);
                 writeBuffer(playerSaveDirTarget.toString(), Constants.PLAYERCHR, fileDataMap);
                 StashLoader stashLoader = new StashLoader();
                 if (stashLoader.loadStash(playerSaveDirTarget, toPlayerName)) {
@@ -300,6 +302,70 @@ public class PlayerWriter extends FileWriter {
             throw new IOException(e);
         } finally {
             State.get().setSaveInProgress(false);
+        }
+    }
+
+    private void copyDirectoryRecurse(Path source, Path target, boolean replace, String excludeRegex) throws FileAlreadyExistsException {
+        copyDirectoryRecurse(source, target, replace, FileSystems.getDefault(), excludeRegex);
+    }
+
+    private void copyDirectoryRecurse(Path source, Path target, boolean replace, FileSystem fileSystem, String excludeRegex) throws FileAlreadyExistsException {
+        if (!replace && Files.exists(target)) {
+            throw new FileAlreadyExistsException(target.toString() + " already exists");
+        }
+
+        FileVisitor<Path> fileVisitor = new FileVisitor<>() {
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                Path targetDir = fileSystem.getPath(target.toString(), source.relativize(dir).toString());
+
+                try {
+                    if (excludeRegex != null && dir.getFileName().toString().matches(excludeRegex)) {
+                        return FileVisitResult.SKIP_SUBTREE;
+                    }
+                    Files.copy(dir, targetDir, COPY_ATTRIBUTES);
+                } catch (DirectoryNotEmptyException ignored) {
+                    //ignore
+                } catch (IOException e) {
+                    logger.log(System.Logger.Level.ERROR, "Unable to create directory ''{0}''", targetDir);
+                    throw new IOException("Unable to create directory " + targetDir);
+                }
+
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                Path targetFile = fileSystem.getPath(target.toString(), source.relativize(file).toString());
+
+                try {
+                    if (excludeRegex != null && file.getFileName().toString().matches(excludeRegex)) {
+                        return FileVisitResult.CONTINUE;
+                    }
+                    Files.copy(file, targetFile, replace ? new CopyOption[]{COPY_ATTRIBUTES, REPLACE_EXISTING}
+                            : new CopyOption[]{COPY_ATTRIBUTES});
+                } catch (IOException e) {
+                    logger.log(System.Logger.Level.ERROR, "Unable to create file ''{0}''", targetFile);
+                    return FileVisitResult.TERMINATE;
+                }
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFileFailed(Path file, IOException exc) {
+                return FileVisitResult.TERMINATE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
+                return FileVisitResult.CONTINUE;
+            }
+        };
+
+        try {
+            Files.walkFileTree(source, fileVisitor);
+        } catch (IOException e) {
+            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
         }
     }
 }

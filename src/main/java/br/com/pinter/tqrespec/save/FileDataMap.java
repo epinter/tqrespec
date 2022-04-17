@@ -20,8 +20,8 @@
 
 package br.com.pinter.tqrespec.save;
 
+import br.com.pinter.tqrespec.gui.ResourceHelper;
 import br.com.pinter.tqrespec.tqdata.GameVersion;
-import br.com.pinter.tqrespec.util.Util;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -369,7 +369,7 @@ public class FileDataMap implements DeepCloneable {
             newVar.setValue(value);
             storeChange(variableInfo, newVar);
         } else {
-            throw new IllegalArgumentException(Util.getUIMessage(ALERT_INVALIDDATA, variable));
+            throw new IllegalArgumentException(ResourceHelper.getMessage(ALERT_INVALIDDATA, variable));
         }
     }
 
@@ -383,7 +383,7 @@ public class FileDataMap implements DeepCloneable {
                 throw new NumberFormatException(String.format(INVALID_DATA_TYPE, variable));
             }
         } else {
-            throw new IllegalArgumentException(Util.getUIMessage(ALERT_INVALIDDATA, variable));
+            throw new IllegalArgumentException(ResourceHelper.getMessage(ALERT_INVALIDDATA, variable));
         }
     }
 
@@ -408,7 +408,7 @@ public class FileDataMap implements DeepCloneable {
             VariableInfo variableInfo = getFirst(blockStart, variable);
 
             if (variableInfo == null) {
-                throw new IllegalArgumentException(Util.getUIMessage(ALERT_INVALIDDATA, variable));
+                throw new IllegalArgumentException(ResourceHelper.getMessage(ALERT_INVALIDDATA, variable));
             }
 
             if (variableInfo.isInt()) {
@@ -427,7 +427,7 @@ public class FileDataMap implements DeepCloneable {
         VariableInfo variableInfo = getFirst(variable);
 
         if (variableInfo == null) {
-            throw new IllegalArgumentException(Util.getUIMessage(ALERT_INVALIDDATA, variable));
+            throw new IllegalArgumentException(ResourceHelper.getMessage(ALERT_INVALIDDATA, variable));
         }
 
         if (variableInfo.isInt()) {
@@ -475,7 +475,7 @@ public class FileDataMap implements DeepCloneable {
                 throw new NumberFormatException(String.format(INVALID_DATA_TYPE, variable));
             }
         } else {
-            throw new IllegalArgumentException(Util.getUIMessage(ALERT_INVALIDDATA, variable));
+            throw new IllegalArgumentException(ResourceHelper.getMessage(ALERT_INVALIDDATA, variable));
         }
     }
 

@@ -22,16 +22,17 @@ package br.com.pinter.tqrespec;
 
 import br.com.pinter.tqdatabase.Database;
 import br.com.pinter.tqrespec.core.*;
-import br.com.pinter.tqrespec.gui.IconHelper;
+import br.com.pinter.tqrespec.gui.ResourceHelper;
 import br.com.pinter.tqrespec.gui.MainController;
 import br.com.pinter.tqrespec.gui.ResizeListener;
+import br.com.pinter.tqrespec.gui.UIUtils;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.tqdata.Db;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.tqdata.GameVersion;
 import br.com.pinter.tqrespec.tqdata.Txt;
+import br.com.pinter.tqrespec.util.Build;
 import br.com.pinter.tqrespec.util.Constants;
-import br.com.pinter.tqrespec.util.Util;
 import com.google.common.util.concurrent.AtomicDouble;
 import com.google.inject.Inject;
 import javafx.application.Application;
@@ -84,6 +85,8 @@ public class Main extends Application {
     private FXMLLoader fxmlLoader;
     @Inject
     private GameInfo gameInfo;
+    @Inject
+    private UIUtils uiUtils;
     private System.Logger logger;
     private StringExpression initialFontBinding;
     private Future<?> processBarTask;
@@ -113,7 +116,7 @@ public class Main extends Application {
     private void chooseDirectory(Stage primaryStage) {
         File selectedDirectory;
         DirectoryChooser directoryChooser = new DirectoryChooser();
-        directoryChooser.setTitle(Util.getUIMessage(Constants.Msg.MAIN_CHOOSEGAMEDIRECTORY));
+        directoryChooser.setTitle(ResourceHelper.getMessage(Constants.Msg.MAIN_CHOOSEGAMEDIRECTORY));
         selectedDirectory = directoryChooser.showDialog(primaryStage);
 
         if (selectedDirectory == null) {
@@ -125,13 +128,13 @@ public class Main extends Application {
             gameInfo.setManualGamePath(selectedDirectory.getPath());
             if (GameVersion.TQIT.equals(gameInfo.getInstalledVersion())) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setHeaderText(Util.getUIMessage("alert.chooseTQBaseDir_header"));
-                alert.setContentText(Util.getUIMessage("alert.chooseTQBaseDir_content"));
+                alert.setHeaderText(ResourceHelper.getMessage("alert.chooseTQBaseDir_header"));
+                alert.setContentText(ResourceHelper.getMessage("alert.chooseTQBaseDir_content"));
                 alert.initOwner(primaryStage);
-                alert.setTitle(Util.getBuildTitle());
+                alert.setTitle(Build.title());
                 alert.showAndWait();
                 DirectoryChooser tqDirectoryChooser = new DirectoryChooser();
-                tqDirectoryChooser.setTitle(Util.getUIMessage(Constants.Msg.MAIN_CHOOSEGAMEDIRECTORY));
+                tqDirectoryChooser.setTitle(ResourceHelper.getMessage(Constants.Msg.MAIN_CHOOSEGAMEDIRECTORY));
                 File tqSelectedDirectory = tqDirectoryChooser.showDialog(primaryStage);
 
                 if (tqSelectedDirectory == null) {
@@ -146,7 +149,7 @@ public class Main extends Application {
             logger.log(System.Logger.Level.ERROR, "Error", e);
         }
 
-        Util.showError(Util.getUIMessage(Constants.Msg.MAIN_GAMENOTDETECTED), null);
+        uiUtils.showError(ResourceHelper.getMessage(Constants.Msg.MAIN_GAMENOTDETECTED), null);
         Platform.exit();
         System.exit(0);
     }
@@ -159,7 +162,7 @@ public class Main extends Application {
             progressSet(0.1, 0.2);
 
         } catch (FileNotFoundException e) {
-            Util.showError(Util.getUIMessage(Constants.Msg.MAIN_GAMENOTDETECTED), Util.getUIMessage(Constants.Msg.MAIN_CHOOSEGAMEDIRECTORY));
+            uiUtils.showError(ResourceHelper.getMessage(Constants.Msg.MAIN_GAMENOTDETECTED), ResourceHelper.getMessage(Constants.Msg.MAIN_CHOOSEGAMEDIRECTORY));
             logger.log(System.Logger.Level.ERROR, "game path not detected, showing DirectoryChooser", e);
             chooseDirectory(primaryStage);
         }
@@ -232,7 +235,7 @@ public class Main extends Application {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setHeaderText("Error loading application");
         alert.initOwner(primaryStage);
-        alert.setTitle(Util.getBuildTitle());
+        alert.setTitle(Build.title());
         TextArea textArea = new TextArea(ExceptionUtils.getStackTrace(e));
         textArea.setMaxWidth(Double.MAX_VALUE);
         textArea.setMaxHeight(Double.MAX_VALUE);
@@ -246,7 +249,7 @@ public class Main extends Application {
         try {
             new SingleInstanceLock().lock();
         } catch (IOException e) {
-            Util.showError("TQRespec is already running", null);
+            uiUtils.showError("TQRespec is already running", null);
             Platform.exit();
             System.exit(0);
         }
@@ -265,9 +268,9 @@ public class Main extends Application {
 
     public void prepareMainStage(Stage primaryStage) {
         logger.log(System.Logger.Level.DEBUG, "starting application");
-        Font.loadFont(getClass().getResourceAsStream("/fxml/albertus-mt.ttf"), 16);
-        Font.loadFont(getClass().getResourceAsStream("/fxml/albertus-mt-light.ttf"), 16);
-        Font.loadFont(getClass().getResourceAsStream("/fxml/fa5-free-solid-900.ttf"), 16);
+        Font.loadFont(ResourceHelper.getResource("/fxml/albertus-mt.ttf"), 16);
+        Font.loadFont(ResourceHelper.getResource("/fxml/albertus-mt-light.ttf"), 16);
+        Font.loadFont(ResourceHelper.getResource("/fxml/fa5-free-solid-900.ttf"), 16);
 
         Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler::unhandled);
 
@@ -278,15 +281,15 @@ public class Main extends Application {
                 State.get().setLocale(gameLanguage);
             }
             fxmlLoader.setResources(ResourceBundle.getBundle("i18n.UI", State.get().getLocale()));
-            fxmlLoader.setLocation(getClass().getResource(Constants.UI.MAIN_FXML));
+            fxmlLoader.setLocation(ResourceHelper.getResourceUrl(Constants.UI.MAIN_FXML));
             root = fxmlLoader.load();
         } catch (IOException e) {
             logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             return;
         }
 
-        primaryStage.setTitle(Util.getBuildTitle());
-        primaryStage.getIcons().addAll(IconHelper.getAppIcons());
+        primaryStage.setTitle(Build.title());
+        primaryStage.getIcons().addAll(ResourceHelper.getAppIcons());
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
 
@@ -322,7 +325,7 @@ public class Main extends Application {
 
         primaryStage.addEventHandler(KeyEvent.KEY_PRESSED, (event -> {
             if (event.getCode() == KeyCode.ESCAPE) {
-                Util.closeApplication();
+                uiUtils.closeApplication();
             }
         }));
 
