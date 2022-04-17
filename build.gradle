@@ -40,7 +40,7 @@ ext.javafxSdkLibDir = file("${javafxSdkDir}/lib")
 // jpms ready modules
 ext.modulesJars = ["jna-platform-jpms-", "jna-jpms-", "jackson-annotations-", "jackson-core-", "jackson-databind-"]
 // toggle patch-jar feature, enable jpms on non-modular jars
-ext.patchJars = false
+ext.patchJars = true
 // directory for patched jars
 ext.patchjarDir = new File(buildDir, '/patchedjar')
 // modules dependencies to be passed to jdeps
@@ -148,16 +148,6 @@ if (moduleInfoPresent) {
                     '-XX:+UseSerialGC',
                     '-Dguice_bytecode_gen_option=DISABLED',
                     '-XX:MinHeapFreeRatio=10', '-XX:MaxHeapFreeRatio=15',
-                    '--add-reads', "${moduleName}=ALL-UNNAMED",
-                    '--add-opens', 'javafx.base/com.sun.javafx.reflect=ALL-UNNAMED',
-                    '--add-opens', "${moduleName}/${mainPackageName}=ALL-UNNAMED",
-                    '--add-opens', "${moduleName}/${mainPackageName}.core=ALL-UNNAMED",
-                    '--add-opens', "${moduleName}/${mainPackageName}.tqdata=ALL-UNNAMED",
-                    '--add-opens', "${moduleName}/${mainPackageName}.gui=ALL-UNNAMED",
-                    '--add-opens', "${moduleName}/${mainPackageName}.save.player=ALL-UNNAMED",
-                    '--add-opens', "${moduleName}/${mainPackageName}.save.stash=ALL-UNNAMED",
-                    '--add-opens', "${moduleName}/${mainPackageName}.save=ALL-UNNAMED",
-                    '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
                     '--module-path', classpath.asPath,
                     '--class-path', classpath.asPath,
                     '--module', moduleName,
@@ -352,17 +342,7 @@ task appimage(type: Exec) {
                 '--java-options',
                 '-XX:+UseSerialGC ' +
                         '-Dguice_bytecode_gen_option=DISABLED ' +
-                        '-XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=15 ' +
-                        "--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED " +
-                        "--add-opens ${moduleName}/${mainPackageName}=ALL-UNNAMED " +
-                        "--add-opens ${moduleName}/${mainPackageName}.core=ALL-UNNAMED " +
-                        "--add-opens ${moduleName}/${mainPackageName}.tqdata=ALL-UNNAMED " +
-                        "--add-opens ${moduleName}/${mainPackageName}.gui=ALL-UNNAMED " +
-                        "--add-opens ${moduleName}/${mainPackageName}.save.player=ALL-UNNAMED " +
-                        "--add-opens ${moduleName}/${mainPackageName}.save.stash=ALL-UNNAMED " +
-                        "--add-opens ${moduleName}/${mainPackageName}.save=ALL-UNNAMED " +
-                        "--add-opens java.base/java.lang=ALL-UNNAMED " +
-                        "--add-reads ${moduleName}=ALL-UNNAMED"
+                        '-XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=15 '
     } else {
         commandLine binjpackage,
                 '--type', 'app-image',
