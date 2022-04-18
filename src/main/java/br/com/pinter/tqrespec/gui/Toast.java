@@ -50,7 +50,7 @@ public class Toast {
         this.stage.initStyle(StageStyle.TRANSPARENT);
 
         StackPane root = new StackPane();
-        root.getStylesheets().add(Constants.UI.MAIN_CSS);
+        root.getStylesheets().add(ResourceHelper.getResource(Constants.UI.MAIN_CSS));
 
         Label msg = new Label();
         Label msg2 = new Label();
