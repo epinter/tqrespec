@@ -127,6 +127,8 @@ public class AttributesPaneController implements Initializable {
     private int manaStep;
     private int manaMin;
 
+    private boolean characterIsLoading = false;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         if (!State.get().getLocale().equals(Locale.ENGLISH) && resourceBundle.getLocale().getLanguage().isEmpty()) {
@@ -338,6 +340,7 @@ public class AttributesPaneController implements Initializable {
     }
 
     public void loadCharHandler() {
+        characterIsLoading = true;
         strStep = db.player().getPlayerLevels().getStrengthIncrement();
         strMin = Math.round(db.player().getPc().getCharacterStrength());
         intStep = db.player().getPlayerLevels().getIntelligenceIncrement();
@@ -392,6 +395,7 @@ public class AttributesPaneController implements Initializable {
         } else {
             genderSelection = 0;
         }
+
         gender.getSelectionModel().clearAndSelect(genderSelection);
 
         gender.getSelectionModel().selectedIndexProperty().addListener((o, oldValue, newValue) -> {
@@ -402,10 +406,16 @@ public class AttributesPaneController implements Initializable {
                         4000));
             }
         });
+
+        characterIsLoading = false;
     }
 
     @FXML
     public void genderSelect(ActionEvent e) {
+        if(characterIsLoading) {
+            return;
+        }
+
         int selected = gender.getSelectionModel().getSelectedIndex();
         if (selected == 0) {
             player.setGender(Gender.MALE);
