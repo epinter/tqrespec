@@ -61,8 +61,10 @@ public class PlayerFileVariable implements FileVariable {
         map.put("itemsFoundOverLifetimeRandomizedTotal", new PlayerFileVariable("itemsFoundOverLifetimeRandomizedTotal", VariableType.INTEGER, PlayerBlockType.PLAYER_MAIN));
         map.put("hasBeenInGame", new PlayerFileVariable("hasBeenInGame", VariableType.INTEGER, PlayerBlockType.PLAYER_MAIN));
         map.put("boostedCharacterForX4", new PlayerFileVariable("boostedCharacterForX4", VariableType.INTEGER, PlayerBlockType.PLAYER_MAIN));
+        map.put("tartarusDefeatedCount", new PlayerFileVariable("tartarusDefeatedCount[i]", VariableType.INTEGER, PlayerBlockType.PLAYER_MAIN));
         map.put("versionRespawnPoint", new PlayerFileVariable("versionRespawnPoint", VariableType.INTEGER, PlayerBlockType.PLAYER_MAIN));
         map.put("money", new PlayerFileVariable("money", VariableType.INTEGER, PlayerBlockType.PLAYER_MAIN));
+        map.put("altMoney", new PlayerFileVariable("altMoney", VariableType.INTEGER, PlayerBlockType.PLAYER_MAIN));
         map.put("teleportUID", new PlayerFileVariable("teleportUID", VariableType.UID, PlayerBlockType.PLAYER_MAIN));
         map.put("respawnUID", new PlayerFileVariable("respawnUID", VariableType.UID, PlayerBlockType.PLAYER_MAIN));
         map.put("markerUID", new PlayerFileVariable("markerUID", VariableType.UID, PlayerBlockType.PLAYER_MAIN));
@@ -77,6 +79,8 @@ public class PlayerFileVariable implements FileVariable {
         map.put("max", new PlayerFileVariable("max", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLS));
         map.put("masteriesAllowed", new PlayerFileVariable("masteriesAllowed", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLS));
         map.put("skillReclamationPointsUsed", new PlayerFileVariable("skillReclamationPointsUsed", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLS));
+        map.put("hasSkillServices", new PlayerFileVariable("hasSkillServices", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLS));
+        map.put("version", new PlayerFileVariable("version", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLS));
 
         map.put("defaultText", new PlayerFileVariable("defaultText", VariableType.STRING_UTF_16_LE, FileBlockType.BODY));
         map.put("itemPositionsSavedAsGridCoords", new PlayerFileVariable("itemPositionsSavedAsGridCoords", VariableType.INTEGER, PlayerBlockType.PLAYER_INVENTORY));
