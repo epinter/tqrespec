@@ -29,4 +29,6 @@ public interface BlockType extends Serializable {
     int getValue();
 
     String name();
+
+    BlockType getParent();
 }

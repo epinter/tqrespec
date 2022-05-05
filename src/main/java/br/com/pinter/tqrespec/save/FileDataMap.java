@@ -21,6 +21,8 @@
 package br.com.pinter.tqrespec.save;
 
 import br.com.pinter.tqrespec.gui.ResourceHelper;
+import br.com.pinter.tqrespec.save.player.PlayerBlockType;
+import br.com.pinter.tqrespec.save.player.PlayerFileVariable;
 import br.com.pinter.tqrespec.tqdata.GameVersion;
 
 import java.nio.ByteBuffer;
@@ -261,6 +263,17 @@ public class FileDataMap implements DeepCloneable {
         return null;
     }
 
+    public void validate() {
+        getBlockInfo().values().stream().flatMap(b -> b.getVariables().values().stream()).toList().forEach((v) -> {
+            BlockInfo currentBlock = blockInfo.get(v.getBlockOffset());
+            if (v.getBlockOffset() != currentBlock.getStart()) {
+                throw new InvalidVariableException("Savegame validation failed.");
+            }
+
+            PlayerFileVariable.getVar(platform, v.getName());
+        });
+    }
+
     private void convertWindowsToMobile(String saveId) {
         BlockInfo myPlayerNameBlock = this.blockInfo.get(variableLocation.get("myPlayerName").get(0));
         int myPlayerNameKeyOffset = myPlayerNameBlock.getVariables().get("myPlayerName").get(0).getKeyOffset();
@@ -272,7 +285,11 @@ public class FileDataMap implements DeepCloneable {
 
         insertVariable(variableInfo);
         for (VariableInfo v :
-            getBlockInfo().values().stream().flatMap(b -> b.getVariables().values().stream()).collect(Collectors.toList())) {
+            getBlockInfo().values().stream().flatMap(b -> b.getVariables().values().stream()).toList()) {
+            BlockInfo currentBlock = blockInfo.get(v.getBlockOffset());
+            BlockType currentBlockType = currentBlock.getBlockType();
+            PlayerFileVariable playerVar = PlayerFileVariable.getVar(Platform.WINDOWS, v.getName());
+
             if (v.getVariableType().equals(VariableType.STRING_UTF_16_LE)) {
                 if (v.getValSize() == 0)
                     continue;
@@ -283,7 +300,11 @@ public class FileDataMap implements DeepCloneable {
                 }
                 newVar.setVariableType(VariableType.STRING_UTF_32_LE);
                 storeChange(v, newVar);
-            } else if (v.getName().equals("boostedCharacterForX4")) {
+            } else if ((playerVar.var().equals("boostedCharacterForX4") && playerVar.location().equals(currentBlockType))
+                    || (playerVar.var().equals("tartarusDefeatedCount[i]") && playerVar.location().equals(currentBlockType))
+                    || (playerVar.var().equals("altMoney") && playerVar.location().equals(currentBlockType))
+                    || (playerVar.var().equals("hasSkillServices") && playerVar.location().equals(currentBlockType))
+                    || (playerVar.var().equals("version") && playerVar.location().equals(currentBlockType))) {
                 removeVariable(v);
             } else if (v.getName().equals("playerVersion") && getInt("playerVersion") > 5) {
                 VariableInfo newVar = (VariableInfo) v.deepClone();

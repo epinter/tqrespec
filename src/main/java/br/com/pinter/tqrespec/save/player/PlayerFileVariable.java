@@ -70,30 +70,28 @@ public class PlayerFileVariable implements FileVariable {
         map.put("markerUID", new PlayerFileVariable("markerUID", VariableType.UID, PlayerBlockType.PLAYER_MAIN));
         map.put("strategicMovementRespawnPoint", new PlayerFileVariable("strategicMovementRespawnPoint[i]", VariableType.UID, PlayerBlockType.PLAYER_MAIN));
 
-        map.put("skillName", new PlayerFileVariable("skillName", VariableType.STRING, FileBlockType.BODY));//PLAYER_SKILLS + PLAYER_HOT_SLOT
-        map.put("skillActive", new PlayerFileVariable("skillActive", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLS));
-        map.put("skillLevel", new PlayerFileVariable("skillLevel", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLS));
-        map.put("skillEnabled", new PlayerFileVariable("skillEnabled", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLS));
-        map.put("skillSubLevel", new PlayerFileVariable("skillSubLevel", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLS));
-        map.put("skillTransition", new PlayerFileVariable("skillTransition", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLS));
-        map.put("max", new PlayerFileVariable("max", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLS));
-        map.put("masteriesAllowed", new PlayerFileVariable("masteriesAllowed", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLS));
-        map.put("skillReclamationPointsUsed", new PlayerFileVariable("skillReclamationPointsUsed", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLS));
-        map.put("hasSkillServices", new PlayerFileVariable("hasSkillServices", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLS));
-        map.put("version", new PlayerFileVariable("version", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLS));
+        map.put("skillActive", new PlayerFileVariable("skillActive", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILL));
+        map.put("skillLevel", new PlayerFileVariable("skillLevel", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILL));
+        map.put("skillEnabled", new PlayerFileVariable("skillEnabled", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILL));
+        map.put("skillSubLevel", new PlayerFileVariable("skillSubLevel", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILL));
+        map.put("skillTransition", new PlayerFileVariable("skillTransition", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILL));
+        map.put("max", new PlayerFileVariable("max", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLSLIST));
+        map.put("masteriesAllowed", new PlayerFileVariable("masteriesAllowed", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLSLIST));
+        map.put("skillReclamationPointsUsed", new PlayerFileVariable("skillReclamationPointsUsed", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLSLIST));
+        map.put("hasSkillServices", new PlayerFileVariable("hasSkillServices", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLSLIST));
+        map.put("version", new PlayerFileVariable("version", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLSLIST));
 
-        map.put("defaultText", new PlayerFileVariable("defaultText", VariableType.STRING_UTF_16_LE, FileBlockType.BODY));
+        map.put("defaultText", new PlayerFileVariable("defaultText", VariableType.STRING_UTF_16_LE, FileBlockType.UNKNOWN));
         map.put("itemPositionsSavedAsGridCoords", new PlayerFileVariable("itemPositionsSavedAsGridCoords", VariableType.INTEGER, PlayerBlockType.PLAYER_INVENTORY));
         map.put("numberOfSacks", new PlayerFileVariable("numberOfSacks", VariableType.INTEGER, PlayerBlockType.PLAYER_INVENTORY));
         map.put("currentlyFocusedSackNumber", new PlayerFileVariable("currentlyFocusedSackNumber", VariableType.INTEGER, PlayerBlockType.PLAYER_INVENTORY));
         map.put("currentlySelectedSackNumber", new PlayerFileVariable("currentlySelectedSackNumber", VariableType.INTEGER, PlayerBlockType.PLAYER_INVENTORY));
-        map.put("tempBool", new PlayerFileVariable("tempBool", VariableType.INTEGER, PlayerBlockType.PLAYER_INVENTORY));
-        map.put("size", new PlayerFileVariable("size", VariableType.INTEGER, PlayerBlockType.PLAYER_INVENTORY));
+        map.put("tempBool", new PlayerFileVariable("tempBool", VariableType.INTEGER, PlayerBlockType.PLAYER_INVENTORY_SACK));
         map.put("seed", new PlayerFileVariable("seed", VariableType.INTEGER, PlayerBlockType.PLAYER_ITEM));
         map.put("var1", new PlayerFileVariable("var1", VariableType.INTEGER, PlayerBlockType.PLAYER_ITEM));
         map.put("var2", new PlayerFileVariable("var2", VariableType.INTEGER, PlayerBlockType.PLAYER_ITEM));
-        map.put("pointX", new PlayerFileVariable("pointX", VariableType.INTEGER, PlayerBlockType.PLAYER_INVENTORY));
-        map.put("pointY", new PlayerFileVariable("pointY", VariableType.INTEGER, PlayerBlockType.PLAYER_INVENTORY));
+        map.put("pointX", new PlayerFileVariable("pointX", VariableType.INTEGER, PlayerBlockType.PLAYER_INVENTORY_ITEMCONTAINER));
+        map.put("pointY", new PlayerFileVariable("pointY", VariableType.INTEGER, PlayerBlockType.PLAYER_INVENTORY_ITEMCONTAINER));
         map.put("baseName", new PlayerFileVariable("baseName", VariableType.STRING, PlayerBlockType.PLAYER_ITEM));
         map.put("prefixName", new PlayerFileVariable("prefixName", VariableType.STRING, PlayerBlockType.PLAYER_ITEM));
         map.put("suffixName", new PlayerFileVariable("suffixName", VariableType.STRING, PlayerBlockType.PLAYER_ITEM));
@@ -119,17 +117,17 @@ public class PlayerFileVariable implements FileVariable {
         map.put("skillActive3", new PlayerFileVariable("skillActive3", VariableType.INTEGER, PlayerBlockType.PLAYER_UI_SKILL));
         map.put("skillActive4", new PlayerFileVariable("skillActive4", VariableType.INTEGER, PlayerBlockType.PLAYER_UI_SKILL));
         map.put("skillActive5", new PlayerFileVariable("skillActive5", VariableType.INTEGER, PlayerBlockType.PLAYER_UI_SKILL));
-        map.put("primarySkill1", new PlayerFileVariable("primarySkill11", VariableType.INTEGER, PlayerBlockType.PLAYER_UI_SKILL));
-        map.put("primarySkill2", new PlayerFileVariable("primarySkill12", VariableType.INTEGER, PlayerBlockType.PLAYER_UI_SKILL));
-        map.put("primarySkill3", new PlayerFileVariable("primarySkill13", VariableType.INTEGER, PlayerBlockType.PLAYER_UI_SKILL));
-        map.put("primarySkill4", new PlayerFileVariable("primarySkill14", VariableType.INTEGER, PlayerBlockType.PLAYER_UI_SKILL));
-        map.put("primarySkill5", new PlayerFileVariable("primarySkill15", VariableType.INTEGER, PlayerBlockType.PLAYER_UI_SKILL));
+        map.put("primarySkill1", new PlayerFileVariable("primarySkill1", VariableType.INTEGER, PlayerBlockType.PLAYER_UI_SKILL));
+        map.put("primarySkill2", new PlayerFileVariable("primarySkill2", VariableType.INTEGER, PlayerBlockType.PLAYER_UI_SKILL));
+        map.put("primarySkill3", new PlayerFileVariable("primarySkill3", VariableType.INTEGER, PlayerBlockType.PLAYER_UI_SKILL));
+        map.put("primarySkill4", new PlayerFileVariable("primarySkill4", VariableType.INTEGER, PlayerBlockType.PLAYER_UI_SKILL));
+        map.put("primarySkill5", new PlayerFileVariable("primarySkill5", VariableType.INTEGER, PlayerBlockType.PLAYER_UI_SKILL));
         map.put("secondarySkill", new PlayerFileVariable("secondarySkill", VariableType.INTEGER, PlayerBlockType.PLAYER_UI_SKILL));
-        map.put("secondarySkill1", new PlayerFileVariable("secondarySkill11", VariableType.INTEGER, PlayerBlockType.PLAYER_UI_SKILL));
-        map.put("secondarySkill2", new PlayerFileVariable("secondarySkill12", VariableType.INTEGER, PlayerBlockType.PLAYER_UI_SKILL));
-        map.put("secondarySkill3", new PlayerFileVariable("secondarySkill13", VariableType.INTEGER, PlayerBlockType.PLAYER_UI_SKILL));
-        map.put("secondarySkill4", new PlayerFileVariable("secondarySkill14", VariableType.INTEGER, PlayerBlockType.PLAYER_UI_SKILL));
-        map.put("secondarySkill5", new PlayerFileVariable("secondarySkill15", VariableType.INTEGER, PlayerBlockType.PLAYER_UI_SKILL));
+        map.put("secondarySkill1", new PlayerFileVariable("secondarySkill1", VariableType.INTEGER, PlayerBlockType.PLAYER_UI_SKILL));
+        map.put("secondarySkill2", new PlayerFileVariable("secondarySkill2", VariableType.INTEGER, PlayerBlockType.PLAYER_UI_SKILL));
+        map.put("secondarySkill3", new PlayerFileVariable("secondarySkill3", VariableType.INTEGER, PlayerBlockType.PLAYER_UI_SKILL));
+        map.put("secondarySkill4", new PlayerFileVariable("secondarySkill4", VariableType.INTEGER, PlayerBlockType.PLAYER_UI_SKILL));
+        map.put("secondarySkill5", new PlayerFileVariable("secondarySkill5", VariableType.INTEGER, PlayerBlockType.PLAYER_UI_SKILL));
         map.put("skillWindowSelection", new PlayerFileVariable("skillWindowSelection", VariableType.INTEGER, PlayerBlockType.PLAYER_UI_SKILL));
         map.put("skillSettingValid", new PlayerFileVariable("skillSettingValid", VariableType.INTEGER, PlayerBlockType.PLAYER_UI_SKILL));
 
@@ -156,12 +154,18 @@ public class PlayerFileVariable implements FileVariable {
 
         //repeated variables with different types, should be named (name)__(blockname)
         map.put("temp", new PlayerFileVariable("temp", VariableType.UNKNOWN, FileBlockType.MULTIPLE));
+        map.put("size", new PlayerFileVariable("size", VariableType.UNKNOWN, FileBlockType.MULTIPLE));
+        map.put("skillName", new PlayerFileVariable("skillName", VariableType.UNKNOWN, FileBlockType.MULTIPLE));
         map.put("temp__" + PlayerBlockType.PLAYER_ATTRIBUTES, new PlayerFileVariable("temp", VariableType.FLOAT, PlayerBlockType.PLAYER_ATTRIBUTES));
         map.put("temp__" + PlayerBlockType.PLAYER_MAIN, new PlayerFileVariable("temp", VariableType.INTEGER, PlayerBlockType.PLAYER_MAIN));
+        map.put("size__" + PlayerBlockType.PLAYER_SKILLSLIST, new PlayerFileVariable("size", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLSLIST));
+        map.put("size__" + PlayerBlockType.PLAYER_INVENTORY_SACK, new PlayerFileVariable("size", VariableType.INTEGER, PlayerBlockType.PLAYER_INVENTORY_SACK));
+        map.put("skillName__" + PlayerBlockType.PLAYER_SKILL, new PlayerFileVariable("skillName", VariableType.STRING, PlayerBlockType.PLAYER_SKILL));
+        map.put("skillName__" + PlayerBlockType.PLAYER_HOT_SLOT, new PlayerFileVariable("skillName", VariableType.STRING, PlayerBlockType.PLAYER_HOT_SLOT));
 
         HashMap<String, PlayerFileVariable> mapMobile = new HashMap<>(map);
         mapMobile.put("myPlayerName", new PlayerFileVariable("myPlayerName", VariableType.STRING_UTF_32_LE, PlayerBlockType.PLAYER_MAIN));
-        mapMobile.put("defaultText", new PlayerFileVariable("defaultText", VariableType.STRING_UTF_32_LE, FileBlockType.BODY));
+        mapMobile.put("defaultText", new PlayerFileVariable("defaultText", VariableType.STRING_UTF_32_LE, FileBlockType.UNKNOWN));
         mapMobile.put("greatestMonsterKilledName", new PlayerFileVariable("(*greatestMonsterKilledName)[i]", VariableType.STRING_UTF_32_LE, PlayerBlockType.PLAYER_STATS));
         mapMobile.put("mySaveId", new PlayerFileVariable("mySaveId", VariableType.STRING, PlayerBlockType.PLAYER_MAIN));
         mapMobile.put("currentDifficulty", new PlayerFileVariable("currentDifficulty", VariableType.INTEGER, PlayerBlockType.PLAYER_HEADER));
@@ -179,11 +183,39 @@ public class PlayerFileVariable implements FileVariable {
         this.location = location;
     }
 
-    static PlayerFileVariable valueOf(Platform platform, String var) {
-        if (variablesMap.get(platform) == null || variablesMap.get(platform).get(var) == null) {
-            throw new InvalidVariableException(String.format("variable '%s' not found for platform '%s'", var.replaceAll("[^a-zA-Z0-9-_\\[\\] ]*", ""), platform));
+    /**
+     * Returns the PlayerFileVariable from 'platform' that has a key equal to the parameter 'var'
+     *
+     * @param platform Platform to get the variable from
+     * @param key Key that represents the variable in the map (may not be the actual variable name)
+     * @return PlayerFileVariable instance
+     */
+    public static PlayerFileVariable valueOf(Platform platform, String key) {
+        if (variablesMap.get(platform) == null || variablesMap.get(platform).get(key) == null) {
+            throw new InvalidVariableException(String.format("variable '%s' not found for platform '%s'", key.replaceAll("[^a-zA-Z0-9-_\\[\\] ]*", ""), platform));
         }
-        return variablesMap.get(platform).get(var);
+        return variablesMap.get(platform).get(key);
+    }
+
+    /**
+     * Returns a PlayerFileVariable from the 'platform' map
+     *
+     * @param platform Platform to get the variable from
+     * @param variableName Must be a valid savegame variable
+     * @return {@link PlayerFileVariable}
+     */
+    public static PlayerFileVariable getVar(Platform platform, String variableName) {
+        PlayerFileVariable ret = null;
+        if (variablesMap.get(platform) != null) {
+            ret = variablesMap.get(platform).values().stream().filter((v) -> v.var.equals(variableName))
+                    .findFirst().orElse(null);
+        }
+
+        if (ret != null) {
+            return ret;
+        }
+
+        throw new InvalidVariableException(String.format("variable '%s' not found for platform '%s'", variableName.replaceAll("[^a-zA-Z0-9-_\\[\\] ]*", ""), platform));
     }
 
     @Override
@@ -199,6 +231,19 @@ public class PlayerFileVariable implements FileVariable {
     @Override
     public BlockType location() {
         return location;
+    }
+
+    public static BlockType getBlockTypeFromParent(Platform platform, BlockType parent, String varName) {
+        if (variablesMap.get(platform) != null) {
+            for (Map.Entry<String, PlayerFileVariable> v : variablesMap.get(platform).entrySet()) {
+                BlockType t = v.getValue().location;
+                if (t.getParent() != null && varName.equals(v.getValue().var) && t.getParent().name().equals(parent.name())) {
+                    return t;
+                }
+            }
+        }
+
+        return PlayerBlockType.UNKNOWN;
     }
 
     @Override

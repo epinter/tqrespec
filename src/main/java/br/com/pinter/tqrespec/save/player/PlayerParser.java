@@ -223,10 +223,15 @@ final class PlayerParser extends FileParser {
         //prepare fileblock for special var 'temp' (attributes)
         //temp variables for the attributes are always inside a separate block, so the current blocktype will be always BODY
         //difficulty variable is always at the end of main block, so blocktype will be PLAYER_MAIN
-        if (name.equals("temp") && type.equals(FileBlockType.BODY)) {
+        if (name.equals("temp") && type.equals(FileBlockType.UNKNOWN)) {
             return PlayerBlockType.PLAYER_ATTRIBUTES;
         }
         return type;
+    }
+
+    @Override
+    protected BlockType getBlockTypeFromParent(Platform platform, BlockType parent, String varName) {
+        return PlayerFileVariable.getBlockTypeFromParent(platform, parent, varName);
     }
 
     @Override

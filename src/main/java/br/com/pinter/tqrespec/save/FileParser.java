@@ -27,6 +27,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -161,7 +162,7 @@ public abstract class FileParser {
      */
     protected ImmutableListMultimap<String, VariableInfo> parseBlock(BlockInfo block) {
         ArrayListMultimap<String, VariableInfo> ret = ArrayListMultimap.create();
-        BlockType blockType = FileBlockType.BODY;
+        BlockType blockType = FileBlockType.UNKNOWN;
         this.getBuffer().position(block.getStart() + BEGIN_BLOCK_SIZE);
 
         specialVariableStore.clear();
@@ -198,6 +199,10 @@ public abstract class FileParser {
             }
             ret.put(variableInfo.getName(), variableInfo);
             putVarIndex(variableInfo.getName(), block.getStart());
+
+            if(isDetectedBlockType(blockType) && !isDetectedBlockType(block.getBlockType())) {
+                block.setBlockType(blockType);
+            }
         }
 
         processBlockSpecialVariable(block);
@@ -243,15 +248,31 @@ public abstract class FileParser {
                 throw new IllegalStateException(String.format(invalidVarMsg, name, block.getStart()));
             }
         }
-        if (!fileVariable.location().equals(FileBlockType.BODY)
-                && !fileVariable.location().equals(FileBlockType.UNKNOWN)
-                && !fileVariable.location().equals(FileBlockType.MULTIPLE)) {
-            blockType = fileVariable.location();
+        if(!isDetectedBlockType(blockType)) {
+            if (isDetectedBlockType(fileVariable.location())) {
+                blockType = fileVariable.location();
+            } else if (FileBlockType.MULTIPLE.equals(fileVariable.location())) {
+                BlockInfo parent = blockInfoTable.get(block.getParentOffset());
+                if (parent != null && isDetectedBlockType(parent.getBlockType())) {
+                    BlockType guessed = getBlockTypeFromParent(detectedPlatform, parent.getBlockType(), name);
+                    if (! guessed.equals(FileBlockType.UNKNOWN)) {
+                        blockType = guessed;
+                    }
+                }
+            }
         }
 
         blockType = filterBlockType(blockType, name);
 
         return blockType;
+    }
+
+    private boolean isDetectedBlockType(BlockType blockType) {
+        return !FileBlockType.UNKNOWN.equals(blockType) && !FileBlockType.MULTIPLE.equals(blockType);
+    }
+
+    protected BlockType getBlockTypeFromParent(Platform platform, BlockType parent, String varName) {
+        throw new NotImplementedException("Not implemented");
     }
 
     /**
@@ -311,7 +332,7 @@ public abstract class FileParser {
     private void setParentType(BlockInfo block) {
         BlockInfo parentBlock = blockInfoTable.get(block.getParentOffset());
         if (parentBlock != null && parentBlock.getVariables().isEmpty()
-                && parentBlock.getBlockType().equals(FileBlockType.BODY)) {
+                && parentBlock.getBlockType().equals(FileBlockType.UNKNOWN)) {
             parentBlock.setBlockType(block.getBlockType());
             setParentType(parentBlock);
         }

@@ -23,17 +23,23 @@ package br.com.pinter.tqrespec.save.player;
 import br.com.pinter.tqrespec.save.FileBlockType;
 
 public class PlayerBlockType extends FileBlockType {
-    static final FileBlockType PLAYER_HEADER = new FileBlockType(0, "PLAYER_HEADER");
-    static final FileBlockType PLAYER_MAIN = new FileBlockType(1, "PLAYER_MAIN");
-    static final FileBlockType PLAYER_ATTRIBUTES = new FileBlockType(2, "PLAYER_ATTRIBUTES");
-    static final FileBlockType PLAYER_STATS = new FileBlockType(3, "PLAYER_STATS");
-    static final FileBlockType PLAYER_INVENTORY = new FileBlockType(5, "PLAYER_INVENTORY");
-    static final FileBlockType PLAYER_ITEM = new FileBlockType(6, "PLAYER_ITEM");
-    static final FileBlockType PLAYER_EQUIPMENT = new FileBlockType(7, "PLAYER_EQUIPMENT");
-    static final FileBlockType PLAYER_HOT_SLOT = new FileBlockType(8, "PLAYER_HOT_SLOT");
-    static final FileBlockType PLAYER_SKILLS = new FileBlockType(9, "PLAYER_SKILLS");
-    static final FileBlockType PLAYER_UI_SKILL = new FileBlockType(10, "PLAYER_UI_SKILL");
-    static final FileBlockType PLAYER_LEVEL_POINTS = new FileBlockType(11, "PLAYER_LEVEL_POINTS");
+    public static final FileBlockType PLAYER_HEADER = new FileBlockType(0, "PLAYER_HEADER");
+    public static final FileBlockType PLAYER_MAIN = new FileBlockType(1, "PLAYER_MAIN");
+    public static final FileBlockType PLAYER_ATTRIBUTES = new FileBlockType(2, "PLAYER_ATTRIBUTES");
+    public static final FileBlockType PLAYER_STATS = new FileBlockType(3, "PLAYER_STATS");
+    public static final FileBlockType PLAYER_SKILLSLIST = new FileBlockType(4, "PLAYER_SKILLSLIST");
+    public static final FileBlockType PLAYER_INVENTORY = new FileBlockType(5, "PLAYER_INVENTORY");
+    public static final FileBlockType PLAYER_EQUIPMENT = new FileBlockType(7, "PLAYER_EQUIPMENT");
+    public static final FileBlockType PLAYER_HOT_SLOT = new FileBlockType(8, "PLAYER_HOT_SLOT");
+    public static final FileBlockType PLAYER_UI_SKILL = new FileBlockType(10, "PLAYER_UI_SKILL");
+    public static final FileBlockType PLAYER_LEVEL_POINTS = new FileBlockType(11, "PLAYER_LEVEL_POINTS");
+
+    public static final FileBlockType PLAYER_SKILL = new FileBlockType(9, "PLAYER_SKILL", PlayerBlockType.PLAYER_SKILLSLIST);
+
+    public static final FileBlockType PLAYER_ITEM = new FileBlockType(6, "PLAYER_ITEM", PlayerBlockType.PLAYER_INVENTORY_ITEMCONTAINER);
+    public static final FileBlockType PLAYER_INVENTORY_SACK = new FileBlockType(13, "PLAYER_INVENTORY_SACK", PlayerBlockType.PLAYER_INVENTORY);;
+    public static final FileBlockType PLAYER_INVENTORY_ITEMCONTAINER = new FileBlockType(14, "PLAYER_INVENTORY_ITEMCONTAINER", PlayerBlockType.PLAYER_INVENTORY_SACK);;
+
 
     public PlayerBlockType(int value, String name) {
         super(value, name);

@@ -98,6 +98,7 @@ public class Player {
             getSaveData().getDataMap().setBlockInfo(playerParser.getBlockInfo());
             getSaveData().setHeaderInfo(playerParser.getHeaderInfo());
             getSaveData().getDataMap().setVariableLocation(playerParser.getVariableLocation());
+            saveData.getDataMap().validate();
             prepareSkillsList();
         } catch (RuntimeException e) {
             reset();

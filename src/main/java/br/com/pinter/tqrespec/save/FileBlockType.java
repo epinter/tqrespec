@@ -24,15 +24,21 @@ import java.util.Objects;
 
 public class FileBlockType implements BlockType {
     public static final FileBlockType MULTIPLE = new FileBlockType(-3, "MULTIPLE");
-    public static final FileBlockType BODY = new FileBlockType(-2, "BODY");
     public static final FileBlockType UNKNOWN = new FileBlockType(-1, "UNKNOWN");
 
     private String name;
     private int value;
+    private BlockType parent;
 
     public FileBlockType(int value, String name) {
         this.value = value;
         this.name = name;
+    }
+
+    public FileBlockType(int value, String name, BlockType parent) {
+        this.value = value;
+        this.name = name;
+        this.parent = parent;
     }
 
     @Override
@@ -43,6 +49,11 @@ public class FileBlockType implements BlockType {
     @Override
     public String name() {
         return name;
+    }
+
+    @Override
+    public BlockType getParent() {
+        return parent;
     }
 
     @Override
