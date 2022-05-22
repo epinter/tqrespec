@@ -1,4 +1,17 @@
 # Changelog
+## [0.11.1] - 2022-05-22
+### Added
+- Add support for TQ v2.10.20820
+- Enable JPMS for all dependencies using improved jar patching system
+
+### Changed
+- Improved savegame parse to better handle new format
+- Updated Russian and Ukranian translations (thanks Evgeniy Chefranov)
+- Refactor resource loading to work with JPMS
+
+### Fixed
+- Fix minor ui initialization bug
+
 ## [0.11.0] - 2021-12-04
 ### Added
 - Add support for TQ v2.10.19520 (released with Eternal Embers) 
