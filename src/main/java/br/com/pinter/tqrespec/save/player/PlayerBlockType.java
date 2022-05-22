@@ -37,8 +37,8 @@ public class PlayerBlockType extends FileBlockType {
     public static final FileBlockType PLAYER_SKILL = new FileBlockType(9, "PLAYER_SKILL", PlayerBlockType.PLAYER_SKILLSLIST);
 
     public static final FileBlockType PLAYER_ITEM = new FileBlockType(6, "PLAYER_ITEM", PlayerBlockType.PLAYER_INVENTORY_ITEMCONTAINER);
-    public static final FileBlockType PLAYER_INVENTORY_SACK = new FileBlockType(13, "PLAYER_INVENTORY_SACK", PlayerBlockType.PLAYER_INVENTORY);;
-    public static final FileBlockType PLAYER_INVENTORY_ITEMCONTAINER = new FileBlockType(14, "PLAYER_INVENTORY_ITEMCONTAINER", PlayerBlockType.PLAYER_INVENTORY_SACK);;
+    public static final FileBlockType PLAYER_INVENTORY_SACK = new FileBlockType(13, "PLAYER_INVENTORY_SACK", PlayerBlockType.PLAYER_INVENTORY);
+    public static final FileBlockType PLAYER_INVENTORY_ITEMCONTAINER = new FileBlockType(14, "PLAYER_INVENTORY_ITEMCONTAINER", PlayerBlockType.PLAYER_INVENTORY_SACK);
 
 
     public PlayerBlockType(int value, String name) {

@@ -207,7 +207,7 @@ public class PlayerFileVariable implements FileVariable {
     public static PlayerFileVariable getVar(Platform platform, String variableName) {
         PlayerFileVariable ret = null;
         if (variablesMap.get(platform) != null) {
-            ret = variablesMap.get(platform).values().stream().filter((v) -> v.var.equals(variableName))
+            ret = variablesMap.get(platform).values().stream().filter(v -> v.var.equals(variableName))
                     .findFirst().orElse(null);
         }
 

@@ -21,7 +21,6 @@
 package br.com.pinter.tqrespec.save;
 
 import br.com.pinter.tqrespec.gui.ResourceHelper;
-import br.com.pinter.tqrespec.save.player.PlayerBlockType;
 import br.com.pinter.tqrespec.save.player.PlayerFileVariable;
 import br.com.pinter.tqrespec.tqdata.GameVersion;
 
@@ -264,7 +263,7 @@ public class FileDataMap implements DeepCloneable {
     }
 
     public void validate() {
-        getBlockInfo().values().stream().flatMap(b -> b.getVariables().values().stream()).toList().forEach((v) -> {
+        getBlockInfo().values().stream().flatMap(b -> b.getVariables().values().stream()).toList().forEach(v -> {
             BlockInfo currentBlock = blockInfo.get(v.getBlockOffset());
             if (v.getBlockOffset() != currentBlock.getStart()) {
                 throw new InvalidVariableException("Savegame validation failed.");
