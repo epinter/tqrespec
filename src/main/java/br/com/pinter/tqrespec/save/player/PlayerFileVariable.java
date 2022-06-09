@@ -80,6 +80,8 @@ public class PlayerFileVariable implements FileVariable {
         map.put("skillReclamationPointsUsed", new PlayerFileVariable("skillReclamationPointsUsed", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLSLIST));
         map.put("hasSkillServices", new PlayerFileVariable("hasSkillServices", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLSLIST));
         map.put("version", new PlayerFileVariable("version", VariableType.INTEGER, PlayerBlockType.PLAYER_SKILLSLIST));
+        map.put("buffSkillName", new PlayerFileVariable("buffSkillName", VariableType.STRING, PlayerBlockType.PLAYER_SKILLSLIST));
+
 
         map.put("defaultText", new PlayerFileVariable("defaultText", VariableType.STRING_UTF_16_LE, FileBlockType.UNKNOWN));
         map.put("itemPositionsSavedAsGridCoords", new PlayerFileVariable("itemPositionsSavedAsGridCoords", VariableType.INTEGER, PlayerBlockType.PLAYER_INVENTORY));
