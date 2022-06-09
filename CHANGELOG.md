@@ -1,4 +1,8 @@
 # Changelog
+## [0.11.2] - 2022-06-09
+### Fixed
+- Add missing variable (buffSkillName) from update v2.10.20820 ([#42](https://github.com/epinter/tqrespec/issues/42))
+
 ## [0.11.1] - 2022-05-22
 ### Added
 - Add support for TQ v2.10.20820
