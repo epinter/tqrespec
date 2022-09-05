@@ -24,9 +24,11 @@ import br.com.pinter.tqrespec.Main;
 import br.com.pinter.tqrespec.core.ResourceNotFoundException;
 import br.com.pinter.tqrespec.core.State;
 import br.com.pinter.tqrespec.tqdata.Txt;
+import br.com.pinter.tqrespec.util.Constants;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.Tab;
 import javafx.scene.image.Image;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import org.apache.commons.lang3.StringUtils;
 
@@ -123,6 +125,10 @@ public class ResourceHelper {
         } else {
             throw new UnsupportedOperationException("BUG: trying to set text on unsupported control");
         }
+    }
+
+    public static void loadFonts() {
+        Constants.UI.FONTS_LOADLIST.forEach(f -> Font.loadFont(getResource(f), 16));
     }
 
     private static void setLabeledText(Object obj, String text) {

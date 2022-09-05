@@ -41,7 +41,7 @@ public class AppPreloader extends Preloader {
     private Stage stage;
 
     private Scene createPreloaderScene() {
-        Font.loadFont(ResourceHelper.getResource("/fxml/albertus-mt.ttf"), 16);
+        ResourceHelper.loadFonts();
 
         BorderPane pane = new BorderPane();
         Scene scene = new Scene(pane, Constants.UI.PRELOADER_WIDTH, Constants.UI.PRELOADER_HEIGHT);

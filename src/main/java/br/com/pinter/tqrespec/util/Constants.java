@@ -25,8 +25,7 @@ import javafx.scene.text.Font;
 
 import java.io.File;
 import java.nio.file.Paths;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 public class Constants {
     public static final String APPNAME = "TQRespec";
@@ -150,6 +149,13 @@ public class Constants {
         public static final String TAG_STAT_MONSTERSKILLED = "tagCMonsterKills";
         public static final String TAG_STAT_GREATESTDAMAGE = "tagCHighestDamage";
         public static final String TAG_STAT_GREATESTMONSTER = "tagCHighestMonster";
+
+        public static final List<String> FONTS_LOADLIST = List.of(
+                "/fxml/albertus-mt.ttf",
+                "/fxml/albertus-mt-light.ttf",
+                "/fxml/fa5-free-solid-900.ttf"
+        );
+
         private UI() {
         }
     }

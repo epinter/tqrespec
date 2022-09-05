@@ -268,9 +268,7 @@ public class Main extends Application {
 
     public void prepareMainStage(Stage primaryStage) {
         logger.log(System.Logger.Level.DEBUG, "starting application");
-        Font.loadFont(ResourceHelper.getResource("/fxml/albertus-mt.ttf"), 16);
-        Font.loadFont(ResourceHelper.getResource("/fxml/albertus-mt-light.ttf"), 16);
-        Font.loadFont(ResourceHelper.getResource("/fxml/fa5-free-solid-900.ttf"), 16);
+        ResourceHelper.loadFonts();
 
         Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler::unhandled);
 
