@@ -1,4 +1,14 @@
 # Changelog
+## [0.11.3] - 2022-09-05
+### Added
+- French translation (by [EtienneLamoureux](https://github.com/EtienneLamoureux))
+
+### Changed
+- Repositioned UI elements to avoid truncated text on tabs
+
+### Fixed
+- Fixed error when reading custom .arc
+
 ## [0.11.2] - 2022-06-09
 ### Fixed
 - Add missing variable (buffSkillName) from update v2.10.20820 ([#42](https://github.com/epinter/tqrespec/issues/42))

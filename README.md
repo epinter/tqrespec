@@ -191,6 +191,7 @@ TQRespec.exe --debug=9
 * Russian (ru): ***Evgeniy Chefranov (titanquest.org.ua)***
 * Ukrainian (uk): ***Evgeniy Chefranov (titanquest.org.ua)***
 * Italian (it): ***Loris Gabriele***
+* French (fr): ***Etienne Lamoureux***
 
 ### ***Note***
 Contributions are always welcome. They will be accepted or rejected depending on the scope and predefined objectives of the project. Look at the open [issues](https://github.com/epinter/tqrespec/issues) and milestones to know how you can help. Feel free to open an issue and suggest a feature you want to see available.
