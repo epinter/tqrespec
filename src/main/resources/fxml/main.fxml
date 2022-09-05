@@ -22,7 +22,7 @@
   ~ Copyright (C) 2021 Emerson Pinter - All Rights Reserved
   -->
 
-<VBox fx:id="rootelement" alignment="TOP_CENTER" maxHeight="940.0" maxWidth="1320.0" minHeight="570.0" minWidth="720.0" prefHeight="570.0" prefWidth="720.0" stylesheets="@main.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.pinter.tqrespec.gui.MainController">
+<VBox fx:id="rootelement" alignment="TOP_CENTER" maxHeight="940.0" maxWidth="1320.0" minHeight="570.0" minWidth="780.0" prefHeight="570.0" prefWidth="780.0" stylesheets="@main.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.pinter.tqrespec.gui.MainController">
    <children>
       <HBox fx:id="tophbox" fillHeight="false" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" onMouseDragged="#moveWindow" onMousePressed="#startMoveWindow" onMouseReleased="#endMoveWindow" prefHeight="47.0" styleClass="tq-topdecoration" VBox.vgrow="ALWAYS">
          <children>
@@ -53,7 +53,7 @@
             <Insets bottom="10.0" />
          </VBox.margin>
       </HBox>
-      <VBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="470.0" prefWidth="660.0" stylesheets="@main.css" VBox.vgrow="ALWAYS">
+      <VBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="470.0" prefWidth="780.0" stylesheets="@main.css" VBox.vgrow="ALWAYS">
         <children>
             <GridPane prefHeight="75.0" prefWidth="637.0">
               <columnConstraints>
@@ -69,7 +69,7 @@
                <children>
                   <Label alignment="BOTTOM_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#openAboutWindow" styleClass="tq-bigtitle" text="TQ Respec" GridPane.halignment="LEFT" GridPane.valignment="BOTTOM">
                      <GridPane.margin>
-                        <Insets />
+                        <Insets left="10.0" />
                      </GridPane.margin>
                      <padding>
                         <Insets right="5.0" />
