@@ -51,6 +51,8 @@ public class Constants {
     public static final String STASH_FILE = "winsys.dxb";
     public static final String STASH_FILE_BACKUP = "winsys.dxg";
     public static final int MAX_CHARACTER_NAME_LENGTH = 14;
+    public static final String ARCHIVE_DIR="ArchivedCharacters";
+    public static final String EXPLORER_COMMAND="explorer.exe";
     /**
      * Maps Game Options language to i18n locale
      */

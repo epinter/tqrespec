@@ -27,10 +27,7 @@ import br.com.pinter.tqdatabase.models.Teleport;
 import br.com.pinter.tqrespec.core.State;
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.logging.Log;
-import br.com.pinter.tqrespec.save.BlockInfo;
-import br.com.pinter.tqrespec.save.UID;
-import br.com.pinter.tqrespec.save.VariableInfo;
-import br.com.pinter.tqrespec.save.VariableType;
+import br.com.pinter.tqrespec.save.*;
 import br.com.pinter.tqrespec.tqdata.*;
 import br.com.pinter.tqrespec.util.Constants;
 import com.google.inject.Inject;
@@ -66,11 +63,7 @@ public class Player {
         reset();
     }
 
-    public boolean loadPlayer(String playerName) {
-        return loadPlayer(playerName, false);
-    }
-
-    public boolean loadPlayer(String playerName, boolean external) {
+    public boolean loadPlayer(String playerName, SaveLocation saveLocation) {
         if (State.get().getSaveInProgress() != null && State.get().getSaveInProgress()) {
             return false;
         }
@@ -78,15 +71,14 @@ public class Player {
         try {
             prepareSaveData();
 
-            getSaveData().setPlayerName(playerName);
             Path playerChrPath;
 
-            if (external) {
-                playerChrPath = gameInfo.playerChrExternalPath(playerName);
-            } else {
-                playerChrPath = gameInfo.playerChr(playerName, getSaveData().isCustomQuest());
-            }
+            getSaveData().setPlayerName(playerName);
+            getSaveData().setLocation(saveLocation);
+            playerChrPath = gameInfo.playerChr(playerName, saveLocation);
+
             logger.log(System.Logger.Level.INFO, "Loading character ''{0}''", playerChrPath);
+
 
             getSaveData().setPlayerChr(playerChrPath);
             PlayerParser playerParser = new PlayerParser(
@@ -110,6 +102,8 @@ public class Player {
 
     public PlayerCharacter getCharacter() {
         PlayerCharacter playerCharacter = new PlayerCharacter();
+        playerCharacter.setPath(getSaveData().getPlayerPath());
+        playerCharacter.setLocation(getSaveData().getLocation());
         playerCharacter.setGender(getGender());
         playerCharacter.setCharacterClass(getPlayerClassName());
         playerCharacter.setDifficulty(getDifficulty());

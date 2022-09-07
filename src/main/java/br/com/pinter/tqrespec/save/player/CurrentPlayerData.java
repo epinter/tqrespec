@@ -23,6 +23,7 @@ package br.com.pinter.tqrespec.save.player;
 import br.com.pinter.tqrespec.save.FileDataHolder;
 import br.com.pinter.tqrespec.save.FileDataMap;
 import br.com.pinter.tqrespec.save.Platform;
+import br.com.pinter.tqrespec.save.SaveLocation;
 import com.google.inject.Singleton;
 
 import java.nio.ByteBuffer;
@@ -38,10 +39,10 @@ public class CurrentPlayerData implements FileDataHolder {
     private final AtomicBoolean missingSkills = new AtomicBoolean(false);
     private String playerName = null;
     private Path playerChr = null;
-    private boolean customQuest = false;
     private FileDataMap dataMap = new FileDataMap();
     private HeaderInfo headerInfo = new HeaderInfo();
     private ByteBuffer buffer = null;
+    private SaveLocation location;
 
     @Override
     public String getPlayerName() {
@@ -53,12 +54,16 @@ public class CurrentPlayerData implements FileDataHolder {
         this.playerName = playerName;
     }
 
-    boolean isCustomQuest() {
-        return customQuest;
+    public void setLocation(SaveLocation location) {
+        this.location = location;
     }
 
-    public void setCustomQuest(boolean customQuest) {
-        this.customQuest = customQuest;
+    public SaveLocation getLocation() {
+        return location;
+    }
+
+    boolean isCustomQuest() {
+        return SaveLocation.USER.equals(location);
     }
 
     String getPlayerClassTag() {
@@ -139,7 +144,7 @@ public class CurrentPlayerData implements FileDataHolder {
         this.headerInfo = new HeaderInfo();
         this.dataMap = new FileDataMap();
         this.playerName = null;
-        this.customQuest = false;
+        this.location = SaveLocation.MAIN;
         this.playerSkills.clear();
         this.missingSkills.set(false);
     }

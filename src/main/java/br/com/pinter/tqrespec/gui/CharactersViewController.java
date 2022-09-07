@@ -24,6 +24,8 @@ import br.com.pinter.tqrespec.core.MyTask;
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.core.WorkerThread;
 import br.com.pinter.tqrespec.logging.Log;
+import br.com.pinter.tqrespec.save.SaveLocation;
+import br.com.pinter.tqrespec.save.player.Archiver;
 import br.com.pinter.tqrespec.save.player.PlayerLoader;
 import br.com.pinter.tqrespec.tqdata.*;
 import br.com.pinter.tqrespec.util.Build;
@@ -36,6 +38,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -45,6 +50,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.*;
+import javafx.stage.Window;
 import javafx.util.Callback;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -90,6 +96,9 @@ public class CharactersViewController implements Initializable {
 
     @FXML
     private TableColumn<PlayerCharacter, String> colName;
+
+    @FXML
+    private TableColumn<PlayerCharacter, String> colStore;
 
     @FXML
     private TableColumn<PlayerCharacter, Integer> colLevel;
@@ -176,6 +185,9 @@ public class CharactersViewController implements Initializable {
 
     private AtomicBoolean loadingCharacters = new AtomicBoolean(false);
 
+    @Inject
+    private Archiver archiver;
+
     @FXML
     public void closeWindow(@SuppressWarnings("unused") MouseEvent evt) {
         close();
@@ -225,6 +237,34 @@ public class CharactersViewController implements Initializable {
         }
     }
 
+    private void loadCharacters() {
+        loadingCharacters.set(true);
+
+        Platform.runLater(() -> {
+            charactersTable.setPlaceholder(new Label(ResourceHelper.getMessage("characters.loadingPlaceholder")));
+            rootElement.getScene().setCursor(Cursor.WAIT);
+
+        });
+
+        characters = new ArrayList<>();
+        for (PlayerCharacterFile p : gameInfo.getPlayerCharacterList()) {
+            try {
+                player.loadPlayer(p.getPlayerName(), p.getLocation());
+            } catch (RuntimeException e) {
+                logger.log(System.Logger.Level.ERROR, String.format("Error loading character '%s'", p));
+                continue;
+            }
+            characters.add(player.getCharacter());
+        }
+
+        Platform.runLater(() -> {
+            setupTable();
+            charactersTable.setPlaceholder(new Label(""));
+            Platform.runLater(() -> rootElement.getScene().setCursor(Cursor.DEFAULT));
+            loadingCharacters.set(false);
+        });
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         player.reset();
@@ -269,31 +309,7 @@ public class CharactersViewController implements Initializable {
         stage.addEventHandler(WindowEvent.WINDOW_SHOWING, e -> new WorkerThread(new MyTask<>() {
             @Override
             protected Void call() {
-                loadingCharacters.set(true);
-
-                Platform.runLater(() -> {
-                    charactersTable.setPlaceholder(new Label(ResourceHelper.getMessage("characters.loadingPlaceholder")));
-                    rootElement.getScene().setCursor(Cursor.WAIT);
-
-                });
-
-                characters = new ArrayList<>();
-                for (PlayerCharacterFile p : gameInfo.getPlayerCharacterList()) {
-                    try {
-                        player.loadPlayer(p.getPlayerName(), p.isExternal());
-                    } catch (RuntimeException e) {
-                        logger.log(System.Logger.Level.ERROR, String.format("Error loading character '%s'", p));
-                        continue;
-                    }
-                    characters.add(player.getCharacter());
-                }
-
-                Platform.runLater(() -> {
-                    setupTable();
-                    charactersTable.setPlaceholder(new Label(""));
-                    Platform.runLater(() -> rootElement.getScene().setCursor(Cursor.DEFAULT));
-                    loadingCharacters.set(false);
-                });
+                loadCharacters();
                 return null;
             }
         }).start());
@@ -305,14 +321,84 @@ public class CharactersViewController implements Initializable {
 
         exportButton.setGraphic(Icon.FA_FILE_EXPORT.create());
 
+        ContextMenu contextMenu = new ContextMenu();
+        MenuItem archive = new MenuItem(ResourceHelper.getMessage("characters.archive"));
+        MenuItem unarchive = new MenuItem(ResourceHelper.getMessage("characters.unarchive"));
+        MenuItem explore = new MenuItem(ResourceHelper.getMessage("characters.explore"));
+        contextMenu.getItems().add(explore);
+        contextMenu.getItems().add(new SeparatorMenuItem());
+        contextMenu.getItems().add(archive);
+        contextMenu.getItems().add(unarchive);
+
+        explore.setOnAction(event -> {
+            try {
+                Runtime.getRuntime().exec(Constants.EXPLORER_COMMAND + " "
+                        + charactersTable.getSelectionModel().getSelectedItem().getPath().toString());
+            } catch (IOException e) {
+                logger.log(System.Logger.Level.WARNING, "unable to open explorer: ", e);
+            }
+        });
+        archive.setOnAction(event -> archiveAction(false));
+        unarchive.setOnAction(event -> archiveAction(true));
+
+        charactersTable.setContextMenu(contextMenu);
+        contextMenu.setOnShowing(e -> {
+            int selectedCount = charactersTable.getSelectionModel().getSelectedItems().size();
+            PlayerCharacter selected = charactersTable.getSelectionModel().getSelectedItem();
+            archive.setDisable(selectedCount > 1 || !selected.isArchivable());
+            unarchive.setDisable(selectedCount > 1 || !selected.isArchived());
+        });
         stage.show();
+    }
+
+    private void archiveAction(boolean undo) {
+        PlayerCharacter selected = charactersTable.getSelectionModel().getSelectedItem();
+
+        String toastHeader = null;
+        String toastContent = null;
+
+        try {
+            rootElement.getScene().setCursor(Cursor.WAIT);
+            if(undo) {
+                archiver.unarchive(selected);
+                toastHeader = "characters.unarchive";
+                toastContent = "characters.unarchivedmessage";
+            } else {
+                archiver.archive(selected);
+                toastHeader = "characters.archive";
+                toastContent = "characters.archivedmessage";
+            }
+        } catch (IOException e) {
+            throw new UnhandledRuntimeException(e);
+        } finally {
+            reset();
+            SaveLocation locationMessage = selected.getLocation();
+            if(locationMessage.equals(SaveLocation.ARCHIVEMAIN)) {
+                locationMessage = SaveLocation.MAIN;
+            }
+            if(locationMessage.equals(SaveLocation.ARCHIVEUSER)) {
+                locationMessage = SaveLocation.USER;
+            }
+
+            rootElement.getScene().setCursor(Cursor.DEFAULT);
+            Toast.show((Stage) rootElement.getScene().getWindow(),
+                    ResourceHelper.getMessage(toastHeader),
+                    ResourceHelper.getMessage(toastContent,
+                            selected.getName(), ResourceHelper.getMessage("characters.store." + locationMessage)),
+                    5000);
+        }
     }
 
     private void setupTable() {
         //setup tableview
         setupTableColumnString(colName, ResourceHelper.getMessage("characters.characterName"), "name");
+        setupTableColumnString(colStore, ResourceHelper.getMessage("characters.store"), null);
         setupTableColumnInteger(colLevel, ResourceHelper.getMessage("main.charlevel"), "level");
         setupTableColumnString(colGender, ResourceHelper.getMessage("main.gender"), null);
+
+        colStore.setCellValueFactory( f ->  new SimpleStringProperty(
+                ResourceHelper.getMessage("characters.store."+ f.getValue().getLocation().toString().toUpperCase())
+        ));
         colGender.setCellValueFactory(f -> new SimpleStringProperty(
                 ResourceHelper.getMessage("main.gender." + f.getValue().getGender().name().toLowerCase())));
 
@@ -399,6 +485,15 @@ public class CharactersViewController implements Initializable {
 
         charactersTable.getItems().addAll(characters);
 
+        charactersTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+        resizeCharactersTable();
+    }
+
+    private void reset() {
+        charactersTable.getItems().clear();
+        characters.clear();
+        loadCharacters();
         resizeCharactersTable();
     }
 
@@ -448,6 +543,7 @@ public class CharactersViewController implements Initializable {
 
         String[] header = new String[]{
                 ResourceHelper.getMessage("characters.characterName"),
+                ResourceHelper.getMessage("characters.store"),
                 ResourceHelper.getMessage("main.charlevel"),
                 ResourceHelper.getMessage("main.gender"),
                 ResourceHelper.getMessage("main.charclass"),
@@ -517,6 +613,7 @@ public class CharactersViewController implements Initializable {
 
             String[] row = new String[]{
                     p.getName(),
+                    ResourceHelper.getMessage("characters.store." + p.getLocation()),
                     String.valueOf(p.getLevel()),
                     gender,
                     p.getCharacterClass(),

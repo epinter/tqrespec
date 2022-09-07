@@ -24,6 +24,7 @@ import br.com.pinter.tqrespec.Settings;
 import br.com.pinter.tqrespec.core.GameNotFoundException;
 import br.com.pinter.tqrespec.gui.ResourceHelper;
 import br.com.pinter.tqrespec.logging.Log;
+import br.com.pinter.tqrespec.save.SaveLocation;
 import br.com.pinter.tqrespec.util.Constants;
 import com.google.inject.Singleton;
 import com.sun.jna.platform.win32.*;
@@ -703,6 +704,22 @@ public class GameInfo {
         return null;
     }
 
+    public String getSaveDataMainArchivedPath() {
+        String archived = getSaveDataMainPath();
+        if(archived == null) {
+            return null;
+        }
+        return Paths.get(archived, Constants.ARCHIVE_DIR).toString();
+    }
+
+    public String getSaveDataUserArchivedPath() {
+        String archived = getSaveDataUserPath();
+        if(archived == null) {
+            return null;
+        }
+        return Paths.get(archived, Constants.ARCHIVE_DIR).toString();
+    }
+
     public String getSaveDataMainPath() {
         if (!SystemUtils.IS_OS_WINDOWS) return Paths.get(Constants.DEV_GAMEDATA, Constants.SAVEDATA, "Main").toString();
         String savePath = getSavePath();
@@ -731,12 +748,25 @@ public class GameInfo {
     }
 
     public List<PlayerCharacterFile> getPlayerCharacterList() {
-        List<PlayerCharacterFile> ret = new ArrayList<>(getPlayerListFromPath(getSaveDataMainPath(), false));
-        ret.addAll(getPlayerListFromPath(getExternalSaveDataPath(), true));
+        List<PlayerCharacterFile> ret = new ArrayList<>(getPlayerListFromPath(SaveLocation.MAIN));
+        ret.addAll(getPlayerListFromPath(SaveLocation.USER));
+        ret.addAll(getPlayerListFromPath(SaveLocation.ARCHIVEMAIN));
+        ret.addAll(getPlayerListFromPath(SaveLocation.ARCHIVEUSER));
+        ret.addAll(getPlayerListFromPath(SaveLocation.EXTERNAL));
         return ret;
     }
 
-    private List<PlayerCharacterFile> getPlayerListFromPath(String savePath, boolean external) {
+    public List<PlayerCharacterFile> getPlayerCharacterList(SaveLocation... locations) {
+        List<PlayerCharacterFile> ret = new ArrayList<>();
+        for(SaveLocation l: locations) {
+            ret.addAll(getPlayerListFromPath(l));
+        }
+        return ret;
+    }
+
+    private List<PlayerCharacterFile> getPlayerListFromPath(SaveLocation location) {
+        String savePath = locationPath(location);
+
         if (savePath == null) {
             return Collections.emptyList();
         }
@@ -745,11 +775,12 @@ public class GameInfo {
         List<PlayerCharacterFile> playerList = new ArrayList<>();
         if (directory.exists()) {
             for (File player : Objects.requireNonNull(directory.listFiles((File fileName) -> fileName.getName().startsWith("_")))) {
-                playerList.add(new PlayerCharacterFile(player.getName().replaceAll("^_", ""), external));
+                playerList.add(new PlayerCharacterFile(player.getName().replaceAll("^_", ""), location));
             }
         } else {
             return Collections.emptyList();
         }
+
         return playerList;
     }
 
@@ -762,27 +793,29 @@ public class GameInfo {
         return null;
     }
 
-    public Path playerPath(String playerName, boolean customQuest) {
-        String path;
+    public Path playerPath(String playerName, SaveLocation saveLocation) {
+        return Paths.get(locationPath(saveLocation), "_" + playerName);
+    }
 
-        if (customQuest) {
-            path = getSaveDataUserPath();
-        } else {
-            path = getSaveDataMainPath();
+    private String locationPath(SaveLocation saveLocation) {
+        if(saveLocation == null) {
+            saveLocation = SaveLocation.MAIN;
         }
 
-        return Paths.get(path, "_" + playerName);
+        switch (saveLocation) {
+            case USER -> { return getSaveDataUserPath();  }
+            case EXTERNAL -> { return getExternalSaveDataPath(); }
+            case ARCHIVEMAIN -> { return getSaveDataMainArchivedPath(); }
+            case ARCHIVEUSER -> { return getSaveDataUserArchivedPath(); }
+            default -> { return getSaveDataMainPath(); }
+        }
     }
 
-    public Path playerChr(String playerName, boolean customQuest) {
-        return Paths.get(playerPath(playerName, customQuest).toString(), Constants.PLAYERCHR);
-    }
-
-    public Path playerChrExternalPath(String playerName) {
-        if (getExternalSaveDataPath() == null) {
+    public Path playerChr(String playerName, SaveLocation saveLocation) {
+        if(SaveLocation.EXTERNAL.equals(saveLocation) && getExternalSaveDataPath() == null) {
             return null;
         }
-        return Paths.get(getExternalSaveDataPath(), "_" + playerName, Constants.PLAYERCHR);
+        return Paths.get(playerPath(playerName, saveLocation).toString(), Constants.PLAYERCHR);
     }
 
     public Locale getGameLanguage() {

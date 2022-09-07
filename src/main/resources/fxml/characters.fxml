@@ -20,7 +20,7 @@
   ~ Copyright (C) 2021 Emerson Pinter - All Rights Reserved
   -->
 
-<VBox fx:id="rootElement" alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="400.0" minWidth="700.0" prefHeight="400.0" prefWidth="700.0" stylesheets="@main.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.pinter.tqrespec.gui.CharactersViewController">
+<VBox fx:id="rootElement" alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="600.0" minWidth="900.0" prefHeight="600.0" prefWidth="900.0" stylesheets="@main.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.pinter.tqrespec.gui.CharactersViewController">
    <children>
       <HBox maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" onMouseDragged="#moveWindow" onMousePressed="#startMoveWindow" onMouseReleased="#endMoveWindow" prefHeight="47.0" styleClass="tq-topdecoration">
          <children>
@@ -49,6 +49,7 @@
             <TableView fx:id="charactersTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
                <columns>
                   <TableColumn fx:id="colName" editable="false" prefWidth="75.0" text="name" />
+                  <TableColumn fx:id="colStore" editable="false" prefWidth="75.0" text="store" />
                   <TableColumn fx:id="colLevel" editable="false" prefWidth="75.0" text="level" />
                   <TableColumn fx:id="colGender" editable="false" prefWidth="75.0" text="gender" />
                   <TableColumn fx:id="colClass" editable="false" prefWidth="75.0" text="characterClass" />

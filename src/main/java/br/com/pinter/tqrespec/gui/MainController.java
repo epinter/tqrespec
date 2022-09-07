@@ -22,6 +22,7 @@ package br.com.pinter.tqrespec.gui;
 
 import br.com.pinter.tqrespec.core.*;
 import br.com.pinter.tqrespec.logging.Log;
+import br.com.pinter.tqrespec.save.SaveLocation;
 import br.com.pinter.tqrespec.save.player.Player;
 import br.com.pinter.tqrespec.save.player.PlayerWriter;
 import br.com.pinter.tqrespec.tqdata.Db;
@@ -155,11 +156,19 @@ public class MainController implements Initializable {
         State.get().gameRunningProperty().addListener((value, oldV, newV) -> {
             if (BooleanUtils.isTrue(newV)) {
                 Platform.runLater(() -> {
+                    Parent rootCharWindow = fxmlLoaderCharacter.getRoot();
+                    if(rootCharWindow != null) {
+                        Stage charactersWindow = (Stage) rootCharWindow.getScene().getWindow();
+                        charactersWindow.close();
+                    }
+                });
+
+                Platform.runLater(() -> {
                     reset();
                     Toast.show((Stage) rootelement.getScene().getWindow(),
                             ResourceHelper.getMessage("alert.errorgamerunning_header"),
                             ResourceHelper.getMessage("alert.errorgamerunning_content"),
-                            8000);
+                            30000);
                 });
             }
         });
@@ -170,7 +179,7 @@ public class MainController implements Initializable {
     public void addCharactersToCombo() {
         try {
             characterCombo.getSelectionModel().clearSelection();
-            characterCombo.getItems().setAll(gameInfo.getPlayerCharacterList());
+            characterCombo.getItems().setAll(gameInfo.getPlayerCharacterList(SaveLocation.MAIN, SaveLocation.EXTERNAL));
             characterCombo.getItems().sort(Comparator.comparing(PlayerCharacterFile::getPlayerName));
         } catch (ClassCastException | UnsupportedOperationException | IllegalArgumentException e) {
             logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
@@ -228,9 +237,14 @@ public class MainController implements Initializable {
             fxmlLoaderCharacter.setLocation(ResourceHelper.getResourceUrl("/fxml/characters.fxml"));
             fxmlLoaderCharacter.setResources(ResourceBundle.getBundle("i18n.UI", State.get().getLocale()));
             fxmlLoaderCharacter.load();
+            Parent r = fxmlLoaderCharacter.getRoot();
+            Stage charactersWindow = (Stage) r.getScene().getWindow();
+            charactersWindow.setOnHiding(e -> reset());
         } else {
             root = fxmlLoaderCharacter.getRoot();
-            ((Stage) root.getScene().getWindow()).show();
+            Stage charactersWindow = (Stage) root.getScene().getWindow();
+            charactersWindow.setOnHiding(e -> reset());
+            charactersWindow.show();
         }
     }
 
@@ -371,7 +385,7 @@ public class MainController implements Initializable {
         MyTask<Boolean> loadTask = new MyTask<>() {
             @Override
             protected Boolean call() {
-                return player.loadPlayer(playerCharacterFile.getPlayerName(), playerCharacterFile.isExternal());
+                return player.loadPlayer(playerCharacterFile.getPlayerName(), playerCharacterFile.getLocation());
             }
         };
 

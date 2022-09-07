@@ -24,13 +24,11 @@ import br.com.pinter.tqrespec.Settings;
 import br.com.pinter.tqrespec.core.State;
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.logging.Log;
-import br.com.pinter.tqrespec.save.FileDataHolder;
-import br.com.pinter.tqrespec.save.FileDataMap;
-import br.com.pinter.tqrespec.save.FileWriter;
-import br.com.pinter.tqrespec.save.Platform;
+import br.com.pinter.tqrespec.save.*;
 import br.com.pinter.tqrespec.save.stash.StashLoader;
 import br.com.pinter.tqrespec.save.stash.StashWriter;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
+import br.com.pinter.tqrespec.tqdata.PlayerCharacterFile;
 import br.com.pinter.tqrespec.util.Constants;
 import com.google.inject.Inject;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -43,6 +41,7 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -213,6 +212,10 @@ public class PlayerWriter extends FileWriter {
     }
 
     public void copyCurrentSave(String toPlayerName) throws IOException {
+        List<PlayerCharacterFile> playerCharacterList = gameInfo.getPlayerCharacterList(SaveLocation.MAIN, SaveLocation.ARCHIVEMAIN);
+        if(playerCharacterList.stream().anyMatch(f -> f.getPlayerName().equalsIgnoreCase(toPlayerName))) {
+            throw new FileAlreadyExistsException("A character with name '"+toPlayerName+"' already exists");
+        }
         copyCurrentSave(toPlayerName, Platform.UNDEFINED, null);
     }
 

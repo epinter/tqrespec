@@ -26,10 +26,32 @@ This software requires **Microsoft Windows (64-bit recommended)**. You don't nee
 
 Keep in mind that this software make modifications to your save game (more specifically the file Player.chr). You shouldn't modify your characters while the game is running, you can corrupt your save game. ***YOU SHOULD ALWAYS KEEP A FULL BACKUP OF YOUR SAVE GAME FOLDER*** (Documents/My Games/Titan Quest - Immortal Throne).
 
-![TQRespec Screenshot 1](assets/screenshot_attributes.png "Attributes")
-![TQRespec Screenshot 2](assets/screenshot_skills.png "Skills")
-![TQRespec Screenshot 3](assets/screenshot_misc.png "Misc")
-![TQRespec Screenshot 4](assets/screenshot_characters.png "Characters")
+#### ***Screenshots***
+
+- *Attributes*
+
+  ![TQRespec Screenshot 1](assets/screenshot_attributes.png "Attributes")
+
+
+- *Remove Skills and masteries*
+
+  ![TQRespec Screenshot 2](assets/screenshot_skills.png "Skills")
+
+
+- *Copy, Backup, Convert and JSON export*
+
+  ![TQRespec Screenshot 3](assets/screenshot_misc.png "Misc")
+
+
+- *Characters list and export CSV*
+
+  ![TQRespec Screenshot 4](assets/screenshot_characters.png "Characters")
+
+
+- *Characters Archive and Unarchive **(archive to hide character in game)***
+
+  ![TQRespec Screenshot 5](assets/screenshot_archive.png "Archive")
+
 
 #### ***Running without the game installed***
 
@@ -74,7 +96,7 @@ If you have a mastery on level 24 and 7 skills with points allocated, you can cl
 
 #### ***Characters list and stats***
 
-When you click on the button near the character selection list, you will be able to see a table with all your characters, with attributes and stats. There's also an option to export the table to CSV.
+When you click on the button near the character selection list, you will be able to see a table with all your characters, with attributes and stats. There's also an option to export the table to CSV. To Archive or Unarchive a character, right click on the row and select the option desired. When the archive is done, the character directory is moved from "SaveData/Main/_charactername" to "SaveData/Main/ArchivedCharacters/_charactername", hiding it from the game. Unarchive moves the character back to default directory.
 
 #### ***Android support***
 

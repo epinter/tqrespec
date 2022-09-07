@@ -4,21 +4,23 @@
 
 package br.com.pinter.tqrespec.tqdata;
 
+import br.com.pinter.tqrespec.save.SaveLocation;
+
 public class PlayerCharacterFile {
     private final String playerName;
-    private final boolean external;
+    private final SaveLocation location;
 
-    public PlayerCharacterFile(String playerName, boolean external) {
+    public PlayerCharacterFile(String playerName, SaveLocation location) {
         this.playerName = playerName;
-        this.external = external;
+        this.location = location;
     }
 
     public String getPlayerName() {
         return playerName;
     }
 
-    public boolean isExternal() {
-        return external;
+    public SaveLocation getLocation() {
+        return location;
     }
 
     @Override

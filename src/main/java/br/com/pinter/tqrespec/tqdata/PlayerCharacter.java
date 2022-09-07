@@ -20,14 +20,18 @@
 
 package br.com.pinter.tqrespec.tqdata;
 
+import br.com.pinter.tqrespec.save.SaveLocation;
 import br.com.pinter.tqrespec.save.player.Gender;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerCharacter {
     private String name;
+    private Path path;
+    private SaveLocation location = SaveLocation.MAIN;
     private int level;
     private Gender gender;
     private String characterClass;
@@ -59,6 +63,14 @@ public class PlayerCharacter {
 
     public String getName() {
         return name;
+    }
+
+    public SaveLocation getLocation() {
+        return location;
+    }
+
+    public void setLocation(SaveLocation location) {
+        this.location = location;
     }
 
     public void setName(String name) {
@@ -289,6 +301,14 @@ public class PlayerCharacter {
         this.defaultMapTeleports = defaultMapTeleports;
     }
 
+    public boolean isArchived() {
+        return SaveLocation.ARCHIVEMAIN.equals(location) || SaveLocation.ARCHIVEUSER.equals(location);
+    }
+
+    public boolean isArchivable() {
+        return SaveLocation.MAIN.equals(location) || SaveLocation.USER.equals(location);
+    }
+
     public MapTeleport getLastMapTeleport() {
         List<MapTeleport> mapTeleports = getDefaultMapTeleports().get(getDifficulty());
 
@@ -296,5 +316,13 @@ public class PlayerCharacter {
             return mapTeleports.get(mapTeleports.size() - 1);
         }
         return null;
+    }
+
+    public void setPath(Path path) {
+        this.path = path;
+    }
+
+    public Path getPath() {
+        return path;
     }
 }
