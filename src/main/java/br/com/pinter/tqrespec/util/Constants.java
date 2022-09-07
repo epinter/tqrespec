@@ -129,7 +129,7 @@ public class Constants {
         public static final int TOOLTIP_SHOWDELAY_MILLIS = 150;
         public static final int TOOLTIP_SHOWDURATION_MILLIS = 9000;
         public static final double TOOLTIP_MAXWIDTH = 500d;
-        public static final Font TOOLTIP_FONT = Font.font("Albertus MT", 16d);
+        public static final Font TOOLTIP_FONT = Font.font("Marcellus", 16d);
         public static final String TAG_STRLABEL = "tagCStrength";
         public static final String TAG_INTLABEL = "tagCIntelligence";
         public static final String TAG_DEXLABEL = "tagCDexterity";
@@ -151,8 +151,7 @@ public class Constants {
         public static final String TAG_STAT_GREATESTMONSTER = "tagCHighestMonster";
 
         public static final List<String> FONTS_LOADLIST = List.of(
-                "/fxml/albertus-mt.ttf",
-                "/fxml/albertus-mt-light.ttf",
+                "/fxml/Marcellus-Regular.ttf",
                 "/fxml/fa5-free-solid-900.ttf"
         );
 

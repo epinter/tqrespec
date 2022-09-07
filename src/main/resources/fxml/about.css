@@ -24,14 +24,14 @@
 	-fx-text-fill: #000000;
 	// px, do not scale
 	-fx-font-size: 12px;
-	-fx-font-family: 'Albertus MT Light';
+	-fx-font-family: 'Marcellus';
 	-fx-background-image: url('topbar_center.png');
 	-fx-background-repeat: no-repeat;
 
 }
 .tq-bigtitle {
 	-fx-font-size: 30px;
-	-fx-font-family: 'Albertus MT';
+	-fx-font-family: 'Marcellus';
 	-fx-font-weight: bold;
 	-fx-font-style: italic;
     -fx-text-fill: #ffd993;
@@ -53,13 +53,13 @@
     -fx-prompt-text-fill: transparent;
     -fx-base: transparent;
     -fx-text-fill: #ffd993;
-   	-fx-font-family: 'Albertus MT Light';
+    -fx-font-family: 'Marcellus';
 }
 
 .tq-aboutversion {
     -fx-text-fill: #ffffff;
     -fx-font-size: 26px;
-   	-fx-font-family: 'Albertus MT Light';
+    -fx-font-family: 'Marcellus';
 }
 .tq-winclose {
 	-fx-background-image: url('close.png');

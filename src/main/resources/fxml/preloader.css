@@ -53,7 +53,7 @@
 
 .version {
 	-fx-font-size: 1.3em;
-	-fx-font-family: 'Albertus MT Light';
+	-fx-font-family: sans-serif;
     -fx-text-fill: #ffd993;
     -fx-padding: 0 0 0 0;
     -fx-effect: dropshadow( one-pass-box , black , 0, 0.0 , 0 , 2 );
@@ -61,7 +61,7 @@
 
 .tq-bigtitle {
 	-fx-font-size: 3.0em;
-	-fx-font-family: 'Albertus MT';
+	-fx-font-family: 'Marcellus';
 	-fx-font-weight: bold;
     -fx-text-fill: #ffd993;
     -fx-effect: dropshadow( one-pass-box , black , 5, 5.0 , 5 , 5 );

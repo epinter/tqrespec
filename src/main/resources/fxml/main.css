@@ -12,7 +12,7 @@
     -fx-mark-color: #ffd993;
     /* will be overriden to 1em on runtime */
     -fx-font-size: 1em;
-    -fx-font-family: 'Albertus MT';
+    -fx-font-family: 'Marcellus';
 }
 
 .tooltip {
@@ -36,7 +36,7 @@
 /* button */
 .tq-button .text {
     -fx-effect: dropshadow( one-pass-box , black , 0, 0.0 , 0 , 2 );
-	-fx-font-family: 'Albertus MT';
+	-fx-font-family: 'Marcellus';
 }
 
 .tq-button {
@@ -44,14 +44,14 @@
 	-fx-background-size: stretch;
 	-fx-background-color:transparent;
 	-fx-font-weight: bold;
-	-fx-font-family: 'Albertus MT';
+	-fx-font-family: 'Marcellus';
 	-fx-font-size: 1.5em;
 	-fx-text-fill: #ffffff;
 }
 
 .tq-menubutton .text {
     -fx-effect: dropshadow( one-pass-box , black , 0, 0.0 , 0 , 2 );
-	-fx-font-family: 'Albertus MT';
+	-fx-font-family: 'Marcellus';
 }
 
 .tq-menubutton .context-menu .menu-item:hover:disabled{
@@ -82,7 +82,7 @@
 	-fx-background-size: stretch;
 	-fx-background-color:transparent;
 	-fx-font-weight: bold;
-	-fx-font-family: 'Albertus MT';
+	-fx-font-family: 'Marcellus';
 	-fx-text-fill: #ffffff;
 }
 
@@ -107,7 +107,7 @@
 	-fx-text-fill: #000000;
 	// px, do not scale
 	-fx-font-size: 12px;
-	-fx-font-family: 'Albertus MT Light';
+	-fx-font-family: sans-serif;
 	-fx-background-image: url('topbar_center.png');
 	-fx-background-repeat: no-repeat;
 
@@ -121,7 +121,7 @@
 .tq-bigtitle {
     -fx-font-size: 3.4em;
     -fx-text-alignment: left;
-    -fx-font-family: 'Albertus MT';
+    -fx-font-family: 'Marcellus';
     -fx-font-weight: bold;
     -fx-text-fill: #ffd993;
     -fx-effect: dropshadow( one-pass-box , black , 5, 5.0 , 5 , 5 );
@@ -295,7 +295,7 @@
 .tq-labelradio,
 .tq-label {
 	-fx-font-size: 1.4em;
-	-fx-font-family: 'Albertus MT Light';
+	-fx-font-family: 'Marcellus';
 }
 
 .tq-labelradio .text,
@@ -307,7 +307,7 @@
 
 .tq-textfield {
     -fx-background-color: #443823;
-    -fx-font-family: 'Albertus MT';
+    -fx-font-family: 'Marcellus';
     -fx-text-fill: #ffffff;
     -fx-prompt-text-fill: #9e8760;
     -fx-font-size: 1.4em
@@ -315,7 +315,7 @@
 
 .tq-labelbox {
     -fx-background-color: #443823;
-    -fx-font-family: 'Albertus MT';
+    -fx-font-family: 'Marcellus';
     -fx-text-fill: #ffffff;
     -fx-font-size: 1.4em;
     -fx-background-radius: 4;
@@ -324,7 +324,7 @@
 
 /*****spinner********/
 .spinner {
-    -fx-font-family: 'Albertus MT';
+    -fx-font-family: 'Marcellus';
   	-fx-font-size: 1.4em;
 }
 .spinner .increment-arrow-button .increment-arrow {
@@ -362,7 +362,7 @@
     -fx-text-fill: #ffffff;
 }
 .tq-versioncheck {
-    -fx-font-family: 'Albertus MT Light';
+    -fx-font-family: sans-serif;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
     -fx-border-width: 0;
@@ -371,7 +371,7 @@
 }
 
 .tq-versioncheck:visited {
-    -fx-font-family: 'Albertus MT Light';
+    -fx-font-family: sans-serif;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
     -fx-border-width: 0;
@@ -412,7 +412,7 @@
 }
 
 .tq-tabbutton {
-	-fx-font-family: 'Albertus MT Light';
+	-fx-font-family: 'Marcellus';
 	-fx-font-size: 0.7em;
     -fx-border-image-source: url('border.png');
     -fx-border-image-insets: 0;
@@ -444,7 +444,7 @@
 .tq-label-skillpoints {
 	-fx-text-fill: #ffffff;
 	-fx-font-size: 1.4em;
-	-fx-font-family: 'Albertus MT Light';
+	-fx-font-family: 'Marcellus';
     -fx-effect: dropshadow( one-pass-box , black , 0, 0.0 , 0 , 2 );
     -fx-text-alignment: center;
 }
