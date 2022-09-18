@@ -1,4 +1,11 @@
 # Changelog
+## [0.12.0] - 2022-09-18
+### Added
+- Archive (activated in characters window). When archived, the savegame is moved so is hidden from game.
+
+### Changed
+- Font replaced.
+
 ## [0.11.3] - 2022-09-05
 ### Added
 - French translation (by [EtienneLamoureux](https://github.com/EtienneLamoureux))
