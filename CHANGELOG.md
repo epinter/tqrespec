@@ -1,4 +1,9 @@
 # Changelog
+## [0.12.1] - 2022-12-12
+### Changed
+- Updated Russian and Ukranian translations (thanks Evgeniy Chefranov)
+- Updated JDK to 17.0.5, fixes generic error message popup when application terminates with non-zero exit status
+
 ## [0.12.0] - 2022-09-18
 ### Added
 - Archive (activated in characters window). When archived, the savegame is moved so is hidden from game.
