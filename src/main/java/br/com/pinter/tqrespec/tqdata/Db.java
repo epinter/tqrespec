@@ -53,7 +53,9 @@ public class Db {
                         && !Path.of(gameInfo.getGamePath(), "FORCE_WINDOWS.txt").toFile().exists()
                         && (recordExists("Records\\InGameUI\\Player Character\\Mobile\\CharStatsMobile.dbr")
                         || recordExists("Records\\xpack\\ui\\hud\\hud_mobile.dbr"))) {
-                    logger.log(System.Logger.Level.INFO, "Mobile database detected. If this database is from Windows version, create the file to force detection: " + Path.of(gameInfo.getGamePath(), "FORCE_WINDOWS.txt").toFile());
+                    logger.log(System.Logger.Level.INFO,
+                            "Mobile database detected. If this database is from Windows version, create the file to force detection: "
+                                    + Path.of(gameInfo.getGamePath(), "FORCE_WINDOWS.txt").toFile());
                     platform = Platform.MOBILE;
                 }
             }

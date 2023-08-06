@@ -74,6 +74,7 @@ public class PlayerWriter extends FileWriter {
     @SuppressWarnings("SameParameterValue")
     private boolean backupSaveGame(String fileName, String playerName) throws IOException {
         File backupDirectory = new File(gameInfo.getSavePath(), Constants.BACKUP_DIRECTORY);
+        logger.log(System.Logger.Level.INFO, "creating backup at "+backupDirectory.getAbsolutePath());
         Path player = Paths.get(fileName);
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HH");
         String ts = df.format(new Date());
@@ -86,7 +87,7 @@ public class PlayerWriter extends FileWriter {
         }
 
         if (!backupDirectory.exists() && !backupDirectory.mkdir()) {
-            throw new IOException("Unable to create backup directory");
+            throw new IOException("Unable to create backup directory at "+backupDirectory.getAbsolutePath());
         }
 
         if (backupDirectory.canWrite()) {

@@ -62,11 +62,19 @@ if (!file(javafxSdkDir).directory) {
 if (project.hasProperty('buildVersion')) {
     project.version = project.properties.get("buildVersion")
 }
-if (osArch == "amd64") {
-    ext.appArchiveName = "${distAppName}-${project.version}.zip"
-} else {
-    ext.appArchiveName = "${distAppName}-${project.version}_${osArch}.zip"
+
+ext.appArchiveOs = ""
+ext.appArchiveArch = ""
+
+if(!OS.isWindows()) {
+    ext.appArchiveOs = String.format("-%s",OS.toFamilyName().toLowerCase())
 }
+
+if (osArch != "amd64") {
+    ext.appArchiveArch = String.format("-%s",ext.osArch)
+}
+
+ext.appArchiveName = "${distAppName}-${project.version}${ext.appArchiveOs}${ext.appArchiveArch}.zip"
 
 repositories {
     mavenCentral()
@@ -379,7 +387,7 @@ task appimage(type: Exec) {
                 into "$buildDir/app-image/${distAppName}/runtime/bin"
             } else {
                 from javafxSdkLibDir.listFiles().findAll { it.getName().toLowerCase().endsWith('.so') }.collect()
-                into "$buildDir/app-image/${distAppName}"
+                into "$buildDir/app-image/${distAppName}/lib/runtime/lib"
             }
         }
         new File(buildDir, "app-image/${distAppName}").listFiles().findAll {
@@ -395,6 +403,12 @@ task appimage(type: Exec) {
         copy {
             from "${projectDir}/README.md"
             into new File(buildDir, "app-image/${distAppName}")
+        }
+        copy {
+            if (OS.isLinux()) {
+                from "${projectDir}/src/dist/TQRespec.sh"
+                into new File(buildDir, "app-image/${distAppName}")
+            }
         }
         new File(buildDir, "app-image/${distAppName}/savedata").mkdir()
         new File(buildDir, "app-image/${distAppName}/gamedata").mkdir()

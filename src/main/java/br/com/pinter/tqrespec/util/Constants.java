@@ -53,6 +53,7 @@ public class Constants {
     public static final int MAX_CHARACTER_NAME_LENGTH = 14;
     public static final String ARCHIVE_DIR="ArchivedCharacters";
     public static final String EXPLORER_COMMAND="explorer.exe";
+    public static final String XDGOPEN_COMMAND="xdg-open";
     /**
      * Maps Game Options language to i18n locale
      */

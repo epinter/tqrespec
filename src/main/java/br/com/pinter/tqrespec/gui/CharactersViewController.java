@@ -331,12 +331,7 @@ public class CharactersViewController implements Initializable {
         contextMenu.getItems().add(unarchive);
 
         explore.setOnAction(event -> {
-            try {
-                Runtime.getRuntime().exec(Constants.EXPLORER_COMMAND + " "
-                        + charactersTable.getSelectionModel().getSelectedItem().getPath().toString());
-            } catch (IOException e) {
-                logger.log(System.Logger.Level.WARNING, "unable to open explorer: ", e);
-            }
+            UIUtils.fileExplorer(charactersTable.getSelectionModel().getSelectedItem().getPath().toString());
         });
         archive.setOnAction(event -> archiveAction(false));
         unarchive.setOnAction(event -> archiveAction(true));

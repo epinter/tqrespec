@@ -21,6 +21,7 @@
 package br.com.pinter.tqrespec.gui;
 
 import br.com.pinter.tqrespec.core.State;
+import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.util.Build;
 import br.com.pinter.tqrespec.util.Constants;
 import javafx.application.Platform;
@@ -28,8 +29,13 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Tooltip;
 import javafx.stage.Modality;
 import javafx.util.Duration;
+import org.apache.commons.lang3.SystemUtils;
+
+import java.io.IOException;
 
 public class UIUtils {
+    private static final System.Logger logger = Log.getLogger(UIUtils.class.getName());
+
     public void showError(String message, String contentText) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.initModality(Modality.APPLICATION_MODAL);
@@ -73,4 +79,15 @@ public class UIUtils {
         alert.showAndWait();
     }
 
+    public static void fileExplorer(String path) {
+        try {
+            if(SystemUtils.IS_OS_WINDOWS) {
+                Runtime.getRuntime().exec(new String[]{Constants.EXPLORER_COMMAND,path});
+            } else {
+                Runtime.getRuntime().exec(new String[]{Constants.XDGOPEN_COMMAND,path});
+            }
+        } catch (IOException e) {
+            logger.log(System.Logger.Level.WARNING, "unable to open file explorer: ", e);
+        }
+    }
 }

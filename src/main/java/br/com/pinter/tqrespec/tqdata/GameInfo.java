@@ -681,11 +681,24 @@ public class GameInfo {
         }
     }
 
+    private void prepareDevGameSaveData() {
+        File gamedataSavePath = Paths.get(Constants.DEV_GAMEDATA, Constants.SAVEDATA).toFile();
+        if(!gamedataSavePath.exists()) {
+            try {
+                //noinspection ResultOfMethodCallIgnored
+                gamedataSavePath.mkdir();
+            } catch (SecurityException e) {
+                logger.log(System.Logger.Level.INFO, "unable to create SaveData directory at "+gamedataSavePath.getAbsolutePath());
+            }
+        }
+    }
+
     public String getSavePath() {
         String userHome = System.getProperty("user.home");
         logger.log(System.Logger.Level.DEBUG, "SavePath: user.home is ''{0}''", userHome);
 
         if (!SystemUtils.IS_OS_WINDOWS) {
+            prepareDevGameSaveData();
             return Constants.DEV_GAMEDATA;
         }
 
@@ -721,7 +734,10 @@ public class GameInfo {
     }
 
     public String getSaveDataMainPath() {
-        if (!SystemUtils.IS_OS_WINDOWS) return Paths.get(Constants.DEV_GAMEDATA, Constants.SAVEDATA, "Main").toString();
+        if (!SystemUtils.IS_OS_WINDOWS) {
+            prepareDevGameSaveData();
+            return Paths.get(Constants.DEV_GAMEDATA, Constants.SAVEDATA, "Main").toString();
+        }
         String savePath = getSavePath();
         if (StringUtils.isNotEmpty(savePath)) {
             return Paths.get(savePath, Constants.SAVEDATA, "Main").toString();
@@ -730,7 +746,10 @@ public class GameInfo {
     }
 
     public String getSaveDataUserPath() {
-        if (!SystemUtils.IS_OS_WINDOWS) return Paths.get(Constants.DEV_GAMEDATA, Constants.SAVEDATA, "User").toString();
+        if (!SystemUtils.IS_OS_WINDOWS) {
+            prepareDevGameSaveData();
+            return Paths.get(Constants.DEV_GAMEDATA, Constants.SAVEDATA, "User").toString();
+        }
         String savePath = getSavePath();
         if (StringUtils.isNotEmpty(savePath)) {
             return Paths.get(savePath, Constants.SAVEDATA, "User").toString();
@@ -739,7 +758,10 @@ public class GameInfo {
     }
 
     public String getSaveSetingsPath() {
-        if (!SystemUtils.IS_OS_WINDOWS) return Paths.get(Constants.DEV_GAMEDATA, Constants.SETTINGS).toString();
+        if (!SystemUtils.IS_OS_WINDOWS) {
+            return Paths.get(Constants.DEV_GAMEDATA, Constants.SETTINGS).toString();
+        }
+
         String savePath = getSavePath();
         if (StringUtils.isNotEmpty(savePath)) {
             return Paths.get(savePath, Constants.SETTINGS).toString();
