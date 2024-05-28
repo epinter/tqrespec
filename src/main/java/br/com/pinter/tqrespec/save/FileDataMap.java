@@ -317,6 +317,16 @@ public class FileDataMap implements DeepCloneable {
     }
 
     private void convertMobileToWindows() {
+        BlockInfo numberOfSacksBlock = this.blockInfo.get(variableLocation.get("numberOfSacks").get(0));
+        VariableInfo numberOfSacks = numberOfSacksBlock.getVariables().get("numberOfSacks").get(0);
+
+        for (VariableInfo v : getBlockInfo().get(numberOfSacksBlock.getStart()).getVariables().values().stream().toList()) {
+            if ((Integer) numberOfSacks.getValue() > 1 &&
+                    (v.getName().equals("currentlyFocusedSackNumber") || v.getName().equals("currentlySelectedSackNumber"))) {
+                setInt(v, 1);
+            }
+        }
+
         for (VariableInfo v :
                 getBlockInfo().values().stream().flatMap(b -> b.getVariables().values().stream()).collect(Collectors.toList())) {
             if (v.getName().equals("mySaveId") || v.getName().equals("currentDifficulty")) {
