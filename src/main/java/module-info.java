@@ -36,7 +36,7 @@ module br.com.pinter.tqrespec {
     requires com.google.errorprone.annotations;
     requires failureaccess;
     requires j2objc.annotations;
-    requires javax.inject;
+    requires jakarta.inject;
     requires jsr305;
     requires listenablefuture;
     requires org.apache.commons.text;

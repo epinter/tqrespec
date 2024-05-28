@@ -44,7 +44,9 @@ project.ext {
     javahome = System.getProperty("java.home")
     moduleInfoPresent = false
     osArch = System.getProperty("os.arch").toLowerCase()
-    javafxSdkDir = file(String.format("%s/sdk/javafx-sdk-%s-%s-%s", projectDir, compileJava.javaCompiler.get().metadata.languageVersion, OS.toFamilyName().toLowerCase(), osArch))
+    javafxSdkDir = file(String.format("%s/sdk/javafx-sdk-%s-%s-%s",
+                                    projectDir, compileJava.javaCompiler.get().metadata.languageVersion,
+                                    OS.toFamilyName().toLowerCase(), osArch))
     javafxSdkBinDir = file("${javafxSdkDir}/bin")
     javafxSdkLibDir = file("${javafxSdkDir}/lib")
     appArchiveOs = ""
@@ -54,8 +56,13 @@ project.ext {
     // directory for patched jars
     patchjarDir = layout.buildDirectory.dir('patchedjar').get().asFile.getPath()
     // modules dependencies to be passed to jdeps
-    patchJarModuleDeps = ["com.google.guice" : ["com.google.common", "aopalliance"],
-                              "com.google.common": ["com.google.errorprone.annotations", "javax.inject", "j2objc.annotations", "jsr305", "failureaccess"]]
+    patchJarModuleDeps = [
+        "com.google.guice": ["com.google.common", "aopalliance", "jakarta.inject"],
+        "com.google.common": ["com.google.errorprone.annotations", "j2objc.annotations", "jsr305", "failureaccess"],
+    ]
+    //ignore dependencies when generating module-info for the given package
+    //use only when all required deps are satisfied
+    patchJarIgnoreMissingDeps = ["com.google.guice"]
 }
 
 if (file('src/main/java/module-info.java').exists()) {
@@ -86,7 +93,7 @@ repositories {
 dependencies {
     implementation fileTree(dir: 'libs', include: '*.jar')
     implementation fileTree(dir: javafxSdkLibDir, include: '*.jar')
-    implementation 'com.google.inject:guice:5.1.0'
+    implementation 'com.google.inject:guice:7.0.0'
     implementation 'org.apache.commons:commons-lang3:3.14.0'
     implementation 'org.apache.commons:commons-text:1.12.0'
     implementation 'net.java.dev.jna:jna-platform-jpms:5.14.0'
@@ -99,7 +106,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.11.0-M2'
     testImplementation 'org.mockito:mockito-core:5.11.0'
     testImplementation 'org.mockito:mockito-junit-jupiter:5.12.0'
-    testImplementation 'com.google.inject:guice:5.1.0'
+    testImplementation 'com.google.inject:guice:7.0.0'
 }
 
 test {
@@ -203,10 +210,13 @@ tasks.register('copyJarsToModuleDeps', Copy) {
 tasks.register('patchModulesJar', PatchJarModuleTask) {
     group = 'tqrespec'
     dependsOn 'copyJarsToModuleDeps'
+    dependsOn 'copyToLib'
     delete = true
+    ignoreMissingDeps = patchJarIgnoreMissingDeps
     tempPatchDir = layout.buildDirectory.dir('temppatch').get().asFile.getPath()
     tempJarDir = patchjarDir
     moduleDeps = patchJarModuleDeps
+    modulesDepsDir = layout.buildDirectory.dir("jardist").get().asFile
 }
 
 tasks.register('createDirs') {
@@ -269,7 +279,6 @@ tasks.register('copyAppimageFiles') {
 tasks.register('jlink', Exec) {
     group = 'tqrespec'
     dependsOn createDirs
-    dependsOn 'copyToLib'
     dependsOn 'copyAppimageFiles'
     workingDir layout.buildDirectory.get().asFile
 
