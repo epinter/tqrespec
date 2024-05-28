@@ -222,4 +222,3 @@ Contributions are always welcome. They will be accepted or rejected depending on
 
 ### ***THQ and [Iron Lore](https://en.wikipedia.org/wiki/Iron_Lore_Entertainment) for creation of this game that we love since 2006, and [THQ Nordic](https://www.thqnordic.com) for all the content and improvements***
 
-### ***[Jetbrains](https://www.jetbrains.com/idea) for their amazing IDE!***

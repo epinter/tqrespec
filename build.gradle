@@ -2,21 +2,22 @@
  * Copyright (C) 2021 Emerson Pinter - All Rights Reserved
  */
 
-group 'br.com.pinter.tqrespec'
-apply plugin: 'application'
-apply plugin: 'java'
-apply plugin: 'org.sonarqube'
-
 buildscript {
     repositories {
         maven {
             url "https://plugins.gradle.org/m2/"
         }
     }
-    dependencies {
-        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.1.1"
-    }
 }
+
+plugins {
+    id "application"
+    id "java"
+    id "org.sonarqube" version "5.0.0.4638"
+}
+
+group 'br.com.pinter.tqrespec'
+
 apply from: "gradle/patchModulesJar.gradle"
 
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
@@ -28,53 +29,55 @@ sourceSets {
 OperatingSystem OS = DefaultNativePlatform.currentOperatingSystem
 ext.distAppName = 'TQRespec'
 version = '0.12.2'
-sourceCompatibility = JavaVersion.VERSION_17
-ext.moduleName = 'br.com.pinter.tqrespec'
-ext.mainPackageName = 'br.com.pinter.tqrespec'
-ext.javahome = System.getProperty("java.home")
-ext.moduleInfoPresent = false
-ext.osArch = System.getProperty("os.arch").toLowerCase()
-ext.javafxSdkDir = file(String.format("%s/sdk/javafx-sdk-%s-%s-%s", projectDir, sourceCompatibility, OS.toFamilyName().toLowerCase(), osArch))
-ext.javafxSdkBinDir = file("${javafxSdkDir}/bin")
-ext.javafxSdkLibDir = file("${javafxSdkDir}/lib")
-// jpms ready modules
-ext.modulesJars = ["jna-platform-jpms-", "jna-jpms-", "jackson-annotations-", "jackson-core-", "jackson-databind-"]
-// toggle patch-jar feature, enable jpms on non-modular jars
-ext.patchJars = true
-// directory for patched jars
-ext.patchjarDir = new File(buildDir, '/patchedjar')
-// modules dependencies to be passed to jdeps
-ext.patchJarModuleDeps = ["org.apache.commons.lang3": ["java.desktop"],
-              "org.apache.commons.text" : ["org.apache.commons.lang3"],
-              "com.google.guice"        : ["com.google.common", "aopalliance"],
-              "com.google.common"       : ["com.google.errorprone.annotations", "javax.inject", "j2objc.annotations",
-                                           "jsr305", "failureaccess"]]
+
+application {
+    mainClass = "br.com.pinter.tqrespec.Main"
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+}
+
+project.ext {
+    moduleName = 'br.com.pinter.tqrespec'
+    mainPackageName = 'br.com.pinter.tqrespec'
+    javahome = System.getProperty("java.home")
+    moduleInfoPresent = false
+    osArch = System.getProperty("os.arch").toLowerCase()
+    javafxSdkDir = file(String.format("%s/sdk/javafx-sdk-%s-%s-%s", projectDir, compileJava.javaCompiler.get().metadata.languageVersion, OS.toFamilyName().toLowerCase(), osArch))
+    javafxSdkBinDir = file("${javafxSdkDir}/bin")
+    javafxSdkLibDir = file("${javafxSdkDir}/lib")
+    appArchiveOs = ""
+    appArchiveArch = ""
+    // toggle patch-jar feature, enable jpms on non-modular jars
+    patchJars = true
+    // directory for patched jars
+    patchjarDir = layout.buildDirectory.dir('patchedjar').get().asFile.getPath()
+    // modules dependencies to be passed to jdeps
+    patchJarModuleDeps = ["com.google.guice" : ["com.google.common", "aopalliance"],
+                              "com.google.common": ["com.google.errorprone.annotations", "javax.inject", "j2objc.annotations", "jsr305", "failureaccess"]]
+}
 
 if (file('src/main/java/module-info.java').exists()) {
-    ext.moduleInfoPresent = true
+    ext['moduleInfoPresent'] = true
 }
-mainClassName = "br.com.pinter.tqrespec.Main"
 
 if (!file(javafxSdkDir).directory) {
-    throw new GradleException(String.format("ERROR: openjfx-sdk for java %s (%s) not found in %s", sourceCompatibility, System.getProperty("os.arch"), javafxSdkDir))
+    throw new GradleException(String.format("ERROR: openjfx-sdk for java '%s' (%s) not found in %s", compileJava.javaCompiler.get().metadata.languageVersion, System.getProperty("os.arch"), javafxSdkDir))
 }
 
 if (project.hasProperty('buildVersion')) {
     project.version = project.properties.get("buildVersion")
 }
 
-ext.appArchiveOs = ""
-ext.appArchiveArch = ""
-
 if(!OS.isWindows()) {
-    ext.appArchiveOs = String.format("-%s",OS.toFamilyName().toLowerCase())
+    ext['appArchiveOs'] = String.format("-%s",OS.toFamilyName().toLowerCase())
 }
-
 if (osArch != "amd64") {
-    ext.appArchiveArch = String.format("-%s",ext.osArch)
+    ext['appArchiveArch'] = String.format("-%s",ext.osArch)
 }
 
-ext.appArchiveName = "${distAppName}-${project.version}${ext.appArchiveOs}${ext.appArchiveArch}.zip"
+ext['appArchiveName'] = "${distAppName}-${project.version}${ext.appArchiveOs}${ext.appArchiveArch}.zip"
 
 repositories {
     mavenCentral()
@@ -84,25 +87,23 @@ dependencies {
     implementation fileTree(dir: 'libs', include: '*.jar')
     implementation fileTree(dir: javafxSdkLibDir, include: '*.jar')
     implementation 'com.google.inject:guice:5.1.0'
-    implementation 'org.apache.commons:commons-lang3:3.12.0'
-    implementation 'org.apache.commons:commons-text:1.9'
-    implementation 'net.java.dev.jna:jna-platform-jpms:5.11.0'
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.13.2'
-    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.13.2'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.2.2'
-
+    implementation 'org.apache.commons:commons-lang3:3.14.0'
+    implementation 'org.apache.commons:commons-text:1.12.0'
+    implementation 'net.java.dev.jna:jna-platform-jpms:5.14.0'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.17.1'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.17.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.1'
 
     implementation project(':tqdatabase')
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
-    testImplementation 'org.mockito:mockito-core:4.4.0'
-    testImplementation 'org.mockito:mockito-junit-jupiter:4.4.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.11.0-M2'
+    testImplementation 'org.mockito:mockito-core:5.11.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.12.0'
     testImplementation 'com.google.inject:guice:5.1.0'
 }
 
 test {
     useJUnitPlatform()
-
     jvmArgs '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
             '--add-opens', 'java.base/java.util.concurrent=ALL-UNNAMED',
             '--add-opens', 'java.base/java.io=ALL-UNNAMED',
@@ -125,13 +126,14 @@ jar {
         attributes('Class-Path': configurations.runtimeClasspath.collect { it.getName() }.join(' '),
                 'Implementation-Title': distAppName,
                 'Implementation-Version': project.version,
+                'Implementation-Vendor': 'Emerson Pinter',
                 'Automatic-Module-Name': moduleName,
-                'Main-Class': mainClassName)
+                'Main-Class': application.mainClass.get())
     }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
-task copyMetaInf(type: Copy) {
+tasks.register('copyMetaInf', Copy) {
     group = 'tqrespec'
     from fileTree(new File(sourceSets.main.output.resourcesDir, '/META-INF'))
     into sourceSets.main.java.classesDirectory.get().dir('/META-INF')
@@ -158,7 +160,7 @@ if (moduleInfoPresent) {
                     '--module-path', classpath.asPath,
                     '--class-path', classpath.asPath,
                     '--module', moduleName,
-            ]
+            ] as List<String>
             classpath = files()
         }
     }
@@ -175,21 +177,21 @@ if (moduleInfoPresent) {
     }
 }
 
-task copyToLib(type: Copy) {
+tasks.register('copyToLib', Copy) {
     group = 'tqrespec'
     doFirst {
-        mkdir "$buildDir/jardist"
+        mkdir layout.buildDirectory.dir("jardist")
     }
-    from(configurations.runtimeClasspath.findAll { !it.getName().toLowerCase().matches("javafx.*\\.jar") }).collect { it.getPath() }
 
+    from(configurations.runtimeClasspath.findAll { !it.getName().toLowerCase().matches("javafx.*\\.jar") }).collect { it.getPath() }
     from jar
-    into "$buildDir/jardist"
+    into layout.buildDirectory.dir("jardist")
 }
 
 copyToLib.dependsOn(jar)
 classes.dependsOn('copyMetaInf')
 
-task copyJarsToModuleDeps(type: Copy) {
+tasks.register('copyJarsToModuleDeps', Copy) {
     group = 'tqrespec'
     if (patchJars) {
         from project(':tqdatabase').configurations.compileClasspath
@@ -198,23 +200,24 @@ task copyJarsToModuleDeps(type: Copy) {
     }
 }
 
-task patchModulesJar(type: PatchJarModuleTask) {
+tasks.register('patchModulesJar', PatchJarModuleTask) {
     group = 'tqrespec'
     dependsOn 'copyJarsToModuleDeps'
     delete = true
-    tempPatchDir = new File(buildDir, '/temppatch')
+    tempPatchDir = layout.buildDirectory.dir('temppatch').get().asFile.getPath()
     tempJarDir = patchjarDir
     moduleDeps = patchJarModuleDeps
 }
 
-task createDirs {
+tasks.register('createDirs') {
     doLast {
-        mkdir "${buildDir}/appimage-files"
-        mkdir "${buildDir}/appimage-modules"
+        mkdir layout.buildDirectory.dir("appimage-files")
+        mkdir layout.buildDirectory.dir("appimage-modules")
     }
 }
 
-task copyAppimageModules(type: Copy) {
+tasks.register('copyAppimageModules', Copy) {
+    duplicatesStrategy = DuplicatesStrategy.WARN
     group = 'tqrespec'
     dependsOn jar
     dependsOn 'tqdatabase:jar'
@@ -222,22 +225,20 @@ task copyAppimageModules(type: Copy) {
         dependsOn patchModulesJar
     }
 
-    if (moduleInfoPresent) {
-        if (patchJars) {
-            from patchjarDir
-        }
-        from jar
+    from tasks.jar.outputs.files.collect { it.getPath() }
+    from configurations.runtimeClasspath.filter {
+        !file(patchjarDir).listFiles().collect {p -> p.getName().toLowerCase()}.contains(it.getName().toLowerCase())
     }
-
-    from configurations.runtimeClasspath.findAll {
-        modulesJars.findAll { f -> it.getName().toLowerCase().startsWith(f.toString().toLowerCase()) }
-    }.collect()
     from project(':tqdatabase').tasks.jar.outputs.files.collect { it.getPath() }
 
-    into "$buildDir/appimage-modules"
+    if (moduleInfoPresent && patchJars) {
+        from patchjarDir
+    }
+
+    into layout.buildDirectory.dir("appimage-modules")
 }
 
-task copyAppimageFiles {
+tasks.register('copyAppimageFiles') {
     group = 'tqrespec'
     dependsOn jar
     dependsOn 'tqdatabase:jar'
@@ -246,12 +247,7 @@ task copyAppimageFiles {
     def excludeJars = new ArrayList<>()
 
     doFirst {
-        excludeJars.addAll(configurations.runtimeClasspath.findAll {
-            it.getName().toLowerCase().matches("javafx.*.jar")
-                    || it.getName().toLowerCase().matches("tqdatabase.*.jar")
-                    || modulesJars.findAll { m -> it.getName().toLowerCase().startsWith(m.toLowerCase()) }
-                    || patchjarDir.listFiles().findAll { p -> it.getName().equalsIgnoreCase(p.getName()) }
-        }.collect { x -> x.getName() })
+        excludeJars.addAll(configurations.runtimeClasspath.collect { x -> x.getName() })
     }
 
     doLast {
@@ -265,17 +261,17 @@ task copyAppimageFiles {
                 !excludeJars.contains(it.getName().toLowerCase())
             }.collect()
 
-            into("$buildDir/appimage-files")
+            into layout.buildDirectory.dir("appimage-files")
         }
     }
 }
 
-task jlink(type: Exec) {
+tasks.register('jlink', Exec) {
     group = 'tqrespec'
     dependsOn createDirs
     dependsOn 'copyToLib'
     dependsOn 'copyAppimageFiles'
-    workingDir buildDir
+    workingDir layout.buildDirectory.get().asFile
 
     doFirst {
         def addModulesJlink
@@ -292,23 +288,23 @@ task jlink(type: Exec) {
                     "com.fasterxml.jackson.core",
                     "com.fasterxml.jackson.databind",
                     "com.fasterxml.jackson.annotation",
-                    String.join(",", patchModulesJar.patchedModules))
+                    String.join(",", patchModulesJar.getPatchedModules()))
 
             commandLine binjlink,
                     '-J-Djlink.debug=true',
-                    '--module-path', "${javafxSdkLibDir}" + File.pathSeparator + "${buildDir}/appimage-modules",
+                    '--module-path', "${javafxSdkLibDir}" + File.pathSeparator + layout.buildDirectory.dir("appimage-modules").get().asFile,
                     '--add-modules', addModulesJlink,
-                    '--output', "${buildDir}/jre-image",
-                    '--compress', '2',
+                    '--output', layout.buildDirectory.dir("jre-image").get().asFile,
+                    '--compress', 'zip-6',
                     '--no-header-files',
                     '--no-man-pages',
                     '--strip-native-commands'
         } else {
             commandLine binjlink,
-                    '--module-path', "${javafxSdkLibDir}" + File.pathSeparator + "${buildDir}/appimage-modules",
+                    '--module-path', "${javafxSdkLibDir}" + File.pathSeparator + layout.buildDirectory.dir("appimage-modules").get().asFile,
                     '--add-modules', ("javafx.base,javafx.fxml,javafx.graphics,javafx.controls,java.prefs,java.base,jdk.zipfs,jdk.unsupported,java.logging,java.net.http,jdk.crypto.cryptoki"),
-                    '--output', "${buildDir}/jre-image",
-                    '--compress', '2',
+                    '--output', layout.buildDirectory.dir("jre-image").get().asFile,
+                    '--compress', 'zip-6',
                     '--no-header-files',
                     '--no-man-pages',
                     '--strip-native-commands'
@@ -316,35 +312,35 @@ task jlink(type: Exec) {
     }
 }
 
-task archiveAppimage(type: Zip) {
+tasks.register('archiveAppimage', Zip) {
     group = 'tqrespec'
     dependsOn clean
     dependsOn 'appimage'
     doLast {
         println("Creating archive '${appArchiveName}'")
     }
-    from "${buildDir}/app-image"
+    from layout.buildDirectory.dir("app-image").get().asFile
     archiveFileName = appArchiveName
-    destinationDirectory = file("$buildDir")
+    destinationDirectory = layout.buildDirectory.get().asFile
 }
 
-task appimage(type: Exec) {
+tasks.register('appimage', Exec) {
     group = 'tqrespec'
     dependsOn clean
     dependsOn jlink
-    workingDir buildDir
+    workingDir layout.buildDirectory
     if (moduleInfoPresent) {
         commandLine binjpackage,
                 '--type', 'app-image',
                 '--verbose',
-                '--runtime-image', "${buildDir}/jre-image",
-                '--module', "${moduleName}/${mainClassName}",
-                '--dest', "${buildDir}/app-image",
+                '--runtime-image', layout.buildDirectory.dir("jre-image").get().asFile,
+                '--module', "${moduleName}/${application.mainClass.get()}",
+                '--dest', layout.buildDirectory.dir("app-image").get().asFile,
                 '--name', distAppName,
                 '--icon', "${projectDir}/src/main/resources/icon/icon64.ico",
                 '--app-version', project.version,
                 '--vendor', 'Emerson Pinter',
-                '--input', "${buildDir}/appimage-files",
+                '--input', layout.buildDirectory.dir("appimage-files").get().asFile,
                 '--description', 'The respec tool for Titan Quest game',
                 '--java-options',
                 '-XX:+UseSerialGC ' +
@@ -354,16 +350,16 @@ task appimage(type: Exec) {
         commandLine binjpackage,
                 '--type', 'app-image',
                 '--verbose',
-                '--runtime-image', "${buildDir}/jre-image",
-                '--dest', "${buildDir}/app-image",
+                '--runtime-image', layout.buildDirectory.dir("jre-image").get().asFile,
+                '--dest', layout.buildDirectory.dir("app-image").get().asFile,
                 '--name', distAppName,
                 '--icon', "${projectDir}/src/main/resources/icon/icon64.ico",
                 '--app-version', project.version,
                 '--vendor', 'Emerson Pinter',
-                '--input', "${buildDir}/appimage-files",
+                '--input', layout.buildDirectory.dir("appimage-files").get().asFile,
                 '--description', 'The respec tool for Titan Quest game',
                 '--main-jar', jar.outputs.files.collect { it.getName() }.get(0),
-                '--main-class', mainClassName,
+                '--main-class', ${application.mainClass.get()},
                 '--java-options',
                 '-XX:+UseSerialGC ' +
                         '-Dguice_bytecode_gen_option=DISABLED ' +
@@ -384,13 +380,15 @@ task appimage(type: Exec) {
                             it.getName().equalsIgnoreCase("prism_d3d.dll") ||
                             it.getName().equalsIgnoreCase("prism_sw.dll")
                 }.collect()
-                into "$buildDir/app-image/${distAppName}/runtime/bin"
+
+                into layout.buildDirectory.dir("app-image/${distAppName}/runtime/bin")
             } else {
                 from javafxSdkLibDir.listFiles().findAll { it.getName().toLowerCase().endsWith('.so') }.collect()
-                into "$buildDir/app-image/${distAppName}/lib/runtime/lib"
+                into layout.buildDirectory.dir("app-image/${distAppName}/lib/runtime/lib")
             }
         }
-        new File(buildDir, "app-image/${distAppName}").listFiles().findAll {
+
+        layout.buildDirectory.dir("app-image/${distAppName}").get().asFile.listFiles().findAll {
             it.getName().equalsIgnoreCase("jfxwebkit.dll") ||
                     it.getName().equalsIgnoreCase("ucrtbase.dll") ||
                     it.getName().equalsIgnoreCase("gstreamer-lite.dll") ||
@@ -402,17 +400,17 @@ task appimage(type: Exec) {
         })
         copy {
             from "${projectDir}/README.md"
-            into new File(buildDir, "app-image/${distAppName}")
+            into layout.buildDirectory.dir("app-image/${distAppName}")
         }
         copy {
             if (OS.isLinux()) {
                 from "${projectDir}/src/dist/TQRespec.sh"
-                into new File(buildDir, "app-image/${distAppName}")
+                into layout.buildDirectory.dir("app-image/${distAppName}")
             }
         }
-        new File(buildDir, "app-image/${distAppName}/savedata").mkdir()
-        new File(buildDir, "app-image/${distAppName}/gamedata").mkdir()
-        new File(buildDir, "jre-image").deleteDir()
+        layout.buildDirectory.dir("app-image/${distAppName}/savedata").get().asFile.mkdir()
+        layout.buildDirectory.dir("app-image/${distAppName}/gamedata").get().asFile.mkdir()
+        layout.buildDirectory.dir("jre-image").get().asFile.deleteDir()
     }
 }
 
