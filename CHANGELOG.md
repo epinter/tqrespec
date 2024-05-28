@@ -1,4 +1,8 @@
 # Changelog
+## [0.12.2] - 2024-05-27
+### Fixed
+- Fix missing bags when converting from mobile.
+
 ## [0.12.1] - 2022-12-12
 ### Changed
 - Updated Russian and Ukranian translations (thanks Evgeniy Chefranov)
