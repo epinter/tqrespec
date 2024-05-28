@@ -4,6 +4,9 @@ ext.PatchJarModuleTask = PatchJarModuleTask
  * Copyright (C) 2021 Emerson Pinter - All Rights Reserved
  */
 
+
+import java.nio.file.Files
+import java.nio.file.Path;
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -27,9 +30,20 @@ class PatchJarModuleTask extends DefaultTask {
     @Internal
     Map<String, String> packageMap = new HashMap<>()
 
+    @Internal
+    Map<String, String> packageDepInfo = new HashMap<>()
+
+    @Input
+    @Optional
+    List<String> ignoreMissingDeps
+
     @Input
     @Optional
     Map<String, List<String>> moduleDepsPath
+
+    @Input
+    @Optional
+    String modulesDepsDir;
 
     @Internal
     private List<String> patchedModules = new ArrayList<>()
@@ -59,8 +73,8 @@ class PatchJarModuleTask extends DefaultTask {
                 OperatingSystemFamily.WINDOWS ? ".exe" : "")
     }
 
-    String readPackageName(String filename) {
-        if (debug) System.out.println("Verifying jar " + filename)
+    String readPackageName(String filename, boolean automatic) {
+        if (debug) System.out.println("[patchModulesJar] Verifying jar " + filename)
 
         ProcessBuilder processBuilder = new ProcessBuilder()
         processBuilder.command(JAR, "-d", "-f", filename, "--release", "9")
@@ -73,7 +87,12 @@ class PatchJarModuleTask extends DefaultTask {
         String line
         String packageName = null
         while ((line = stdout.readLine()) != null) {
-            Pattern p = Pattern.compile("(^[^@]+)@.* automatic\$")
+            Pattern p = null;
+            if(automatic) {
+                p = Pattern.compile("(^[^@]+)@.* automatic\$")
+            } else {
+                p = Pattern.compile("(^[^@]+)@.*module-info.class\$")
+            }
             Matcher m = p.matcher(line)
             if (m.matches() && packageName == null) {
                 s += line
@@ -102,9 +121,21 @@ class PatchJarModuleTask extends DefaultTask {
             fileTempJarDir.mkdir()
         }
 
+        if(modulesDepsDir != null && Files.exists(Path.of(modulesDepsDir))) {
+            new File(modulesDepsDir).eachFile {
+                if (it.getName().endsWith(".jar")) {
+                    String packageName = readPackageName(it.getPath(), false)
+                    if (packageName != null) {
+                        System.out.println(String.format("[patchModulesJar] Package found '%s' on file '%s'", packageName, it.getName()))
+                        packageDepInfo.put(it.getPath(), packageName)
+                    }
+                }
+            }
+        }
+
         new File(tempJarDir).eachFile {
             if (it.getName().endsWith(".jar")) {
-                String packageName = readPackageName(it.getPath())
+                String packageName = readPackageName(it.getPath(), true)
                 if (packageName != null) {
                     System.out.println(String.format("[patchModulesJar] Package found '%s' on file '%s', generating module-info", packageName, it.getName()))
                     packageMap.put(it.getPath(), packageName)
@@ -125,6 +156,14 @@ class PatchJarModuleTask extends DefaultTask {
 
     String getJarFromPackage(String packageName) {
         def first = packageMap.entrySet().stream().filter(e -> { e.value == packageName }).findFirst()
+        if (first.isPresent()) {
+            return first.get().key
+        }
+        return null
+    }
+
+    String getJarFromPackageModule(String packageName) {
+        def first = packageDepInfo.entrySet().stream().filter(e -> { e.value == packageName }).findFirst()
         if (first.isPresent()) {
             return first.get().key
         }
@@ -165,6 +204,7 @@ class PatchJarModuleTask extends DefaultTask {
                     dep == e.value
                 }).forEach((e2) -> {
                     if (debug) System.out.printf("[patchModulesJar] processing dependency: %s / %s=%s\n", dep, e2.key, e2.value)
+                    System.out.printf("[patchModulesJar] \tprocessing dependency: %s\n", dep)
                     processFile(new File(e2.key))
                 })
             })
@@ -203,12 +243,19 @@ class PatchJarModuleTask extends DefaultTask {
                 if (jar != null) {
                     modulePath.add(jar)
                 }
+                jar = getJarFromPackageModule(dep);
+                if (jar != null) {
+                    modulePath.add(jar)
+                }
             })
         }
 
-
         List<String> command = new ArrayList<>()
         command.add(JDEPS)
+        if(ignoreMissingDeps != null && ignoreMissingDeps.contains(packageName)) {
+            command.add("--ignore-missing-deps")
+        }
+
         if (!modulePath.isEmpty()) {
             command.add("--module-path")
             command.add(String.join(File.pathSeparator, modulePath))
@@ -220,7 +267,7 @@ class PatchJarModuleTask extends DefaultTask {
         command.addAll(List.of("--generate-module-info", tempPatchDir, filename))
 
         processBuilder.command(command)
-        if (debug) System.out.println("Running: " + processBuilder.command())
+        if (debug) System.out.println("[patchModulesJar] Running: " + processBuilder.command())
 
         Process jdeps = processBuilder.start()
         printStream(jdeps.getInputStream())
@@ -228,20 +275,20 @@ class PatchJarModuleTask extends DefaultTask {
         jdeps.waitFor()
 
         if (jdeps.exitValue() != 0) {
-            if (debug) System.out.println("jdeps exited with error for " + packageName)
+            System.out.printf("[patchModulesJar] jdeps exited with error %s for %s\n", jdeps.exitValue(), packageName)
             if (delete) {
                 new File(filename).delete()
             }
             return false
         }
-        if (debug) System.out.println("jdeps finished for " + packageName)
+        if (debug) System.out.println("[patchModulesJar] jdeps finished for " + packageName)
 
         processBuilder = new ProcessBuilder()
         processBuilder.directory(fileTempPatchDir)
-        processBuilder.command(JAVAC, "--module-path", tempJarDir, "--patch-module", String.format("%s=%s", packageName, filename),
+        processBuilder.command(JAVAC, "--module-path", tempJarDir, "--module-path", modulesDepsDir, "--patch-module", String.format("%s=%s", packageName, filename),
                 String.format("%s/module-info.java", packageName), "-nowarn", "-d", ".")
 
-        if (debug) System.out.println("Running: " + processBuilder.command())
+        if (debug) System.out.println("[patchModulesJar] \tRunning: " + processBuilder.command())
         Process javac = processBuilder.start()
         printStream(javac.getInputStream())
         printStream(javac.getErrorStream())
@@ -250,12 +297,12 @@ class PatchJarModuleTask extends DefaultTask {
             new File(filename).delete()
             return false
         }
-        if (debug) System.out.println("javac finished")
+        if (debug) System.out.println("[patchModulesJar] javac finished")
 
         processBuilder = new ProcessBuilder()
         processBuilder.directory(fileTempPatchDir)
         processBuilder.command(JAR, "--update", "--file", filename, "module-info.class")
-        if (debug) System.out.println("Running: " + processBuilder.command())
+        if (debug) System.out.println("[patchModulesJar] Running: " + processBuilder.command())
         Process jarUpdate = processBuilder.start()
         printStream(jarUpdate.getInputStream())
         printStream(jarUpdate.getErrorStream())
@@ -267,7 +314,7 @@ class PatchJarModuleTask extends DefaultTask {
             return false
         }
         fileTempPatchDir.deleteDir()
-        if (debug) System.out.println("jar update finished")
+        if (debug) System.out.println("[patchModulesJar] jar update finished")
         if (new File(filename).exists()) {
             System.out.printf("[patchModulesJar] \tJAR file '%s' (%s) patched\n", filename, packageName)
             patchedModules.add(packageName)
