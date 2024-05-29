@@ -366,32 +366,37 @@ tasks.register('appimage', Exec) {
             if (OS.isWindows()) {
                 from javafxSdkBinDir.listFiles().findAll {
                     it.getName().equalsIgnoreCase("decora_sse.dll") ||
-                            it.getName().equalsIgnoreCase("fxplugins.dll") ||
-                            it.getName().equalsIgnoreCase("glass.dll") ||
-                            it.getName().equalsIgnoreCase("javafx_font.dll") ||
-                            it.getName().equalsIgnoreCase("javafx_iio.dll") ||
-                            it.getName().equalsIgnoreCase("prism_common.dll") ||
-                            it.getName().equalsIgnoreCase("prism_d3d.dll") ||
-                            it.getName().equalsIgnoreCase("prism_sw.dll")
+                    it.getName().equalsIgnoreCase("fxplugins.dll") ||
+                    it.getName().equalsIgnoreCase("glass.dll") ||
+                    it.getName().equalsIgnoreCase("javafx_font.dll") ||
+                    it.getName().equalsIgnoreCase("javafx_iio.dll") ||
+                    it.getName().equalsIgnoreCase("glib-lite.dll") ||
+                    it.getName().equalsIgnoreCase("prism_common.dll") ||
+                    it.getName().equalsIgnoreCase("prism_d3d.dll") ||
+                    it.getName().equalsIgnoreCase("prism_sw.dll")
                 }.collect()
 
-                into layout.buildDirectory.dir("app-image/${distAppName}/runtime/bin")
+                into layout.buildDirectory.dir("app-image/${distAppName}")
             } else {
                 from javafxSdkLibDir.listFiles().findAll { it.getName().toLowerCase().endsWith('.so') }.collect()
                 into layout.buildDirectory.dir("app-image/${distAppName}/lib/runtime/lib")
             }
         }
 
-        layout.buildDirectory.dir("app-image/${distAppName}").get().asFile.listFiles().findAll {
-            it.getName().equalsIgnoreCase("jfxwebkit.dll") ||
+        copy {
+            if (OS.isWindows()) {
+                from javafxSdkBinDir.listFiles().findAll {
                     it.getName().equalsIgnoreCase("ucrtbase.dll") ||
-                    it.getName().equalsIgnoreCase("gstreamer-lite.dll") ||
-                    it.getName().equalsIgnoreCase("glib-lite.dll") ||
+                    it.getName().toLowerCase().startsWith("vcruntime") ||
+                    it.getName().toLowerCase().startsWith("msvcp") ||
                     it.getName().toLowerCase().startsWith("api-ms-win-core") ||
                     it.getName().toLowerCase().startsWith("api-ms-win-crt")
-        }.forEach({
-            f -> f.delete()
-        })
+                }.collect()
+
+                into layout.buildDirectory.dir("app-image/${distAppName}/runtime/bin")
+            }
+        }
+
         copy {
             from "${projectDir}/README.md"
             into layout.buildDirectory.dir("app-image/${distAppName}")
