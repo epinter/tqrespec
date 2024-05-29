@@ -91,8 +91,8 @@ repositories {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: '*.jar')
-    implementation fileTree(dir: javafxSdkLibDir, include: '*.jar')
+    implementation fileTree(dir: javafxSdkLibDir, include: [
+                    'javafx.base.jar', 'javafx.controls.jar', 'javafx.fxml.jar', 'javafx.graphics.jar'])
     implementation 'com.google.inject:guice:7.0.0'
     implementation 'org.apache.commons:commons-lang3:3.14.0'
     implementation 'org.apache.commons:commons-text:1.12.0'
@@ -283,26 +283,11 @@ tasks.register('jlink', Exec) {
     workingDir layout.buildDirectory.get().asFile
 
     doFirst {
-        def addModulesJlink
         if (moduleInfoPresent) {
-            //noinspection GroovyAccessibility
-            addModulesJlink = String.join(",",
-                    "br.com.pinter.tqdatabase",
-                    "${moduleName}",
-                    "com.sun.jna", "com.sun.jna.platform",
-                    "java.desktop",
-                    "javafx.base,javafx.fxml,javafx.graphics,javafx.controls",
-                    "java.prefs,java.base,jdk.zipfs,jdk.unsupported,java.logging",
-                    "java.net.http,jdk.crypto.cryptoki",
-                    "com.fasterxml.jackson.core",
-                    "com.fasterxml.jackson.databind",
-                    "com.fasterxml.jackson.annotation",
-                    String.join(",", patchModulesJar.getPatchedModules()))
-
             commandLine binjlink,
                     '-J-Djlink.debug=true',
-                    '--module-path', "${javafxSdkLibDir}" + File.pathSeparator + layout.buildDirectory.dir("appimage-modules").get().asFile,
-                    '--add-modules', addModulesJlink,
+                    '--module-path', layout.buildDirectory.dir("appimage-modules").get().asFile,
+                    '--add-modules', "ALL-MODULE-PATH",
                     '--output', layout.buildDirectory.dir("jre-image").get().asFile,
                     '--compress', 'zip-6',
                     '--no-header-files',
@@ -310,8 +295,8 @@ tasks.register('jlink', Exec) {
                     '--strip-native-commands'
         } else {
             commandLine binjlink,
-                    '--module-path', "${javafxSdkLibDir}" + File.pathSeparator + layout.buildDirectory.dir("appimage-modules").get().asFile,
-                    '--add-modules', ("javafx.base,javafx.fxml,javafx.graphics,javafx.controls,java.prefs,java.base,jdk.zipfs,jdk.unsupported,java.logging,java.net.http,jdk.crypto.cryptoki"),
+                    '--module-path', layout.buildDirectory.dir("appimage-modules").get().asFile,
+                    '--add-modules', "ALL-MODULE-PATH",
                     '--output', layout.buildDirectory.dir("jre-image").get().asFile,
                     '--compress', 'zip-6',
                     '--no-header-files',
