@@ -58,35 +58,35 @@ public class Constants {
      * Maps Game Options language to i18n locale
      */
     public static final Map<String, Locale> GAMELANGUAGE_LOCALE = ImmutableMap.<String, Locale>builder()
-            .put("English", new Locale("en"))
-            .put("Portuguese", new Locale("pt", "BR"))
-            .put("Chinese", new Locale("ch"))
-            .put("German", new Locale("de"))
-            .put("Spanish", new Locale("es"))
-            .put("French", new Locale("fr"))
-            .put("Italian", new Locale("it"))
-            .put("Japanese", new Locale("ja"))
-            .put("Korean", new Locale("ko"))
-            .put("Polish", new Locale("pl"))
-            .put("Russian", new Locale("ru"))
-            .put("Ukrainian", new Locale("uk")).build();
+            .put("English", Locale.of("en"))
+            .put("Portuguese", Locale.of("pt", "BR"))
+            .put("Chinese", Locale.of("ch"))
+            .put("German", Locale.of("de"))
+            .put("Spanish", Locale.of("es"))
+            .put("French", Locale.of("fr"))
+            .put("Italian", Locale.of("it"))
+            .put("Japanese", Locale.of("ja"))
+            .put("Korean", Locale.of("ko"))
+            .put("Polish", Locale.of("pl"))
+            .put("Russian", Locale.of("ru"))
+            .put("Ukrainian", Locale.of("uk")).build();
     /**
      * Maps Locale to Text files
      */
     public static final Map<Locale, String> LOCALE_TEXT = ImmutableMap.<Locale, String>builder()
-            .put(new Locale("en"), "EN")
-            .put(new Locale("pt", "BR"), "BR")
-            .put(new Locale("ch"), "CH")
-            .put(new Locale("cz"), "CZ")
-            .put(new Locale("de"), "DE")
-            .put(new Locale("es"), "ES")
-            .put(new Locale("fr"), "FR")
-            .put(new Locale("it"), "IT")
-            .put(new Locale("ja"), "JA")
-            .put(new Locale("ko"), "KO")
-            .put(new Locale("pl"), "PL")
-            .put(new Locale("ru"), "RU")
-            .put(new Locale("uk"), "UK").build();
+            .put(Locale.of("en"), "EN")
+            .put(Locale.of("pt", "BR"), "BR")
+            .put(Locale.of("ch"), "CH")
+            .put(Locale.of("cz"), "CZ")
+            .put(Locale.of("de"), "DE")
+            .put(Locale.of("es"), "ES")
+            .put(Locale.of("fr"), "FR")
+            .put(Locale.of("it"), "IT")
+            .put(Locale.of("ja"), "JA")
+            .put(Locale.of("ko"), "KO")
+            .put(Locale.of("pl"), "PL")
+            .put(Locale.of("ru"), "RU")
+            .put(Locale.of("uk"), "UK").build();
 
     private Constants() {
     }
