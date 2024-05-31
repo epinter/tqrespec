@@ -874,9 +874,11 @@ public class GameInfo {
         try (BufferedReader reader = new BufferedReader(Channels.newReader(optionsFile, StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] opt = line.split("\\s+=\\s+");
-                if (opt[1] != null) {
+                String[] opt = line.split("\\s*=\\s*");
+                if (opt.length == 2 && opt[1] != null) {
                     gameOptions.put(opt[0].trim(), opt[1].replace("\"", "").trim());
+                } else {
+                    logger.log(System.Logger.Level.ERROR, "error reading game options.txt file, line ''{0}''", line);
                 }
             }
         }
