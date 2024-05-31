@@ -413,7 +413,7 @@ public class Player {
     public String getStatGreatestMonsterKilledName() {
         List<String> monsters = getSaveData().getDataMap().getStringValuesFromBlock(
                 (PlayerFileVariable.valueOf(getSaveData().getPlatform(), "greatestMonsterKilledName").variable()))
-                .stream().filter(v -> v != null && !v.isEmpty()).collect(Collectors.toList());
+                .stream().filter(v -> v != null && !v.isEmpty()).toList();
         if (monsters.isEmpty()) {
             return null;
         }
@@ -423,7 +423,7 @@ public class Player {
     public int getStatGreatestMonsterKilledLevel() {
         List<Integer> monsterLevels = getSaveData().getDataMap().getIntValuesFromBlock(
                 PlayerFileVariable.valueOf(getSaveData().getPlatform(), "greatestMonsterKilledLevel").variable())
-                .stream().filter(v -> v != 0).collect(Collectors.toList());
+                .stream().filter(v -> v != 0).toList();
         if (monsterLevels.isEmpty()) {
             return -1;
         }

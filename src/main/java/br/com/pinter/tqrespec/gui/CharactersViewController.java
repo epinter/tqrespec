@@ -652,7 +652,7 @@ public class CharactersViewController implements Initializable {
                         }
                     }
                     return d;
-                }).collect(Collectors.toList());
+                }).toList();
                 return String.join(",", fields);
             }).forEach(writer::println);
         } catch (IOException e) {

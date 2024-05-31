@@ -328,7 +328,7 @@ public class FileDataMap implements DeepCloneable {
         }
 
         for (VariableInfo v :
-                getBlockInfo().values().stream().flatMap(b -> b.getVariables().values().stream()).collect(Collectors.toList())) {
+                getBlockInfo().values().stream().flatMap(b -> b.getVariables().values().stream()).toList()) {
             if (v.getName().equals("mySaveId") || v.getName().equals("currentDifficulty")) {
                 removeVariable(v);
             } else if(v.getName().equals("headerVersion")) {

@@ -51,7 +51,7 @@ public class Exporter {
 
     public Node getTree() {
         List<BlockInfo> rootBlocks = fileDataMap.getBlockInfo().values()
-                .stream().filter(f -> f.getParentOffset() == -1).sorted(Comparator.comparing(BlockInfo::getStart)).collect(Collectors.toList());
+                .stream().filter(f -> f.getParentOffset() == -1).sorted(Comparator.comparing(BlockInfo::getStart)).toList();
 
         for (BlockInfo b : fileDataMap.getBlockInfo().values()) {
             children.computeIfAbsent(b.getParentOffset(), k -> new ArrayList<>());

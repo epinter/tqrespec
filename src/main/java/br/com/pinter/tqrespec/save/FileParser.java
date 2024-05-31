@@ -315,7 +315,7 @@ public abstract class FileParser {
      * Blocks listed in {@link FileParser#blocksIgnore} are skipped (e.g. a header).
      */
     public void parseAllBlocks() {
-        for (BlockInfo block : blockInfoTable.values().stream().sorted(Comparator.comparing(BlockInfo::getStart)).collect(Collectors.toList())) {
+        for (BlockInfo block : blockInfoTable.values().stream().sorted(Comparator.comparing(BlockInfo::getStart)).toList()) {
             //ignore header
             if (block == null || getBlocksIgnore().contains(block.getStart())) {
                 continue;
