@@ -64,7 +64,7 @@ public class Player {
     }
 
     public boolean loadPlayer(String playerName, SaveLocation saveLocation) {
-        if (State.get().getSaveInProgress() != null && State.get().getSaveInProgress()) {
+        if (State.get().getSaveInProgress()) {
             return false;
         }
 

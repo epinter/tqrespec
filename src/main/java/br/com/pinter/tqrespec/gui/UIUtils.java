@@ -65,8 +65,7 @@ public class UIUtils {
     }
 
     public void closeApplication() {
-        if (State.get().getSaveInProgress() != null && !State.get().getSaveInProgress()
-                || State.get().getSaveInProgress() == null) {
+        if (!State.get().getSaveInProgress()) {
             Platform.exit();
             System.exit(0);
         }

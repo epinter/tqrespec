@@ -54,7 +54,7 @@ public class State {
         return instance;
     }
 
-    public Boolean getSaveInProgress() {
+    public boolean getSaveInProgress() {
         return saveInProgress.getValue();
     }
 
@@ -62,16 +62,12 @@ public class State {
         this.saveInProgress.setValue(saveInProgress);
     }
 
-    public Boolean getGameRunning() {
+    public boolean getGameRunning() {
         return gameRunning.getValue();
     }
 
     public void setGameRunning(Boolean gameRunning) {
         this.gameRunning.setValue(gameRunning);
-    }
-
-    public SimpleBooleanProperty saveInProgressProperty() {
-        return saveInProgress;
     }
 
     public SimpleBooleanProperty gameRunningProperty() {
@@ -101,8 +97,7 @@ public class State {
         return lastCursorWaitTask.get();
     }
 
-    public State setLastCursorWaitTask(MyTask<Integer> lastCursorWaitTask) {
+    public void setLastCursorWaitTask(MyTask<Integer> lastCursorWaitTask) {
         this.lastCursorWaitTask.set(lastCursorWaitTask);
-        return this;
     }
 }
