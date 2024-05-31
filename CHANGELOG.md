@@ -1,4 +1,14 @@
 # Changelog
+## [0.13.0] - 2024-05-31
+### Fixed
+- Fixed crash during parse of edited options.txt, issue #51.
+- Fixed rare crash on launch when older java versions are installed, issue #50.
+
+### Changed
+- Improved logging of uncaught runtime exceptions.
+- Updated to Java 21
+- Updated dependencies
+
 ## [0.12.2] - 2024-05-27
 ### Fixed
 - Fix missing bags when converting from mobile.
