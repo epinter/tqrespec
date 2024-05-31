@@ -258,8 +258,12 @@ public class Main extends Application {
         logger = Log.getLogger(Main.class.getName());
         logger.log(System.Logger.Level.DEBUG, State.get().getDebugPrefix());
         progressSet(0.0, 0.1);
-        prepareMainStage(primaryStage);
-        load(primaryStage);
+        try {
+            prepareMainStage(primaryStage);
+            load(primaryStage);
+        } catch (RuntimeException e) {
+            ExceptionHandler.logAndShow(e);
+        }
     }
 
     public void prepareMainStage(Stage primaryStage) {

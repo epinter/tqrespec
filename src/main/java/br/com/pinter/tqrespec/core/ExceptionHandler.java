@@ -40,17 +40,21 @@ public class ExceptionHandler {
     private ExceptionHandler() {
     }
 
-    @SuppressWarnings("unused")
-    public static void unhandled(Thread t, Throwable e) {
+    public static void logAndShow(Throwable e) {
         logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
 
         if (Platform.isFxApplicationThread()) {
-            ExceptionHandler.showAlert(t, e);
+            ExceptionHandler.showAlert(e);
         }
     }
 
     @SuppressWarnings("unused")
-    private static void showAlert(Thread t, Throwable e) {
+    public static void unhandled(Thread t, Throwable e) {
+        logAndShow(e);
+    }
+
+    @SuppressWarnings("unused")
+    private static void showAlert(Throwable e) {
         String header = ExceptionUtils.getRootCause(e).toString();
         if (header == null) {
             header = e.toString();
@@ -65,7 +69,7 @@ public class ExceptionHandler {
         alert.setHeaderText("An unhandled exception occurred");
         alert.setContentText(header);
 
-        TextArea textArea = new TextArea(ExceptionUtils.getStackTrace(e.getCause()));
+        TextArea textArea = new TextArea(ExceptionUtils.getStackTrace(e.getCause() != null ? e.getCause() : e));
         textArea.setEditable(false);
         textArea.setWrapText(false);
 
