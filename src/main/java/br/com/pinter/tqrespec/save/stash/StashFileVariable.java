@@ -66,7 +66,7 @@ public class StashFileVariable implements FileVariable {
     }
 
     @Override
-    public String var() {
+    public String variable() {
         return variable;
     }
 

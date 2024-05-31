@@ -296,7 +296,7 @@ class PlayerParserTest {
 
     @Test
     void readMonsterName_Should_readMonsterNameFromSavegame() {
-        assertEquals("{^r}Hades ~ God of the Dead", readStringVar(PlayerFileVariable.valueOf(Platform.WINDOWS, "greatestMonsterKilledName").var()));
+        assertEquals("{^r}Hades ~ God of the Dead", readStringVar(PlayerFileVariable.valueOf(Platform.WINDOWS, "greatestMonsterKilledName").variable()));
     }
 
     private int readTempVar(String alias) {

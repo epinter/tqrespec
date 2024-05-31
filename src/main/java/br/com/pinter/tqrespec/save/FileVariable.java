@@ -21,7 +21,7 @@
 package br.com.pinter.tqrespec.save;
 
 public interface FileVariable {
-    String var();
+    String variable();
 
     VariableType type();
 

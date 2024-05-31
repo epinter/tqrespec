@@ -299,11 +299,11 @@ public class FileDataMap implements DeepCloneable {
                 }
                 newVar.setVariableType(VariableType.STRING_UTF_32_LE);
                 storeChange(v, newVar);
-            } else if ((playerVar.var().equals("boostedCharacterForX4") && playerVar.location().equals(currentBlockType))
-                    || (playerVar.var().equals("tartarusDefeatedCount[i]") && playerVar.location().equals(currentBlockType))
-                    || (playerVar.var().equals("altMoney") && playerVar.location().equals(currentBlockType))
-                    || (playerVar.var().equals("hasSkillServices") && playerVar.location().equals(currentBlockType))
-                    || (playerVar.var().equals("version") && playerVar.location().equals(currentBlockType))) {
+            } else if ((playerVar.variable().equals("boostedCharacterForX4") && playerVar.location().equals(currentBlockType))
+                    || (playerVar.variable().equals("tartarusDefeatedCount[i]") && playerVar.location().equals(currentBlockType))
+                    || (playerVar.variable().equals("altMoney") && playerVar.location().equals(currentBlockType))
+                    || (playerVar.variable().equals("hasSkillServices") && playerVar.location().equals(currentBlockType))
+                    || (playerVar.variable().equals("version") && playerVar.location().equals(currentBlockType))) {
                 removeVariable(v);
             } else if (v.getName().equals("playerVersion") && getInt("playerVersion") > 5) {
                 VariableInfo newVar = (VariableInfo) v.deepClone();

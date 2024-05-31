@@ -103,7 +103,7 @@ final class PlayerParser extends FileParser {
                 throw new IncompatibleSavegameException("Invalid variable '{}'");
             }
 
-            if (e.var().equals(name) && e.location().equals(PlayerBlockType.PLAYER_HEADER)) {
+            if (e.variable().equals(name) && e.location().equals(PlayerBlockType.PLAYER_HEADER)) {
                 readVar(name, variableInfo);
 
                 String valueLog = null;
@@ -144,23 +144,23 @@ final class PlayerParser extends FileParser {
 
     private void readIntegerFromHeader(HeaderInfo h, String name, int valueInt) throws IncompatibleSavegameException {
         try {
-            if (name.equals(PlayerFileVariable.valueOf(getDetectedPlatform(), "headerVersion").var()))
+            if (name.equals(PlayerFileVariable.valueOf(getDetectedPlatform(), "headerVersion").variable()))
                 h.setHeaderVersion(GameVersion.fromValue(valueInt));
         } catch (EnumConstantNotPresentException e) {
             throw new IncompatibleSavegameException(
                     String.format("Incompatible character '%s' (unknown headerVersion)", this.player));
 
         }
-        if (name.equals(PlayerFileVariable.valueOf(getDetectedPlatform(), "playerVersion").var()))
+        if (name.equals(PlayerFileVariable.valueOf(getDetectedPlatform(), "playerVersion").variable()))
             h.setPlayerVersion(valueInt);
-        if (name.equals(PlayerFileVariable.valueOf(getDetectedPlatform(), "playerLevel").var()))
+        if (name.equals(PlayerFileVariable.valueOf(getDetectedPlatform(), "playerLevel").variable()))
             h.setPlayerLevel(valueInt);
     }
 
     private void readStringFromHeader(HeaderInfo h, String name, String valueString) {
-        if (name.equals(PlayerFileVariable.valueOf(getDetectedPlatform(), "playerCharacterClass").var()))
+        if (name.equals(PlayerFileVariable.valueOf(getDetectedPlatform(), "playerCharacterClass").variable()))
             h.setPlayerCharacterClass(valueString);
-        if (name.equals(PlayerFileVariable.valueOf(getDetectedPlatform(), "playerClassTag").var())) {
+        if (name.equals(PlayerFileVariable.valueOf(getDetectedPlatform(), "playerClassTag").variable())) {
             h.setPlayerClassTag(valueString);
         }
     }

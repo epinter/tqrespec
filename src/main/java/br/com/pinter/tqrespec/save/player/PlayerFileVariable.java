@@ -221,7 +221,7 @@ public class PlayerFileVariable implements FileVariable {
     }
 
     @Override
-    public String var() {
+    public String variable() {
         return variable;
     }
 
