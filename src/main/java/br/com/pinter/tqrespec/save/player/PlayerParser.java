@@ -247,7 +247,7 @@ final class PlayerParser extends FileParser {
         String key = "temp";
         String logMsg = "blockStart: ''{0}''; variableInfo: ''{1}'';";
         if (getSpecialVariableStore().get(key).size() == 1) {
-            VariableInfo difficulty = getSpecialVariableStore().get(key).get(0);
+            VariableInfo difficulty = getSpecialVariableStore().get(key).getFirst();
             difficulty.setAlias("difficulty");
             logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), difficulty.toString());
         } else if (getSpecialVariableStore().get(key).size() == 5) {

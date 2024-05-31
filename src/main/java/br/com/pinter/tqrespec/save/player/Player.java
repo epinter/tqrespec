@@ -175,11 +175,11 @@ public class Player {
                 }
 
                 PlayerSkill sb = new PlayerSkill();
-                sb.setSkillName((String) b.getVariables().get(Constants.Save.SKILL_NAME).get(0).getValue());
-                sb.setSkillEnabled((Integer) b.getVariables().get(Constants.Save.SKILL_ENABLED).get(0).getValue());
-                sb.setSkillActive((Integer) b.getVariables().get(Constants.Save.SKILL_ACTIVE).get(0).getValue());
-                sb.setSkillSubLevel((Integer) b.getVariables().get(Constants.Save.SKILL_SUB_LEVEL).get(0).getValue());
-                sb.setSkillTransition((Integer) b.getVariables().get(Constants.Save.SKILL_TRANSITION).get(0).getValue());
+                sb.setSkillName((String) b.getVariables().get(Constants.Save.SKILL_NAME).getFirst().getValue());
+                sb.setSkillEnabled((Integer) b.getVariables().get(Constants.Save.SKILL_ENABLED).getFirst().getValue());
+                sb.setSkillActive((Integer) b.getVariables().get(Constants.Save.SKILL_ACTIVE).getFirst().getValue());
+                sb.setSkillSubLevel((Integer) b.getVariables().get(Constants.Save.SKILL_SUB_LEVEL).getFirst().getValue());
+                sb.setSkillTransition((Integer) b.getVariables().get(Constants.Save.SKILL_TRANSITION).getFirst().getValue());
                 sb.setSkillLevel(getVariableValueInteger(b.getStart(), Constants.Save.SKILL_LEVEL));
                 sb.setBlockStart(b.getStart());
                 if (sb.getSkillName() != null) {
@@ -224,7 +224,7 @@ public class Player {
     public int getAvailableSkillPoints() {
         if (!isCharacterLoaded()) return 0;
 
-        int block = getSaveData().getDataMap().getVariableLocation().get(Constants.Save.SKILL_POINTS).get(0);
+        int block = getSaveData().getDataMap().getVariableLocation().get(Constants.Save.SKILL_POINTS).getFirst();
         BlockInfo statsBlock = getSaveData().getDataMap().getBlockInfo().get(block);
         return getVariableValueInteger(statsBlock.getStart(), Constants.Save.SKILL_POINTS);
     }
@@ -253,7 +253,7 @@ public class Player {
             throw new IllegalStateException("Error loading mastery. Skill detected.");
         }
         BlockInfo sk = getSaveData().getDataMap().getBlockInfo().get(blockStart);
-        VariableInfo varSkillLevel = sk.getVariables().get(Constants.Save.SKILL_LEVEL).get(0);
+        VariableInfo varSkillLevel = sk.getVariables().get(Constants.Save.SKILL_LEVEL).getFirst();
 
         if (varSkillLevel.getVariableType() == VariableType.INTEGER) {
             return getVariableValueInteger(blockStart, Constants.Save.SKILL_LEVEL);
@@ -269,7 +269,7 @@ public class Player {
         }
 
         BlockInfo skillToRemove = getSaveData().getDataMap().getBlockInfo().get(blockStart);
-        VariableInfo varSkillLevel = skillToRemove.getVariables().get(Constants.Save.SKILL_LEVEL).get(0);
+        VariableInfo varSkillLevel = skillToRemove.getVariables().get(Constants.Save.SKILL_LEVEL).getFirst();
         if (varSkillLevel.getVariableType() == VariableType.INTEGER) {
             int currentSkillPoints = getVariableValueInteger(Constants.Save.SKILL_POINTS);
             int currentSkillLevel = (int) varSkillLevel.getValue();
@@ -519,7 +519,7 @@ public class Player {
         }
 
         if (pc.getPlayerTextures() != null && !pc.getPlayerTextures().isEmpty()) {
-            newTexture = pc.getPlayerTextures().get(0);
+            newTexture = pc.getPlayerTextures().getFirst();
         }
 
         String currentTexture = getSaveData().getDataMap().getString(Constants.Save.PLAYER_TEXTURE);

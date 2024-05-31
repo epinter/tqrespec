@@ -414,7 +414,7 @@ public class CharactersViewController implements Initializable {
 
         colMasteryOne.setCellValueFactory(f -> {
             if (f.getValue().getMasteries() != null && !f.getValue().getMasteries().isEmpty()) {
-                Mastery mastery = f.getValue().getMasteries().get(0);
+                Mastery mastery = f.getValue().getMasteries().getFirst();
                 String s = txt.getCapitalizedString(mastery.getDisplayName());
                 return new SimpleStringProperty(String.format(Constants.Msg.CHARACTERS_NAMENUMBER_FORMAT, s, mastery.getLevel()));
             }
@@ -589,7 +589,7 @@ public class CharactersViewController implements Initializable {
             String masteryOne = "";
             String masteryTwo = "";
             if (p.getMasteries() != null && !p.getMasteries().isEmpty()) {
-                Mastery mastery = p.getMasteries().get(0);
+                Mastery mastery = p.getMasteries().getFirst();
                 String s = txt.getCapitalizedString(mastery.getDisplayName());
                 masteryOne = String.format(Constants.Msg.CHARACTERS_NAMENUMBER_FORMAT, s, mastery.getLevel());
             }

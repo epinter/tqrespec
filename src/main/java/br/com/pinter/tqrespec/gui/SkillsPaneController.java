@@ -310,7 +310,7 @@ public class SkillsPaneController implements Initializable {
     @FXML
     public void reclaimMasteryFirst(Event event) {
         disableControls(true);
-        Skill mastery = player.getPlayerMasteries().get(0);
+        Skill mastery = player.getPlayerMasteries().getFirst();
         PlayerSkill sb = player.getPlayerSkills().get(mastery.getRecordPath());
 
         if (!isMasteryEmpty(mastery)) {
@@ -338,7 +338,7 @@ public class SkillsPaneController implements Initializable {
     @FXML
     public void reclaimSkillsFirst(Event event) {
         disableControls(true);
-        Skill mastery = player.getPlayerMasteries().get(0);
+        Skill mastery = player.getPlayerMasteries().getFirst();
         reclaimPointsFromSkills(mastery);
         updateMasteries();
     }
@@ -354,7 +354,7 @@ public class SkillsPaneController implements Initializable {
     @FXML
     public void removeMasteryFirst(Event event) {
         disableControls(true);
-        Skill mastery = player.getPlayerMasteries().get(0);
+        Skill mastery = player.getPlayerMasteries().getFirst();
         PlayerSkill sb = player.getPlayerSkills().get(mastery.getRecordPath());
 
         if (!isMasteryEmpty(mastery)) {

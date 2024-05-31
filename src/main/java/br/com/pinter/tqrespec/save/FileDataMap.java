@@ -110,7 +110,7 @@ public class FileDataMap implements DeepCloneable {
 
     private int searchFirstVariable(String variable) {
         if (getVariableLocation().get(variable) != null) {
-            int block = getVariableLocation().get(variable).get(0);
+            int block = getVariableLocation().get(variable).getFirst();
             if (getBlockInfo().get(block) != null) {
                 return block;
             }
@@ -241,7 +241,7 @@ public class FileDataMap implements DeepCloneable {
 
     private VariableInfo getFirst(int block, String variable) {
         if (block >= 0) {
-            return getBlockInfo().get(block).getVariables().get(variable).get(0);
+            return getBlockInfo().get(block).getVariables().get(variable).getFirst();
         }
         return null;
     }
@@ -249,7 +249,7 @@ public class FileDataMap implements DeepCloneable {
     private VariableInfo getFirst(String variable) {
         int block = searchFirstVariable(variable);
         if (block >= 0) {
-            return getBlockInfo().get(block).getVariables().get(variable).get(0);
+            return getBlockInfo().get(block).getVariables().get(variable).getFirst();
         }
         return null;
     }
@@ -274,8 +274,8 @@ public class FileDataMap implements DeepCloneable {
     }
 
     private void convertWindowsToMobile(String saveId) {
-        BlockInfo myPlayerNameBlock = this.blockInfo.get(variableLocation.get("myPlayerName").get(0));
-        int myPlayerNameKeyOffset = myPlayerNameBlock.getVariables().get("myPlayerName").get(0).getKeyOffset();
+        BlockInfo myPlayerNameBlock = this.blockInfo.get(variableLocation.get("myPlayerName").getFirst());
+        int myPlayerNameKeyOffset = myPlayerNameBlock.getVariables().get("myPlayerName").getFirst().getKeyOffset();
         VariableInfo variableInfo = VariableInfo.builder().name("mySaveId")
                 .blockOffset(myPlayerNameBlock.getStart())
                 .keyOffset(myPlayerNameKeyOffset)
@@ -317,8 +317,8 @@ public class FileDataMap implements DeepCloneable {
     }
 
     private void convertMobileToWindows() {
-        BlockInfo numberOfSacksBlock = this.blockInfo.get(variableLocation.get("numberOfSacks").get(0));
-        VariableInfo numberOfSacks = numberOfSacksBlock.getVariables().get("numberOfSacks").get(0);
+        BlockInfo numberOfSacksBlock = this.blockInfo.get(variableLocation.get("numberOfSacks").getFirst());
+        VariableInfo numberOfSacks = numberOfSacksBlock.getVariables().get("numberOfSacks").getFirst();
 
         for (VariableInfo v : getBlockInfo().get(numberOfSacksBlock.getStart()).getVariables().values().stream().toList()) {
             if ((Integer) numberOfSacks.getValue() > 1 &&
@@ -375,7 +375,7 @@ public class FileDataMap implements DeepCloneable {
     public List<String> getStringValuesFromBlock(String variable) {
         List<String> ret = new ArrayList<>();
         if (getVariableLocation().get(variable) != null) {
-            int block = getVariableLocation().get(variable).get(0);
+            int block = getVariableLocation().get(variable).getFirst();
             if (getBlockInfo().get(block) != null) {
                 for (VariableInfo vi : getBlockInfo().get(block).getVariables().values()) {
                     if (vi.getValue() == null || !vi.getName().equals(variable)) {
@@ -568,7 +568,7 @@ public class FileDataMap implements DeepCloneable {
     public List<Integer> getIntValuesFromBlock(String variable) {
         List<Integer> ret = new ArrayList<>();
         if (getVariableLocation().get(variable) != null) {
-            int block = getVariableLocation().get(variable).get(0);
+            int block = getVariableLocation().get(variable).getFirst();
             if (getBlockInfo().get(block) != null) {
                 for (VariableInfo vi : getBlockInfo().get(block).getVariables().values()) {
                     if (vi.getValue() == null || !vi.getName().equals(variable)) {
@@ -587,7 +587,7 @@ public class FileDataMap implements DeepCloneable {
     List<UID> getUIDValuesFromBlock(String variable) {
         List<UID> ret = new ArrayList<>();
         if (getVariableLocation().get(variable) != null) {
-            int block = getVariableLocation().get(variable).get(0);
+            int block = getVariableLocation().get(variable).getFirst();
             if (getBlockInfo().get(block) != null) {
                 for (VariableInfo vi : getBlockInfo().get(block).getVariables().values()) {
                     if (vi.getValue() == null || !vi.getName().equals(variable)) {
@@ -668,8 +668,8 @@ public class FileDataMap implements DeepCloneable {
     public int getTempAttr(String attr) {
         int ret = -1;
         List<VariableInfo> varList = getTempVariableInfo(attr);
-        if (varList.size() == 1 && varList.get(0) != null) {
-            VariableInfo attrVar = varList.get(0);
+        if (varList.size() == 1 && varList.getFirst() != null) {
+            VariableInfo attrVar = varList.getFirst();
             if (attrVar.getVariableType() == VariableType.FLOAT) {
                 ret = Math.round(getFloat(attrVar));
             } else if (attrVar.getVariableType() == VariableType.INTEGER) {
@@ -684,8 +684,8 @@ public class FileDataMap implements DeepCloneable {
 
     public void setTempAttr(String attr, Integer val) {
         List<VariableInfo> varList = getTempVariableInfo(attr);
-        if (!varList.isEmpty() && varList.get(0) != null) {
-            VariableInfo attrVar = varList.get(0);
+        if (!varList.isEmpty() && varList.getFirst() != null) {
+            VariableInfo attrVar = varList.getFirst();
             if (attrVar.getVariableType() == VariableType.FLOAT) {
                 setFloat(attrVar, val);
             } else if (attrVar.getVariableType() == VariableType.INTEGER) {
