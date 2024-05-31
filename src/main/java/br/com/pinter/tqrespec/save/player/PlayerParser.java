@@ -271,14 +271,14 @@ final class PlayerParser extends FileParser {
     }
 
     @Override
-    protected FileVariable getFileVariable(String var) {
-        return PlayerFileVariable.valueOf(getDetectedPlatform(), var);
+    protected FileVariable getFileVariable(String variable) {
+        return PlayerFileVariable.valueOf(getDetectedPlatform(), variable);
     }
 
     @Override
-    protected FileVariable getPlatformFileVariable(Platform platform, String var) {
+    protected FileVariable getPlatformFileVariable(Platform platform, String variable) {
         try {
-            return PlayerFileVariable.valueOf(platform, var);
+            return PlayerFileVariable.valueOf(platform, variable);
         } catch (InvalidVariableException e) {
             return null;
         }

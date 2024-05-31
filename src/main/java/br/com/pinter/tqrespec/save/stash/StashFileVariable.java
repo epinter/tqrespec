@@ -27,7 +27,7 @@ import br.com.pinter.tqrespec.save.VariableType;
 import java.util.HashMap;
 
 public class StashFileVariable implements FileVariable {
-    private static HashMap<String, StashFileVariable> map = new HashMap<>();
+    private static final HashMap<String, StashFileVariable> map = new HashMap<>();
 
     static {
         map.put("stashVersion", new StashFileVariable("stashVersion", VariableType.INTEGER, StashBlockType.STASH_MAIN));
@@ -52,22 +52,22 @@ public class StashFileVariable implements FileVariable {
     }
 
     private final BlockType location;
-    private final String var;
+    private final String variable;
     private final VariableType type;
 
     private StashFileVariable(String variable, VariableType type, BlockType location) {
-        this.var = variable;
+        this.variable = variable;
         this.type = type;
         this.location = location;
     }
 
-    static StashFileVariable valueOf(String var) {
-        return map.get(var);
+    static StashFileVariable valueOf(String variable) {
+        return map.get(variable);
     }
 
     @Override
     public String var() {
-        return var;
+        return variable;
     }
 
     @Override

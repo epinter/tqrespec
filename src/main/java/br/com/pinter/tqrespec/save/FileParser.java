@@ -513,9 +513,9 @@ public abstract class FileParser {
         }
     }
 
-    protected abstract FileVariable getFileVariable(String var);
+    protected abstract FileVariable getFileVariable(String variable);
 
-    protected abstract FileVariable getPlatformFileVariable(Platform platform, String var);
+    protected abstract FileVariable getPlatformFileVariable(Platform platform, String variable);
 
     VariableInfo readVar(String name) {
         return readVar(name, new VariableInfo(), FileBlockType.UNKNOWN);

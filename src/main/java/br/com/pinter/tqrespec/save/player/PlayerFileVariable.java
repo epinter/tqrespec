@@ -176,11 +176,11 @@ public class PlayerFileVariable implements FileVariable {
     }
 
     private final BlockType location;
-    private final String var;
+    private final String variable;
     private final VariableType type;
 
     private PlayerFileVariable(String variable, VariableType type, BlockType location) {
-        this.var = variable;
+        this.variable = variable;
         this.type = type;
         this.location = location;
     }
@@ -209,7 +209,7 @@ public class PlayerFileVariable implements FileVariable {
     public static PlayerFileVariable getVar(Platform platform, String variableName) {
         PlayerFileVariable ret = null;
         if (variablesMap.get(platform) != null) {
-            ret = variablesMap.get(platform).values().stream().filter(v -> v.var.equals(variableName))
+            ret = variablesMap.get(platform).values().stream().filter(v -> v.variable.equals(variableName))
                     .findFirst().orElse(null);
         }
 
@@ -222,7 +222,7 @@ public class PlayerFileVariable implements FileVariable {
 
     @Override
     public String var() {
-        return var;
+        return variable;
     }
 
     @Override
@@ -239,7 +239,7 @@ public class PlayerFileVariable implements FileVariable {
         if (variablesMap.get(platform) != null) {
             for (Map.Entry<String, PlayerFileVariable> v : variablesMap.get(platform).entrySet()) {
                 BlockType t = v.getValue().location;
-                if (t.getParent() != null && varName.equals(v.getValue().var) && t.getParent().name().equals(parent.name())) {
+                if (t.getParent() != null && varName.equals(v.getValue().variable) && t.getParent().name().equals(parent.name())) {
                     return t;
                 }
             }
@@ -252,7 +252,7 @@ public class PlayerFileVariable implements FileVariable {
     public String toString() {
         return "PlayerFileVariable{" +
                 "location=" + location +
-                ", var='" + var + '\'' +
+                ", variable='" + variable + '\'' +
                 ", type=" + type +
                 '}';
     }
