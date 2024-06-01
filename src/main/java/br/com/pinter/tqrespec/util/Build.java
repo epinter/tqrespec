@@ -46,7 +46,7 @@ public class Build {
         String implementationVersion = Build.class.getPackage().getImplementationVersion();
         if (implementationVersion == null) {
             Attributes attr = readManifest();
-            if (attr != null) {
+            if (!attr.isEmpty()) {
                 implementationVersion = attr.getValue("Implementation-Version");
             }
         }
@@ -61,7 +61,7 @@ public class Build {
         String implementationTitle = Build.class.getPackage().getImplementationTitle();
         if (implementationTitle == null) {
             Attributes attr = readManifest();
-            if (attr != null) {
+            if (!attr.isEmpty()) {
                 implementationTitle = attr.getValue("Implementation-Title");
             }
         }
@@ -71,7 +71,7 @@ public class Build {
 
     private static Attributes readManifest() {
         if (!Build.class.getModule().isNamed()) {
-            return null;
+            return new Attributes();
         }
 
         Manifest manifest;
@@ -84,7 +84,7 @@ public class Build {
         } catch (IOException ignored) {
             //ignored
         }
-        return null;
+        return new Attributes();
     }
 
 }

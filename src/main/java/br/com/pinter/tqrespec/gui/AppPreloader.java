@@ -89,8 +89,8 @@ public class AppPreloader extends Preloader {
 
     @Override
     public void handleApplicationNotification(PreloaderNotification pn) {
-        if (pn instanceof ProgressNotification) {
-            bar.setProgress(((ProgressNotification) pn).getProgress());
+        if (pn instanceof ProgressNotification progressNotification) {
+            bar.setProgress(progressNotification.getProgress());
         } else if (pn instanceof StateChangeNotification) {
             //hide after get any state update from application
             stage.hide();
