@@ -549,18 +549,13 @@ public abstract class FileParser {
 
         variableInfo.setVariableType(type);
 
-        if (type == VariableType.INTEGER) {
-            readInt(variableInfo);
-        } else if (type == VariableType.FLOAT) {
-            readFloat(variableInfo);
-        } else if (type == VariableType.STRING || type == VariableType.STRING_UTF_16_LE || type == VariableType.STRING_UTF_32_LE) {
-            readString(variableInfo);
-        } else if (type == VariableType.UID) {
-            readUid(variableInfo);
-        } else if (type == VariableType.STREAM) {
-            readStream(variableInfo);
-        } else {
-            throw new IllegalArgumentException(String.format("Variable type undefined for '%s'.", name));
+        switch (type) {
+            case INTEGER -> readInt(variableInfo);
+            case FLOAT -> readFloat(variableInfo);
+            case STRING, STRING_UTF_16_LE, STRING_UTF_32_LE -> readString(variableInfo);
+            case UID -> readUid(variableInfo);
+            case STREAM -> readStream(variableInfo);
+            case null, default -> throw new IllegalArgumentException(String.format("Variable type undefined for '%s'.", name));
         }
 
         return variableInfo;
