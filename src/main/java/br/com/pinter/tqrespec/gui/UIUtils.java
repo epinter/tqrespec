@@ -80,10 +80,10 @@ public class UIUtils {
 
     public static void fileExplorer(String path) {
         try {
-            if(SystemUtils.IS_OS_WINDOWS) {
-                Runtime.getRuntime().exec(new String[]{Constants.EXPLORER_COMMAND,path});
+            if (SystemUtils.IS_OS_WINDOWS) {
+                Runtime.getRuntime().exec(new String[]{Constants.EXPLORER_COMMAND, path});
             } else {
-                Runtime.getRuntime().exec(new String[]{Constants.XDGOPEN_COMMAND,path});
+                Runtime.getRuntime().exec(new String[]{Constants.XDGOPEN_COMMAND, path});
             }
         } catch (IOException e) {
             logger.log(System.Logger.Level.WARNING, "unable to open file explorer: ", e);

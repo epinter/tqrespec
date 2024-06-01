@@ -157,7 +157,7 @@ public class MainController implements Initializable {
             if (BooleanUtils.isTrue(newV)) {
                 Platform.runLater(() -> {
                     Parent rootCharWindow = fxmlLoaderCharacter.getRoot();
-                    if(rootCharWindow != null) {
+                    if (rootCharWindow != null) {
                         Stage charactersWindow = (Stage) rootCharWindow.getScene().getWindow();
                         charactersWindow.close();
                     }

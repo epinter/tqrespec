@@ -38,7 +38,6 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class Player {
     private static final System.Logger logger = Log.getLogger(Player.class);
@@ -412,7 +411,7 @@ public class Player {
 
     public String getStatGreatestMonsterKilledName() {
         List<String> monsters = getSaveData().getDataMap().getStringValuesFromBlock(
-                (PlayerFileVariable.valueOf(getSaveData().getPlatform(), "greatestMonsterKilledName").variable()))
+                        (PlayerFileVariable.valueOf(getSaveData().getPlatform(), "greatestMonsterKilledName").variable()))
                 .stream().filter(v -> v != null && !v.isEmpty()).toList();
         if (monsters.isEmpty()) {
             return null;
@@ -422,7 +421,7 @@ public class Player {
 
     public int getStatGreatestMonsterKilledLevel() {
         List<Integer> monsterLevels = getSaveData().getDataMap().getIntValuesFromBlock(
-                PlayerFileVariable.valueOf(getSaveData().getPlatform(), "greatestMonsterKilledLevel").variable())
+                        PlayerFileVariable.valueOf(getSaveData().getPlatform(), "greatestMonsterKilledLevel").variable())
                 .stream().filter(v -> v != 0).toList();
         if (monsterLevels.isEmpty()) {
             return -1;
@@ -596,7 +595,7 @@ public class Player {
             }
         }
 
-        for(VariableInfo v: toRemove) {
+        for (VariableInfo v : toRemove) {
             getSaveData().getDataMap().removeVariable(v.getKeyOffset(), v);
             getSaveData().getDataMap().decrementInt(uidSize);
         }

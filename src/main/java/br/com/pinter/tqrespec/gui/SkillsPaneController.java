@@ -145,13 +145,13 @@ public class SkillsPaneController implements Initializable {
         freeSkillPointsLabel.textProperty().bind(freeSkillPointsBinding);
 
         reclaimMasteryFirstBinding = Bindings.createStringBinding(() -> ResourceHelper.getMessage("skills.reclaimMasteryPoints",
-                currentFirstMasteryLevel.getValue()),
+                        currentFirstMasteryLevel.getValue()),
                 currentFirstMasteryLevel
         );
         reclaimMasteryFirstItem.textProperty().bind(reclaimMasteryFirstBinding);
 
         reclaimMasterySecondBinding = Bindings.createStringBinding(() -> ResourceHelper.getMessage("skills.reclaimMasteryPoints",
-                currentSecondMasteryLevel.getValue()),
+                        currentSecondMasteryLevel.getValue()),
                 currentSecondMasteryLevel
         );
         reclaimMasterySecondItem.textProperty().bind(reclaimMasterySecondBinding);

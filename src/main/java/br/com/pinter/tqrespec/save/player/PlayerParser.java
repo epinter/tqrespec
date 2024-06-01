@@ -92,14 +92,14 @@ final class PlayerParser extends FileParser {
                 logger.log(System.Logger.Level.ERROR, "", exception);
                 logger.log(System.Logger.Level.ERROR, "Variable ''{0}'' not found for {1}, trying {2} ",
                         name, getDetectedPlatform(), Platform.MOBILE);
-                if(Platform.WINDOWS.equals(getDetectedPlatform()) && PlayerFileVariable.valueOf(Platform.MOBILE, name)!=null
+                if (Platform.WINDOWS.equals(getDetectedPlatform()) && PlayerFileVariable.valueOf(Platform.MOBILE, name) != null
                         && h.getHeaderVersion().equals(GameVersion.TQLE)) {
                     e = PlayerFileVariable.valueOf(Platform.MOBILE, name);
                     setDetectedPlatform(Platform.MOBILE);
                 }
             }
 
-            if(e == null) {
+            if (e == null) {
                 throw new IncompatibleSavegameException("Invalid variable '{}'");
             }
 
@@ -130,13 +130,13 @@ final class PlayerParser extends FileParser {
             }
             variables.put(variableInfo.getName(), variableInfo);
             if (variableInfo.getName().equals("playerCharacterClass")
-                || variableInfo.getName().equals("playerVersion")) {
+                    || variableInfo.getName().equals("playerVersion")) {
                 putVarIndex(variableInfo.getName(), block.getStart());
             }
         }
         getBlockInfo().put(block.getStart(), block);
         block.setVariables(ImmutableListMultimap.copyOf(variables));
-        if(block.getVariables().containsKey("currentDifficulty") && h.getHeaderVersion().equals(GameVersion.TQLE)) {
+        if (block.getVariables().containsKey("currentDifficulty") && h.getHeaderVersion().equals(GameVersion.TQLE)) {
             setDetectedPlatform(Platform.MOBILE);
         }
         return h;
@@ -211,7 +211,7 @@ final class PlayerParser extends FileParser {
 
     @Override
     protected void preprocessVariable(String name, int keyOffset, BlockType blockType) {
-        if (! Platform.MOBILE.equals(getDetectedPlatform())
+        if (!Platform.MOBILE.equals(getDetectedPlatform())
                 && ((name.equals("mySaveId") && blockType.equals(PlayerBlockType.PLAYER_MAIN))
                 || headerInfo.getHeaderVersion().equals(GameVersion.TQLE))) {
             setDetectedPlatform(Platform.MOBILE);

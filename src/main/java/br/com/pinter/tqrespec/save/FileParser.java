@@ -37,7 +37,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
 public abstract class FileParser {
@@ -82,7 +81,7 @@ public abstract class FileParser {
 
     protected void setDetectedPlatform(Platform detectedPlatform) {
         this.detectedPlatform = detectedPlatform;
-        if(detectedPlatform.equals(Platform.MOBILE)) {
+        if (detectedPlatform.equals(Platform.MOBILE)) {
             logger.log(System.Logger.Level.INFO, "Mobile savegame detected");
         }
 
@@ -200,7 +199,7 @@ public abstract class FileParser {
             ret.put(variableInfo.getName(), variableInfo);
             putVarIndex(variableInfo.getName(), block.getStart());
 
-            if(isDetectedBlockType(blockType) && !isDetectedBlockType(block.getBlockType())) {
+            if (isDetectedBlockType(blockType) && !isDetectedBlockType(block.getBlockType())) {
                 block.setBlockType(blockType);
             }
         }
@@ -248,14 +247,14 @@ public abstract class FileParser {
                 throw new IllegalStateException(String.format(invalidVarMsg, name, block.getStart()));
             }
         }
-        if(!isDetectedBlockType(blockType)) {
+        if (!isDetectedBlockType(blockType)) {
             if (isDetectedBlockType(fileVariable.location())) {
                 blockType = fileVariable.location();
             } else if (FileBlockType.MULTIPLE.equals(fileVariable.location())) {
                 BlockInfo parent = blockInfoTable.get(block.getParentOffset());
                 if (parent != null && isDetectedBlockType(parent.getBlockType())) {
                     BlockType guessed = getBlockTypeFromParent(detectedPlatform, parent.getBlockType(), name);
-                    if (! guessed.equals(FileBlockType.UNKNOWN)) {
+                    if (!guessed.equals(FileBlockType.UNKNOWN)) {
                         blockType = guessed;
                     }
                 }

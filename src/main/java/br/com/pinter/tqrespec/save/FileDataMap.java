@@ -28,7 +28,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 public class FileDataMap implements DeepCloneable {
     private static final String ALERT_INVALIDDATA = "alert.changesinvaliddata";
@@ -284,7 +283,7 @@ public class FileDataMap implements DeepCloneable {
 
         insertVariable(variableInfo);
         for (VariableInfo v :
-            getBlockInfo().values().stream().flatMap(b -> b.getVariables().values().stream()).toList()) {
+                getBlockInfo().values().stream().flatMap(b -> b.getVariables().values().stream()).toList()) {
             BlockInfo currentBlock = blockInfo.get(v.getBlockOffset());
             BlockType currentBlockType = currentBlock.getBlockType();
             PlayerFileVariable playerVar = PlayerFileVariable.getVar(Platform.WINDOWS, v.getName());
@@ -331,7 +330,7 @@ public class FileDataMap implements DeepCloneable {
                 getBlockInfo().values().stream().flatMap(b -> b.getVariables().values().stream()).toList()) {
             if (v.getName().equals("mySaveId") || v.getName().equals("currentDifficulty")) {
                 removeVariable(v);
-            } else if(v.getName().equals("headerVersion")) {
+            } else if (v.getName().equals("headerVersion")) {
                 VariableInfo newVar = (VariableInfo) v.deepClone();
                 if (hasChange(v)) {
                     newVar = getFirstChange(v);

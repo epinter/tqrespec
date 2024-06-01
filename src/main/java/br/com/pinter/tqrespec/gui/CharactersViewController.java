@@ -38,9 +38,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -50,7 +47,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.*;
-import javafx.stage.Window;
 import javafx.util.Callback;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -65,7 +61,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 public class CharactersViewController implements Initializable {
     private static final System.Logger logger = Log.getLogger(CharactersViewController.class.getName());
@@ -330,9 +325,7 @@ public class CharactersViewController implements Initializable {
         contextMenu.getItems().add(archive);
         contextMenu.getItems().add(unarchive);
 
-        explore.setOnAction(event -> {
-            UIUtils.fileExplorer(charactersTable.getSelectionModel().getSelectedItem().getPath().toString());
-        });
+        explore.setOnAction(event -> UIUtils.fileExplorer(charactersTable.getSelectionModel().getSelectedItem().getPath().toString()));
         archive.setOnAction(event -> archiveAction(false));
         unarchive.setOnAction(event -> archiveAction(true));
 
@@ -354,7 +347,7 @@ public class CharactersViewController implements Initializable {
 
         try {
             rootElement.getScene().setCursor(Cursor.WAIT);
-            if(undo) {
+            if (undo) {
                 archiver.unarchive(selected);
                 toastHeader = "characters.unarchive";
                 toastContent = "characters.unarchivedmessage";
@@ -368,10 +361,10 @@ public class CharactersViewController implements Initializable {
         } finally {
             reset();
             SaveLocation locationMessage = selected.getLocation();
-            if(locationMessage.equals(SaveLocation.ARCHIVEMAIN)) {
+            if (locationMessage.equals(SaveLocation.ARCHIVEMAIN)) {
                 locationMessage = SaveLocation.MAIN;
             }
-            if(locationMessage.equals(SaveLocation.ARCHIVEUSER)) {
+            if (locationMessage.equals(SaveLocation.ARCHIVEUSER)) {
                 locationMessage = SaveLocation.USER;
             }
 
@@ -391,8 +384,8 @@ public class CharactersViewController implements Initializable {
         setupTableColumnInteger(colLevel, ResourceHelper.getMessage("main.charlevel"), "level");
         setupTableColumnString(colGender, ResourceHelper.getMessage("main.gender"), null);
 
-        colStore.setCellValueFactory( f ->  new SimpleStringProperty(
-                ResourceHelper.getMessage("characters.store."+ f.getValue().getLocation().toString().toUpperCase())
+        colStore.setCellValueFactory(f -> new SimpleStringProperty(
+                ResourceHelper.getMessage("characters.store." + f.getValue().getLocation().toString().toUpperCase())
         ));
         colGender.setCellValueFactory(f -> new SimpleStringProperty(
                 ResourceHelper.getMessage("main.gender." + f.getValue().getGender().name().toLowerCase())));

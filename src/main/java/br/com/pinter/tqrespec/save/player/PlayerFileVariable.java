@@ -189,7 +189,7 @@ public class PlayerFileVariable implements FileVariable {
      * Returns the PlayerFileVariable from 'platform' that has a key equal to the parameter 'var'
      *
      * @param platform Platform to get the variable from
-     * @param key Key that represents the variable in the map (may not be the actual variable name)
+     * @param key      Key that represents the variable in the map (may not be the actual variable name)
      * @return PlayerFileVariable instance
      */
     public static PlayerFileVariable valueOf(Platform platform, String key) {
@@ -202,7 +202,7 @@ public class PlayerFileVariable implements FileVariable {
     /**
      * Returns a PlayerFileVariable from the 'platform' map
      *
-     * @param platform Platform to get the variable from
+     * @param platform     Platform to get the variable from
      * @param variableName Must be a valid savegame variable
      * @return {@link PlayerFileVariable}
      */

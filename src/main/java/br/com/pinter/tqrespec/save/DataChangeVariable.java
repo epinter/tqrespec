@@ -69,8 +69,8 @@ class DataChangeVariable extends DataChange implements Serializable {
                 if (v.getValOffset() != oldVariable.getValOffset()) {
                     throw new IllegalArgumentException("invalid offset " + v);
                 }
-                if(addVars.contains(v.getName())) {
-                    ByteBuffer varKey = ByteBuffer.allocate(v.getName().getBytes().length+4).order(ByteOrder.LITTLE_ENDIAN);
+                if (addVars.contains(v.getName())) {
+                    ByteBuffer varKey = ByteBuffer.allocate(v.getName().getBytes().length + 4).order(ByteOrder.LITTLE_ENDIAN);
 
                     varKey.putInt(v.getName().length());
                     varKey.put(v.getName().getBytes());
@@ -103,8 +103,8 @@ class DataChangeVariable extends DataChange implements Serializable {
     }
 
     public VariableInfo getVariable(VariableInfo variable) {
-        for(VariableInfo v:variables) {
-            if(v.getName().equals(variable.getName()) && v.getBlockOffset() == variable.getBlockOffset()
+        for (VariableInfo v : variables) {
+            if (v.getName().equals(variable.getName()) && v.getBlockOffset() == variable.getBlockOffset()
                     && v.getVariableType().equals(variable.getVariableType())) {
                 return v;
             }

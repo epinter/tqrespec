@@ -412,7 +412,7 @@ public class AttributesPaneController implements Initializable {
 
     @FXML
     public void genderSelect(ActionEvent e) {
-        if(characterIsLoading) {
+        if (characterIsLoading) {
             return;
         }
 

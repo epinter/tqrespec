@@ -134,7 +134,7 @@ public class VariableInfo implements DeepCloneable, Serializable {
     }
 
     public void setValue(String value) {
-        if(!isString()) {
+        if (!isString()) {
             throw new IllegalArgumentException(INVALID_VALUE_TYPE_MSG);
         }
         this.valueString = value;
@@ -142,7 +142,7 @@ public class VariableInfo implements DeepCloneable, Serializable {
     }
 
     public void setValue(int value) {
-        if(!isInt()) {
+        if (!isInt()) {
             throw new IllegalArgumentException(INVALID_VALUE_TYPE_MSG);
         }
         this.valueInteger = value;
@@ -150,7 +150,7 @@ public class VariableInfo implements DeepCloneable, Serializable {
     }
 
     public void setValue(float value) {
-        if(!isFloat()) {
+        if (!isFloat()) {
             throw new IllegalArgumentException(INVALID_VALUE_TYPE_MSG);
         }
         this.valueFloat = value;
@@ -158,7 +158,7 @@ public class VariableInfo implements DeepCloneable, Serializable {
     }
 
     public void setValue(byte[] value) {
-        if(!isUid() && !isStream()) {
+        if (!isUid() && !isStream()) {
             throw new IllegalArgumentException(INVALID_VALUE_TYPE_MSG);
         }
         this.valueByteArray = value;
@@ -291,18 +291,18 @@ public class VariableInfo implements DeepCloneable, Serializable {
     }
 
     public byte[] bytes() {
-        if(variableType.equals(VariableType.INTEGER)) {
-                return ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(valueInteger).array();
-        } else if(variableType.equals(VariableType.FLOAT)) {
-                return ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putFloat(valueFloat).array();
-        }else if(variableType.equals(VariableType.STRING) || variableType.equals(VariableType.STRING_UTF_16_LE) || variableType.equals(VariableType.STRING_UTF_32_LE)) {
+        if (variableType.equals(VariableType.INTEGER)) {
+            return ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(valueInteger).array();
+        } else if (variableType.equals(VariableType.FLOAT)) {
+            return ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putFloat(valueFloat).array();
+        } else if (variableType.equals(VariableType.STRING) || variableType.equals(VariableType.STRING_UTF_16_LE) || variableType.equals(VariableType.STRING_UTF_32_LE)) {
             byte[] str = encodeString();
             byte[] len = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(valueString.length()).array();
             byte[] data = new byte[4 + str.length];
             System.arraycopy(len, 0, data, 0, len.length);
             System.arraycopy(str, 0, data, len.length, str.length);
             return data;
-        } else if(variableType.equals(VariableType.UID) ||variableType.equals(VariableType.STREAM)) {
+        } else if (variableType.equals(VariableType.UID) || variableType.equals(VariableType.STREAM)) {
             return valueByteArray;
         }
         return new byte[0];

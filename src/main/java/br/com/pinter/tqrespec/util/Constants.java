@@ -25,7 +25,9 @@ import javafx.scene.text.Font;
 
 import java.io.File;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public class Constants {
     public static final String APPNAME = "TQRespec";
@@ -51,9 +53,9 @@ public class Constants {
     public static final String STASH_FILE = "winsys.dxb";
     public static final String STASH_FILE_BACKUP = "winsys.dxg";
     public static final int MAX_CHARACTER_NAME_LENGTH = 14;
-    public static final String ARCHIVE_DIR="ArchivedCharacters";
-    public static final String EXPLORER_COMMAND="explorer.exe";
-    public static final String XDGOPEN_COMMAND="xdg-open";
+    public static final String ARCHIVE_DIR = "ArchivedCharacters";
+    public static final String EXPLORER_COMMAND = "explorer.exe";
+    public static final String XDGOPEN_COMMAND = "xdg-open";
     /**
      * Maps Game Options language to i18n locale
      */
@@ -107,6 +109,7 @@ public class Constants {
         public static final String FEMALE_DEFAULT_TEXTURE = "Creatures\\pc\\female\\femalepc01_tan.tex";
         public static final String VAR_TELEPORTUIDSSIZE = "teleportUIDsSize";
         public static final String VAR_TELEPORTUID = "teleportUID";
+
         private Save() {
         }
 
@@ -167,6 +170,7 @@ public class Constants {
         public static final String MAIN_CHOOSEGAMEDIRECTORY = "main.chooseGameDirectory";
         public static final String CHARACTERS_TITLE_MASTERY = "characters.masteryTitle";
         public static final String CHARACTERS_NAMENUMBER_FORMAT = "%s (%d)";
+
         private Msg() {
         }
     }

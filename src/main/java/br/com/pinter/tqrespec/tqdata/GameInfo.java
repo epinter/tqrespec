@@ -683,12 +683,12 @@ public class GameInfo {
 
     private void prepareDevGameSaveData() {
         File gamedataSavePath = Paths.get(Constants.DEV_GAMEDATA, Constants.SAVEDATA).toFile();
-        if(!gamedataSavePath.exists()) {
+        if (!gamedataSavePath.exists()) {
             try {
                 //noinspection ResultOfMethodCallIgnored
                 gamedataSavePath.mkdir();
             } catch (SecurityException e) {
-                logger.log(System.Logger.Level.INFO, "unable to create SaveData directory at "+gamedataSavePath.getAbsolutePath());
+                logger.log(System.Logger.Level.INFO, "unable to create SaveData directory at " + gamedataSavePath.getAbsolutePath());
             }
         }
     }
@@ -719,7 +719,7 @@ public class GameInfo {
 
     public String getSaveDataMainArchivedPath() {
         String archived = getSaveDataMainPath();
-        if(archived == null) {
+        if (archived == null) {
             return null;
         }
         return Paths.get(archived, Constants.ARCHIVE_DIR).toString();
@@ -727,7 +727,7 @@ public class GameInfo {
 
     public String getSaveDataUserArchivedPath() {
         String archived = getSaveDataUserPath();
-        if(archived == null) {
+        if (archived == null) {
             return null;
         }
         return Paths.get(archived, Constants.ARCHIVE_DIR).toString();
@@ -780,7 +780,7 @@ public class GameInfo {
 
     public List<PlayerCharacterFile> getPlayerCharacterList(SaveLocation... locations) {
         List<PlayerCharacterFile> ret = new ArrayList<>();
-        for(SaveLocation l: locations) {
+        for (SaveLocation l : locations) {
             ret.addAll(getPlayerListFromPath(l));
         }
         return ret;
@@ -820,21 +820,31 @@ public class GameInfo {
     }
 
     private String locationPath(SaveLocation saveLocation) {
-        if(saveLocation == null) {
+        if (saveLocation == null) {
             saveLocation = SaveLocation.MAIN;
         }
 
         switch (saveLocation) {
-            case USER -> { return getSaveDataUserPath();  }
-            case EXTERNAL -> { return getExternalSaveDataPath(); }
-            case ARCHIVEMAIN -> { return getSaveDataMainArchivedPath(); }
-            case ARCHIVEUSER -> { return getSaveDataUserArchivedPath(); }
-            default -> { return getSaveDataMainPath(); }
+            case USER -> {
+                return getSaveDataUserPath();
+            }
+            case EXTERNAL -> {
+                return getExternalSaveDataPath();
+            }
+            case ARCHIVEMAIN -> {
+                return getSaveDataMainArchivedPath();
+            }
+            case ARCHIVEUSER -> {
+                return getSaveDataUserArchivedPath();
+            }
+            default -> {
+                return getSaveDataMainPath();
+            }
         }
     }
 
     public Path playerChr(String playerName, SaveLocation saveLocation) {
-        if(SaveLocation.EXTERNAL.equals(saveLocation) && getExternalSaveDataPath() == null) {
+        if (SaveLocation.EXTERNAL.equals(saveLocation) && getExternalSaveDataPath() == null) {
             return null;
         }
         return Paths.get(playerPath(playerName, saveLocation).toString(), Constants.PLAYERCHR);

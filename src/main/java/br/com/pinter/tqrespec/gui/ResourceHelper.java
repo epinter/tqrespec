@@ -45,24 +45,24 @@ public class ResourceHelper {
     }
 
     public static List<Image> getAppIcons() {
-            return Arrays.asList(loadImage("icon/icon64.png"), loadImage("icon/icon32.png"), loadImage("icon/icon16.png"));
+        return Arrays.asList(loadImage("icon/icon64.png"), loadImage("icon/icon32.png"), loadImage("icon/icon16.png"));
     }
 
     public static Image loadImage(String url) {
-        try(InputStream image = Main.class.getModule().getResourceAsStream(url)) {
+        try (InputStream image = Main.class.getModule().getResourceAsStream(url)) {
             return new Image(image);
         } catch (IOException e) {
             throw new ResourceNotFoundException(e);
         }
     }
 
-    public static String getResource(String resource)  {
+    public static String getResource(String resource) {
         return getResourceUrl(resource).toExternalForm();
     }
 
-    public static URL getResourceUrl(String resource)  {
+    public static URL getResourceUrl(String resource) {
         URL url = Main.class.getResource(resource);
-        if(url == null) {
+        if (url == null) {
             throw new ResourceNotFoundException(String.format("The resource '%s' was not found.", resource));
         }
 

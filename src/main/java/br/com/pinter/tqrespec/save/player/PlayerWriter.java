@@ -74,7 +74,7 @@ public class PlayerWriter extends FileWriter {
     @SuppressWarnings("SameParameterValue")
     private boolean backupSaveGame(String fileName, String playerName) throws IOException {
         File backupDirectory = new File(gameInfo.getSavePath(), Constants.BACKUP_DIRECTORY);
-        logger.log(System.Logger.Level.INFO, "creating backup at "+backupDirectory.getAbsolutePath());
+        logger.log(System.Logger.Level.INFO, "creating backup at " + backupDirectory.getAbsolutePath());
         Path player = Paths.get(fileName);
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HH");
         String ts = df.format(new Date());
@@ -87,7 +87,7 @@ public class PlayerWriter extends FileWriter {
         }
 
         if (!backupDirectory.exists() && !backupDirectory.mkdir()) {
-            throw new IOException("Unable to create backup directory at "+backupDirectory.getAbsolutePath());
+            throw new IOException("Unable to create backup directory at " + backupDirectory.getAbsolutePath());
         }
 
         if (backupDirectory.canWrite()) {
@@ -214,8 +214,8 @@ public class PlayerWriter extends FileWriter {
 
     public void copyCurrentSave(String toPlayerName) throws IOException {
         List<PlayerCharacterFile> playerCharacterList = gameInfo.getPlayerCharacterList(SaveLocation.MAIN, SaveLocation.ARCHIVEMAIN);
-        if(playerCharacterList.stream().anyMatch(f -> f.getPlayerName().equalsIgnoreCase(toPlayerName))) {
-            throw new FileAlreadyExistsException("A character with name '"+toPlayerName+"' already exists");
+        if (playerCharacterList.stream().anyMatch(f -> f.getPlayerName().equalsIgnoreCase(toPlayerName))) {
+            throw new FileAlreadyExistsException("A character with name '" + toPlayerName + "' already exists");
         }
         copyCurrentSave(toPlayerName, Platform.UNDEFINED, null);
     }

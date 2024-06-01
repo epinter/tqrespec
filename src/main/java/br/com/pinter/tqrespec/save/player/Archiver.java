@@ -8,6 +8,7 @@ import br.com.pinter.tqrespec.save.SaveLocation;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
 import br.com.pinter.tqrespec.tqdata.PlayerCharacter;
 import com.google.inject.Inject;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,13 +25,13 @@ public class Archiver {
 
         Path main = Paths.get(gameInfo.getSaveDataMainPath());
         Path mainArchive = Paths.get(gameInfo.getSaveDataMainArchivedPath());
-        if(main.toFile().exists() && !mainArchive.toFile().exists()) {
+        if (main.toFile().exists() && !mainArchive.toFile().exists()) {
             Files.createDirectory(mainArchive);
         }
 
         Path user = Paths.get(gameInfo.getSaveDataUserPath());
         Path userArchive = Paths.get(gameInfo.getSaveDataUserArchivedPath());
-        if(user.toFile().exists() && !userArchive.toFile().exists()) {
+        if (user.toFile().exists() && !userArchive.toFile().exists()) {
             Files.createDirectory(userArchive);
         }
 
@@ -42,7 +43,7 @@ public class Archiver {
             throw new IOException("Invalid savegame location");
         }
 
-        if(!dst.startsWith(src.getParent()) || !dst.startsWith(gameInfo.getSavePath())) {
+        if (!dst.startsWith(src.getParent()) || !dst.startsWith(gameInfo.getSavePath())) {
             throw new IOException("Error archiving character, invalid path");
         }
 
@@ -61,7 +62,7 @@ public class Archiver {
             throw new IOException("Invalid savegame location");
         }
 
-        if(!src.startsWith(dst.getParent()) || !dst.startsWith(gameInfo.getSavePath())) {
+        if (!src.startsWith(dst.getParent()) || !dst.startsWith(gameInfo.getSavePath())) {
             throw new IOException("Error unarchiving character, invalid path");
         }
 

@@ -55,14 +55,14 @@ public class UID {
                 p2 & 0xFFFFFFFFL,
                 p1 & 0xFFFFFFFFL);
 
-        if("0-0-0-0".equals(uidStr) || StringUtils.isBlank(uidStr)) {
+        if ("0-0-0-0".equals(uidStr) || StringUtils.isBlank(uidStr)) {
             return null;
         }
         return uidStr;
     }
 
     public static byte[] convertUidStringToByte(String uid) {
-        if(StringUtils.isBlank(uid)) {
+        if (StringUtils.isBlank(uid)) {
             return new byte[0];
         }
 
