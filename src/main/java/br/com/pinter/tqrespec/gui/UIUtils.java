@@ -20,6 +20,7 @@
 
 package br.com.pinter.tqrespec.gui;
 
+import br.com.pinter.tqrespec.core.ResourceNotFoundException;
 import br.com.pinter.tqrespec.core.State;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.util.Build;
@@ -81,18 +82,27 @@ public class UIUtils {
     }
 
     public static void setStageFontCss(Stage stage) {
-        if (br.com.pinter.tqrespec.core.State.get().isLocaleLatin()) {
-            if (State.get().isGameFontFound()) {
-                String cssFontFile = String.format("/fxml/font/font-%s.css", Constants.UI.GAME_FONT_FAMILY.toLowerCase()).replaceAll("\\s+", "_");
-                logger.log(System.Logger.Level.INFO, "Setting font family to ''{0}'' (''{1}''), stage ''{2}''", Constants.UI.GAME_FONT_FAMILY, cssFontFile, stage.getTitle());
-                stage.getScene().getStylesheets().add(ResourceHelper.getResource(cssFontFile));
+        try {
+            if (br.com.pinter.tqrespec.core.State.get().isLocaleLatin()) {
+                if (State.get().isGameFontFound()) {
+                    String cssFontFile = String.format("/fxml/font/font-%s.css", Constants.UI.GAME_FONT_FAMILY.toLowerCase()).replaceAll("\\s+", "_");
+                    logger.log(System.Logger.Level.INFO, "Setting font family to ''{0}'' (''{1}''), stage ''{2}''", Constants.UI.GAME_FONT_FAMILY, cssFontFile, stage.getTitle());
+                    stage.getScene().getStylesheets().add(ResourceHelper.getResource(cssFontFile));
+                } else {
+                    logger.log(System.Logger.Level.INFO, "Setting font family css to default, stage ''{0}''", stage.getTitle());
+                    stage.getScene().getStylesheets().add(ResourceHelper.getResource(Constants.UI.DEFAULT_FONT_CSS));
+                }
             } else {
-                logger.log(System.Logger.Level.INFO, "Setting font family css to default, stage ''{0}''", stage.getTitle());
-                stage.getScene().getStylesheets().add(ResourceHelper.getResource(Constants.UI.DEFAULT_FONT_CSS));
+                logger.log(System.Logger.Level.INFO, "Setting font family css to default nonlatin, stage ''{0}''", stage.getTitle());
+                stage.getScene().getStylesheets().add(ResourceHelper.getResource("/fxml/font/font-nonlatin.css"));
             }
-        } else {
-            logger.log(System.Logger.Level.INFO, "Setting font family css to default nonlatin, stage ''{0}''", stage.getTitle());
-            stage.getScene().getStylesheets().add(ResourceHelper.getResource("/fxml/font/font-nonlatin.css"));
+            if (br.com.pinter.tqrespec.core.State.get().isGameFontFound()) {
+                stage.getScene().getStylesheets().add(ResourceHelper.getResource(
+                        String.format("/fxml/font/font-title-%s.css", Constants.UI.GAME_FONT_FAMILY.toLowerCase()).replaceAll("\\s+", "_")
+                ));
+            }
+        } catch (ResourceNotFoundException e) {
+            logger.log(System.Logger.Level.ERROR, "Error", e);
         }
     }
 
