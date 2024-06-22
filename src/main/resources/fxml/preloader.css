@@ -15,16 +15,16 @@
 }
 
 .bg-container {
-	-fx-background-color: #000000;
+    -fx-background-color: #000000;
     -fx-padding: 0 0 0 0;
     -fx-border-image-source: url('border.png');
     -fx-border-image-insets: 0;
     -fx-border-image-repeat: stretch;
     -fx-border-image-width: 3 3 3 3;
     -fx-border-image-slice: 3 3 3 3;
-	-fx-background-image: url('window_bg.png');
-	-fx-background-size: cover;
-	-fx-background-repeat: no-repeat;
+    -fx-background-image: url('window_bg.png');
+    -fx-background-size: cover;
+    -fx-background-repeat: no-repeat;
 }
 
 .topContainer,
@@ -36,10 +36,10 @@
 }
 
 .bar {
-    -fx-min-height: 50px;
-    -fx-pref-height: 50px;
-    -fx-max-height: 50px;
-    -fx-padding: 0px 0px 0px 0px;
+    -fx-min-height: 70px;
+    -fx-pref-height: 70px;
+    -fx-max-height: 70px;
+    -fx-padding: 20px 0px 0px 0px;
 }
 
 .indicator {
@@ -52,17 +52,16 @@
 }
 
 .version {
-	-fx-font-size: 1.3em;
-	-fx-font-family: sans-serif;
+    -fx-font-size: 1.3em;
     -fx-text-fill: #ffd993;
     -fx-padding: 0 0 0 0;
     -fx-effect: dropshadow( one-pass-box , black , 0, 0.0 , 0 , 2 );
 }
 
 .tq-bigtitle {
-	-fx-font-size: 3.0em;
-	-fx-font-family: 'Marcellus';
-	-fx-font-weight: bold;
+    -fx-font-size: 5.0em;
+    -fx-font-weight: bold;
     -fx-text-fill: #ffd993;
-    -fx-effect: dropshadow( one-pass-box , black , 5, 5.0 , 5 , 5 );
+    -fx-effect: dropshadow( one-pass-box, black, 5, 5.0, 5, 5);
+    -fx-padding: 20px 0px 0px 0px;
 }

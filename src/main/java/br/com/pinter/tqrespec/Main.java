@@ -27,10 +27,7 @@ import br.com.pinter.tqrespec.gui.ResizeListener;
 import br.com.pinter.tqrespec.gui.ResourceHelper;
 import br.com.pinter.tqrespec.gui.UIUtils;
 import br.com.pinter.tqrespec.logging.Log;
-import br.com.pinter.tqrespec.tqdata.Db;
-import br.com.pinter.tqrespec.tqdata.GameInfo;
-import br.com.pinter.tqrespec.tqdata.GameVersion;
-import br.com.pinter.tqrespec.tqdata.Txt;
+import br.com.pinter.tqrespec.tqdata.*;
 import br.com.pinter.tqrespec.util.Build;
 import br.com.pinter.tqrespec.util.Constants;
 import com.google.common.util.concurrent.AtomicDouble;
@@ -51,6 +48,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.text.Font;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -59,13 +57,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.io.*;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -86,6 +79,8 @@ public class Main extends Application {
     private GameInfo gameInfo;
     @Inject
     private UIUtils uiUtils;
+    @Inject
+    private GameResources fonts;
     private System.Logger logger;
     private StringExpression initialFontBinding;
     private Future<?> processBarTask;
@@ -179,6 +174,24 @@ public class Main extends Application {
                 txt.preload();
                 progressSet(1.0, 1.0);
                 db.player().preload();
+
+                try {
+                    for (Map.Entry<String, byte[]> font : fonts.getAllFonts().entrySet()) {
+                        InputStream is = new ByteArrayInputStream(font.getValue());
+                        logger.log(System.Logger.Level.INFO, "Loading game font ''{0}''", font.getKey());
+                        Font.loadFont(is, Constants.UI.DEFAULT_FONT_SIZE);
+                    }
+                    for (String family : Font.getFamilies()) {
+                        if (family.equals(Constants.UI.GAME_FONT_FAMILY)) {
+                            logger.log(System.Logger.Level.INFO, "Game font family found ''{0}''", family);
+                            br.com.pinter.tqrespec.core.State.get().setGameFontFound(true);
+                        }
+                    }
+                } catch (RuntimeException e) {
+                    logger.log(System.Logger.Level.ERROR, "Error loading game fonts", e);
+                }
+
+                UIUtils.setStageFontCss(primaryStage);
 
                 try {
                     new Thread(new GameProcessMonitor(gameInfo.getGamePath())).start();
@@ -280,6 +293,7 @@ public class Main extends Application {
             Locale gameLanguage = gameInfo.getGameLanguage();
             if (gameLanguage != null) {
                 State.get().setLocale(gameLanguage);
+                logger.log(System.Logger.Level.INFO, "Application language set to ''{0}''", State.get().getLocale());
             }
             fxmlLoader.setResources(ResourceBundle.getBundle("i18n.UI", State.get().getLocale()));
             fxmlLoader.setLocation(ResourceHelper.getResourceUrl(Constants.UI.MAIN_FXML));

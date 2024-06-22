@@ -128,7 +128,7 @@ public class ResourceHelper {
     }
 
     public static void loadFonts() {
-        Constants.UI.FONTS_LOADLIST.forEach(f -> Font.loadFont(getResource(f), 16));
+        Constants.UI.FONTS_LOADLIST.forEach(f -> Font.loadFont(getResource(f), Constants.UI.DEFAULT_FONT_SIZE));
     }
 
     private static void setLabeledText(Object obj, String text) {

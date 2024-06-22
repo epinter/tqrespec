@@ -129,15 +129,16 @@ public class Constants {
         public static final String PRELOADER_TOP_STYLE = "topContainer";
         public static final String PRELOADER_BOTTOM_STYLE = "bottomContainer";
         public static final String PRELOADER_BAR_STYLE = "bar";
-        public static final int PRELOADER_WIDTH = 370;
-        public static final int PRELOADER_HEIGHT = 180;
+        public static final int PRELOADER_WIDTH = 500;
+        public static final int PRELOADER_HEIGHT = 250;
         public static final String TOAST_HEADER_STYLE = "tq-toast-header";
         public static final String TOAST_CONTENT_STYLE = "tq-toast-content";
         public static final int TOAST_WARNING_TIMEOUT = 10000;
         public static final int TOOLTIP_SHOWDELAY_MILLIS = 150;
         public static final int TOOLTIP_SHOWDURATION_MILLIS = 9000;
         public static final double TOOLTIP_MAXWIDTH = 500d;
-        public static final Font TOOLTIP_FONT = Font.font("Marcellus", 16d);
+        public static final double DEFAULT_FONT_SIZE = 16d;
+        public static final Font TOOLTIP_FONT = Font.font("sans-serif", DEFAULT_FONT_SIZE);
         public static final String TAG_STRLABEL = "tagCStrength";
         public static final String TAG_INTLABEL = "tagCIntelligence";
         public static final String TAG_DEXLABEL = "tagCDexterity";
@@ -157,9 +158,11 @@ public class Constants {
         public static final String TAG_STAT_MONSTERSKILLED = "tagCMonsterKills";
         public static final String TAG_STAT_GREATESTDAMAGE = "tagCHighestDamage";
         public static final String TAG_STAT_GREATESTMONSTER = "tagCHighestMonster";
+        public static final String DEFAULT_FONT_CSS = "/fxml/font/font-default.css";
+        public static final String GAME_FONT_FAMILY = "Albertus MT";
 
         public static final List<String> FONTS_LOADLIST = List.of(
-                "/fxml/Marcellus-Regular.ttf",
+                "/fxml/font/Marcellus-Regular.ttf",
                 "/fxml/fa5-free-solid-900.ttf"
         );
 

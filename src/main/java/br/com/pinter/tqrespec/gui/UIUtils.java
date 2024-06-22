@@ -27,7 +27,9 @@ import br.com.pinter.tqrespec.util.Constants;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Tooltip;
+import javafx.scene.text.Font;
 import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -76,6 +78,22 @@ public class UIUtils {
         alert.setHeaderText(ResourceHelper.getMessage("alert.saveinprogress_header"));
         alert.setContentText(ResourceHelper.getMessage("alert.saveinprogress_content"));
         alert.showAndWait();
+    }
+
+    public static void setStageFontCss(Stage stage) {
+        if (br.com.pinter.tqrespec.core.State.get().isLocaleLatin()) {
+            if (State.get().isGameFontFound()) {
+                String cssFontFile = String.format("/fxml/font/font-%s.css", Constants.UI.GAME_FONT_FAMILY.toLowerCase()).replaceAll("\\s+", "_");
+                logger.log(System.Logger.Level.INFO, "Setting font family to ''{0}'' (''{1}''), stage ''{2}''", Constants.UI.GAME_FONT_FAMILY, cssFontFile, stage.getTitle());
+                stage.getScene().getStylesheets().add(ResourceHelper.getResource(cssFontFile));
+            } else {
+                logger.log(System.Logger.Level.INFO, "Setting font family css to default, stage ''{0}''", stage.getTitle());
+                stage.getScene().getStylesheets().add(ResourceHelper.getResource(Constants.UI.DEFAULT_FONT_CSS));
+            }
+        } else {
+            logger.log(System.Logger.Level.INFO, "Setting font family css to default nonlatin, stage ''{0}''", stage.getTitle());
+            stage.getScene().getStylesheets().add(ResourceHelper.getResource("/fxml/font/font-nonlatin.css"));
+        }
     }
 
     public static void fileExplorer(String path) {

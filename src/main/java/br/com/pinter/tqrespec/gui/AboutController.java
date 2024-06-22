@@ -60,6 +60,7 @@ public class AboutController implements Initializable {
         stage.setScene(scene);
         scene.setFill(Color.TRANSPARENT);
         stage.initModality(Modality.APPLICATION_MODAL);
+        UIUtils.setStageFontCss(stage);
 
         stage.getIcons().addAll(ResourceHelper.getAppIcons());
 

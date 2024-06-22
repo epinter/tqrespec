@@ -21,10 +21,12 @@
 package br.com.pinter.tqrespec.core;
 
 import javafx.beans.property.SimpleBooleanProperty;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
@@ -35,7 +37,8 @@ public class State {
     private final SimpleBooleanProperty gameRunning = new SimpleBooleanProperty(false);
     private final Map<String, Level> debugPrefix = new HashMap<>();
     private final AtomicReference<MyTask<Integer>> lastCursorWaitTask = new AtomicReference<>();
-    private Locale locale = Locale.ENGLISH;
+    private final AtomicBoolean gameFontFound = new AtomicBoolean(false);
+    private Locale locale = Locale.of("en");
 
     private State() {
     }
@@ -84,9 +87,16 @@ public class State {
 
     public Locale getLocale() {
         if (locale == null) {
-            locale = Locale.ENGLISH;
+            locale = Locale.of("en");
         }
         return locale;
+    }
+
+    public boolean isLocaleLatin() {
+        if (locale == null) {
+            return true;
+        }
+        return !StringUtils.equalsAnyIgnoreCase(locale.getLanguage(), "zh", "ja", "ko", "pl", "ru", "uk");
     }
 
     public void setLocale(Locale locale) {
@@ -99,5 +109,13 @@ public class State {
 
     public void setLastCursorWaitTask(MyTask<Integer> lastCursorWaitTask) {
         this.lastCursorWaitTask.set(lastCursorWaitTask);
+    }
+
+    public boolean isGameFontFound() {
+        return gameFontFound.get();
+    }
+
+    public void setGameFontFound(boolean gameFontFound) {
+        this.gameFontFound.set(gameFontFound);
     }
 }

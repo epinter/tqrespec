@@ -44,7 +44,8 @@ public class AppPreloader extends Preloader {
 
         BorderPane pane = new BorderPane();
         Scene scene = new Scene(pane, Constants.UI.PRELOADER_WIDTH, Constants.UI.PRELOADER_HEIGHT);
-        pane.getStylesheets().add(ResourceHelper.getResource(Constants.UI.PRELOADER_CSS));
+        scene.getStylesheets().add(ResourceHelper.getResource(Constants.UI.PRELOADER_CSS));
+        scene.getStylesheets().add(ResourceHelper.getResource(Constants.UI.DEFAULT_FONT_CSS));
         pane.getStyleClass().add(Constants.UI.PRELOADER_PANE_STYLE);
 
         Label title = new Label();

@@ -935,6 +935,18 @@ public class GameInfo {
         return textPaths;
     }
 
+    public String getResourcesPath() throws FileNotFoundException {
+        try {
+            if (gamePath == null) {
+                getGamePath();
+            }
+            return Path.of(gamePath, "Resources").toString();
+        } catch (GameNotFoundException e) {
+            logger.log(System.Logger.Level.ERROR, "", e);
+            throw new FileNotFoundException("Resources path not found");
+        }
+    }
+
     public GameVersion getInstalledVersion() {
         return installedVersion;
     }
