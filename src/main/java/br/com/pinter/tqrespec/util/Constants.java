@@ -56,13 +56,14 @@ public class Constants {
     public static final String ARCHIVE_DIR = "ArchivedCharacters";
     public static final String EXPLORER_COMMAND = "explorer.exe";
     public static final String XDGOPEN_COMMAND = "xdg-open";
+
     /**
      * Maps Game Options language to i18n locale
      */
     public static final Map<String, Locale> GAMELANGUAGE_LOCALE = ImmutableMap.<String, Locale>builder()
             .put("English", Locale.of("en"))
             .put("Portuguese", Locale.of("pt", "BR"))
-            .put("Chinese", Locale.of("ch"))
+            .put("Chinese", Locale.of("zh"))
             .put("German", Locale.of("de"))
             .put("Spanish", Locale.of("es"))
             .put("French", Locale.of("fr"))
@@ -72,13 +73,14 @@ public class Constants {
             .put("Polish", Locale.of("pl"))
             .put("Russian", Locale.of("ru"))
             .put("Ukrainian", Locale.of("uk")).build();
+
     /**
      * Maps Locale to Text files
      */
     public static final Map<Locale, String> LOCALE_TEXT = ImmutableMap.<Locale, String>builder()
             .put(Locale.of("en"), "EN")
             .put(Locale.of("pt", "BR"), "BR")
-            .put(Locale.of("ch"), "CH")
+            .put(Locale.of("zh"), "CH")
             .put(Locale.of("cz"), "CZ")
             .put(Locale.of("de"), "DE")
             .put(Locale.of("es"), "ES")
