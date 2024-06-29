@@ -177,9 +177,9 @@ public class Main extends Application {
 
                 try {
                     for (Map.Entry<String, byte[]> font : fonts.getAllFonts().entrySet()) {
-                        InputStream is = new ByteArrayInputStream(font.getValue());
-                        logger.log(System.Logger.Level.INFO, "Loading game font ''{0}''", font.getKey());
-                        Font.loadFont(is, Constants.UI.DEFAULT_FONT_SIZE);
+                        if (Constants.UI.GAME_FONT_FILENAMES.contains(font.getKey())) {
+                            ResourceHelper.loadFont(new ByteArrayInputStream(font.getValue()), font.getKey());
+                        }
                     }
                     for (String family : Font.getFamilies()) {
                         if (family.equals(Constants.UI.GAME_FONT_FAMILY)) {

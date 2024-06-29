@@ -23,6 +23,7 @@ package br.com.pinter.tqrespec.gui;
 import br.com.pinter.tqrespec.Main;
 import br.com.pinter.tqrespec.core.ResourceNotFoundException;
 import br.com.pinter.tqrespec.core.State;
+import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Constants;
 import javafx.scene.control.Labeled;
@@ -41,6 +42,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class ResourceHelper {
+    private static final System.Logger logger = Log.getLogger(ResourceHelper.class.getName());
+
     private ResourceHelper() {
     }
 
@@ -127,8 +130,22 @@ public class ResourceHelper {
         }
     }
 
+    public static void loadFont(InputStream is, String fileName) {
+        Font loaded = null;
+        loaded = Font.loadFont(is, Constants.UI.DEFAULT_FONT_SIZE);
+        if (loaded != null) {
+            logger.log(System.Logger.Level.INFO, "Loading game font file:''{0}''; name:''{1}''; family:''{2}''",
+                    fileName, loaded.getName(), loaded.getFamily());
+        }
+    }
+
     public static void loadFonts() {
-        Constants.UI.FONTS_LOADLIST.forEach(f -> Font.loadFont(getResource(f), Constants.UI.DEFAULT_FONT_SIZE));
+        Constants.UI.FONTS_LOADLIST.forEach(f -> {
+            Font loaded = null;
+            if ((loaded = Font.loadFont(getResource(f), Constants.UI.DEFAULT_FONT_SIZE)) != null) {
+                logger.log(System.Logger.Level.INFO, "Font loaded: name:''{0}''; family''{1}''", f, loaded.getFamily());
+            }
+        });
     }
 
     private static void setLabeledText(Object obj, String text) {

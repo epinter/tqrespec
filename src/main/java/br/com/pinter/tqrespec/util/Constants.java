@@ -163,7 +163,13 @@ public class Constants {
 
         public static final List<String> FONTS_LOADLIST = List.of(
                 "/fxml/font/Marcellus-Regular.ttf",
+                "/fxml/font/Roboto-Regular.ttf",
                 "/fxml/fa5-free-solid-900.ttf"
+        );
+
+        public static final List<String> GAME_FONT_FILENAMES = List.of(
+                "ALBERTUS MT.FNT",
+                "ALBERTUS MT LIGHT.FNT"
         );
 
         private UI() {
