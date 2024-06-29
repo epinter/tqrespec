@@ -131,6 +131,7 @@ public class MainController implements Initializable {
             @Override
             protected Void call() {
                 windowShownHandler();
+                pointsPaneController.windowShownHandler();
                 return null;
             }
         }).start()));
