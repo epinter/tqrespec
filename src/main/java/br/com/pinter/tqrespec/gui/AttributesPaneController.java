@@ -147,6 +147,11 @@ public class AttributesPaneController implements Initializable {
         }
     }
 
+    public void windowShownHandler() {
+        logger.log(System.Logger.Level.INFO, "Font applied: name:''{0}'', family:''{1}''",
+                healthLabel.getFont().getName(), healthLabel.getFont().getFamily());
+    }
+
     public boolean isSaveDisabled() {
         return saveDisabled.get();
     }
