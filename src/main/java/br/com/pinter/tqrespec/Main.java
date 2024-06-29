@@ -293,8 +293,10 @@ public class Main extends Application {
             Locale gameLanguage = gameInfo.getGameLanguage();
             if (gameLanguage != null) {
                 State.get().setLocale(gameLanguage);
-                logger.log(System.Logger.Level.INFO, "Application language set to ''{0}''", State.get().getLocale());
             }
+            Locale.setDefault(State.get().getLocale());
+            logger.log(System.Logger.Level.INFO, "Application language set to ''{0}''", State.get().getLocale());
+
             fxmlLoader.setResources(ResourceBundle.getBundle("i18n.UI", State.get().getLocale()));
             fxmlLoader.setLocation(ResourceHelper.getResourceUrl(Constants.UI.MAIN_FXML));
             root = fxmlLoader.load();
