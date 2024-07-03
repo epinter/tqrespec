@@ -1,4 +1,13 @@
 # Changelog
+## [0.13.1] - 2024-07-03
+### Fixed
+- Fix non-latin languages font
+- Code updated and optimized for Java 21
+- Fix code warnings
+
+### Added
+- Use game font if available
+
 ## [0.13.0] - 2024-05-31
 ### Fixed
 - Fixed crash during parse of edited options.txt, issue #51.
