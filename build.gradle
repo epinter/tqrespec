@@ -315,7 +315,7 @@ tasks.register('archiveAppimage', Zip) {
     }
     from layout.buildDirectory.dir("app-image").get().asFile
     archiveFileName = appArchiveName
-    destinationDirectory = layout.buildDirectory.get().asFile
+    destinationDirectory = layout.buildDirectory.dir("appimage-dist").get().asFile
 }
 
 tasks.register('appimage', Exec) {
