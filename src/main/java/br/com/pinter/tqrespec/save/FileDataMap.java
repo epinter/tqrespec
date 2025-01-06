@@ -300,7 +300,6 @@ public class FileDataMap implements DeepCloneable {
                 storeChange(v, newVar);
             } else if ((playerVar.variable().equals("boostedCharacterForX4") && playerVar.location().equals(currentBlockType))
                     || (playerVar.variable().equals("tartarusDefeatedCount[i]") && playerVar.location().equals(currentBlockType))
-                    || (playerVar.variable().equals("altMoney") && playerVar.location().equals(currentBlockType))
                     || (playerVar.variable().equals("hasSkillServices") && playerVar.location().equals(currentBlockType))
                     || (playerVar.variable().equals("version") && playerVar.location().equals(currentBlockType))) {
                 removeVariable(v);
