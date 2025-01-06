@@ -84,7 +84,8 @@ if (osArch != "amd64") {
     ext['appArchiveArch'] = String.format("-%s",ext.osArch)
 }
 
-ext['appArchiveName'] = "${distAppName}-${project.version}${ext.appArchiveOs}${ext.appArchiveArch}.zip"
+ext['buildPackageName'] = "${distAppName}-${project.version}${ext.appArchiveOs}${ext.appArchiveArch}"
+ext['appArchiveName'] = "${ext.buildPackageName}.zip"
 
 repositories {
     mavenCentral()
@@ -412,5 +413,20 @@ tasks.register('appimage', Exec) {
         layout.buildDirectory.dir("jre-image").get().asFile.deleteDir()
     }
 }
+
+tasks.register('prepBuildEnv') {
+    doFirst {
+        file(layout.buildDirectory.get().file("build-packagename.txt")).write("${buildPackageName}")
+        if (System.getenv("GITHUB_ENV") != null) {
+            println "GitHub Actions found"
+            file(System.getenv("GITHUB_ENV")).withWriterAppend { out ->
+                out.println("APP_BUILDPACKAGENAME=${buildPackageName}")
+                out.println("APP_NAME=${distAppName}")
+                out.println("APP_VERSION=${project.version}")
+            }
+        }
+    }
+}
+appimage.dependsOn 'prepBuildEnv'
 
 clean.dependsOn subprojects.collect { it.tasks.matching { it.name == 'clean' } }
