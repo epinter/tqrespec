@@ -1,4 +1,12 @@
 # Changelog
+## [0.14.0] - 2025-01-19
+### Fixed
+- Don't remove altMoney(Electrum) when converting save to mobile, issue #54
+
+### Changed
+- Updated OpenJFX SDK
+- Improved Linux support
+
 ## [0.13.1] - 2024-07-03
 ### Fixed
 - Fix non-latin languages font

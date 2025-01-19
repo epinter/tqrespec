@@ -28,7 +28,7 @@ sourceSets {
 
 OperatingSystem OS = DefaultNativePlatform.currentOperatingSystem
 ext.distAppName = 'TQRespec'
-version = '0.13.1'
+version = '0.14.0'
 
 application {
     mainClass = "br.com.pinter.tqrespec.Main"
