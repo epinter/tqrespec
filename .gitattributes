@@ -1,6 +1,7 @@
 * text=auto
 *.java text
+*.sh text eol=lf
 *.properties text
 *.gradle text
-grablew binary
-grablew.bat text
+gradlew text eol=lf
+gradlew.bat text eol=crlf
