@@ -222,8 +222,8 @@ class PlayerWriterTest {
             fail();
         }
 
-        assertTrue("src\\test\\resources\\_testcopy\\winsys.dxb".equals(stashData.getDataMap().getString("fName"))
-                || "src\\test\\resources\\_testcopy/winsys.dxb".equals(stashData.getDataMap().getString("fName")));
+        assertNotNull(stashData.getDataMap().getString("fName"));
+        assertTrue(stashData.getDataMap().getString("fName").matches("src[\\\\/]test[\\\\/]resources[\\\\/]_testcopy[\\\\/]winsys.dxb"));
     }
 
     @Test
