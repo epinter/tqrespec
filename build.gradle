@@ -4,9 +4,7 @@
 
 buildscript {
     repositories {
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
+        mavenCentral()
     }
 }
 
@@ -16,7 +14,7 @@ plugins {
     id "org.sonarqube" version "5.0.0.4638"
 }
 
-group 'br.com.pinter.tqrespec'
+group = 'br.com.pinter.tqrespec'
 
 apply from: "gradle/patchModulesJar.gradle"
 
@@ -396,14 +394,14 @@ tasks.register('appimage', Exec) {
             }
         }
 
-        copy {
-            if (OS.isWindows()) {
+        if (OS.isWindows()) {
+            copy {
                 from javafxSdkBinDir.listFiles().findAll {
                     it.getName().equalsIgnoreCase("ucrtbase.dll") ||
-                    it.getName().toLowerCase().startsWith("vcruntime") ||
-                    it.getName().toLowerCase().startsWith("msvcp") ||
-                    it.getName().toLowerCase().startsWith("api-ms-win-core") ||
-                    it.getName().toLowerCase().startsWith("api-ms-win-crt")
+                            it.getName().toLowerCase().startsWith("vcruntime") ||
+                            it.getName().toLowerCase().startsWith("msvcp") ||
+                            it.getName().toLowerCase().startsWith("api-ms-win-core") ||
+                            it.getName().toLowerCase().startsWith("api-ms-win-crt")
                 }.collect()
 
                 into layout.buildDirectory.dir("app-image/${distAppName}/runtime/bin")
@@ -414,8 +412,8 @@ tasks.register('appimage', Exec) {
             from "${projectDir}/README.md"
             into layout.buildDirectory.dir("app-image/${distAppName}")
         }
-        copy {
-            if (OS.isLinux()) {
+        if (OS.isLinux()) {
+            copy {
                 from "${projectDir}/src/dist/TQRespec.sh"
                 into layout.buildDirectory.dir("app-image/${distAppName}")
             }
