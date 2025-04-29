@@ -94,6 +94,7 @@ repositories {
 dependencies {
     implementation fileTree(dir: javafxSdkLibDir, include: [
                     'javafx.base.jar', 'javafx.controls.jar', 'javafx.fxml.jar', 'javafx.graphics.jar'])
+    implementation libs.guava
     implementation libs.guice
     implementation libs.commons.lang3
     implementation libs.commons.text
@@ -109,6 +110,7 @@ dependencies {
     testRuntimeOnly libs.junit.launcher
     testImplementation libs.mockito.core
     testImplementation libs.mockito.junit.jupiter
+    testImplementation libs.guava
     testImplementation libs.guice
 }
 
