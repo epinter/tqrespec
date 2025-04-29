@@ -1,0 +1,23 @@
+[versions]
+junit = "5.13.0-M2"
+junit-launcher = "1.13.0-M2"
+mockito = "5.17.0"
+guice = "7.0.0"
+commons-lang3 = "3.14.0"
+commons-text = "1.12.0"
+jna = "5.14.0"
+jackson = "2.17.1"
+
+[libraries]
+junit = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
+junit-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
+junit-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-launcher" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
+guice = { module = "com.google.inject:guice", version.ref = "guice" }
+commons-lang3 = { module = "org.apache.commons:commons-lang3", version.ref = "commons-lang3" }
+commons-text = { module = "org.apache.commons:commons-text", version.ref = "commons-text" }
+jna = { module = "net.java.dev.jna:jna-platform-jpms", version.ref = "jna" }
+jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson" }
+jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "jackson" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
