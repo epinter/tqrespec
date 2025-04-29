@@ -88,7 +88,7 @@ public class ResourceHelper {
 
     public static String getMessage(String message) {
         ResourceBundle ui = ResourceBundle.getBundle("i18n.UI", State.get().getLocale());
-        if (ui.containsKey(message)) {
+        if (ui != null && message != null && ui.containsKey(message)) {
             return ui.getString(message);
         }
         return message;
@@ -96,7 +96,7 @@ public class ResourceHelper {
 
     public static String getMessage(String message, Object... parameters) {
         ResourceBundle ui = ResourceBundle.getBundle("i18n.UI", State.get().getLocale());
-        if (ui.containsKey(message)) {
+        if (ui != null && message != null && ui.containsKey(message)) {
             return MessageFormat.format(ui.getString(message), parameters);
         }
         return message;
