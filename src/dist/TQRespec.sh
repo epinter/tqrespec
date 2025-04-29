@@ -6,4 +6,4 @@ if [ -n "$LD_LIBRARY_PATH" ]; then
 fi
 export LD_LIBRARY_PATH=${MYDIR}/lib/runtime/lib${OLDLDLIB}
 cd "$MYDIR"
-exec ./bin/TQRespec
+exec ./bin/TQRespec $@
