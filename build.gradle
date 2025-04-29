@@ -91,6 +91,10 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+    mockitoAgent
+}
+
 dependencies {
     implementation fileTree(dir: javafxSdkLibDir, include: [
                     'javafx.base.jar', 'javafx.controls.jar', 'javafx.fxml.jar', 'javafx.graphics.jar'])
@@ -110,6 +114,9 @@ dependencies {
     testRuntimeOnly libs.junit.launcher
     testImplementation libs.mockito.core
     testImplementation libs.mockito.junit.jupiter
+    mockitoAgent(libs.mockito.core) {
+        transitive = false
+    }
     testImplementation libs.guava
     testImplementation libs.guice
 }
@@ -121,7 +128,8 @@ test {
             '--add-opens', 'java.base/java.io=ALL-UNNAMED',
             '--add-opens', 'java.base/java.nio=ALL-UNNAMED',
             '--add-opens', 'java.base/java.nio.file=ALL-UNNAMED',
-            '--add-opens', 'java.logging/java.util.logging=ALL-UNNAMED'
+            '--add-opens', 'java.logging/java.util.logging=ALL-UNNAMED',
+            "-javaagent:${configurations.mockitoAgent.asPath}"
 }
 
 if (OS.isWindows()) {
