@@ -27,7 +27,12 @@ import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.SaveLocation;
 import br.com.pinter.tqrespec.util.Constants;
 import com.google.inject.Singleton;
-import com.sun.jna.platform.win32.*;
+import com.sun.jna.platform.win32.Advapi32Util;
+import com.sun.jna.platform.win32.Shell32Util;
+import com.sun.jna.platform.win32.ShlObj;
+import com.sun.jna.platform.win32.Win32Exception;
+import com.sun.jna.platform.win32.WinNT;
+import com.sun.jna.platform.win32.WinReg;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -41,7 +46,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -59,6 +69,7 @@ public class GameInfo {
     private String gamePath = null;
     private InstallType installType = InstallType.UNKNOWN;
     private Path tqBasePath = null;
+    private Path steamLibraryPathFound = null;
     private HashMap<String, String> gameOptions;
     private GameVersion installedVersion = GameVersion.UNKNOWN;
     private boolean dlcRagnarok = false;
@@ -122,26 +133,28 @@ public class GameInfo {
 
     private Path getSteamLibraryPath() {
         String steamPath = null;
-        try {
-            steamPath = Advapi32Util.registryGetStringValue(
-                    WinReg.HKEY_CURRENT_USER, REG_KEY_VALVE_STEAM, "SteamPath");
-        } catch (Win32Exception e) {
-            logger.log(System.Logger.Level.ERROR, "", e);
-        }
+        Path steamLibraryFolderVdf;
 
-        try {
-            if (steamPath == null) {
+        if (SystemUtils.IS_OS_WINDOWS) {
+            try {
                 steamPath = Advapi32Util.registryGetStringValue(
-                        WinReg.HKEY_LOCAL_MACHINE, REG_KEY_VALVE_STEAM, "InstallPath",
-                        WinNT.KEY_WOW64_32KEY);
+                        WinReg.HKEY_CURRENT_USER, REG_KEY_VALVE_STEAM, "SteamPath");
+
+                if (steamPath == null) {
+                    steamPath = Advapi32Util.registryGetStringValue(
+                            WinReg.HKEY_LOCAL_MACHINE, REG_KEY_VALVE_STEAM, "InstallPath",
+                            WinNT.KEY_WOW64_32KEY);
+                }
+            } catch (Win32Exception e) {
+                logger.log(System.Logger.Level.ERROR, "", e);
+                return null;
             }
-        } catch (Win32Exception e) {
-            logger.log(System.Logger.Level.ERROR, "", e);
-            return null;
+            steamLibraryFolderVdf = Paths.get(steamPath, "SteamApps", "libraryfolders.vdf").toAbsolutePath();
+        } else {
+            steamLibraryFolderVdf = Paths.get(System.getProperty("user.home"), ".steam", "steam", "config", "libraryfolders.vdf").toAbsolutePath();
         }
 
         try {
-            Path steamLibraryFolderVdf = Paths.get(steamPath, "SteamApps", "libraryfolders.vdf").toAbsolutePath();
 
             List<String> libraryPaths = getLibraryPathsFromSteam(steamLibraryFolderVdf.toString());
 
@@ -150,10 +163,11 @@ public class GameInfo {
             for (String directory : libraryPaths) {
                 logger.log(System.Logger.Level.DEBUG, "Trying library -- ''{0}''", directory);
 
-                Path libraryPath = Paths.get(directory, "SteamApps").toAbsolutePath();
+                Path libraryPath = Paths.get(directory, "steamapps").toAbsolutePath();
                 Path libraryGamePath = Paths.get(libraryPath.toString(), Constants.GAME_DIRECTORY_STEAM).toAbsolutePath();
                 if (isValidGamePath(libraryGamePath)) {
                     logger.log(System.Logger.Level.DEBUG, "VALID PATH FOUND!! -- ''{0}''", libraryGamePath);
+                    steamLibraryPathFound = libraryPath;
                     return libraryPath;
                 }
             }
@@ -222,6 +236,10 @@ public class GameInfo {
     }
 
     private Path getGameGogPath() {
+        if (!SystemUtils.IS_OS_WINDOWS) {
+            return null;
+        }
+
         try {
             //TQAE GOG 1196955511
             String gog = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE,
@@ -247,6 +265,10 @@ public class GameInfo {
     }
 
     private Path getGameDiscPath(String reg) {
+        if (!SystemUtils.IS_OS_WINDOWS) {
+            return null;
+        }
+
         try {
             String disc = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, reg, "Install Location", WinNT.KEY_WOW64_32KEY);
             if (StringUtils.isNotBlank(disc)) {
@@ -263,6 +285,10 @@ public class GameInfo {
     }
 
     private Path getGameInstalledPath(String regexGameName) {
+        if (!SystemUtils.IS_OS_WINDOWS) {
+            return null;
+        }
+
         String[] installedApps = new String[0];
         try {
             installedApps = Advapi32Util.registryGetKeys(WinReg.HKEY_LOCAL_MACHINE,
@@ -293,6 +319,10 @@ public class GameInfo {
     }
 
     private Path getGameMicrosoftStorePath() {
+        if (!SystemUtils.IS_OS_WINDOWS) {
+            return null;
+        }
+
         String regexGameName = Constants.REGEX_REGISTRY_PACKAGE;
         String[] pkgList;
         String pkgKeyPath = "Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\CurrentVersion\\" +
@@ -329,6 +359,10 @@ public class GameInfo {
     }
 
     private Path getGameSteamApiBasedPath() {
+        if (!SystemUtils.IS_OS_WINDOWS) {
+            return null;
+        }
+
         try {
             String steamPath = Advapi32Util.registryGetStringValue(
                     WinReg.HKEY_CURRENT_USER, REG_KEY_VALVE_STEAM, "SteamPath");
@@ -532,6 +566,10 @@ public class GameInfo {
     }
 
     private String getLastUsedGamePath() throws GameNotFoundException {
+        if (!SystemUtils.IS_OS_WINDOWS) {
+            return null;
+        }
+
         String lastUsedPath = Settings.getLastDetectedGamePath();
         String lastUsedTqBase = Settings.getLastDetectedTqBasePath();
         GameVersion lastUsedVersion = GameVersion.fromValue(Settings.getLastDetectedGameVersion());
@@ -560,11 +598,6 @@ public class GameInfo {
     }
 
     public String getGamePath() throws GameNotFoundException {
-        if (StringUtils.isEmpty(gamePath) && !SystemUtils.IS_OS_WINDOWS) {
-            logger.log(System.Logger.Level.DEBUG, "OS is not windows, using dev game path");
-            return setDevGamePath(Constants.DEV_GAMEDATA);
-        }
-
         if (isValidLocalPath(Paths.get(Constants.DEV_GAMEDATA))) {
             logger.log(System.Logger.Level.INFO, "Local gamedata path found");
             return setDevGamePath(Constants.DEV_GAMEDATA);
@@ -585,6 +618,11 @@ public class GameInfo {
             if (installedPath != null) {
                 setGamePath(installedPath.toString());
             }
+        }
+
+        if (StringUtils.isEmpty(gamePath) && !SystemUtils.IS_OS_WINDOWS) {
+            logger.log(System.Logger.Level.DEBUG, "OS is not windows, using dev game path");
+            return setDevGamePath(Constants.DEV_GAMEDATA);
         }
 
         logger.log(System.Logger.Level.DEBUG, "Game data found: ''{0}''", gamePath);
@@ -698,6 +736,18 @@ public class GameInfo {
         logger.log(System.Logger.Level.DEBUG, "SavePath: user.home is ''{0}''", userHome);
 
         if (!SystemUtils.IS_OS_WINDOWS) {
+            if (gamePath == null || steamLibraryPathFound == null) {
+                try {
+                    getGamePath();
+                } catch (GameNotFoundException ignored) {
+                }
+            }
+            if (installType == InstallType.STEAM) {
+                return Path.of(
+                        steamLibraryPathFound.toString(),
+                        "compatdata", "475150", "pfx", "drive_c", "users", "steamuser", "Documents",
+                        Constants.SAVEGAME_SUBDIR).toAbsolutePath().toString();
+            }
             prepareDevGameSaveData();
             return Constants.DEV_GAMEDATA;
         }
@@ -734,7 +784,7 @@ public class GameInfo {
     }
 
     public String getSaveDataMainPath() {
-        if (!SystemUtils.IS_OS_WINDOWS) {
+        if (!SystemUtils.IS_OS_WINDOWS && installType != InstallType.STEAM) {
             prepareDevGameSaveData();
             return Paths.get(Constants.DEV_GAMEDATA, Constants.SAVEDATA, "Main").toString();
         }
@@ -746,7 +796,7 @@ public class GameInfo {
     }
 
     public String getSaveDataUserPath() {
-        if (!SystemUtils.IS_OS_WINDOWS) {
+        if (!SystemUtils.IS_OS_WINDOWS && installType != InstallType.STEAM) {
             prepareDevGameSaveData();
             return Paths.get(Constants.DEV_GAMEDATA, Constants.SAVEDATA, "User").toString();
         }
@@ -759,7 +809,15 @@ public class GameInfo {
 
     public String getSaveSetingsPath() {
         if (!SystemUtils.IS_OS_WINDOWS) {
-            return Paths.get(Constants.DEV_GAMEDATA, Constants.SETTINGS).toString();
+            if (gamePath == null) {
+                try {
+                    getGamePath();
+                } catch (GameNotFoundException ignored) {
+                }
+            }
+            if (installType != InstallType.STEAM) {
+                return Paths.get(Constants.DEV_GAMEDATA, Constants.SETTINGS).toString();
+            }
         }
 
         String savePath = getSavePath();
