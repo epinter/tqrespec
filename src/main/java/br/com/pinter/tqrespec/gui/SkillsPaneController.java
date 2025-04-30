@@ -31,7 +31,6 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
@@ -49,6 +48,7 @@ import java.util.ResourceBundle;
 
 public class SkillsPaneController implements Initializable {
     private final BooleanProperty saveDisabled = new SimpleBooleanProperty();
+    private MainController mc;
     @FXML
     public GridPane skillsGridPane;
     @Inject
@@ -86,17 +86,6 @@ public class SkillsPaneController implements Initializable {
     @Inject
     private UIUtils uiUtils;
 
-    private SimpleStringProperty currentSkillPoints = null;
-    private SimpleStringProperty currentFirstMasteryLevel = null;
-    private SimpleStringProperty currentSecondMasteryLevel = null;
-
-    private int firstMasteryLevel = -1;
-    private int secondMasteryLevel = -1;
-
-    private StringBinding freeSkillPointsBinding;
-    private StringBinding reclaimMasterySecondBinding;
-    private StringBinding reclaimMasteryFirstBinding;
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         reclaimSkillsFirstButton.setGraphic(Icon.FA_RECYCLE.create());
@@ -107,6 +96,10 @@ public class SkillsPaneController implements Initializable {
         removeMasteryFirstItem.setGraphic(Icon.FA_TIMES.create());
         reclaimMasterySecondItem.setGraphic(Icon.FA_ANGLE_DOUBLE_DOWN.create());
         removeMasterySecondItem.setGraphic(Icon.FA_TIMES.create());
+    }
+
+    private UiPlayerProperties playerProps() {
+        return mc.getPlayerProperties();
     }
 
     public boolean isSaveDisabled() {
@@ -128,44 +121,49 @@ public class SkillsPaneController implements Initializable {
                     ResourceHelper.getMessage("alert.missingSkill_content", player.getPlayerSavegameName(), Constants.LOGFILE),
                     Constants.UI.TOAST_WARNING_TIMEOUT);
         }
-        currentSkillPoints = new SimpleStringProperty();
-        currentFirstMasteryLevel = new SimpleStringProperty();
-        currentSecondMasteryLevel = new SimpleStringProperty();
 
-        freeSkillPointsBinding = Bindings.createStringBinding(() -> {
-                    if (currentSkillPoints != null && currentSkillPoints.getValue() != null) {
-                        return ResourceHelper.getMessage("skills.availableSkillPoints",
-                                currentSkillPoints.getValue());
-                    } else {
-                        return "";
-                    }
-                },
-                currentSkillPoints
+        StringBinding freeSkillPointsBinding = Bindings.createStringBinding(() -> ResourceHelper.getMessage("skills.availableSkillPoints",
+                playerProps().getSkillAvailable()),
+                playerProps().skillAvailableProperty()
         );
         freeSkillPointsLabel.textProperty().bind(freeSkillPointsBinding);
 
-        reclaimMasteryFirstBinding = Bindings.createStringBinding(() -> ResourceHelper.getMessage("skills.reclaimMasteryPoints",
-                        currentFirstMasteryLevel.getValue()),
-                currentFirstMasteryLevel
+        StringBinding reclaimMasteryFirstBinding = Bindings.createStringBinding(() -> ResourceHelper.getMessage("skills.reclaimMasteryPoints",
+                        playerProps().getFirstMasteryLevel()-1),
+                playerProps().firstMasteryLevelProperty()
         );
         reclaimMasteryFirstItem.textProperty().bind(reclaimMasteryFirstBinding);
 
-        reclaimMasterySecondBinding = Bindings.createStringBinding(() -> ResourceHelper.getMessage("skills.reclaimMasteryPoints",
-                        currentSecondMasteryLevel.getValue()),
-                currentSecondMasteryLevel
+        StringBinding reclaimMasterySecondBinding = Bindings.createStringBinding(() -> ResourceHelper.getMessage("skills.reclaimMasteryPoints",
+                        playerProps().getSecondMasteryLevel()-1),
+                playerProps().secondMasteryLevelProperty()
         );
         reclaimMasterySecondItem.textProperty().bind(reclaimMasterySecondBinding);
 
         updateMasteries();
     }
 
+    public void clearProperties() {
+        if (freeSkillPointsLabel.textProperty().isBound()) {
+            freeSkillPointsLabel.textProperty().unbind();
+        }
+    }
+
+    public void reset() {
+        clearProperties();
+        resetSkilltabControls();
+    }
+
     public void resetSkilltabControls() {
-        if (currentFirstMasteryLevel != null)
-            currentFirstMasteryLevel.setValue(null);
-        if (currentSecondMasteryLevel != null)
-            currentSecondMasteryLevel.setValue(null);
-        if (currentSkillPoints != null)
-            currentSkillPoints.setValue(null);
+        if (!firstMasteryLabel.textProperty().isBound()) {
+            firstMasteryLabel.setText(null);
+        }
+        if (!secondMasteryLabel.textProperty().isBound()) {
+            secondMasteryLabel.setText(null);
+        }
+        if (!freeSkillPointsLabel.textProperty().isBound()) {
+            freeSkillPointsLabel.setText(null);
+        }
         firstMasteryLabel.setText(null);
         firstMasteryListView.getItems().clear();
         secondMasteryLabel.setText(null);
@@ -181,6 +179,7 @@ public class SkillsPaneController implements Initializable {
 
         reclaimSkillsFirstButton.setDisable(disable || firstMasteryListView.getItems().isEmpty());
 
+        int firstMasteryLevel = playerProps().getFirstMasteryLevel();
         if (player.isCharacterLoaded() && (!disable && firstMasteryLevel > 0) && firstMasteryListView.getItems().isEmpty()) {
             if (firstMasteryLevel > 1) {
                 reclaimMasteryFirstItem.setDisable(false);
@@ -194,6 +193,7 @@ public class SkillsPaneController implements Initializable {
 
         reclaimSkillsSecondButton.setDisable(disable || secondMasteryListView.getItems().isEmpty());
 
+        int secondMasteryLevel = playerProps().getSecondMasteryLevel();
         if (player.isCharacterLoaded() && (!disable && secondMasteryLevel > 0) && secondMasteryListView.getItems().isEmpty()) {
             if (secondMasteryLevel > 1) {
                 reclaimMasterySecondItem.setDisable(false);
@@ -210,10 +210,7 @@ public class SkillsPaneController implements Initializable {
     }
 
     protected void updateMasteries() {
-        if (player.isCharacterLoaded()) {
-            firstMasteryLevel = getMasteryLevel(0);
-            secondMasteryLevel = getMasteryLevel(1);
-        } else {
+        if (!player.isCharacterLoaded()) {
             return;
         }
 
@@ -221,11 +218,10 @@ public class SkillsPaneController implements Initializable {
 
         fillMastery(0);
         fillMastery(1);
-        disableControls(false);
+        playerProps().reloadAvailSkillPoints();
+        playerProps().reloadMasteriesLevels();
 
-        currentSkillPoints.setValue(String.valueOf(player.getAvailableSkillPoints()));
-        currentFirstMasteryLevel.setValue(String.valueOf(Math.max(firstMasteryLevel - 1, 0)));
-        currentSecondMasteryLevel.setValue(String.valueOf(Math.max(secondMasteryLevel - 1, 0)));
+        disableControls(false);
     }
 
     private int getMasteryLevel(int i) {
@@ -386,5 +382,9 @@ public class SkillsPaneController implements Initializable {
             return false;
         }
         return true;
+    }
+
+    public void setMainController(MainController mainController) {
+        this.mc = mainController;
     }
 }

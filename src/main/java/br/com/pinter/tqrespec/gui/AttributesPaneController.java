@@ -29,7 +29,10 @@ import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Constants;
 import com.google.inject.Inject;
 import javafx.application.Platform;
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -49,6 +52,7 @@ import java.util.ResourceBundle;
 public class AttributesPaneController implements Initializable {
     private static final System.Logger logger = Log.getLogger(AttributesPaneController.class.getName());
     private final BooleanProperty saveDisabled = new SimpleBooleanProperty();
+    private MainController mc;
     @FXML
     private Label strengthLabel;
     @FXML
@@ -104,12 +108,6 @@ public class AttributesPaneController implements Initializable {
     @Inject
     private UIUtils uiUtils;
 
-    private IntegerProperty currentStr = new SimpleIntegerProperty();
-    private IntegerProperty currentInt = new SimpleIntegerProperty();
-    private IntegerProperty currentDex = new SimpleIntegerProperty();
-    private IntegerProperty currentLife = new SimpleIntegerProperty();
-    private IntegerProperty currentMana = new SimpleIntegerProperty();
-    private IntegerProperty currentAvail = new SimpleIntegerProperty();
     private ObjectProperty<Integer> strProperty;
     private ObjectProperty<Integer> intProperty;
     private ObjectProperty<Integer> dexProperty;
@@ -147,6 +145,10 @@ public class AttributesPaneController implements Initializable {
         }
     }
 
+    private UiPlayerProperties playerProps() {
+        return mc.getPlayerProperties();
+    }
+
     public void windowShownHandler() {
         logger.log(System.Logger.Level.INFO, "Font applied: name:''{0}'', family:''{1}''",
                 healthLabel.getFont().getName(), healthLabel.getFont().getFamily());
@@ -162,14 +164,6 @@ public class AttributesPaneController implements Initializable {
 
     public BooleanProperty saveDisabledProperty() {
         return saveDisabled;
-    }
-
-    public int getCurrentAvail() {
-        return currentAvail.get();
-    }
-
-    public IntegerProperty currentAvailProperty() {
-        return currentAvail;
     }
 
     public void setSpinnersDisable(boolean disable) {
@@ -193,118 +187,130 @@ public class AttributesPaneController implements Initializable {
 
     private void setStrField(int value) {
         if (value < strMin && (value - strMin) % strStep == 0) {
-            currentAvail.set(currentAvail.get() - ((strMin - value) / strStep));
-            value = strMin;
+            playerProps().setAttrAvailable(playerProps().getAttrAvailable() - ((strMin - value) / strStep));
+            playerProps().setStr(strMin);
         }
-        currentStr = new SimpleIntegerProperty(value);
-        strProperty = currentStr.asObject();
-        AttrIntegerSpinnerValueFactory strFactory = new AttrIntegerSpinnerValueFactory(strMin, currentStr.get(), currentStr.get(), strStep, currentAvail);
+        strProperty = playerProps().strProperty().asObject();
+        AttrIntegerSpinnerValueFactory strFactory = new AttrIntegerSpinnerValueFactory(
+                strMin, playerProps().getStr(), playerProps().getStr(), strStep, playerProps().attrAvailableProperty());
         strSpinner.setValueFactory(strFactory);
         strSpinner.getValueFactory().valueProperty().bindBidirectional(strProperty);
-        currentStr.addListener(((observable, oldValue, newValue) -> attributesChanged((int) oldValue, (int) newValue, strStep, currentStr)));
+        playerProps().strProperty().addListener(((observable, oldValue, newValue) ->
+                attributesChanged((int) oldValue, (int) newValue, strStep, playerProps().strProperty())));
     }
 
     private void setIntField(int value) {
         if (value < intMin && (value - intMin) % intStep == 0) {
-            currentAvail.set(currentAvail.get() - ((intMin - value) / intStep));
-            value = intMin;
+            playerProps().setAttrAvailable(playerProps().getAttrAvailable() - ((intMin - value) / intStep));
+            playerProps().setIntl(intMin);
         }
-        currentInt = new SimpleIntegerProperty(value);
-        intProperty = currentInt.asObject();
-        AttrIntegerSpinnerValueFactory intFactory = new AttrIntegerSpinnerValueFactory(intMin, currentInt.get(), currentInt.get(), intStep, currentAvail);
+        intProperty = playerProps().intlProperty().asObject();
+        AttrIntegerSpinnerValueFactory intFactory = new AttrIntegerSpinnerValueFactory
+                (intMin, playerProps().getIntl(), playerProps().getIntl(), intStep, playerProps().attrAvailableProperty());
         intSpinner.setValueFactory(intFactory);
         intSpinner.getValueFactory().valueProperty().bindBidirectional(intProperty);
-        currentInt.addListener(((observable, oldValue, newValue) -> attributesChanged((int) oldValue, (int) newValue, intStep, currentInt)));
+        playerProps().intlProperty().addListener(((observable, oldValue, newValue) ->
+                attributesChanged((int) oldValue, (int) newValue, intStep, playerProps().intlProperty())));
     }
 
     private void setDexField(int value) {
         if (value < dexMin && (value - dexMin) % dexStep == 0) {
-            currentAvail.set(currentAvail.get() - ((dexMin - value) / dexStep));
-            value = dexMin;
+            playerProps().setAttrAvailable(playerProps().getAttrAvailable() - ((dexMin - value) / dexStep));
+            playerProps().setDex(dexMin);
         }
-        currentDex = new SimpleIntegerProperty(value);
-        dexProperty = currentDex.asObject();
-        AttrIntegerSpinnerValueFactory dexFactory = new AttrIntegerSpinnerValueFactory(dexMin, currentDex.get(), currentDex.get(), dexStep, currentAvail);
+        dexProperty = playerProps().dexProperty().asObject();
+        AttrIntegerSpinnerValueFactory dexFactory = new AttrIntegerSpinnerValueFactory(
+                dexMin, playerProps().getDex(), playerProps().getDex(), dexStep, playerProps().attrAvailableProperty());
         dexSpinner.setValueFactory(dexFactory);
         dexSpinner.getValueFactory().valueProperty().bindBidirectional(dexProperty);
-        currentDex.addListener(((observable, oldValue, newValue) -> attributesChanged((int) oldValue, (int) newValue, dexStep, currentDex)));
+        playerProps().dexProperty().addListener(((observable, oldValue, newValue) ->
+                attributesChanged((int) oldValue, (int) newValue, dexStep, playerProps().dexProperty())));
     }
 
     private void setLifeField(int value) {
         if (value < lifeMin && (value - lifeMin) % lifeStep == 0) {
-            currentAvail.set(currentAvail.get() - ((lifeMin - value) / lifeStep));
-            value = lifeMin;
+            playerProps().setAttrAvailable(playerProps().getAttrAvailable() - ((lifeMin - value) / lifeStep));
+            playerProps().setLife(lifeMin);
         }
-        currentLife = new SimpleIntegerProperty(value);
-        lifeProperty = currentLife.asObject();
-        AttrIntegerSpinnerValueFactory lifeFactory = new AttrIntegerSpinnerValueFactory(lifeMin, currentLife.get(), currentLife.get(), lifeStep, currentAvail);
+        lifeProperty = playerProps().lifeProperty().asObject();
+        AttrIntegerSpinnerValueFactory lifeFactory = new AttrIntegerSpinnerValueFactory(
+                lifeMin, playerProps().getLife(), playerProps().getLife(), lifeStep, playerProps().attrAvailableProperty());
         lifeSpinner.setValueFactory(lifeFactory);
         lifeSpinner.getValueFactory().valueProperty().bindBidirectional(lifeProperty);
-        currentLife.addListener(((observable, oldValue, newValue) -> attributesChanged((int) oldValue, (int) newValue, lifeStep, currentLife)));
+        playerProps().lifeProperty().addListener(((observable, oldValue, newValue) ->
+                attributesChanged((int) oldValue, (int) newValue, lifeStep, playerProps().lifeProperty())));
     }
 
     private void setManaField(int value) {
         if (value < manaMin && (value - manaMin) % manaStep == 0) {
-            currentAvail.set(currentAvail.get() - ((manaMin - value) / manaStep));
-            value = manaMin;
+            playerProps().setAttrAvailable(playerProps().getAttrAvailable() - ((manaMin - value) / manaStep));
+            playerProps().setMana(manaMin);
         }
-        currentMana = new SimpleIntegerProperty(value);
-        manaProperty = currentMana.asObject();
-        AttrIntegerSpinnerValueFactory manaFactory = new AttrIntegerSpinnerValueFactory(manaMin, currentMana.get(), currentMana.get(), manaStep, currentAvail);
+        manaProperty = playerProps().manaProperty().asObject();
+        AttrIntegerSpinnerValueFactory manaFactory = new AttrIntegerSpinnerValueFactory(
+                manaMin, playerProps().getMana(), playerProps().getMana(), manaStep, playerProps().attrAvailableProperty());
         manaSpinner.setValueFactory(manaFactory);
         manaSpinner.getValueFactory().valueProperty().bindBidirectional(manaProperty);
-        currentMana.addListener(((observable, oldValue, newValue) -> attributesChanged((int) oldValue, (int) newValue, manaStep, currentMana)));
+        playerProps().manaProperty().addListener(((observable, oldValue, newValue) ->
+                attributesChanged((int) oldValue, (int) newValue, manaStep, playerProps().manaProperty())));
     }
 
     private void attributesChanged(int oldValue, int newValue, int step, IntegerProperty currentAttr) {
-        if (newValue > oldValue && currentAvail.get() > 0) {
+        if (newValue > oldValue && playerProps().getAttrAvailable() > 0) {
             int diff = newValue - oldValue;
             if (diff < step) return;
             currentAttr.set(newValue);
-            currentAvail.set(currentAvail.get() - (diff / step));
+            playerProps().setAttrAvailable(playerProps().getAttrAvailable() - (diff / step));
         }
 
         if (newValue < oldValue) {
             int diff = oldValue - newValue;
             if (diff < step) return;
             currentAttr.set(newValue);
-            currentAvail.set(currentAvail.get() + (diff / step));
+            playerProps().setAttrAvailable(playerProps().getAttrAvailable() + (diff / step));
         }
-        if (currentAvail.get() > 0) {
+        if (playerProps().getAttrAvailable() > 0) {
             saveDisabled.set(false);
         }
     }
 
     private void setAvailablePointsField(int value) {
-        this.availPointsText.setText(String.valueOf(value));
-        currentAvail = new SimpleIntegerProperty(value);
-        availPointsText.textProperty().bindBidirectional(currentAvail, new NumberStringConverter());
+        availPointsText.setText(String.valueOf(value));
+        playerProps().setAttrAvailable(value);
+        availPointsText.textProperty().bindBidirectional(playerProps().attrAvailableProperty(), new NumberStringConverter());
     }
 
     public void clearProperties() {
-        availPointsText.textProperty().unbindBidirectional(currentAvail);
-        currentAvail.setValue(null);
-        currentStr.setValue(null);
-        currentInt.setValue(null);
-        currentDex.setValue(null);
-        currentLife.setValue(null);
-        currentMana.setValue(null);
+        if (playerProps() != null) {
+            availPointsText.textProperty().unbindBidirectional(playerProps().attrAvailableProperty());
+        }
         availPointsText.setText("");
         experienceText.setText("");
         charLevelText.setText("");
         goldText.setText("");
         charClassText.setText("");
         difficultyText.setText("");
-        if (strSpinner.getValueFactory() != null && strSpinner.getValueFactory().valueProperty().isBound())
-            strSpinner.getValueFactory().valueProperty().unbindBidirectional(currentStr.asObject());
-        if (intSpinner.getValueFactory() != null && intSpinner.getValueFactory().valueProperty().isBound())
-            intSpinner.getValueFactory().valueProperty().unbindBidirectional(currentInt.asObject());
-        if (dexSpinner.getValueFactory() != null && dexSpinner.getValueFactory().valueProperty().isBound())
-            dexSpinner.getValueFactory().valueProperty().unbindBidirectional(currentDex.asObject());
-        if (lifeSpinner.getValueFactory() != null && lifeSpinner.getValueFactory().valueProperty().isBound())
-            lifeSpinner.getValueFactory().valueProperty().unbindBidirectional(currentLife.asObject());
-        if (manaSpinner.getValueFactory() != null && manaSpinner.getValueFactory().valueProperty().isBound())
-            manaSpinner.getValueFactory().valueProperty().unbindBidirectional(currentMana.asObject());
+
+        if (strSpinner.getValueFactory() != null && strSpinner.getValueFactory().valueProperty().isBound()) {
+            strSpinner.getValueFactory().valueProperty().unbindBidirectional(strProperty);
+            strSpinner.getEditor().setText("");
+        }
+        if (intSpinner.getValueFactory() != null && intSpinner.getValueFactory().valueProperty().isBound()) {
+            intSpinner.getValueFactory().valueProperty().unbindBidirectional(intProperty);
+            intSpinner.getEditor().setText("");
+        }
+        if (dexSpinner.getValueFactory() != null && dexSpinner.getValueFactory().valueProperty().isBound()) {
+            dexSpinner.getValueFactory().valueProperty().unbindBidirectional(dexProperty);
+            dexSpinner.getEditor().setText("");
+        }
+        if (lifeSpinner.getValueFactory() != null && lifeSpinner.getValueFactory().valueProperty().isBound()) {
+            lifeSpinner.getValueFactory().valueProperty().unbindBidirectional(lifeProperty);
+            lifeSpinner.getEditor().setText("");
+        }
+        if (manaSpinner.getValueFactory() != null && manaSpinner.getValueFactory().valueProperty().isBound()) {
+            manaSpinner.getValueFactory().valueProperty().unbindBidirectional(manaProperty);
+            manaSpinner.getEditor().setText("");
+        }
         strSpinner.setValueFactory(null);
         intSpinner.setValueFactory(null);
         dexSpinner.setValueFactory(null);
@@ -323,23 +329,23 @@ public class AttributesPaneController implements Initializable {
         int manaOld = player.getMana();
         int modifierOld = player.getModifierPoints();
 
-        if (strOld != currentStr.get() && currentStr.get() > 0) {
-            player.setStr(currentStr.get());
+        if (strOld != playerProps().getStr() && playerProps().getStr() > 0) {
+            player.setStr(playerProps().getStr());
         }
-        if (intOld != currentInt.get() && currentInt.get() > 0) {
-            player.setInt(currentInt.get());
+        if (intOld != playerProps().getIntl() && playerProps().getIntl() > 0) {
+            player.setInt(playerProps().getIntl());
         }
-        if (dexOld != currentDex.get() && currentDex.get() > 0) {
-            player.setDex(currentDex.get());
+        if (dexOld != playerProps().getDex() && playerProps().getDex() > 0) {
+            player.setDex(playerProps().getDex());
         }
-        if (lifeOld != currentLife.get() && currentLife.get() > 0) {
-            player.setLife(currentLife.get());
+        if (lifeOld != playerProps().getLife() && playerProps().getLife() > 0) {
+            player.setLife(playerProps().getLife());
         }
-        if (manaOld != currentMana.get() && currentMana.get() > 0) {
-            player.setMana(currentMana.get());
+        if (manaOld != playerProps().getMana() && playerProps().getMana() > 0) {
+            player.setMana(playerProps().getMana());
         }
-        if (modifierOld != currentAvail.get() && currentAvail.get() >= 0) {
-            player.setModifierPoints(currentAvail.get());
+        if (modifierOld != playerProps().getAttrAvailable() && playerProps().getAttrAvailable() >= 0) {
+            player.setModifierPoints(playerProps().getAttrAvailable());
         }
         logger.log(System.Logger.Level.DEBUG, "returning savegame task");
     }
@@ -358,40 +364,32 @@ public class AttributesPaneController implements Initializable {
         manaMin = Math.round(db.player().getPc().getCharacterMana());
 
         clearProperties();
-        int str = player.getStr();
-        int inl = player.getInt();
-        int dex = player.getDex();
-        int life = player.getLife();
-        int mana = player.getMana();
-        int modifier = player.getModifierPoints();
-        if (modifier < 0 || str < 0 || dex < 0 || inl < 0 || life < 0 || mana < 0) {
+        if (playerProps().getAttrAvailable() < 0 || playerProps().getStr() < 0 || playerProps().getDex() < 0
+                || playerProps().getIntl() < 0 || playerProps().getLife() < 0 || playerProps().getMana() < 0) {
             uiUtils.showError(ResourceHelper.getMessage("alert.errorloadingchar_header"),
-                    ResourceHelper.getMessage("alert.errorloadingchar_content", life, mana, str, inl, dex));
-            clearProperties();
+                    ResourceHelper.getMessage("alert.errorloadingchar_content",
+                            playerProps().getLife(), playerProps().getMana(), playerProps().getStr(), playerProps().getIntl(), playerProps().getDex()));
             return;
         }
-        this.setAvailablePointsField(modifier);
-        this.setStrField(str);
-        this.setIntField(inl);
-        this.setDexField(dex);
-        this.setLifeField(life);
-        this.setManaField(mana);
-        int xp = player.getXp();
-        int level = player.getLevel();
-        int gold = player.getMoney();
+        setAvailablePointsField(playerProps().getAttrAvailable());
+        setStrField(playerProps().getStr());
+        setIntField(playerProps().getIntl());
+        setDexField(playerProps().getDex());
+        setLifeField(playerProps().getLife());
+        setManaField(playerProps().getMana());
+        logger.log(System.Logger.Level.INFO, "MANA: " + playerProps().getMana());
         charClassText.setText(player.getPlayerClassName());
-        int difficulty = player.getDifficulty();
 
-        String difficultyTextValue = String.format("%s%02d", Constants.UI.PREFIXTAG_DIFFICULTYLABEL, difficulty + 1);
+        String difficultyTextValue = String.format("%s%02d", Constants.UI.PREFIXTAG_DIFFICULTYLABEL, playerProps().getDifficulty() + 1);
         if (txt.isTagStringValid(difficultyTextValue)) {
             difficultyText.setText(ResourceHelper.cleanTagString(txt.getString(difficultyTextValue)));
         } else {
-            difficultyText.setText(ResourceHelper.getMessage(String.format("difficulty.%d", difficulty)));
+            difficultyText.setText(ResourceHelper.getMessage(String.format("difficulty.%d", playerProps().getDifficulty())));
         }
 
-        experienceText.setText(NumberFormat.getInstance().format(xp));
-        charLevelText.setText(String.valueOf(level));
-        goldText.setText(NumberFormat.getInstance().format(gold));
+        experienceText.setText(NumberFormat.getInstance().format(playerProps().getXp()));
+        charLevelText.setText(String.valueOf(playerProps().getCharLevel()));
+        goldText.setText(NumberFormat.getInstance().format(playerProps().getGold()));
 
         gender.getItems().setAll(ResourceHelper.getMessage("main.gender.male"), ResourceHelper.getMessage("main.gender.female"));
         int genderSelection;
@@ -427,6 +425,10 @@ public class AttributesPaneController implements Initializable {
         } else if (selected == 1) {
             player.setGender(Gender.FEMALE);
         }
+    }
+
+    public void setMainController(MainController mainController) {
+        this.mc = mainController;
     }
 }
 
@@ -467,5 +469,4 @@ class AttrIntegerSpinnerValueFactory extends SpinnerValueFactory.IntegerSpinnerV
         if (newValue <= this.getMax())
             this.setValue(newValue);
     }
-
 }

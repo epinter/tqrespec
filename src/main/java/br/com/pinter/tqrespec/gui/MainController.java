@@ -63,6 +63,7 @@ public class MainController implements Initializable {
     public static final BooleanProperty mainFormInitialized = new SimpleBooleanProperty();
     private static final System.Logger logger = Log.getLogger(MainController.class.getName());
     public final BooleanProperty saveDisabled = new SimpleBooleanProperty();
+    private UiPlayerProperties playerProperties;
     @FXML
     public GridPane pointsPane;
     @FXML
@@ -139,6 +140,8 @@ public class MainController implements Initializable {
         //initialize properties and bind them to respective properties in the tab controllers
         saveDisabled.setValue(saveButton.isDisable());
         miscPaneController.setMainController(this);
+        pointsPaneController.setMainController(this);
+        skillsPaneController.setMainController(this);
         pointsPaneController.setSaveDisabled(saveButton.isDisabled());
         skillsPaneController.setSaveDisabled(saveButton.isDisabled());
         miscPaneController.setSaveDisabled(saveButton.isDisabled());
@@ -192,6 +195,10 @@ public class MainController implements Initializable {
         if (characterCombo.getItems().contains(character)) {
             characterCombo.setValue(character);
         }
+    }
+
+    public UiPlayerProperties getPlayerProperties() {
+        return playerProperties;
     }
 
     private void windowShownHandler() {
@@ -258,7 +265,7 @@ public class MainController implements Initializable {
 
     public void reset() {
         pointsPaneController.clearProperties();
-        skillsPaneController.resetSkilltabControls();
+        skillsPaneController.reset();
         miscPaneController.reset();
         player.reset();
         characterCombo.setValue(null);
@@ -269,6 +276,7 @@ public class MainController implements Initializable {
         Toast.cancel();
         restoreDefaultCursor();
         tabPane.getSelectionModel().select(attributesTab);
+        playerProperties = null;
     }
 
     public void setCursorWaitOnTask(MyTask<Integer> task) {
@@ -394,9 +402,10 @@ public class MainController implements Initializable {
         loadTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new MyEventHandler<>() {
             @Override
             public void handleEvent(WorkerStateEvent workerStateEvent) {
+                playerProperties = new UiPlayerProperties(player);
                 pointsPaneController.loadCharHandler();
                 miscPaneController.loadCharEventHandler();
-                if (pointsPaneController.getCurrentAvail() >= 0) {
+                if (playerProperties.getAttrAvailable() >= 0) {
                     saveDisabled.set(false);
                 }
                 characterCombo.setDisable(false);

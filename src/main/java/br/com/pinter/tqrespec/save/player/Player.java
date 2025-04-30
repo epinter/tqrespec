@@ -260,6 +260,17 @@ public class Player {
         return -1;
     }
 
+    public int getMasteryLevel(int i) {
+        List<Skill> masteries = getPlayerMasteries();
+
+        if (!(masteries.size() == 1 && i > 0) && !masteries.isEmpty()) {
+            PlayerSkill sb = getPlayerSkills().get(masteries.get(i).getRecordPath());
+            return getMasteryLevel(sb);
+        } else {
+            return -1;
+        }
+    }
+
     public void reclaimSkillPoints(PlayerSkill sb) {
         int blockStart = sb.getBlockStart();
         Skill skill = db.skills().getSkill(sb.getSkillName(), false);
