@@ -20,6 +20,7 @@
 
 package br.com.pinter.tqrespec.save.player;
 
+import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.Platform;
 import br.com.pinter.tqrespec.save.UID;
 import br.com.pinter.tqrespec.save.VariableInfo;
@@ -42,13 +43,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import static java.lang.System.Logger.Level.ERROR;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class PlayerParserTest {
-    private static final Logger logger = Logger.getLogger(PlayerParserTest.class.getName());
+    private static final System.Logger logger = Log.getLogger(PlayerParserTest.class.getName());
 
     @Mock
     private CurrentPlayerData mockSaveData;
@@ -80,7 +81,7 @@ class PlayerParserTest {
         try {
             playerParser.fillBuffer();
         } catch (Exception e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             fail("parseAllBlocks: readPlayerChr() failed");
         }
 
@@ -90,7 +91,7 @@ class PlayerParserTest {
             playerParser.buildBlocksTable();
             playerParser.prepareForParse();
         } catch (Exception e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
         }
 
         playerParser.parseAllBlocks();
@@ -109,7 +110,7 @@ class PlayerParserTest {
             saveData.setHeaderInfo(playerParser.getHeaderInfo());
             saveData.getDataMap().setVariableLocation(playerParser.getVariableLocation());
         } catch (Exception e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             fail();
         }
     }
@@ -128,7 +129,7 @@ class PlayerParserTest {
         try {
             playerParser.parse();
         } catch (Exception e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
         }
         playerParser.prepareBufferForRead();
         assertEquals(0, playerParser.getBuffer().position());
@@ -139,7 +140,7 @@ class PlayerParserTest {
         try {
             playerParser.parse();
         } catch (Exception e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
         }
         assertNotNull(playerParser.getBuffer());
         assertTrue(playerParser.getBuffer().capacity() > 0);
@@ -150,7 +151,7 @@ class PlayerParserTest {
         try {
             playerParser.parse();
         } catch (Exception e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
         }
         ConcurrentMap<String, List<Integer>> variableLocation = playerParser.getVariableLocation();
         assertNotNull(variableLocation);
@@ -162,7 +163,7 @@ class PlayerParserTest {
         try {
             playerParser.parse();
         } catch (Exception e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             fail();
         }
     }
@@ -178,10 +179,10 @@ class PlayerParserTest {
             HeaderInfo headerInfo = playerParser.parseHeader();
             assertNotNull(headerInfo);
             assertTrue(headerInfo.getHeaderVersion() == GameVersion.TQIT || headerInfo.getHeaderVersion() == GameVersion.TQAE);
-            assertEquals(5, headerInfo.getPlayerVersion());
+            assertEquals(9, headerInfo.getPlayerVersion());
             assertTrue(headerInfo.getPlayerLevel() > 0);
         } catch (Exception e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
         }
 
     }
@@ -250,7 +251,7 @@ class PlayerParserTest {
     void matchTeleports_Should_matchTeleportsFromSavegame() {
         parse();
         Mockito.when(mockSaveData.getDataMap()).thenReturn(saveData.getDataMap());
-        List<TeleportDifficulty> saveTeleports = player.getTeleports();
+        List<TeleportDifficulty> saveTeleports = player.getTeleportDifficulty();
         assertEquals(3, saveTeleports.size());
         Map<Integer, List<UID>> teleports = new HashMap<>();
 

@@ -36,19 +36,14 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import javafx.util.converter.NumberStringConverter;
 
 import java.net.URL;
 import java.text.NumberFormat;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.*;
 
-import static java.lang.System.Logger.Level.DEBUG;
 import static java.lang.System.Logger.Level.INFO;
 
 @SuppressWarnings("unused")
@@ -56,6 +51,7 @@ public class AttributesPaneController implements Initializable {
     private static final System.Logger logger = Log.getLogger(AttributesPaneController.class);
     private final BooleanProperty saveDisabled = new SimpleBooleanProperty();
     private MainController mc;
+
     @FXML
     private Label strengthLabel;
     @FXML
@@ -97,21 +93,23 @@ public class AttributesPaneController implements Initializable {
     @FXML
     private Spinner<Integer> skillSpinner;
     @FXML
+    private Label skillLabel;
+    @FXML
     private Label availPointsText;
     @FXML
     private Label experienceText;
     @FXML
-    private Label charLevelText;
+    private Spinner<Integer> charLevelSpinner;
     @FXML
     private Label charClassText;
     @FXML
-    private Label goldText;
+    private TextField goldText;
     @FXML
-    private Label difficultyText;
+    private ComboBox<DifficultyItem> difficulty;
     @FXML
     private ComboBox<String> gender;
     @FXML
-    private Label electrumText;
+    private TextField electrumText;
     @Inject
     private UIUtils uiUtils;
 
@@ -122,6 +120,7 @@ public class AttributesPaneController implements Initializable {
     private ObjectProperty<Integer> manaProperty;
     private ObjectProperty<Integer> availProperty;
     private ObjectProperty<Integer> skillProperty;
+    private ObjectProperty<Integer> charLevelProperty;
     private int strStep;
     private int strMin;
     private int intStep;
@@ -157,10 +156,70 @@ public class AttributesPaneController implements Initializable {
         intSpinner.setTooltip(uiUtils.simpleTooltip(ResourceHelper.getMessage("main.tooltipIntSpinner")));
         dexSpinner.setTooltip(uiUtils.simpleTooltip(ResourceHelper.getMessage("main.tooltipDexSpinner")));
         skillSpinner.setTooltip(uiUtils.simpleTooltip(ResourceHelper.getMessage("main.tooltip.skillSpinner")));
+        skillLabel.setTooltip(uiUtils.simpleTooltip(ResourceHelper.getMessage("main.tooltip.skillSpinner")));
+        charLevelSpinner.setTooltip(uiUtils.simpleTooltip(ResourceHelper.getMessage("main.tooltipCharLevelSpinner")));
+
+        goldText.textProperty().addListener((observable, oldValue, newValue) -> {
+            Platform.runLater(() -> {
+                int res = processNumberTextField(oldValue, newValue, goldText);
+                if (res != Integer.MIN_VALUE) {
+                    playerProps().setGold(res);
+                }
+            });
+        });
+
+        electrumText.textProperty().addListener((observable, oldValue, newValue) -> {
+            Platform.runLater(() -> {
+                int res = processNumberTextField(oldValue, newValue, electrumText);
+                if (res != Integer.MIN_VALUE) {
+                    playerProps().setElectrum(res);
+                }
+            });
+        });
+
+    }
+
+    private int processNumberTextField(String oldValue, String newValue, TextField textField) {
+        int res = Integer.MIN_VALUE;
+        if (newValue.matches(".*\\D.*")) {
+            String valueStr;
+            int c = textField.getCaretPosition();
+            try {
+                res = Integer.parseInt(newValue.replaceAll("\\D", ""));
+            } catch (NumberFormatException ignored) {
+                try {
+                    res = Integer.parseInt(oldValue.replaceAll("\\D", ""));
+                } catch (NumberFormatException ignored2) {
+                }
+            }
+            valueStr = String.valueOf(res);
+            textField.setText(valueStr);
+            textField.positionCaret(c - (newValue.length() - valueStr.length()));
+        } else if (newValue.matches("^\\d+$")) {
+            try {
+                res = Integer.parseInt(newValue);
+            } catch (NumberFormatException e) {
+                String old = oldValue.replaceAll("\\D", "");
+                textField.setText(old);
+                textField.positionCaret(old.length());
+            }
+        }
+        return res;
+    }
+
+    public void onMainInitialized() {
+        mc.unlockedEditProperty().addListener((o, ov, nv) -> {
+            goldText.setEditable(nv);
+            goldText.setStyle("border: 1px solid");
+            electrumText.setEditable(nv);
+            electrumText.setStyle("border: 1px solid");
+            charLevelSpinner.setDisable(!nv);
+            skillSpinner.setDisable(!nv);
+        });
     }
 
     private UiPlayerProperties playerProps() {
-        return mc.getPlayerProperties();
+        return mc.playerProps();
     }
 
     public void windowShownHandler() {
@@ -186,7 +245,17 @@ public class AttributesPaneController implements Initializable {
         strSpinner.setDisable(disable);
         intSpinner.setDisable(disable);
         dexSpinner.setDisable(disable);
-        skillSpinner.setDisable(disable);
+        if (mc.isUnlockedEdit()) {
+            charLevelSpinner.setDisable(disable);
+            skillSpinner.setDisable(disable);
+        }
+        if (mc.isCharacterSelected()) {
+            charLevelSpinner.getStyleClass().add("charLevelSpinnerInUse");
+            skillSpinner.getStyleClass().add("skillSpinnerInUse");
+        } else {
+            charLevelSpinner.getStyleClass().remove("charLevelSpinnerInUse");
+            skillSpinner.getStyleClass().remove("skillSpinnerInUse");
+        }
     }
 
     public void disableControls(boolean disable) {
@@ -194,9 +263,8 @@ public class AttributesPaneController implements Initializable {
         gender.setDisable(disable);
         availPointsText.setDisable(disable);
         charClassText.setDisable(disable);
-        difficultyText.setDisable(disable);
+        difficulty.setDisable(disable);
         experienceText.setDisable(disable);
-        charLevelText.setDisable(disable);
         goldText.setDisable(disable);
         electrumText.setDisable(disable);
     }
@@ -278,25 +346,60 @@ public class AttributesPaneController implements Initializable {
         skillSpinner.setValueFactory(skillFactory);
         skillSpinner.getValueFactory().valueProperty().bindBidirectional(skillProperty);
         playerProps().skillAvailableProperty().addListener(((observable, oldValue, newValue) -> {
-            if(newValue.intValue() > 0) {
+            if (newValue.intValue() > 0) {
                 playerProps().setSkillAvailable(newValue.intValue());
             }
         }));
     }
 
-    private void attributesChanged(int oldValue, int newValue, int step, IntegerProperty currentAttr) {
-        if (newValue > oldValue && playerProps().getAttrAvailable() > 0) {
-            int diff = newValue - oldValue;
-            if (diff < step) return;
-            currentAttr.set(newValue);
-            playerProps().setAttrAvailable(playerProps().getAttrAvailable() - (diff / step));
+    private void setCharLevelField(int value) {
+        if (value < 1 || value > 85) {
+            return;
         }
+        charLevelProperty = playerProps().charLevelProperty().asObject();
+        LevelIntegerSpinnerValueFactory charLevelFactory = new LevelIntegerSpinnerValueFactory(
+                1, 85, playerProps().getAttrAvailable(), playerProps().attrAvailableProperty(), playerProps().skillAvailableProperty());
+        charLevelSpinner.setValueFactory(charLevelFactory);
+        charLevelSpinner.getValueFactory().valueProperty().bindBidirectional(charLevelProperty);
+        playerProps().charLevelProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    if (newValue.intValue() > oldValue.intValue()) {
+                        playerProps().setAttrAvailable(playerProps().getAttrAvailable() + 2);
+                        playerProps().setSkillAvailable(playerProps().getSkillAvailable() + 3);
+                    }
 
-        if (newValue < oldValue) {
-            int diff = oldValue - newValue;
-            if (diff < step) return;
+                    if (newValue.intValue() < oldValue.intValue()) {
+                        if (mc.isFreeLvl() && (playerProps().getAttrAvailable() - 2) >= 0 || !mc.isFreeLvl()) {
+                            playerProps().setAttrAvailable(playerProps().getAttrAvailable() - 2);
+                        }
+                        if (mc.isFreeLvl() && (playerProps().getSkillAvailable() - 3) >= 0 || !mc.isFreeLvl()) {
+                            playerProps().setSkillAvailable(playerProps().getSkillAvailable() - 3);
+                        }
+                    }
+                    playerProps().setCharLevel(newValue.intValue());
+                    player.setAvailableSkillPoints(playerProps().getSkillAvailable());
+                    player.setCharLevel(playerProps().getCharLevel());
+                    experienceText.setText(String.valueOf(player.getXpLevelMin(playerProps().getCharLevel())));
+                });
+    }
+
+    private void attributesChanged(int oldValue, int newValue, int step, IntegerProperty currentAttr) {
+        if (mc.isFreeLvl()) {
             currentAttr.set(newValue);
-            playerProps().setAttrAvailable(playerProps().getAttrAvailable() + (diff / step));
+        } else {
+            if (newValue > oldValue && playerProps().getAttrAvailable() > 0) {
+                int diff = newValue - oldValue;
+                if (diff < step) return;
+                currentAttr.set(newValue);
+                playerProps().setAttrAvailable(playerProps().getAttrAvailable() - (diff / step));
+            }
+
+            if (newValue < oldValue) {
+                int diff = oldValue - newValue;
+                if (diff < step) return;
+                currentAttr.set(newValue);
+                playerProps().setAttrAvailable(playerProps().getAttrAvailable() + (diff / step));
+            }
         }
         if (playerProps().getAttrAvailable() > 0) {
             saveDisabled.set(false);
@@ -315,11 +418,12 @@ public class AttributesPaneController implements Initializable {
         }
         availPointsText.setText("");
         experienceText.setText("");
-        charLevelText.setText("");
         goldText.setText("");
         electrumText.setText("");
         charClassText.setText("");
-        difficultyText.setText("");
+        if (difficulty.getSelectionModel() != null) {
+            difficulty.getSelectionModel().clearSelection();
+        }
 
         if (strSpinner.getValueFactory() != null && strSpinner.getValueFactory().valueProperty().isBound()) {
             strSpinner.getValueFactory().valueProperty().unbindBidirectional(strProperty);
@@ -339,6 +443,9 @@ public class AttributesPaneController implements Initializable {
         if (skillSpinner.getValueFactory() != null && skillSpinner.getValueFactory().valueProperty().isBound()) {
             skillSpinner.getValueFactory().valueProperty().unbindBidirectional(skillProperty);
         }
+        if (charLevelSpinner.getValueFactory() != null && charLevelSpinner.getValueFactory().valueProperty().isBound()) {
+            charLevelSpinner.getValueFactory().valueProperty().unbindBidirectional(charLevelProperty);
+        }
         if (!characterIsLoading) {
             strSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 0));
             intSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 0));
@@ -346,12 +453,14 @@ public class AttributesPaneController implements Initializable {
             lifeSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 0));
             manaSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 0));
             skillSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 0));
+            charLevelSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 0));
             strSpinner.getValueFactory().setValue(0);
             intSpinner.getValueFactory().setValue(0);
             dexSpinner.getValueFactory().setValue(0);
             lifeSpinner.getValueFactory().setValue(0);
             manaSpinner.getValueFactory().setValue(0);
             skillSpinner.getValueFactory().setValue(0);
+            charLevelSpinner.getValueFactory().setValue(0);
         }
         strSpinner.setValueFactory(null);
         intSpinner.setValueFactory(null);
@@ -359,48 +468,8 @@ public class AttributesPaneController implements Initializable {
         lifeSpinner.setValueFactory(null);
         manaSpinner.setValueFactory(null);
         skillSpinner.setValueFactory(null);
+        charLevelSpinner.setValueFactory(null);
         gender.getSelectionModel().clearSelection();
-    }
-
-    public void commitChanges() {
-        int strOld = player.getStr();
-        int intOld = player.getInt();
-        int dexOld = player.getDex();
-        int lifeOld = player.getLife();
-        int manaOld = player.getMana();
-        int modifierOld = player.getModifierPoints();
-        int skillOld = player.getAvailableSkillPoints();
-        int altMoneyOld = player.getAltMoney();
-
-        if (strOld != playerProps().getStr() && playerProps().getStr() > 0) {
-            player.setStr(playerProps().getStr());
-        }
-        if (intOld != playerProps().getIntl() && playerProps().getIntl() > 0) {
-            player.setInt(playerProps().getIntl());
-        }
-        if (dexOld != playerProps().getDex() && playerProps().getDex() > 0) {
-            player.setDex(playerProps().getDex());
-        }
-        if (lifeOld != playerProps().getLife() && playerProps().getLife() > 0) {
-            player.setLife(playerProps().getLife());
-        }
-        if (manaOld != playerProps().getMana() && playerProps().getMana() > 0) {
-            player.setMana(playerProps().getMana());
-        }
-        if (modifierOld != playerProps().getAttrAvailable() && playerProps().getAttrAvailable() >= 0) {
-            player.setModifierPoints(playerProps().getAttrAvailable());
-        }
-        if (altMoneyOld != playerProps().getElectrum() && playerProps().getElectrum() >= 0) {
-            player.setAltMoney(playerProps().getElectrum());
-        }
-    }
-
-    public void saveCharHandler() {
-        logger.log(DEBUG, "starting savegame task");
-
-        commitChanges();
-
-        logger.log(DEBUG, "returning savegame task");
     }
 
     public void loadCharHandler() {
@@ -434,17 +503,29 @@ public class AttributesPaneController implements Initializable {
 
         charClassText.setText(player.getPlayerClassName());
 
-        String difficultyTextValue = String.format("%s%02d", Constants.UI.PREFIXTAG_DIFFICULTYLABEL, playerProps().getDifficulty() + 1);
-        if (txt.isTagStringValid(difficultyTextValue)) {
-            difficultyText.setText(ResourceHelper.cleanTagString(txt.getString(difficultyTextValue)));
-        } else {
-            difficultyText.setText(ResourceHelper.getMessage(String.format("difficulty.%d", playerProps().getDifficulty())));
+        List<DifficultyItem> difficultyItems = new ArrayList<>();
+        //load difficulty list from game, the tag id starts with 1, while the difficulty id in save game starts with 0
+        for (int i = 0; txt.getString(String.format("%s%02d", Constants.UI.PREFIXTAG_DIFFICULTYLABEL, i + 1)) != null; i++) {
+            difficultyItems.add(new DifficultyItem(
+                    i, ResourceHelper.cleanTagString(txt.getString(String.format("%s%02d", Constants.UI.PREFIXTAG_DIFFICULTYLABEL, i + 1)))
+            ));
+        }
+        if (difficultyItems.isEmpty()) {
+            for (int i = 0; i <= 2; i++) {
+                difficultyItems.add(new DifficultyItem(
+                        i, ResourceHelper.getMessage(String.format("difficulty.%d", i))
+                ));
+            }
         }
 
-        experienceText.setText(NumberFormat.getInstance().format(playerProps().getXp()));
-        charLevelText.setText(String.valueOf(playerProps().getCharLevel()));
-        goldText.setText(NumberFormat.getInstance().format(playerProps().getGold()));
-        electrumText.setText(NumberFormat.getInstance().format(playerProps().getElectrum()));
+        difficulty.getItems().setAll(difficultyItems);
+        difficulty.getSelectionModel().select(player.getDifficulty());
+        difficulty.getItems().sort(Comparator.comparing(DifficultyItem::getId));
+
+        electrumText.setText(String.valueOf(playerProps().getElectrum()));
+        experienceText.setText(NumberFormat.getInstance(State.get().getLocale()).format(playerProps().getXp()));
+        setCharLevelField(playerProps().getCharLevel());
+        goldText.setText(String.valueOf(playerProps().getGold()));
 
         gender.getItems().setAll(ResourceHelper.getMessage("main.gender.male"), ResourceHelper.getMessage("main.gender.female"));
         int genderSelection;
@@ -482,56 +563,113 @@ public class AttributesPaneController implements Initializable {
         }
     }
 
+    @FXML
+    public void difficultySelect(ActionEvent e) {
+        if (characterIsLoading) {
+            return;
+        }
+
+        if (difficulty.getSelectionModel().getSelectedItem() != null) {
+            playerProps().setDifficulty(difficulty.getSelectionModel().getSelectedItem().getId());
+        }
+    }
+
     public void setMainController(MainController mainController) {
         this.mc = mainController;
     }
 
     class SkillIntegerSpinnerValueFactory extends SpinnerValueFactory.IntegerSpinnerValueFactory {
-
         SkillIntegerSpinnerValueFactory(int min, int max, int initialValue, int amountToStepBy) {
             super(min, max, initialValue, amountToStepBy);
         }
 
         @Override
         public void decrement(int v) {
+            int oldValue = getValue();
+            int step = v * getAmountToStepBy();
+            int newValue = oldValue - step;
+            if (newValue >= getMin() && mc.isUnlockedEdit()) {
+                setValue(newValue);
+            }
         }
 
         @Override
         public void increment(int v) {
-        }
-    }
-}
-
-@SuppressWarnings("CanBeFinal")
-class AttrIntegerSpinnerValueFactory extends SpinnerValueFactory.IntegerSpinnerValueFactory {
-    private final IntegerProperty available;
-
-    AttrIntegerSpinnerValueFactory(int min, int max, int initialValue, int amountToStepBy, IntegerProperty available) {
-        super(min, max, initialValue, amountToStepBy);
-        this.available = available;
-    }
-
-    @Override
-    public void decrement(int v) {
-        int oldValue = getValue();
-        int step = v * getAmountToStepBy();
-        int newValue = oldValue - step;
-        if (newValue >= getMin()) {
-            setValue(newValue);
+            int oldValue = getValue();
+            int step = v * getAmountToStepBy();
+            int newValue = oldValue + step;
+            if (newValue <= getMax() && mc.isUnlockedEdit()) {
+                setValue(newValue);
+            }
         }
     }
 
-    @Override
-    public void increment(int v) {
-        int oldValue = getValue();
-        int step = v * getAmountToStepBy();
-        int newValue = oldValue + step;
-        int pointsAvail = available.get() * step;
-        if (oldValue == getMax() && available.get() <= 0) {
-            return;
+    class AttrIntegerSpinnerValueFactory extends SpinnerValueFactory.IntegerSpinnerValueFactory {
+        private final IntegerProperty available;
+
+        AttrIntegerSpinnerValueFactory(int min, int max, int initialValue, int amountToStepBy, IntegerProperty available) {
+            super(min, max, initialValue, amountToStepBy);
+            this.available = available;
         }
-        setMax(oldValue + pointsAvail);
-        if (newValue <= getMax())
-            setValue(newValue);
+
+        @Override
+        public void decrement(int v) {
+            int oldValue = getValue();
+            int step = v * getAmountToStepBy();
+            int newValue = oldValue - step;
+            if (newValue >= getMin()) {
+                setValue(newValue);
+            }
+        }
+
+        @Override
+        public void increment(int v) {
+            int oldValue = getValue();
+            int step = v * getAmountToStepBy();
+            int newValue = oldValue + step;
+            int pointsAvail = available.get() * step;
+            if (oldValue == getMax() && available.get() <= 0 && !mc.isFreeLvl()) {
+                return;
+            }
+            if (mc.isFreeLvl()) {
+                setMax(Integer.MAX_VALUE);
+            } else {
+                setMax(oldValue + pointsAvail);
+            }
+            if (newValue <= getMax() || mc.isFreeLvl())
+                setValue(newValue);
+        }
+    }
+
+    class LevelIntegerSpinnerValueFactory extends SpinnerValueFactory.IntegerSpinnerValueFactory {
+        private final IntegerProperty attrAvailable;
+        private final IntegerProperty skillAvailable;
+
+        LevelIntegerSpinnerValueFactory(int min, int max, int initialValue, IntegerProperty attrAvailable, IntegerProperty skillAvailable) {
+            super(min, max, initialValue, 1);
+            this.attrAvailable = attrAvailable;
+            this.skillAvailable = skillAvailable;
+        }
+
+        @Override
+        public void decrement(int v) {
+            int oldValue = this.getValue();
+            int step = v * this.getAmountToStepBy();
+            int newValue = oldValue - step;
+
+            if (newValue >= this.getMin() && ((!mc.isFreeLvl() && attrAvailable.get() >= 2 && skillAvailable.get() >= 3) || mc.isFreeLvl())) {
+                setValue(newValue);
+            }
+        }
+
+        @Override
+        public void increment(int v) {
+            int oldValue = this.getValue();
+            int step = v * this.getAmountToStepBy();
+            int newValue = oldValue + step;
+            if (newValue <= this.getMax()) {
+                setValue(newValue);
+            }
+        }
     }
 }

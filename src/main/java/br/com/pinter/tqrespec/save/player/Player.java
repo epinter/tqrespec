@@ -230,6 +230,11 @@ public class Player {
         return getVariableValueInteger(statsBlock.getStart(), Constants.Save.SKILL_POINTS);
     }
 
+    public void setAvailableSkillPoints(int skillPoints) {
+        if (!isCharacterLoaded()) return;
+        getSaveData().getDataMap().setInt(Constants.Save.SKILL_POINTS, skillPoints);
+    }
+
     public Map<String, PlayerSkill> getPlayerSkills() {
         boolean update = false;
 
@@ -406,8 +411,29 @@ public class Player {
         getSaveData().getDataMap().setInt("modifierPoints", val);
     }
 
+    public void setXp(int val) {
+        getSaveData().getDataMap().setInt("currentStats.experiencePoints", val);
+    }
+
+    public void setCharLevel(int val) {
+        getSaveData().getDataMap().setInt("currentStats.charLevel", val);
+        getSaveData().getDataMap().setInt("currentStats.experiencePoints", getXpLevelMin(val));
+    }
+
+    public void setMoney(int gold) {
+        getSaveData().getDataMap().setInt("money", gold);
+    }
+
     public int getXp() {
         return getVariableValueInteger("currentStats.experiencePoints");
+    }
+
+    public int getXpLevelMin(int lvl) {
+        lvl--;
+        if (lvl == 0) {
+            return 0;
+        }
+        return (int) (((Math.pow(1.2, lvl)) * (1 + (lvl / 0.8))) + (65 * (Math.pow((lvl + 1), 3.25))));
     }
 
     public int getLevel() {
@@ -423,21 +449,98 @@ public class Player {
             return getVariableValueInteger("altMoney");
         }
 
-        logger.log(INFO, "altMoney variable not found for character {0}", saveData.getPlayerName());
+        logger.log(INFO, "altMoney variable not found for character {0}, version {1}",
+                saveData.getPlayerName(), saveData.getHeaderInfo().getPlayerVersion());
         return 0;
     }
 
     public void setAltMoney(int altMoney) {
         if (!getSaveData().getDataMap().hasVariable("altMoney")) {
-            logger.log(INFO, "altMoney variable not found for character {0}", saveData.getPlayerName());
+            logger.log(INFO, "altMoney variable not found for character {0}, version {1}",
+                    saveData.getPlayerName(), saveData.getHeaderInfo().getPlayerVersion());
             return;
         }
 
         getSaveData().getDataMap().setInt("altMoney", altMoney);
     }
 
+    public int getBoostedCharacterForX4() {
+        return getVariableValueIntegerValidate("boostedCharacterForX4", 0);
+    }
+
+    public void setBoostedCharacterForX4(int value) {
+        setVariableValueIntegerValidate("boostedCharacterForX4", value);
+
+    }
+
+    public int getNumberOfSacks() {
+        return getVariableValueIntegerValidate("numberOfSacks", 1);
+    }
+
+    public void setNumberOfSacks(int value) {
+        setVariableValueIntegerValidate("numberOfSacks", value);
+    }
+
+    public int getCurrentlyFocusedSackNumber() {
+        return getVariableValueIntegerValidate("currentlyFocusedSackNumber", 1);
+    }
+
+    public void setCurrentlyFocusedSackNumber(int value) {
+        setVariableValueIntegerValidate("currentlyFocusedSackNumber", value);
+    }
+
+    public int getCurrentlySelectedSackNumber() {
+        return getVariableValueIntegerValidate("currentlySelectedSackNumber", 1);
+    }
+
+    public void setCurrentlySelectedSackNumber(int value) {
+        setVariableValueIntegerValidate("currentlySelectedSackNumber", value);
+    }
+
+    public BlockInfo getPlayerInventoryBlock() {
+        int blockOffset = getSaveData().getDataMap().getVariableLocation().get("itemPositionsSavedAsGridCoords").getFirst();
+        int validate = getSaveData().getDataMap().getVariableLocation().get("numberOfSacks").getFirst();
+        if (blockOffset == validate) {
+            return getSaveData().getDataMap().getBlockInfo().get(blockOffset);
+        }
+        return null;
+    }
+
+    public int getInventorySacksCount() {
+        BlockInfo inv = getPlayerInventoryBlock();
+        List<BlockInfo> playerSacks = getSaveData().getDataMap().getBlockInfo().values()
+                .stream().filter(p -> p.getParentOffset() == inv.getStart()).toList();
+        return playerSacks.size();
+    }
+
+    public void addEmptyPlayerSacks() {
+        BlockInfo block = getPlayerInventoryBlock();
+        int endBlockSize = 17; //FileParser.END_BLOCK_SIZE
+        byte[] sack = new byte[]{
+                0x0B, 0x00, 0x00, 0x00, 0x62, 0x65, 0x67, 0x69, 0x6E, 0x5F, 0x62, 0x6C, 0x6F, 0x63, 0x6B,
+                (byte) 0xCE, (byte) 0xFA, 0x1D, (byte) 0xB0, 0x08, 0x00, 0x00, 0x00, 0x74, 0x65, 0x6D, 0x70, 0x42, 0x6F, 0x6F,
+                0x6C, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x73, 0x69, 0x7A, 0x65, 0x00, 0x00,
+                0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x65, 0x6E, 0x64, 0x5F, 0x62, 0x6C, 0x6F, 0x63, 0x6B,
+                (byte) 0xDE, (byte) 0xC0, (byte) 0xAD, (byte) 0xDE};
+        int sacksToCreate = 4 - getInventorySacksCount();
+        int offset = block.getEnd() - endBlockSize + 1;
+        System.out.println("ADDING BLOCK TO OFFSET " + offset);
+        for (int i = 0; i < sacksToCreate; i++) {
+            getSaveData().getDataMap().insertRawData(sack, offset);
+        }
+    }
+
+
+    public int getHasBeenInGame() {
+        return getVariableValueIntegerValidate("hasBeenInGame", -1);
+    }
+
     public int getStatPlayTimeInSeconds() {
         return getVariableValueInteger("playTimeInSeconds");
+    }
+
+    public void setStatPlayTimeInSeconds(int secs) {
+        getSaveData().getDataMap().setInt("playTimeInSeconds", secs);
     }
 
     public String getStatGreatestMonsterKilledName() {
@@ -450,54 +553,181 @@ public class Player {
         return monsters.getLast();
     }
 
+    public void resetStatGreatestMonsterKilledName() {
+        String var = PlayerFileVariable.valueOf(getSaveData().getPlatform(), "greatestMonsterKilledName").variable();
+        int block = getSaveData().getDataMap().getVariableLocation().get(var).getFirst();
+        if (getSaveData().getDataMap().getBlockInfo().get(block) != null) {
+            for (VariableInfo vi : getSaveData().getDataMap().getBlockInfo().get(block).getVariables().values()) {
+                if (vi.getValue() == null || !vi.getName().equals(var)) {
+                    continue;
+                }
+                if (vi.getVariableType().equals(VariableType.STRING) || vi.getVariableType().equals(VariableType.STRING_UTF_16_LE) || vi.getVariableType().equals(VariableType.STRING_UTF_32_LE)) {
+                    getSaveData().getDataMap().setString(vi, "");
+                }
+            }
+        }
+    }
+
     public int getStatGreatestMonsterKilledLevel() {
         List<Integer> monsterLevels = getSaveData().getDataMap().getIntValuesFromBlock(
                         PlayerFileVariable.valueOf(getSaveData().getPlatform(), "greatestMonsterKilledLevel").variable())
-                .stream().filter(v -> v != 0).toList();
+                .stream().filter(v -> v >= 0).toList();
         if (monsterLevels.isEmpty()) {
             return -1;
         }
         return monsterLevels.getLast();
     }
 
+    public void resetStatGreatestMonsterKilledLevel() {
+        String var = PlayerFileVariable.valueOf(getSaveData().getPlatform(), "greatestMonsterKilledLevel").variable();
+        int block = getSaveData().getDataMap().getVariableLocation().get(var).getFirst();
+        if (getSaveData().getDataMap().getBlockInfo().get(block) != null) {
+            for (VariableInfo vi : getSaveData().getDataMap().getBlockInfo().get(block).getVariables().values()) {
+                if (vi.getValue() == null || !vi.getName().equals(var)) {
+                    continue;
+                }
+                getSaveData().getDataMap().setInt(vi, 0);
+            }
+        }
+    }
+
+    public void resetStatGreatestMonsterKilledLifeAndMana() {
+        String var = PlayerFileVariable.valueOf(getSaveData().getPlatform(), "greatestMonsterKilledLifeAndMana").variable();
+        int block = getSaveData().getDataMap().getVariableLocation().get(var).getFirst();
+        if (getSaveData().getDataMap().getBlockInfo().get(block) != null) {
+            for (VariableInfo vi : getSaveData().getDataMap().getBlockInfo().get(block).getVariables().values()) {
+                if (vi.getValue() == null || !vi.getName().equals(var)) {
+                    continue;
+                }
+                getSaveData().getDataMap().setInt(vi, 0);
+            }
+        }
+    }
+
     public int getStatNumberOfDeaths() {
         return getVariableValueInteger("numberOfDeaths");
+    }
+
+    public void setStatNumberOfDeaths(int deaths) {
+        getSaveData().getDataMap().setInt("numberOfDeaths", deaths);
     }
 
     public int getStatNumberOfKills() {
         return getVariableValueInteger("numberOfKills");
     }
 
+    public void setStatNumberOfKills(int kills) {
+        getSaveData().getDataMap().setInt("numberOfKills", kills);
+    }
+
     public int getStatExperienceFromKills() {
         return getVariableValueInteger("experienceFromKills");
+    }
+
+    public void setStatExperienceFromKills(int xp) {
+        getSaveData().getDataMap().setInt("experienceFromKills", xp);
     }
 
     public int getStatHealthPotionsUsed() {
         return getVariableValueInteger("healthPotionsUsed");
     }
 
+    public void setStatHealthPotionsUsed(int health) {
+        getSaveData().getDataMap().setInt("healthPotionsUsed", health);
+    }
+
     public int getStatManaPotionsUsed() {
         return getVariableValueInteger("manaPotionsUsed");
+    }
+
+    public void setStatManaPotionsUsed(int mana) {
+        getSaveData().getDataMap().setInt("manaPotionsUsed", mana);
     }
 
     public int getStatMaxLevel() {
         return getVariableValueInteger("maxLevel");
     }
 
+    public void setStatMaxLevel(int level) {
+        getSaveData().getDataMap().setInt("maxLevel", level);
+    }
+
     public int getStatNumHitsReceived() {
         return getVariableValueInteger("numHitsReceived");
+    }
+
+    public void setStatNumHitsReceived(int hits) {
+        getSaveData().getDataMap().setInt("numHitsReceived", hits);
     }
 
     public int getStatNumHitsInflicted() {
         return getVariableValueInteger("numHitsInflicted");
     }
 
+    public void setStatNumHitsInflicted(int hits) {
+        getSaveData().getDataMap().setInt("numHitsInflicted", hits);
+    }
+
     public int getStatGreatestDamageInflicted() {
         return (int) getVariableValueFloat("greatestDamageInflicted");
     }
 
+    public void setStatGreatestDamageInflicted(float dmg) {
+        getSaveData().getDataMap().setFloat("greatestDamageInflicted", dmg);
+    }
+
     public int getStatCriticalHitsInflicted() {
         return getVariableValueInteger("criticalHitsInflicted");
+    }
+
+    public void setStatCriticalHitsInflicted(int hits) {
+        getSaveData().getDataMap().setInt("criticalHitsInflicted", hits);
+    }
+
+    public int getStatCriticalHitsReceived() {
+        return getVariableValueInteger("criticalHitsReceived");
+    }
+
+    public void setStatCriticalHitsReceived(int hits) {
+        getSaveData().getDataMap().setInt("criticalHitsReceived", hits);
+    }
+
+    public void resetPlayerStats() {
+        resetStatGreatestMonsterKilledName();
+        resetStatGreatestMonsterKilledLevel();
+        resetStatGreatestMonsterKilledLifeAndMana();
+        setStatPlayTimeInSeconds(0);
+        setStatNumberOfDeaths(0);
+        setStatNumberOfKills(0);
+        setStatExperienceFromKills(0);
+        setStatHealthPotionsUsed(0);
+        setStatManaPotionsUsed(0);
+        setStatMaxLevel(1);
+        setStatNumHitsReceived(0);
+        setStatNumHitsInflicted(0);
+        setStatGreatestDamageInflicted(0);
+        setStatCriticalHitsInflicted(0);
+        setStatCriticalHitsReceived(0);
+    }
+
+    private int getVariableValueIntegerValidate(String variable, int defaultVal) {
+        if (!getSaveData().getDataMap().hasVariable(variable)) {
+            logger.log(INFO, "{0} variable not found for character {1}, version {2}",
+                    variable, saveData.getPlayerName(), saveData.getHeaderInfo().getPlayerVersion());
+            return defaultVal;
+        }
+
+        return getSaveData().getDataMap().getInt(variable);
+    }
+
+    private void setVariableValueIntegerValidate(String variable, int value) {
+        if (!getSaveData().getDataMap().hasVariable(variable)) {
+            logger.log(INFO, "{0} variable not found for character {1}, version {2}",
+                    variable, saveData.getPlayerName(), saveData.getHeaderInfo().getPlayerVersion());
+            return;
+        }
+
+        getSaveData().getDataMap().setInt(variable, value);
     }
 
     private int getVariableValueInteger(String variable) {
@@ -572,14 +802,28 @@ public class Player {
         return getSaveData().getDataMap().getTempAttr("difficulty");
     }
 
+    public void setDifficulty(int difficulty) {
+        if (difficulty < 0 || difficulty > 2) {
+            throw new IllegalArgumentException("invalid difficulty");
+        }
+        getSaveData().getDataMap().setTempAttr("difficulty", difficulty);
+    }
+
     public List<MapTeleport> getDefaultMapTeleports(int difficulty) {
         List<MapTeleport> ret = new ArrayList<>();
-        if (getTeleports().size() >= difficulty + 1) {
-            for (VariableInfo t : getTeleports().get(difficulty).getVariables()) {
+        List<TeleportDifficulty> teleports = getTeleportDifficulty();
+        if (teleports.size() >= difficulty + 1) {
+            for (VariableInfo t : teleports.get(difficulty).getVariables()) {
                 UID tpUid = new UID((byte[]) t.getValue());
-                MapTeleport mapTeleport = DefaultMapTeleport.get(tpUid);
-                if (mapTeleport == null) {
-                    logger.log(WARNING, String.format("teleport not found with uid = '%s' character=(%s) difficulty=%d", tpUid, getPlayerSavegameName(), difficulty));
+                MapTeleport mapTeleport;
+                try {
+                    mapTeleport = DefaultMapTeleport.get(tpUid);
+                } catch (NoSuchElementException e) {
+                    logger.log(WARNING, String.format("teleport not found with uid = '%s' character=(%s) difficulty=%d",
+                            tpUid, getPlayerSavegameName(), difficulty));
+                    continue;
+                }
+                if (ret.contains(mapTeleport)) {
                     continue;
                 }
                 Teleport teleport = db.teleports().getTeleport(mapTeleport.getRecordId());
@@ -591,7 +835,7 @@ public class Player {
         return ret;
     }
 
-    public List<TeleportDifficulty> getTeleports() {
+    public List<TeleportDifficulty> getTeleportDifficulty() {
         List<TeleportDifficulty> ret = new ArrayList<>();
 
         for (int i = 0; i <= getDifficulty(); i++) {
@@ -604,31 +848,90 @@ public class Player {
         return ret;
     }
 
+    public VariableInfo getTeleportUIDsSizeVar(int difficulty) {
+        Optional<BlockInfo> first = getSaveData().getDataMap().getBlockInfo().values().stream().filter(
+                f -> f.getBlockType() == PlayerBlockType.PLAYER_MAIN).findFirst();
+
+        BlockInfo block;
+
+        if (first.isPresent()) {
+            block = first.get();
+        } else {
+            return null;
+        }
+        List<VariableInfo> teleportUidsSizeVars = new ArrayList<>(block.getVariables().get(Constants.Save.VAR_TELEPORTUIDSSIZE));
+        VariableInfo var = teleportUidsSizeVars.stream().sorted(Comparator.comparing(VariableInfo::getKeyOffset)).toList().get(difficulty);
+        if (var.isInt() && var.getName().equals(Constants.Save.VAR_TELEPORTUIDSSIZE)) {
+            return var;
+        }
+        return null;
+    }
+
+    public void setTeleportUIDsSize() {
+        for (int difficulty = 0; difficulty <= getDifficulty(); difficulty++) {
+            TeleportDifficulty teleportDifficulty = getTeleportUidFromDifficulty(difficulty);
+            if (teleportDifficulty != null) {
+                logger.log(DEBUG, "setting teleportUIDsSize({0}) to {1}", difficulty, teleportDifficulty.getTeleports().size());
+                getSaveData().getDataMap().setInt(getTeleportUIDsSizeVar(difficulty), teleportDifficulty.getTeleports().size());
+            }
+        }
+    }
+
+    public int getTeleportUIDsSize(int difficulty) {
+        VariableInfo var = getTeleportUIDsSizeVar(difficulty);
+        if (var != null) {
+            return (int) var.getValue();
+        }
+        return 0;
+    }
+
     public void removeTeleport(int difficulty, UID uid) {
         TeleportDifficulty teleportDifficulty = getTeleportUidFromDifficulty(difficulty);
-
-        if (difficulty > getDifficulty()) {
-            throw new UnhandledRuntimeException(String.format("character doesn't have the difficulty %d unlocked", difficulty));
-        }
 
         if (teleportDifficulty == null) {
             throw new UnhandledRuntimeException("error creating teleport");
         }
 
-        VariableInfo uidSize = teleportDifficulty.getBlockInfo().getVariables().get(Constants.Save.VAR_TELEPORTUIDSSIZE).get(difficulty);
+        VariableInfo uidsSize = getTeleportUIDsSizeVar(difficulty);
 
         List<VariableInfo> toRemove = new ArrayList<>();
         for (VariableInfo stagingVar : teleportDifficulty.getBlockInfo().getStagingVariables().values()) {
-            if (stagingVar.getVariableType().equals(VariableType.UID) && stagingVar.getName().equals(Constants.Save.VAR_TELEPORTUID)
-                    && (new UID((byte[]) stagingVar.getValue())).equals(uid)) {
-                logger.log(ERROR, "------------- removing portal " + uid + ".");
-                toRemove.add(stagingVar);
+            if (stagingVar.getVariableType().equals(VariableType.UID) && stagingVar.getName().equals(Constants.Save.VAR_TELEPORTUID)) {
+                UID uidTp;
+                try {
+                    uidTp = new UID((byte[]) stagingVar.getValue());
+                } catch (IllegalArgumentException e) {
+                    logger.log(WARNING, "Invalid map teleport data, uid: " + stagingVar.getValueString());
+                    continue;
+                }
+                if (uidTp.equals(uid)) {
+                    logger.log(DEBUG, "------------- removing portal " + uid + ".");
+                    toRemove.add(stagingVar);
+                }
+            }
+        }
+
+        for (VariableInfo vi : teleportDifficulty.getVariables()) {
+            if (vi.getVariableType().equals(VariableType.UID) && vi.getName().equals(Constants.Save.VAR_TELEPORTUID)) {
+                MapTeleport currentTeleport;
+                UID uidTp = new UID((byte[]) vi.getValue());
+                try {
+                    currentTeleport = DefaultMapTeleport.get(uidTp);
+                } catch (NoSuchElementException e) {
+                    logger.log(WARNING, "Invalid map teleport data, uid: " + vi.getValueString(), e);
+                    continue;
+                }
+
+                if (currentTeleport != null && currentTeleport.getUid().equals(uid)) {
+                    logger.log(DEBUG, "------------- removing portal " + uid);
+                    toRemove.add(vi);
+                }
             }
         }
 
         for (VariableInfo v : toRemove) {
-            getSaveData().getDataMap().removeVariable(v.getKeyOffset(), v);
-            getSaveData().getDataMap().decrementInt(uidSize);
+            getSaveData().getDataMap().removeVariable(v);
+            getSaveData().getDataMap().decrementInt(uidsSize);
         }
     }
 
@@ -646,19 +949,19 @@ public class Player {
         int teleportUIDKeyLength = 4 + Constants.Save.VAR_TELEPORTUID.length();
 
         int offset = teleportDifficulty.getOffset() + (teleportUIDsSizeKeyLength + 4);
-        for (VariableInfo stagingVar : teleportDifficulty.getBlockInfo().getStagingVariables().values()) {
-            if (stagingVar.getVariableType().equals(VariableType.UID) && stagingVar.getName().equals(Constants.Save.VAR_TELEPORTUID)
-                    && (new UID((byte[]) stagingVar.getValue())).equals(uid)) {
-                logger.log(ERROR, "------------- portal " + uid + "already exists");
-                break;
-            }
-        }
-
-        for (VariableInfo vi : teleportDifficulty.getVariables()) {
+        for (VariableInfo r : teleportDifficulty.getVariables()) {
+            VariableInfo vi = getSaveData().getDataMap().getChangesForVariable(r);
             if (vi.getVariableType().equals(VariableType.UID) && vi.getName().equals(Constants.Save.VAR_TELEPORTUID)) {
-                MapTeleport currentTeleport = DefaultMapTeleport.get(new UID((byte[]) vi.getValue()));
-                if (currentTeleport != null && currentTeleport.getUid().equals(uid)) {
-                    logger.log(ERROR, "------------- portal " + uid + "already exists");
+                MapTeleport currentTeleport;
+                try {
+                    currentTeleport = DefaultMapTeleport.get(new UID((byte[]) vi.getValue()));
+                } catch (NoSuchElementException e) {
+                    logger.log(WARNING, "Invalid map teleport data, uid: " + vi.getValueString(), e);
+                    continue;
+                }
+
+                if (currentTeleport.getUid().equals(uid)) {
+                    logger.log(WARNING, "------------- portal ''{0}'' already exists for difficulty ''{1}''", uid, difficulty);
                     return;
                 }
             }
@@ -694,22 +997,55 @@ public class Player {
         }
 
         List<VariableInfo> teleportUidsSizeVars = new ArrayList<>(Objects.requireNonNull(block).getVariables().get(Constants.Save.VAR_TELEPORTUIDSSIZE));
-        teleportUidsSizeVars.sort(Comparator.comparingInt(VariableInfo::getValOffset));
+        teleportUidsSizeVars.sort(Comparator.comparing(VariableInfo::getKeyOffset));
         int offsetStart = teleportUidsSizeVars.get(difficulty).getKeyOffset();
-        int offsetStop = teleportUidsSizeVars.get(Math.max(difficulty, 2)).getKeyOffset();
         VariableInfo size = teleportUidsSizeVars.get(difficulty);
 
         List<VariableInfo> teleports = new ArrayList<>();
 
-        List<VariableInfo> teleportUidVars = new ArrayList<>(block.getVariables().get(Constants.Save.VAR_TELEPORTUID));
-        for (VariableInfo v : teleportUidVars) {
-            if (v.getKeyOffset() > offsetStart) {
-                if (offsetStart != offsetStop && v.getKeyOffset() > offsetStop) {
-                    break;
+        List<VariableInfo> teleportUidVars = block.getVariables().get(Constants.Save.VAR_TELEPORTUID)
+                .stream().sorted(Comparator.comparing(VariableInfo::getKeyOffset)).toList();
+
+        int curDiff = -1;
+        int startOffset = -1;
+        int endOffset = -1;
+
+        for (VariableInfo v : block.getVariables().values().stream().sorted(Comparator.comparing(VariableInfo::getKeyOffset)).toList()) {
+            if (!Constants.Save.VAR_TELEPORTUIDSSIZE.equals(v.getName()) && !Constants.Save.VAR_TELEPORTUID.equals(v.getName())) {
+                continue;
+            }
+            if (Constants.Save.VAR_TELEPORTUIDSSIZE.equals(v.getName())) {
+                curDiff++;
+                if (curDiff == difficulty) {
+                    startOffset = v.getKeyOffset() + v.getVariableBytesLength();
+                    endOffset = startOffset;
+                    continue;
                 }
+            }
+            if (curDiff == difficulty && v.getKeyOffset() >= teleportUidsSizeVars.get(curDiff).getKeyOffset()) {
+                endOffset = v.getValOffset() + v.getValSize() - 1;
+            }
+        }
+
+        //search for teleports from savegame
+        for (VariableInfo v : teleportUidVars) {
+            if (getSaveData().getDataMap().isVariableRemoved(v)) { //skip pending remove teleports
+                continue;
+            }
+            if (v.getKeyOffset() >= startOffset && v.getKeyOffset() <= endOffset) {
                 teleports.add(v);
             }
         }
+
+        //search for teleports pending save
+        for (VariableInfo v : block.getStagingVariables().get(Constants.Save.VAR_TELEPORTUID)
+                .stream().sorted(Comparator.comparing(VariableInfo::getKeyOffset)).toList()) {
+            if (v.getKeyOffset() >= startOffset && v.getKeyOffset() <= endOffset) {
+                teleports.add(v);
+            }
+        }
+
+        logger.log(DEBUG, "difficulty{0}: start={1}; end={2}; count={3}; uidssize={4}", difficulty, startOffset, endOffset, teleports.size(), size.getValue());
 
         return new TeleportDifficulty(difficulty, (Integer) size.getValue(), offsetStart, teleports, block);
     }

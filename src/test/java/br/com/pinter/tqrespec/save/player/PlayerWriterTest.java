@@ -20,6 +20,7 @@
 
 package br.com.pinter.tqrespec.save.player;
 
+import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.Platform;
 import br.com.pinter.tqrespec.save.stash.StashData;
 import br.com.pinter.tqrespec.save.stash.StashLoader;
@@ -42,13 +43,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.INFO;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class PlayerWriterTest {
-    private static final Logger logger = Logger.getLogger(PlayerWriterTest.class.getName());
+    private static final System.Logger logger = Log.getLogger(PlayerWriterTest.class.getName());
 
     @Mock
     private CurrentPlayerData mockSaveData;
@@ -86,7 +88,7 @@ class PlayerWriterTest {
             saveData.setHeaderInfo(playerParser.getHeaderInfo());
             saveData.getDataMap().setVariableLocation(playerParser.getVariableLocation());
         } catch (Exception e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             fail();
         }
 
@@ -113,7 +115,7 @@ class PlayerWriterTest {
         try {
             playerWriter.copyCurrentSave("testcopy");
         } catch (IOException e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             fail();
         }
 
@@ -132,7 +134,7 @@ class PlayerWriterTest {
             assertTrue(isInMainQuestBefore != isInMainQuestAfter && isInMainQuestAfter == 0);
 
         } catch (Exception e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             fail();
         }
     }
@@ -149,13 +151,13 @@ class PlayerWriterTest {
             saveData.setBuffer(playerParser.load());
             saveData.setPlatform(playerParser.getDetectedPlatform());
             saveData.getDataMap().setBlockInfo(playerParser.getBlockInfo());
-            System.out.println("SAVEGAME " + savegame);
-            System.out.println("PLATFORM " + playerParser.getDetectedPlatform());
+            logger.log(INFO, "SAVEGAME " + savegame);
+            logger.log(INFO,"PLATFORM " + playerParser.getDetectedPlatform());
             saveData.setHeaderInfo(playerParser.getHeaderInfo());
             saveData.getDataMap().setVariableLocation(playerParser.getVariableLocation());
-            System.out.println("PLAYER " + saveData.getDataMap().getCharacterName());
+            logger.log(INFO,"PLAYER " + saveData.getDataMap().getCharacterName());
         } catch (Exception e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             fail();
         }
 
@@ -184,7 +186,7 @@ class PlayerWriterTest {
         try {
             playerWriter.copyCurrentSave("testcopy", conversionTarget, null);
         } catch (IOException e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             fail();
         }
 
@@ -201,7 +203,7 @@ class PlayerWriterTest {
             saveData.setHeaderInfo(playerParser.getHeaderInfo());
             saveData.getDataMap().setVariableLocation(playerParser.getVariableLocation());
         } catch (Exception e) {
-            logger.log(Level.SEVERE, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             fail();
         }
     }

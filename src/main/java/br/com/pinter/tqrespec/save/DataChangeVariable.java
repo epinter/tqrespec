@@ -31,13 +31,18 @@ import java.util.List;
 import java.util.Objects;
 
 class DataChangeVariable extends DataChange implements Serializable {
-    private final VariableInfo oldVariable;
+    private VariableInfo oldVariable;
     private final List<VariableInfo> variables = new ArrayList<>();
     private final List<String> addVars = new ArrayList<>();
+    private boolean remove = false;
 
     public DataChangeVariable(VariableInfo oldVariable, VariableInfo variable) {
         this.oldVariable = oldVariable;
-        this.variables.add(variable);
+        if(variable == null) {
+            this.remove = true;
+        } else {
+            this.variables.add(variable);
+        }
     }
 
     @Override
@@ -94,7 +99,11 @@ class DataChangeVariable extends DataChange implements Serializable {
 
     @Override
     public int previousValueLength() {
-        return oldVariable.getValuePrefix() + oldVariable.getValBytesLength();
+        if(remove) {
+            return oldVariable.getVariableBytesLength();
+        }else {
+            return oldVariable.getValuePrefix() + oldVariable.getValBytesLength();
+        }
     }
 
     @Override
@@ -125,6 +134,10 @@ class DataChangeVariable extends DataChange implements Serializable {
         return oldVariable;
     }
 
+    public void setOldVariable(VariableInfo oldVariable) {
+        this.oldVariable = oldVariable;
+    }
+
     @Override
     public boolean isEmpty() {
         return variables.isEmpty() && getPadding().length == 0;
@@ -135,5 +148,24 @@ class DataChangeVariable extends DataChange implements Serializable {
         variables.clear();
         setPadding(new byte[0]);
         setPaddingAfter(true);
+    }
+
+    @Override
+    public boolean isRemove() {
+        return remove;
+    }
+
+    @Override
+    public void setRemove(boolean remove) {
+        this.remove = remove;
+    }
+
+    @Override
+    public String toString() {
+        return "DataChangeVariable{" +
+                "oldVariable=" + oldVariable +
+                ", variables=" + variables +
+                ", addVars=" + addVars +
+                "} " + super.toString();
     }
 }

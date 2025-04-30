@@ -32,6 +32,7 @@ import org.apache.commons.text.WordUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Locale;
 
 import static java.lang.System.Logger.Level.ERROR;
 
@@ -44,9 +45,14 @@ public class Txt {
 
     private Text text;
 
+    private Text textEn;
+
     public void initialize() {
         try {
             if (text == null) {
+                if (!State.get().getLocale().equals(Locale.ENGLISH)) {
+                    textEn = new Text(gameInfo.getTextPath(), Constants.LOCALE_TEXT.get(Locale.ENGLISH), false);
+                }
                 text = new Text(gameInfo.getTextPath(), Constants.LOCALE_TEXT.get(State.get().getLocale()));
             }
         } catch (FileNotFoundException e) {
@@ -59,6 +65,19 @@ public class Txt {
         initialize();
         try {
             return text.getString(str);
+        } catch (IOException ignore) {
+            return null;
+        }
+    }
+
+    public String getStringEn(String str) {
+        initialize();
+        try {
+            if (textEn != null) {
+                return textEn.getString(str);
+            } else {
+                return text.getString(str);
+            }
         } catch (IOException ignore) {
             return null;
         }

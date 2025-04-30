@@ -22,18 +22,30 @@ package br.com.pinter.tqrespec.tqdata;
 
 import br.com.pinter.tqrespec.save.UID;
 
+import java.util.Objects;
+
 public abstract class MapTeleport {
     private final int order;
     private final UID uid;
     private final String recordId;
     private final int act;
     private String name;
+    private String tag;
 
-    protected MapTeleport(int order, UID uid, int act, String recordId) {
+    protected MapTeleport(int order, UID uid, int act, String recordId, String tag) {
         this.order = order;
         this.uid = uid;
         this.recordId = recordId;
         this.act = act;
+        this.tag = tag;
+    }
+
+    protected MapTeleport(MapTeleport o) {
+        this.order = o.order;
+        this.uid = o.uid;
+        this.recordId = o.recordId;
+        this.act = o.act;
+        this.tag = o.tag;
     }
 
     public int getOrder() {
@@ -58,6 +70,26 @@ public abstract class MapTeleport {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        MapTeleport that = (MapTeleport) o;
+        return Objects.equals(uid, that.uid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(uid);
     }
 
     @Override

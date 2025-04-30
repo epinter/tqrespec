@@ -46,6 +46,35 @@ public enum DefaultAct {
         return first.get().getValue();
     }
 
+    public String getTag() {
+        switch (value) {
+            case 1 -> {
+                return "tagMGreece";
+            }
+            case 2 -> {
+                return "tagMEgypt";
+            }
+            case 3 -> {
+                return "tagMOrient";
+            }
+            case 4 -> {
+                return "xtagMHades";
+            }
+            case 5 -> {
+                return "x2tagMNorth";
+            }
+            case 6 -> {
+                return "x3tagQAct06";
+            }
+            case 7 -> {
+                return "x4tagMChina";
+            }
+            default -> {
+                return "";
+            }
+        }
+    }
+
     public int getValue() {
         return value;
     }

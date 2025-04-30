@@ -4,15 +4,17 @@
   ~ Copyright (C) 2021 Emerson Pinter - All Rights Reserved
   -->
 
+<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="270.0" prefWidth="616.0" stylesheets="@main.css" xmlns="http://javafx.com/javafx/24" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.pinter.tqrespec.gui.AttributesPaneController">
+<GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="340.0" prefWidth="670.0" stylesheets="@main.css" xmlns="http://javafx.com/javafx/24" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.pinter.tqrespec.gui.AttributesPaneController">
     <columnConstraints>
         <ColumnConstraints />
         <ColumnConstraints hgrow="SOMETIMES" percentWidth="25.0" />
@@ -27,7 +29,7 @@
         <RowConstraints maxHeight="-Infinity" percentHeight="20.0" vgrow="SOMETIMES" />
         <RowConstraints maxHeight="-Infinity" percentHeight="20.0" vgrow="SOMETIMES" />
         <RowConstraints maxHeight="-Infinity" percentHeight="20.0" vgrow="SOMETIMES" />
-      <RowConstraints maxHeight="-Infinity" minHeight="10.0" percentHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        <RowConstraints maxHeight="-Infinity" percentHeight="20.0" vgrow="SOMETIMES" />
     </rowConstraints>
     <children>
         <Spinner fx:id="lifeSpinner" disable="true" maxWidth="1.7976931348623157E308" minHeight="35.0" minWidth="110.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
@@ -75,22 +77,23 @@
                 <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
             </padding>
         </Label>
-        <Label fx:id="charLevelText" maxWidth="1.7976931348623157E308" minHeight="35.0" styleClass="tq-labelbox" GridPane.columnIndex="4" GridPane.rowIndex="4">
+        <Spinner fx:id="charLevelSpinner" disable="true" maxWidth="1.7976931348623157E308" minHeight="35.0" styleClass="charLevelSpinner" GridPane.columnIndex="4" GridPane.rowIndex="4">
+            <GridPane.margin>
+                <Insets left="10.0" right="5.0" />
+            </GridPane.margin>
+        </Spinner>
+        <TextField fx:id="goldText" editable="false" maxWidth="1.7976931348623157E308" minHeight="35.0" GridPane.columnIndex="4" GridPane.rowIndex="5">
             <GridPane.margin>
                 <Insets left="10.0" right="5.0" />
             </GridPane.margin>
             <padding>
                 <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
             </padding>
-        </Label>
-        <Label fx:id="goldText" maxWidth="1.7976931348623157E308" minHeight="35.0" styleClass="tq-labelbox" GridPane.columnIndex="4" GridPane.rowIndex="5">
-            <GridPane.margin>
-                <Insets left="10.0" right="5.0" />
-            </GridPane.margin>
-            <padding>
-                <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
-            </padding>
-        </Label>
+         <styleClass>
+            <String fx:value="textFieldGold" />
+            <String fx:value="tq-labelbox" />
+         </styleClass>
+        </TextField>
         <Label fx:id="availPointsText" maxWidth="1.7976931348623157E308" minHeight="35.0" minWidth="110.0" styleClass="tq-labelbox" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
             <GridPane.margin>
                 <Insets left="10.0" right="10.0" />
@@ -108,39 +111,37 @@
             </GridPane.margin>
         </Label>
         <Label fx:id="charClassLabel" alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="tq-label" text="%main.charclass" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-        <Label fx:id="difficultyText" maxWidth="1.7976931348623157E308" minHeight="35.0" styleClass="tq-labelbox" GridPane.columnIndex="4" GridPane.rowIndex="2">
-            <padding>
-                <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
-            </padding>
+        <ComboBox fx:id="difficulty" focusTraversable="false" maxWidth="1.7976931348623157E308" minHeight="35.0" onAction="#difficultySelect" styleClass="tq-difficultycombo" GridPane.columnIndex="4" GridPane.rowIndex="2">
             <GridPane.margin>
-                <Insets left="10.0" right="5.0" />
+                <Insets bottom="5.0" left="10.0" right="5.0" top="5.0" />
             </GridPane.margin>
-        </Label>
+        </ComboBox>
         <Label fx:id="difficultyLabel" alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="tq-label" text="%main.difficulty" GridPane.columnIndex="3" GridPane.rowIndex="2" />
       <Label fx:id="genderLabel" alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="tq-label" text="%main.gender" GridPane.columnIndex="3" />
-      <ComboBox fx:id="gender" focusTraversable="false" maxWidth="1.7976931348623157E308" minHeight="35.0" onAction="#genderSelect" styleClass="tq-gendercombo" GridPane.columnIndex="4">
+      <ComboBox fx:id="gender" focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="35.0" onAction="#genderSelect" styleClass="tq-gendercombo" GridPane.columnIndex="4">
          <GridPane.margin>
             <Insets bottom="5.0" left="10.0" right="5.0" top="5.0" />
          </GridPane.margin>
       </ComboBox>
       <Label fx:id="skillLabel" alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" styleClass="tq-label" stylesheets="@main.css" text="%main.skillpoints" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-      <Spinner fx:id="skillSpinner" disable="true" maxWidth="1.7976931348623157E308" minHeight="35.0" minWidth="110.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="6" GridPane.valignment="CENTER">
-         <GridPane.margin>
-            <Insets left="10.0" right="10.0" />
-         </GridPane.margin>
-      </Spinner>
-      <Label fx:id="electrumLabel" alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="tq-label" text="%main.electrum" GridPane.columnIndex="3" GridPane.rowIndex="6" />
-      <Label fx:id="electrumText" maxWidth="1.7976931348623157E308" minHeight="35.0" styleClass="tq-labelbox" GridPane.columnIndex="4" GridPane.rowIndex="6">
-         <padding>
-            <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
-         </padding>
-         <opaqueInsets>
-            <Insets />
-         </opaqueInsets>
-         <GridPane.margin>
-            <Insets left="10.0" right="5.0" />
-         </GridPane.margin>
-      </Label>
+         <Spinner fx:id="skillSpinner" disable="true" maxWidth="1.7976931348623157E308" minHeight="35.0" minWidth="110.0" styleClass="skillSpinner" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="6" GridPane.valignment="CENTER">
+            <GridPane.margin>
+                <Insets left="10.0" right="10.0" />
+            </GridPane.margin>
+         </Spinner>
+         <Label fx:id="electrumLabel" alignment="CENTER_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="tq-label" text="%main.electrum" GridPane.columnIndex="3" GridPane.rowIndex="6" />
+         <TextField fx:id="electrumText" editable="false" maxWidth="1.7976931348623157E308" minHeight="35.0" styleClass="tq-labelbox" GridPane.columnIndex="4" GridPane.rowIndex="6">
+             <GridPane.margin>
+                 <Insets left="10.0" right="5.0" />
+             </GridPane.margin>
+             <padding>
+                 <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+             </padding>
+             <styleClass>
+                 <String fx:value="textFieldElectrum" />
+                 <String fx:value="tq-labelbox" />
+             </styleClass>
+      </TextField>
     </children>
     <padding>
         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

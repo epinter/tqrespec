@@ -31,11 +31,17 @@ public class UID {
     private final String value;
 
     public UID(String value) {
+        if (value == null || value.isBlank() || value.replaceAll("-", "").matches("^0+$")) {
+            throw new IllegalArgumentException("invalid uid");
+        }
         this.value = value;
     }
 
     public UID(byte[] value) {
         this.value = convertUidByteToString(value);
+        if (this.value == null || this.value.isBlank() || this.value.replaceAll("-", "").matches("^0+$")) {
+            throw new IllegalArgumentException("invalid uid");
+        }
     }
 
     public static String convertUidByteToString(byte[] uid) {

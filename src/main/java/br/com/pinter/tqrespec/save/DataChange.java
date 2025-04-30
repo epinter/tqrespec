@@ -77,4 +77,8 @@ abstract class DataChange implements Serializable {
             throw new IllegalStateException("Error writing to buffer");
         }
     }
+
+    public abstract boolean isRemove();
+
+    public abstract void setRemove(boolean remove);
 }

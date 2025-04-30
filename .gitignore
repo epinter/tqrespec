@@ -2,6 +2,7 @@ gamedata/
 savedata/
 libs/
 src/test/resources/_testcopy/
+src/test/resources/_testplayer/
 *.arz
 *.arc
 hs_err_pid*

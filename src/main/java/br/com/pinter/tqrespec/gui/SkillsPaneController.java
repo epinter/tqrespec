@@ -27,6 +27,7 @@ import br.com.pinter.tqrespec.tqdata.Db;
 import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Constants;
 import com.google.inject.Inject;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.BooleanProperty;
@@ -99,7 +100,7 @@ public class SkillsPaneController implements Initializable {
     }
 
     private UiPlayerProperties playerProps() {
-        return mc.getPlayerProperties();
+        return mc.playerProps();
     }
 
     public boolean isSaveDisabled() {
@@ -123,19 +124,19 @@ public class SkillsPaneController implements Initializable {
         }
 
         StringBinding freeSkillPointsBinding = Bindings.createStringBinding(() -> ResourceHelper.getMessage("skills.availableSkillPoints",
-                playerProps().getSkillAvailable()),
+                        playerProps().getSkillAvailable()),
                 playerProps().skillAvailableProperty()
         );
         freeSkillPointsLabel.textProperty().bind(freeSkillPointsBinding);
 
         StringBinding reclaimMasteryFirstBinding = Bindings.createStringBinding(() -> ResourceHelper.getMessage("skills.reclaimMasteryPoints",
-                        playerProps().getFirstMasteryLevel()-1),
+                        playerProps().getFirstMasteryLevel() - 1),
                 playerProps().firstMasteryLevelProperty()
         );
         reclaimMasteryFirstItem.textProperty().bind(reclaimMasteryFirstBinding);
 
         StringBinding reclaimMasterySecondBinding = Bindings.createStringBinding(() -> ResourceHelper.getMessage("skills.reclaimMasteryPoints",
-                        playerProps().getSecondMasteryLevel()-1),
+                        playerProps().getSecondMasteryLevel() - 1),
                 playerProps().secondMasteryLevelProperty()
         );
         reclaimMasterySecondItem.textProperty().bind(reclaimMasterySecondBinding);
@@ -143,8 +144,8 @@ public class SkillsPaneController implements Initializable {
         updateMasteries();
     }
 
-    public void commitChanges() {
-        updateMasteries();
+    public void saveHandler() {
+        Platform.runLater(this::updateMasteries);
     }
 
     public void clearProperties() {

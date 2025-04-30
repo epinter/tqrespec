@@ -264,7 +264,7 @@ public class VariableInfo implements DeepCloneable, Serializable {
 
     @Override
     public String toString() {
-        return String.format("name={%s}; alias={%s}; value={%s}; keyOffset={%d}, valOffset={%d}; valSize={%d}; variableType: {%s}", this.name, alias, this.getValue(), this.keyOffset, this.valOffset, this.valSize, variableType);
+        return String.format("name={%s}; alias={%s}; value={%s}; keyOffset={%d}, valOffset={%d}; valSize={%d}; variableType: {%s}", this.name, alias, this.getValueString(), this.keyOffset, this.valOffset, this.valSize, variableType);
     }
 
     private byte[] encodeString() {

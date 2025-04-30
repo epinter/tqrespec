@@ -20,6 +20,8 @@
 
 package br.com.pinter.tqrespec.save;
 
+import org.apache.commons.lang3.NotImplementedException;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -88,5 +90,24 @@ class DataChangeRaw extends DataChange implements Serializable {
     @Override
     public int offset() {
         return offset;
+    }
+
+    @Override
+    public boolean isRemove() {
+        return false;
+    }
+
+    @Override
+    public void setRemove(boolean remove) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public String toString() {
+        return "DataChangeRaw{" +
+                "data=" + Arrays.toString(data) +
+                ", previouslength=" + previouslength +
+                ", offset=" + offset +
+                "} " + super.toString();
     }
 }

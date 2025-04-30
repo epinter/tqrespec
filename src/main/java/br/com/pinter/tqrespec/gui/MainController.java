@@ -25,10 +25,7 @@ import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.SaveLocation;
 import br.com.pinter.tqrespec.save.player.Player;
 import br.com.pinter.tqrespec.save.player.PlayerWriter;
-import br.com.pinter.tqrespec.tqdata.Db;
-import br.com.pinter.tqrespec.tqdata.GameInfo;
-import br.com.pinter.tqrespec.tqdata.PlayerCharacterFile;
-import br.com.pinter.tqrespec.tqdata.Txt;
+import br.com.pinter.tqrespec.tqdata.*;
 import br.com.pinter.tqrespec.util.Build;
 import br.com.pinter.tqrespec.util.Constants;
 import com.google.inject.Inject;
@@ -54,12 +51,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Comparator;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.*;
 
-import static java.lang.System.Logger.Level.DEBUG;
-import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.*;
 
 @SuppressWarnings("unused")
 public class MainController implements Initializable {
@@ -67,6 +61,9 @@ public class MainController implements Initializable {
     public static final BooleanProperty mainFormInitialized = new SimpleBooleanProperty();
     private final BooleanProperty saveDisabled = new SimpleBooleanProperty();
     private UiPlayerProperties playerProperties;
+    private final BooleanProperty unlockedEdit = new SimpleBooleanProperty(false);
+    private final BooleanProperty freeLvl = new SimpleBooleanProperty(false);
+
     @FXML
     public GridPane pointsPane;
     @FXML
@@ -181,6 +178,10 @@ public class MainController implements Initializable {
         });
 
         checkVersionService.withControl(versionCheck).start();
+
+        miscPaneController.unlockCheckboxSelectedProperty().bindBidirectional(unlockedEdit);
+        miscPaneController.freeLvlCheckboxSelectedProperty().bindBidirectional(freeLvl);
+        pointsPaneController.onMainInitialized();
     }
 
     public void addCharactersToCombo() {
@@ -198,10 +199,6 @@ public class MainController implements Initializable {
         if (characterCombo.getItems().contains(character)) {
             characterCombo.setValue(character);
         }
-    }
-
-    public UiPlayerProperties getPlayerProperties() {
-        return playerProperties;
     }
 
     private void windowShownHandler() {
@@ -279,6 +276,8 @@ public class MainController implements Initializable {
         Toast.cancel();
         restoreDefaultCursor();
         tabPane.getSelectionModel().select(attributesTab);
+        unlockedEdit.set(false);
+        freeLvl.set(false);
         playerProperties = null;
     }
 
@@ -303,9 +302,152 @@ public class MainController implements Initializable {
         return false;
     }
 
+    UiPlayerProperties playerProps() {
+        return playerProperties;
+    }
+
     public void commitChanges() {
-        skillsPaneController.commitChanges();
-        pointsPaneController.commitChanges();
+        skillsPaneController.saveHandler();
+
+        int strOld = player.getStr();
+        int intOld = player.getInt();
+        int dexOld = player.getDex();
+        int lifeOld = player.getLife();
+        int manaOld = player.getMana();
+        int modifierOld = player.getModifierPoints();
+        int skillOld = player.getAvailableSkillPoints();
+        int altMoneyOld = player.getAltMoney();
+        int charLevelOld = player.getLevel();
+        int goldOld = player.getMoney();
+        int diffOld = player.getDifficulty();
+        int boostedX4Old = player.getBoostedCharacterForX4();
+        int sacksOld = player.getNumberOfSacks();
+        int sackFocOld = player.getCurrentlyFocusedSackNumber();
+        int sackSelOld = player.getCurrentlySelectedSackNumber();
+
+        if (strOld != playerProps().getStr() && playerProps().getStr() > 0) {
+            player.setStr(playerProps().getStr());
+        }
+        if (intOld != playerProps().getIntl() && playerProps().getIntl() > 0) {
+            player.setInt(playerProps().getIntl());
+        }
+        if (dexOld != playerProps().getDex() && playerProps().getDex() > 0) {
+            player.setDex(playerProps().getDex());
+        }
+        if (lifeOld != playerProps().getLife() && playerProps().getLife() > 0) {
+            player.setLife(playerProps().getLife());
+        }
+        if (manaOld != playerProps().getMana() && playerProps().getMana() > 0) {
+            player.setMana(playerProps().getMana());
+        }
+        if (modifierOld != playerProps().getAttrAvailable() && playerProps().getAttrAvailable() >= 0) {
+            player.setModifierPoints(playerProps().getAttrAvailable());
+        }
+        if (altMoneyOld != playerProps().getElectrum() && playerProps().getElectrum() >= 0) {
+            player.setAltMoney(playerProps().getElectrum());
+        }
+        if (charLevelOld != playerProps().getCharLevel() && playerProps().getCharLevel() > 0) {
+            player.setCharLevel(playerProps().getCharLevel());
+        }
+        if (goldOld != playerProps().getGold() && playerProps().getGold() >= 0) {
+            player.setMoney(playerProps().getGold());
+        }
+        if (skillOld != playerProps().getSkillAvailable() && playerProps().getSkillAvailable() >= 0) {
+            player.setAvailableSkillPoints(playerProps().getSkillAvailable());
+        }
+        if (diffOld != playerProps().getDifficulty() && playerProps().getDifficulty() >= 0) {
+            player.setDifficulty(playerProps().getDifficulty());
+            adjustTeleportsForDifficulty();
+        }
+        if (boostedX4Old != playerProps().getBoostedCharacterForX4()
+                && playerProps().getBoostedCharacterForX4() >= 0 && playerProps().getBoostedCharacterForX4() <= 1) {
+            player.setBoostedCharacterForX4(playerProps().getBoostedCharacterForX4());
+            adjustTeleportsForDifficulty();
+        }
+        if(sacksOld != playerProps().getNumberOfSacks()) {
+            player.setNumberOfSacks(playerProps().getNumberOfSacks());
+            player.addEmptyPlayerSacks();
+            if(sackFocOld != playerProps().getCurrentlyFocusedSackNumber()) {
+                player.setCurrentlyFocusedSackNumber(playerProps().getCurrentlyFocusedSackNumber());
+            }
+            if(sackSelOld != playerProps().getCurrentlySelectedSackNumber()) {
+                player.setCurrentlySelectedSackNumber(playerProps().getCurrentlySelectedSackNumber());
+            }
+        }
+
+        if (playerProps().isMarkResetStat()) {
+            if (player.getStatPlayTimeInSeconds() != playerProps().getStatplaytime()) {
+                player.setStatPlayTimeInSeconds(playerProps().getStatplaytime());
+            }
+            if (player.getStatGreatestMonsterKilledName() != null
+                    && !player.getStatGreatestMonsterKilledName().equals(playerProps().getStatmonsterkilledname())) {
+                player.resetStatGreatestMonsterKilledName();
+            }
+            if (player.getStatGreatestMonsterKilledLevel() != playerProps().getStatmonsterkilledlevel()) {
+                player.resetStatGreatestMonsterKilledLevel();
+            }
+            if (player.getStatNumberOfKills() != playerProps().getStatkills()) {
+                player.setStatNumberOfKills(playerProps().getStatkills());
+            }
+            if (player.getStatNumberOfDeaths() != playerProps().getStatdeath()) {
+                player.setStatNumberOfDeaths(playerProps().getStatdeath());
+            }
+            if (player.getStatNumberOfDeaths() != playerProps().getStatdeath()) {
+                player.setStatNumberOfDeaths(playerProps().getStatdeath());
+            }
+            if (player.getStatHealthPotionsUsed() != playerProps().getStathealthpotionused()) {
+                player.setStatHealthPotionsUsed(playerProps().getStathealthpotionused());
+            }
+            if (player.getStatManaPotionsUsed() != playerProps().getStatmanapotionused()) {
+                player.setStatManaPotionsUsed(playerProps().getStatmanapotionused());
+            }
+            if (player.getStatExperienceFromKills() != playerProps().getStatxpfromkills()) {
+                player.setStatExperienceFromKills(playerProps().getStatxpfromkills());
+            }
+            if (player.getStatNumHitsReceived() != playerProps().getStathitsreceived()) {
+                player.setStatNumHitsReceived(playerProps().getStathitsreceived());
+            }
+            if (player.getStatNumHitsInflicted() != playerProps().getStathitsinflicted()) {
+                player.setStatNumHitsInflicted(playerProps().getStathitsinflicted());
+            }
+            if (player.getStatCriticalHitsReceived() != playerProps().getStatcriticalreceived()) {
+                player.setStatCriticalHitsReceived(playerProps().getStatcriticalreceived());
+            }
+            if (player.getStatCriticalHitsInflicted() != playerProps().getStatcriticalinflicted()) {
+                player.setStatCriticalHitsInflicted(playerProps().getStatcriticalinflicted());
+            }
+        }
+
+        //keep after any teleport operation like difficulty and boostedCharacterForX4
+        for (Map.Entry<TeleportItem, String> e : playerProps().getTeleportChanges().entrySet()) {
+            if (e.getValue().equals(TeleportItem.Ops.INSERT.name())) {
+                player.insertTeleport(e.getKey().getDifficulty(), e.getKey().getTeleport().getUid());
+                logger.log(DEBUG, "INSERT TELEPORT: " + e.getKey());
+            } else if (e.getValue().equals(TeleportItem.Ops.REMOVE.name())) {
+                player.removeTeleport(e.getKey().getDifficulty(), e.getKey().getTeleport().getUid());
+                logger.log(DEBUG, "REMOVE TELEPORT: " + e.getKey());
+            }
+        }
+        if (!playerProps().getTeleportChanges().isEmpty()) {
+            player.setTeleportUIDsSize();
+        }
+    }
+
+    private void adjustTeleportsForDifficulty() {
+        for (int i = 0; i <= playerProps().getDifficulty(); i++) {
+            List<MapTeleport> teleports = player.getDefaultMapTeleports(i);
+            MapTeleport tp;
+            try {
+                tp = DefaultMapTeleport.get(0);
+            } catch (NoSuchElementException e) {
+                throw new IllegalStateException("Invalid map teleport data, order 0", e);
+            }
+            if (!teleports.contains(tp)) {
+                logger.log(WARNING, "Savegame doesn't have the portal '{0}' open on difficulty '{1}', adding.",
+                        tp.getName() != null ? tp.getName() : tp.getUid(), i);
+                playerProps().putTeleportChange(new TeleportItem(tp, i), TeleportItem.Ops.INSERT);
+            }
+        }
     }
 
     @FXML
@@ -328,7 +470,7 @@ public class MainController implements Initializable {
         MyTask<Integer> saveGameTask = new MyTask<>() {
             @Override
             protected Integer call() {
-                pointsPaneController.saveCharHandler();
+                commitChanges();
                 return playerWriter.save() ? 2 : 0;
             }
         };
@@ -373,19 +515,24 @@ public class MainController implements Initializable {
         miscPaneController.disableControls(disable);
     }
 
+    public boolean isCharacterSelected() {
+        return !characterCombo.getSelectionModel().isEmpty();
+    }
+
     @FXML
     public void characterSelected(ActionEvent evt) {
-        Toast.cancel();
-
-        if (BooleanUtils.isTrue(State.get().isGameRunning())) {
-            reset();
+        if (State.get().isGameRunning()) {
             return;
         }
+
+        Toast.cancel();
 
         if (!(evt.getSource() instanceof ComboBox)) {
             return;
         }
 
+        unlockedEdit.set(false);
+        freeLvl.set(false);
         saveDisabled.set(true);
         characterCombo.setDisable(true);
         ComboBox<?> character = (ComboBox<?>) evt.getSource();
@@ -402,7 +549,18 @@ public class MainController implements Initializable {
         MyTask<Boolean> loadTask = new MyTask<>() {
             @Override
             protected Boolean call() {
-                return player.loadPlayer(playerCharacterFile.getPlayerName(), playerCharacterFile.getLocation());
+                boolean loaded = player.loadPlayer(playerCharacterFile.getPlayerName(), playerCharacterFile.getLocation());
+                if (player.getHasBeenInGame() == 0) {
+                    Platform.runLater(() -> {
+                        reset();
+                        Toast.show((Stage) rootelement.getScene().getWindow(),
+                                ResourceHelper.getMessage("main.savenotstartedToast_header"),
+                                ResourceHelper.getMessage("main.savenotstartedToast_content"),
+                                10000);
+                    });
+                    return cancel();
+                }
+                return loaded;
             }
         };
 
@@ -480,5 +638,21 @@ public class MainController implements Initializable {
             w.setX(dragX + evt.getScreenX());
             w.setY(dragY + evt.getScreenY());
         }
+    }
+
+    public boolean isUnlockedEdit() {
+        return unlockedEdit.get();
+    }
+
+    public BooleanProperty unlockedEditProperty() {
+        return unlockedEdit;
+    }
+
+    public boolean isFreeLvl() {
+        return freeLvl.get();
+    }
+
+    public BooleanProperty freeLvlProperty() {
+        return freeLvl;
     }
 }

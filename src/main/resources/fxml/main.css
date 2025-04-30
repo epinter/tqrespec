@@ -19,6 +19,11 @@
     -fx-show-duration: 8000ms;
 }
 
+.check-box > .box {
+    -fx-border-color: -fx-text-box-border;
+    -fx-background-insets: 0 0 0 0;
+}
+
 .scroll-bar:horizontal > .thumb,
 .scroll-bar:vertical > .thumb {
         -fx-background: -fx-accent;
@@ -241,6 +246,14 @@
 .tq-gendercombo .list-cell{
 	-fx-font-size: 1.2em;
 }
+
+.tq-difficultycombo {
+	-fx-font-size: 1.3em;
+}
+
+.tq-difficultycombo .list-cell{
+	-fx-font-size: 1.2em;
+}
 /************/
 
 .tq-icon-defaultstyle-fa {
@@ -305,13 +318,24 @@
     -fx-font-size: 1.4em
 }
 
+.tq-menucheckbox {
+    -fx-background-color: transparent;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 1.4em
+}
+
+.tq-menucheckbox:hover {
+        -fx-background: -fx-accent;
+        -fx-background-color: -fx-selection-bar;
+        -fx-text-fill: -fx-selection-bar-text;
+}
+
 .tq-labelbox {
     -fx-background-color: #443823;
     -fx-text-fill: #ffffff;
     -fx-font-size: 1.4em;
     -fx-background-radius: 4;
 }
-
 
 /*****spinner********/
 .spinner {
@@ -337,6 +361,57 @@
     -fx-text-fill: #f6d35b;
 }
 
+.spinner:disabled {
+    -fx-opacity: 1.0;
+}
+
+.spinner:disabled > .increment-arrow-button, .spinner:disabled > .decrement-arrow-button {
+    -fx-opacity: 0.4;
+}
+
+.charLevelSpinnerInUse:disabled,
+.charLevelSpinnerInUse:disabled > .text-field,
+.charLevelSpinnerInUse:disabled > .increment-arrow,
+.charLevelSpinnerInUse:disabled > .decrement-arrow,
+.charLevelSpinnerInUse:disabled > .increment-arrow-button,
+.charLevelSpinnerInUse:disabled > .decrement-arrow-button,
+.skillSpinnerInUse:disabled,
+.skillSpinnerInUse:disabled > .text-field,
+.skillSpinnerInUse:disabled > .increment-arrow,
+.skillSpinnerInUse:disabled > .decrement-arrow,
+.skillSpinnerInUse:disabled > .increment-arrow-button,
+.skillSpinnerInUse:disabled > .decrement-arrow-button {
+    -fx-opacity: 1.0;
+    -fx-text-fill: #ffffff;
+    -fx-text-box-border: #ffd993;
+}
+
+.skillSpinner:disabled .increment-arrow-button .increment-arrow,
+.charLevelSpinner:disabled .increment-arrow-button .increment-arrow {
+    -fx-background-color: transparent;
+}
+
+.skillSpinner:disabled .decrement-arrow-button .decrement-arrow,
+.charLevelSpinner:disabled .decrement-arrow-button .decrement-arrow {
+    -fx-background-color: transparent;
+}
+
+.textFieldGold {
+    -fx-text-fill: #f6d35b;
+}
+
+.textFieldGold:readonly {
+    -fx-text-fill: #ffffff;
+}
+
+.textFieldElectrum {
+    -fx-text-fill: #f6d35b;
+}
+
+.textFieldElectrum:readonly {
+    -fx-text-fill: #ffffff;
+}
+
 .spinner > .text-field {
     -fx-background-color: #443823;
 }
@@ -344,7 +419,6 @@
 .spinner:focused,
 .spinner:contains-focus {
     -fx-border-color: #f6d35b;
-
 }
 /*****/
 
@@ -428,6 +502,23 @@
 
 .tq-listview-skill .list-cell {
     -fx-background-insets: 0;
+}
+
+.tq-label-stats {
+	-fx-text-fill: #ffffff;
+	-fx-font-size: 1.2em;
+    -fx-effect: dropshadow( one-pass-box , black , 0, 0.0 , 0 , 2 );
+    -fx-text-alignment: right;
+}
+
+.tq-label-value-stats {
+	-fx-text-fill: #ffffff;
+	-fx-font-size: 1.1em;
+	-fx-padding: 0 15 0 5;
+    -fx-text-alignment: left;
+    -fx-background-color: #443823;
+    -fx-text-fill: #ffffff;
+    -fx-background-radius: 4;
 }
 
 .tq-label-skillpoints {
