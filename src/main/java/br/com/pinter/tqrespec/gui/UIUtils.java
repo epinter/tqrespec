@@ -28,7 +28,6 @@ import br.com.pinter.tqrespec.util.Constants;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Tooltip;
-import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -68,7 +67,7 @@ public class UIUtils {
     }
 
     public void closeApplication() {
-        if (!State.get().getSaveInProgress()) {
+        if (!State.get().isSaveInProgress()) {
             Platform.exit();
             System.exit(0);
         }

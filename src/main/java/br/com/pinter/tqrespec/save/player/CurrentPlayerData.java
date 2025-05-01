@@ -140,13 +140,13 @@ public class CurrentPlayerData implements FileDataHolder {
 
     void reset() {
         dataMap.clear();
-        this.buffer = null;
-        this.headerInfo = new HeaderInfo();
-        this.dataMap = new FileDataMap();
-        this.playerName = null;
-        this.location = SaveLocation.MAIN;
-        this.playerSkills.clear();
-        this.missingSkills.set(false);
+        buffer = null;
+        headerInfo = new HeaderInfo();
+        dataMap = new FileDataMap();
+        playerName = null;
+        location = SaveLocation.MAIN;
+        playerSkills.clear();
+        missingSkills.set(false);
     }
 
 

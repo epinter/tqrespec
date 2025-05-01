@@ -75,17 +75,17 @@ public class AppPreloader extends Preloader {
     @Override
     public void start(Stage stage) throws IOException {
         this.stage = stage;
-        this.stage.getIcons().addAll(ResourceHelper.getAppIcons());
-        this.stage.setScene(createPreloaderScene());
-        this.stage.setTitle(Build.title());
+        stage.getIcons().addAll(ResourceHelper.getAppIcons());
+        stage.setScene(createPreloaderScene());
+        stage.setTitle(Build.title());
 
         if (SystemUtils.IS_OS_WINDOWS) {
-            this.stage.initStyle(StageStyle.TRANSPARENT);
+            stage.initStyle(StageStyle.TRANSPARENT);
         } else {
-            this.stage.initStyle(StageStyle.UNDECORATED);
+            stage.initStyle(StageStyle.UNDECORATED);
         }
 
-        this.stage.show();
+        stage.show();
     }
 
     @Override

@@ -57,7 +57,7 @@ public class State {
         return instance;
     }
 
-    public boolean getSaveInProgress() {
+    public boolean isSaveInProgress() {
         return saveInProgress.getValue();
     }
 
@@ -65,7 +65,7 @@ public class State {
         this.saveInProgress.setValue(saveInProgress);
     }
 
-    public boolean getGameRunning() {
+    public boolean isGameRunning() {
         return gameRunning.getValue();
     }
 

@@ -177,7 +177,7 @@ public class FileDataMap implements DeepCloneable {
                 }
 
                 if (position == -1) {
-                    current.getVariables().add(0, newVar);
+                    current.getVariables().addFirst(newVar);
                 } else if (position == 0) {
                     current.getVariables().clear();
                     current.getVariables().add(newVar);

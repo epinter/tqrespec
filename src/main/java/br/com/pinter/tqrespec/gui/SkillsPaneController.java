@@ -235,8 +235,7 @@ public class SkillsPaneController implements Initializable {
         }
     }
 
-    private boolean fillMastery(int i) {
-        boolean ret = false;
+    private void fillMastery(int i) {
         Label masteryLabel;
         ListView<SkillListViewItem> masteryListView;
 
@@ -250,7 +249,7 @@ public class SkillsPaneController implements Initializable {
                 masteryListView = secondMasteryListView;
                 break;
             default:
-                return false;
+                return;
         }
 
         Skill mastery = null;
@@ -263,7 +262,6 @@ public class SkillsPaneController implements Initializable {
                             player.getPlayerSkills().get(mastery.getRecordPath()).getSkillLevel()
                     )
             );
-            ret = true;
         }
 
         ObservableList<SkillListViewItem> observableSkills = createObservableListFromMastery(mastery);
@@ -273,7 +271,6 @@ public class SkillsPaneController implements Initializable {
 
         masteryListView.setItems(observableSkills);
         masteryListView.setCellFactory(listViewCallback);
-        return ret;
     }
 
     private ObservableList<SkillListViewItem> createObservableListFromMastery(Skill mastery) {
@@ -309,7 +306,7 @@ public class SkillsPaneController implements Initializable {
         Skill mastery = player.getPlayerMasteries().getFirst();
         PlayerSkill sb = player.getPlayerSkills().get(mastery.getRecordPath());
 
-        if (!isMasteryEmpty(mastery)) {
+        if (masteryHasSkills(mastery)) {
             return;
         }
 
@@ -323,7 +320,7 @@ public class SkillsPaneController implements Initializable {
         Skill mastery = player.getPlayerMasteries().get(1);
         PlayerSkill sb = player.getPlayerSkills().get(mastery.getRecordPath());
 
-        if (!isMasteryEmpty(mastery)) {
+        if (masteryHasSkills(mastery)) {
             return;
         }
 
@@ -353,7 +350,7 @@ public class SkillsPaneController implements Initializable {
         Skill mastery = player.getPlayerMasteries().getFirst();
         PlayerSkill sb = player.getPlayerSkills().get(mastery.getRecordPath());
 
-        if (!isMasteryEmpty(mastery)) {
+        if (masteryHasSkills(mastery)) {
             return;
         }
 
@@ -367,7 +364,7 @@ public class SkillsPaneController implements Initializable {
         Skill mastery = player.getPlayerMasteries().get(1);
         PlayerSkill sb = player.getPlayerSkills().get(mastery.getRecordPath());
 
-        if (!isMasteryEmpty(mastery)) {
+        if (masteryHasSkills(mastery)) {
             return;
         }
 
@@ -375,13 +372,13 @@ public class SkillsPaneController implements Initializable {
         updateMasteries();
     }
 
-    public boolean isMasteryEmpty(Skill mastery) {
+    public boolean masteryHasSkills(Skill mastery) {
         List<Skill> list = player.getPlayerSkillsFromMastery(mastery);
         if (!list.isEmpty()) {
             uiUtils.showInformation(ResourceHelper.getMessage("skills.removeSkillsBefore"), null);
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     public void setMainController(MainController mainController) {

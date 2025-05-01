@@ -120,14 +120,12 @@ public abstract class FileParser {
      * Before this method, {@link FileParser#buildBlocksTable()} is executed. So start, end and size of all blocks are
      * available.
      *
-     * @throws IOException
      */
     protected abstract void prepareForParse() throws IOException, IncompatibleSavegameException;
 
     /**
      * This method should load whole file (raw data) into the bytebuffer.
      *
-     * @throws IOException
      */
     public void fillBuffer() throws IOException {
         if (readFile()) {
@@ -148,8 +146,6 @@ public abstract class FileParser {
     /**
      * Reads a file into the buffer
      *
-     * @return
-     * @throws IOException
      */
     protected abstract boolean readFile() throws IOException;
 

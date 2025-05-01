@@ -195,14 +195,15 @@ final class PlayerParser extends FileParser {
             throw new IOException("Couldn't load file");
         }
 
-        try (FileChannel in = new FileInputStream(playerChr).getChannel()) {
-            setBuffer(ByteBuffer.allocate((int) in.size()));
-            this.getBuffer().order(ByteOrder.LITTLE_ENDIAN);
+        try (FileInputStream chr = new FileInputStream(playerChr)) {
+            try (FileChannel in = chr.getChannel()) {
+                setBuffer(ByteBuffer.allocate((int) in.size()));
+                this.getBuffer().order(ByteOrder.LITTLE_ENDIAN);
 
-            while (true) {
-                if (in.read(this.getBuffer()) <= 0) break;
+                while (true) {
+                    if (in.read(this.getBuffer()) <= 0) break;
+                }
             }
-
         }
 
         logger.log(System.Logger.Level.DEBUG, "File ''{0}'' read to buffer: ''{1}''", playerChr, this.getBuffer());

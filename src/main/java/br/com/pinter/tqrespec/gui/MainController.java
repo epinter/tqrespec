@@ -62,7 +62,7 @@ import java.util.ResourceBundle;
 public class MainController implements Initializable {
     public static final BooleanProperty mainFormInitialized = new SimpleBooleanProperty();
     private static final System.Logger logger = Log.getLogger(MainController.class.getName());
-    public final BooleanProperty saveDisabled = new SimpleBooleanProperty();
+    private final BooleanProperty saveDisabled = new SimpleBooleanProperty();
     private UiPlayerProperties playerProperties;
     @FXML
     public GridPane pointsPane;
@@ -218,7 +218,7 @@ public class MainController implements Initializable {
 
     @FXML
     public void openAboutWindow(MouseEvent evt) throws IOException {
-        if (State.get().getSaveInProgress()) {
+        if (State.get().isSaveInProgress()) {
             return;
         }
 
@@ -235,7 +235,7 @@ public class MainController implements Initializable {
 
     @FXML
     public void openCharactersWindow(ActionEvent evt) throws IOException {
-        if (State.get().getSaveInProgress()) {
+        if (State.get().isSaveInProgress()) {
             return;
         }
 
@@ -258,7 +258,7 @@ public class MainController implements Initializable {
 
     @FXML
     public void resetButtonClicked(ActionEvent event) {
-        if (!State.get().getSaveInProgress()) {
+        if (!State.get().isSaveInProgress()) {
             reset();
         }
     }
@@ -292,7 +292,7 @@ public class MainController implements Initializable {
     }
 
     public boolean gameRunningAlert() {
-        if (BooleanUtils.isTrue(State.get().getGameRunning())) {
+        if (BooleanUtils.isTrue(State.get().isGameRunning())) {
             uiUtils.showError(ResourceHelper.getMessage("alert.errorgamerunning_header"),
                     ResourceHelper.getMessage("alert.errorgamerunning_content"));
             return true;
@@ -369,7 +369,7 @@ public class MainController implements Initializable {
     public void characterSelected(ActionEvent evt) {
         Toast.cancel();
 
-        if (BooleanUtils.isTrue(State.get().getGameRunning())) {
+        if (BooleanUtils.isTrue(State.get().isGameRunning())) {
             reset();
             return;
         }

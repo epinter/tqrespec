@@ -26,8 +26,8 @@ public abstract class MyTask<T> extends Task<T> {
 
     protected MyTask() {
         super();
-        this.setOnFailed(workerStateEvent -> {
-            throw new UnhandledRuntimeException(this.getException());
+        setOnFailed(workerStateEvent -> {
+            throw new UnhandledRuntimeException(getException());
         });
     }
 

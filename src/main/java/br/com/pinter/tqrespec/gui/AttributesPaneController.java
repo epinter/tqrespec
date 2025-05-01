@@ -435,7 +435,6 @@ public class AttributesPaneController implements Initializable {
 @SuppressWarnings("CanBeFinal")
 class AttrIntegerSpinnerValueFactory extends SpinnerValueFactory.IntegerSpinnerValueFactory {
     private final IntegerProperty available;
-    private int originalMax = -1;
 
     AttrIntegerSpinnerValueFactory(int min, int max, int initialValue, int amountToStepBy, IntegerProperty available) {
         super(min, max, initialValue, amountToStepBy);
@@ -444,29 +443,25 @@ class AttrIntegerSpinnerValueFactory extends SpinnerValueFactory.IntegerSpinnerV
 
     @Override
     public void decrement(int v) {
-        if (this.originalMax == -1) {
-            this.originalMax = this.getMax();
-        }
-        int oldValue = this.getValue();
-        int step = v * this.getAmountToStepBy();
+        int oldValue = getValue();
+        int step = v * getAmountToStepBy();
         int newValue = oldValue - step;
-        if (oldValue - step >= this.getMin())
-            this.setValue(newValue);
+        if (newValue >= getMin()) {
+            setValue(newValue);
+        }
     }
 
     @Override
     public void increment(int v) {
-        if (this.originalMax == -1) {
-            this.originalMax = this.getMax();
-        }
-        int oldValue = this.getValue();
-        int step = v * this.getAmountToStepBy();
+        int oldValue = getValue();
+        int step = v * getAmountToStepBy();
         int newValue = oldValue + step;
         int pointsAvail = available.get() * step;
-        if (oldValue == this.getMax() && available.get() <= 0)
+        if (oldValue == getMax() && available.get() <= 0) {
             return;
-        this.setMax(oldValue + pointsAvail);
-        if (newValue <= this.getMax())
-            this.setValue(newValue);
+        }
+        setMax(oldValue + pointsAvail);
+        if (newValue <= getMax())
+            setValue(newValue);
     }
 }

@@ -30,7 +30,7 @@ import static br.com.pinter.tqrespec.util.Constants.PROCESS_SCAN_INTERVAL_MS;
 public class GameProcessMonitor implements Runnable {
     private int interrupted = 0;
 
-    private String directory;
+    private final String directory;
 
     public GameProcessMonitor(String directory) {
         this.directory = directory;

@@ -27,12 +27,7 @@ import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.SaveLocation;
 import br.com.pinter.tqrespec.util.Constants;
 import com.google.inject.Singleton;
-import com.sun.jna.platform.win32.Advapi32Util;
-import com.sun.jna.platform.win32.Shell32Util;
-import com.sun.jna.platform.win32.ShlObj;
-import com.sun.jna.platform.win32.Win32Exception;
-import com.sun.jna.platform.win32.WinNT;
-import com.sun.jna.platform.win32.WinReg;
+import com.sun.jna.platform.win32.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -46,12 +41,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

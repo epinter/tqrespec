@@ -24,11 +24,11 @@ public class WorkerThread extends Thread {
     @SuppressWarnings("unused")
     public WorkerThread() {
         super();
-        this.setUncaughtExceptionHandler(ExceptionHandler::unhandled);
+        setUncaughtExceptionHandler(ExceptionHandler::unhandled);
     }
 
     public WorkerThread(Runnable target) {
         super(target);
-        this.setUncaughtExceptionHandler(ExceptionHandler::unhandled);
+        setUncaughtExceptionHandler(ExceptionHandler::unhandled);
     }
 }

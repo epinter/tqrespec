@@ -195,7 +195,7 @@ public class PlayerWriter extends FileWriter {
     }
 
     public boolean save() {
-        if (State.get().getSaveInProgress()) {
+        if (State.get().isSaveInProgress()) {
             return false;
         }
         State.get().setSaveInProgress(true);
