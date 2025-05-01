@@ -183,7 +183,10 @@ public class SkillsPaneController implements Initializable {
 
         reclaimSkillsFirstButton.setDisable(disable || firstMasteryListView.getItems().isEmpty());
 
-        int firstMasteryLevel = playerProps().getFirstMasteryLevel();
+        int firstMasteryLevel = -1;
+        if (playerProps() != null) {
+            firstMasteryLevel = playerProps().getFirstMasteryLevel();
+        }
         if (player.isCharacterLoaded() && (!disable && firstMasteryLevel > 0) && firstMasteryListView.getItems().isEmpty()) {
             if (firstMasteryLevel > 1) {
                 reclaimMasteryFirstItem.setDisable(false);
@@ -197,7 +200,10 @@ public class SkillsPaneController implements Initializable {
 
         reclaimSkillsSecondButton.setDisable(disable || secondMasteryListView.getItems().isEmpty());
 
-        int secondMasteryLevel = playerProps().getSecondMasteryLevel();
+        int secondMasteryLevel = -1;
+        if (playerProps() != null) {
+            secondMasteryLevel = playerProps().getSecondMasteryLevel();
+        }
         if (player.isCharacterLoaded() && (!disable && secondMasteryLevel > 0) && secondMasteryListView.getItems().isEmpty()) {
             if (secondMasteryLevel > 1) {
                 reclaimMasterySecondItem.setDisable(false);
