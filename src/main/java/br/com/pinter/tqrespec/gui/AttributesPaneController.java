@@ -293,23 +293,30 @@ public class AttributesPaneController implements Initializable {
 
         if (strSpinner.getValueFactory() != null && strSpinner.getValueFactory().valueProperty().isBound()) {
             strSpinner.getValueFactory().valueProperty().unbindBidirectional(strProperty);
-            strSpinner.getEditor().setText("");
         }
         if (intSpinner.getValueFactory() != null && intSpinner.getValueFactory().valueProperty().isBound()) {
             intSpinner.getValueFactory().valueProperty().unbindBidirectional(intProperty);
-            intSpinner.getEditor().setText("");
         }
         if (dexSpinner.getValueFactory() != null && dexSpinner.getValueFactory().valueProperty().isBound()) {
             dexSpinner.getValueFactory().valueProperty().unbindBidirectional(dexProperty);
-            dexSpinner.getEditor().setText("");
         }
         if (lifeSpinner.getValueFactory() != null && lifeSpinner.getValueFactory().valueProperty().isBound()) {
             lifeSpinner.getValueFactory().valueProperty().unbindBidirectional(lifeProperty);
-            lifeSpinner.getEditor().setText("");
         }
         if (manaSpinner.getValueFactory() != null && manaSpinner.getValueFactory().valueProperty().isBound()) {
             manaSpinner.getValueFactory().valueProperty().unbindBidirectional(manaProperty);
-            manaSpinner.getEditor().setText("");
+        }
+        if (!characterIsLoading) {
+            strSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 0));
+            intSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 0));
+            dexSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 0));
+            lifeSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 0));
+            manaSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 0));
+            strSpinner.getValueFactory().setValue(0);
+            intSpinner.getValueFactory().setValue(0);
+            dexSpinner.getValueFactory().setValue(0);
+            lifeSpinner.getValueFactory().setValue(0);
+            manaSpinner.getValueFactory().setValue(0);
         }
         strSpinner.setValueFactory(null);
         intSpinner.setValueFactory(null);
