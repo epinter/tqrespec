@@ -4,6 +4,7 @@
 
 package br.com.pinter.tqrespec.gui;
 
+import br.com.pinter.tqrespec.Settings;
 import br.com.pinter.tqrespec.core.MyEventHandler;
 import br.com.pinter.tqrespec.core.MyTask;
 import br.com.pinter.tqrespec.core.WorkerThread;
@@ -16,12 +17,10 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.concurrent.WorkerStateEvent;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import org.apache.commons.lang3.StringUtils;
 
@@ -47,6 +46,8 @@ public class MiscPaneController implements Initializable {
     private ComboBox<CopyTarget> copyTargetCombo;
     @FXML
     private Button exportJsonButton;
+    @FXML
+    private CheckBox fullBackupCheckbox;
     @Inject
     private Player player;
     @Inject
@@ -78,6 +79,9 @@ public class MiscPaneController implements Initializable {
         });
         exportJsonButton.setGraphic(Icon.FA_FILE_EXPORT.create());
         exportJsonButton.setTooltip(uiUtils.simpleTooltip(ResourceHelper.getMessage("misc.tooltipExportJson")));
+
+        fullBackupCheckbox.setSelected(Settings.getAlwaysFullBackup());
+        fullBackupCheckbox.setTooltip(uiUtils.simpleTooltip(ResourceHelper.getMessage("misc.tooltip.options.fullbackup")));
     }
 
     public void setMainController(MainController mainController) {
@@ -296,5 +300,10 @@ public class MiscPaneController implements Initializable {
         if (copyTargetCombo != null && copyTargetCombo.getSelectionModel() != null) {
             copyTargetCombo.getSelectionModel().select(CopyTarget.WINDOWS);
         }
+    }
+
+    @FXML
+    public void fullbackupToggled(ActionEvent event) {
+        Settings.setAlwaysFullBackup(fullBackupCheckbox.isSelected());
     }
 }
