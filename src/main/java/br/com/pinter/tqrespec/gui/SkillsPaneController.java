@@ -143,6 +143,10 @@ public class SkillsPaneController implements Initializable {
         updateMasteries();
     }
 
+    public void commitChanges() {
+        updateMasteries();
+    }
+
     public void clearProperties() {
         if (freeSkillPointsLabel.textProperty().isBound()) {
             freeSkillPointsLabel.textProperty().unbind();

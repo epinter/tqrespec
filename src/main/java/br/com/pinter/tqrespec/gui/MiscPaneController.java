@@ -156,6 +156,8 @@ public class MiscPaneController implements Initializable {
             targetPlayerName = copyCharInput.getText();
         }
 
+        mainController.commitChanges();
+
         CopyTarget selectedTarget = copyTargetCombo.getSelectionModel().getSelectedItem();
         Platform current = player.getSaveData().getPlatform();
         Platform conversionTarget = null;
@@ -241,6 +243,8 @@ public class MiscPaneController implements Initializable {
     }
 
     public void exportJson() {
+        mainController.commitChanges();
+
         FileChooser jsonChooser = new FileChooser();
         jsonChooser.setTitle(ResourceHelper.getMessage("misc.exportJsonFileChooserTitle"));
         jsonChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON", "*.json"));

@@ -334,9 +334,7 @@ public class AttributesPaneController implements Initializable {
         gender.getSelectionModel().clearSelection();
     }
 
-    public void saveCharHandler() {
-        logger.log(DEBUG, "starting savegame task");
-
+    public void commitChanges() {
         int strOld = player.getStr();
         int intOld = player.getInt();
         int dexOld = player.getDex();
@@ -362,6 +360,13 @@ public class AttributesPaneController implements Initializable {
         if (modifierOld != playerProps().getAttrAvailable() && playerProps().getAttrAvailable() >= 0) {
             player.setModifierPoints(playerProps().getAttrAvailable());
         }
+    }
+
+    public void saveCharHandler() {
+        logger.log(DEBUG, "starting savegame task");
+
+        commitChanges();
+
         logger.log(DEBUG, "returning savegame task");
     }
 

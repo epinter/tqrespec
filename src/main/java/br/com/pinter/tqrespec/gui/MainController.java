@@ -303,6 +303,11 @@ public class MainController implements Initializable {
         return false;
     }
 
+    public void commitChanges() {
+        skillsPaneController.commitChanges();
+        pointsPaneController.commitChanges();
+    }
+
     @FXML
     public void saveChar(ActionEvent evt) {
         if (gameRunningAlert()) {
