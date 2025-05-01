@@ -68,6 +68,16 @@ public class UIUtils {
         return tooltip;
     }
 
+    public Tooltip simpleTooltip(String message, int delay) {
+        Tooltip tooltip = new Tooltip(message);
+        tooltip.setFont(Constants.UI.TOOLTIP_FONT);
+        tooltip.setShowDelay(Duration.millis(delay));
+        tooltip.setShowDuration(Duration.ZERO);
+        tooltip.setWrapText(true);
+        tooltip.setMaxWidth(Constants.UI.TOOLTIP_MAXWIDTH);
+        return tooltip;
+    }
+
     public void closeApplication() {
         if (!State.get().isSaveInProgress()) {
             Platform.exit();

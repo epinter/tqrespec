@@ -145,6 +145,12 @@ public class AttributesPaneController implements Initializable {
             ResourceHelper.tryTagText(txt, charClassLabel, Constants.UI.TAG_CLASSLABEL, true, false);
             ResourceHelper.tryTagText(txt, availPointsLabel, Constants.UI.TAG_AVAILPOINTSLABEL, true, true);
         }
+
+        lifeSpinner.setTooltip(uiUtils.simpleTooltip(ResourceHelper.getMessage("main.tooltipLifeSpinner")));
+        manaSpinner.setTooltip(uiUtils.simpleTooltip(ResourceHelper.getMessage("main.tooltipManaSpinner")));
+        strSpinner.setTooltip(uiUtils.simpleTooltip(ResourceHelper.getMessage("main.tooltipStrSpinner")));
+        intSpinner.setTooltip(uiUtils.simpleTooltip(ResourceHelper.getMessage("main.tooltipIntSpinner")));
+        dexSpinner.setTooltip(uiUtils.simpleTooltip(ResourceHelper.getMessage("main.tooltipDexSpinner")));
     }
 
     private UiPlayerProperties playerProps() {
