@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 
 public class JULLogger implements System.Logger {
     private final Logger logger;
-    private String name;
+    private final String name;
 
     public JULLogger(String name) {
         this.name = name;

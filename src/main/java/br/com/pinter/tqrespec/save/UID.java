@@ -28,7 +28,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class UID {
-    private String value;
+    private final String value;
 
     public UID(String value) {
         this.value = value;

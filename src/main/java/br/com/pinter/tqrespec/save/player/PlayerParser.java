@@ -35,8 +35,11 @@ import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.util.EnumSet;
 
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.ERROR;
+
 final class PlayerParser extends FileParser {
-    private static final System.Logger logger = Log.getLogger(PlayerParser.class.getName());
+    private static final System.Logger logger = Log.getLogger(PlayerParser.class);
 
     private final String player;
     private final File playerChr;
@@ -69,7 +72,7 @@ final class PlayerParser extends FileParser {
 
             if (BEGIN_BLOCK.equals(name)) {
                 BlockInfo b = getBlockInfo().get(keyOffset);
-                logger.log(System.Logger.Level.DEBUG, "ignoring block offset: ''{0}''", keyOffset);
+                logger.log(DEBUG, "ignoring block offset: ''{0}''", keyOffset);
                 getBuffer().position(b.getEnd() + 1);
             }
 
@@ -89,8 +92,8 @@ final class PlayerParser extends FileParser {
             try {
                 e = PlayerFileVariable.valueOf(getDetectedPlatform(), name);
             } catch (InvalidVariableException exception) {
-                logger.log(System.Logger.Level.ERROR, "", exception);
-                logger.log(System.Logger.Level.ERROR, "Variable ''{0}'' not found for {1}, trying {2} ",
+                logger.log(ERROR, "", exception);
+                logger.log(ERROR, "Variable ''{0}'' not found for {1}, trying {2} ",
                         name, getDetectedPlatform(), Platform.MOBILE);
                 if (Platform.WINDOWS.equals(getDetectedPlatform()) && PlayerFileVariable.valueOf(Platform.MOBILE, name) != null
                         && h.getHeaderVersion().equals(GameVersion.TQLE)) {
@@ -121,7 +124,7 @@ final class PlayerParser extends FileParser {
                 }
 
                 String logMsg = String.format(logFmt, name, valueLog, e.type());
-                logger.log(System.Logger.Level.DEBUG, logMsg);
+                logger.log(DEBUG, logMsg);
             }
 
             if (variableInfo.getVariableType() == VariableType.UNKNOWN) {
@@ -173,7 +176,7 @@ final class PlayerParser extends FileParser {
         if (this.getBuffer() == null || this.getBuffer().capacity() <= 50) {
             throw new IOException("Can't read Player.chr from player " + this.player);
         }
-        logger.log(System.Logger.Level.DEBUG, "Character ''{0}'' loaded, size=''{1}''", this.player, this.getBuffer().capacity());
+        logger.log(DEBUG, "Character ''{0}'' loaded, size=''{1}''", this.player, this.getBuffer().capacity());
 
         headerInfo = parseHeader();
 
@@ -191,7 +194,7 @@ final class PlayerParser extends FileParser {
     @Override
     protected boolean readFile() throws IOException {
         if (!playerChr.exists()) {
-            logger.log(System.Logger.Level.ERROR, "File ''{0}'' doesn't exists", playerChr.toString());
+            logger.log(ERROR, "File ''{0}'' doesn't exists", playerChr.toString());
             throw new IOException("Couldn't load file");
         }
 
@@ -206,7 +209,7 @@ final class PlayerParser extends FileParser {
             }
         }
 
-        logger.log(System.Logger.Level.DEBUG, "File ''{0}'' read to buffer: ''{1}''", playerChr, this.getBuffer());
+        logger.log(DEBUG, "File ''{0}'' read to buffer: ''{1}''", playerChr, this.getBuffer());
         return this.getBuffer() != null;
     }
 
@@ -250,7 +253,7 @@ final class PlayerParser extends FileParser {
         if (getSpecialVariableStore().get(key).size() == 1) {
             VariableInfo difficulty = getSpecialVariableStore().get(key).getFirst();
             difficulty.setAlias("difficulty");
-            logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), difficulty.toString());
+            logger.log(DEBUG, logMsg, block.getStart(), difficulty.toString());
         } else if (getSpecialVariableStore().get(key).size() == 5) {
             VariableInfo str = getSpecialVariableStore().get(key).get(0);
             VariableInfo dex = getSpecialVariableStore().get(key).get(1);
@@ -263,11 +266,11 @@ final class PlayerParser extends FileParser {
             life.setAlias("life");
             mana.setAlias("mana");
 
-            logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), str.toString());
-            logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), dex.toString());
-            logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), inl.toString());
-            logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), life.toString());
-            logger.log(System.Logger.Level.DEBUG, logMsg, block.getStart(), mana.toString());
+            logger.log(DEBUG, logMsg, block.getStart(), str.toString());
+            logger.log(DEBUG, logMsg, block.getStart(), dex.toString());
+            logger.log(DEBUG, logMsg, block.getStart(), inl.toString());
+            logger.log(DEBUG, logMsg, block.getStart(), life.toString());
+            logger.log(DEBUG, logMsg, block.getStart(), mana.toString());
         }
     }
 

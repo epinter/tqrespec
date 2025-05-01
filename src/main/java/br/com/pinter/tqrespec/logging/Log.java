@@ -43,7 +43,8 @@ public class Log {
     public static FileHandler getLogFileHandler() {
         FileHandler fileHandler;
         try {
-            System.setProperty("java.util.logging.SimpleFormatter.format", "%1$tb %1$td, %1$tY %1$tl:%1$tM:%1$tS.%1$tN %1$Tp %2$s%n\t%4$s: %5$s%6$s%n%n");
+            System.setProperty("java.util.logging.SimpleFormatter.format",
+                    "%1$tb %1$td, %1$tY %1$tH:%1$tM:%1$tS.%1$tL %2$s%n\t%4$s: %5$s%6$s%n%n");
             fileHandler = new FileHandler(Constants.LOGFILE, false);
             fileHandler.setFormatter(new SimpleFormatter());
 

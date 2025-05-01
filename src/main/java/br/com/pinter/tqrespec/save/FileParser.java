@@ -38,11 +38,13 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import static java.lang.System.Logger.Level.*;
+
 @SuppressWarnings("unused")
 public abstract class FileParser {
+    private static final System.Logger logger = Log.getLogger(FileParser.class);
     protected static final String BEGIN_BLOCK = "begin_block";
     protected static final String END_BLOCK = "end_block";
-    private static final System.Logger logger = Log.getLogger(FileParser.class.getName());
     private static final byte[] BEGIN_BLOCK_BYTES = new byte[]{0x0B, 0x00, 0x00, 0x00, 0x62, 0x65, 0x67, 0x69, 0x6E, 0x5F, 0x62, 0x6C, 0x6F, 0x63, 0x6B};
     protected static final int BEGIN_BLOCK_SIZE = BEGIN_BLOCK_BYTES.length + 4;
     private static final byte[] END_BLOCK_BYTES = new byte[]{0x09, 0x00, 0x00, 0x00, 0x65, 0x6E, 0x64, 0x5F, 0x62, 0x6C, 0x6F, 0x63, 0x6B};
@@ -82,7 +84,7 @@ public abstract class FileParser {
     protected void setDetectedPlatform(Platform detectedPlatform) {
         this.detectedPlatform = detectedPlatform;
         if (detectedPlatform.equals(Platform.MOBILE)) {
-            logger.log(System.Logger.Level.INFO, "Mobile savegame detected");
+            logger.log(INFO, "Mobile savegame detected");
         }
 
     }
@@ -110,7 +112,7 @@ public abstract class FileParser {
             prepareForParse();
             parseAllBlocks();
         } catch (IOException | IncompatibleSavegameException e) {
-            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             throw new UnhandledRuntimeException(e);
         }
     }
@@ -176,7 +178,7 @@ public abstract class FileParser {
             try {
                 blockType = validateBlockType(block, name, blockType);
             } catch (InvalidVariableException e) {
-                logger.log(System.Logger.Level.ERROR, "Invalid variable ''{0}'' at block ''{1}'', offset ''{2}''", name, block.getStart(), keyOffset);
+                logger.log(ERROR, "Invalid variable ''{0}'' at block ''{1}'', offset ''{2}''", name, block.getStart(), keyOffset);
                 throw e;
             }
 
@@ -320,7 +322,7 @@ public abstract class FileParser {
 
             setParentType(block);
 
-            logger.log(System.Logger.Level.TRACE, "''{0}''", block);
+            logger.log(TRACE, "''{0}''", block);
         }
     }
 
@@ -359,7 +361,7 @@ public abstract class FileParser {
                 queueBegin.add(blockTagOffset);
                 lastBegin = blockTagOffset;
                 foundBegin = 0;
-                logger.log(System.Logger.Level.TRACE, "adding begin-block ''{0}'' to queue", blockTagOffset);
+                logger.log(TRACE, "adding begin-block ''{0}'' to queue", blockTagOffset);
             }
 
             if (b.equals(END_BLOCK_BYTES[foundEnd]) && ++foundEnd == END_BLOCK_BYTES.length) {
@@ -379,19 +381,19 @@ public abstract class FileParser {
                 blockInfoTable.put(blockStart, block);
                 foundEnd = 0;
                 int logBlockStart = blockStart;
-                logger.log(System.Logger.Level.TRACE, "adding end-block ''{0}'' to queue, (start=''{1}'',end=''{2}'')", blockEnd, logBlockStart, blockEnd);
+                logger.log(TRACE, "adding end-block ''{0}'' to queue, (start=''{1}'',end=''{2}'')", blockEnd, logBlockStart, blockEnd);
             }
 
         }
         if (!queueBegin.isEmpty()) {
-            logger.log(System.Logger.Level.ERROR, queueBegin::toString);
+            logger.log(ERROR, queueBegin::toString);
             throw new UnhandledRuntimeException(String.format("Error building file map: '%s' data block(s) not closed. Corrupted file ?", queueBegin.size()));
         }
     }
 
     void readString(VariableInfo variableInfo) {
         if (variableInfo.getValSize() != -1) {
-            logger.log(System.Logger.Level.ERROR, BUG_VARIABLESIZE_ERROR_MSG);
+            logger.log(ERROR, BUG_VARIABLESIZE_ERROR_MSG);
             throw new IllegalStateException(BUG_VARIABLESIZE_ERROR_MSG);
         }
         int valOffset = getBuffer().position();
@@ -417,13 +419,13 @@ public abstract class FileParser {
             variableInfo.setValue(new String(buf, charset));
             variableInfo.setValOffset(valOffset);
         } catch (IOException e) {
-            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
         }
     }
 
     void readInt(VariableInfo variableInfo) {
         if (variableInfo.getValSize() != -1 && variableInfo.getVariableType() == null) {
-            logger.log(System.Logger.Level.ERROR, BUG_VARIABLESIZE_ERROR_MSG);
+            logger.log(ERROR, BUG_VARIABLESIZE_ERROR_MSG);
             throw new IllegalStateException(BUG_VARIABLESIZE_ERROR_MSG);
         }
 
@@ -433,7 +435,7 @@ public abstract class FileParser {
 
     void readFloat(VariableInfo variableInfo) {
         if (variableInfo.getValSize() != -1 && variableInfo.getVariableType() == null) {
-            logger.log(System.Logger.Level.ERROR, BUG_VARIABLESIZE_ERROR_MSG);
+            logger.log(ERROR, BUG_VARIABLESIZE_ERROR_MSG);
             throw new IllegalStateException(BUG_VARIABLESIZE_ERROR_MSG);
         }
 
@@ -443,7 +445,7 @@ public abstract class FileParser {
 
     void readUid(VariableInfo variableInfo) {
         if (variableInfo.getValSize() != -1 && variableInfo.getVariableType() == null) {
-            logger.log(System.Logger.Level.ERROR, BUG_VARIABLESIZE_ERROR_MSG);
+            logger.log(ERROR, BUG_VARIABLESIZE_ERROR_MSG);
             throw new IllegalStateException(BUG_VARIABLESIZE_ERROR_MSG);
         }
         int valOffset = getBuffer().position();
@@ -463,7 +465,7 @@ public abstract class FileParser {
 
     void readStream(VariableInfo variableInfo) {
         if (variableInfo.getValSize() != -1) {
-            logger.log(System.Logger.Level.ERROR, BUG_VARIABLESIZE_ERROR_MSG);
+            logger.log(ERROR, BUG_VARIABLESIZE_ERROR_MSG);
             throw new IllegalStateException(BUG_VARIABLESIZE_ERROR_MSG);
         }
         int valOffset = getBuffer().position();
@@ -537,7 +539,7 @@ public abstract class FileParser {
 
             if (fileVariableMultiple == null) {
                 String msg = String.format("Variable definition for '%s' not found.", varId);
-                logger.log(System.Logger.Level.ERROR, "Variable definition for ''{0}'' not found.", varId);
+                logger.log(ERROR, "Variable definition for ''{0}'' not found.", varId);
                 throw new UnhandledRuntimeException(msg);
             }
             type = fileVariableMultiple.type();

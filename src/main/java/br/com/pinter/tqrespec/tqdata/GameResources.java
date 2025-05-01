@@ -31,9 +31,11 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
 
+import static java.lang.System.Logger.Level.ERROR;
+
 @Singleton
 public class GameResources {
-    private static final System.Logger logger = Log.getLogger(GameResources.class.getName());
+    private static final System.Logger logger = Log.getLogger(GameResources.class);
 
     @Inject
     private GameInfo gameInfo;
@@ -43,7 +45,7 @@ public class GameResources {
             Resources fonts = new Resources(Path.of(gameInfo.getResourcesPath(), "Fonts.arc").toString());
             return fonts.getAllFonts();
         } catch (IOException e) {
-            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             return Collections.emptyMap();
         }
     }

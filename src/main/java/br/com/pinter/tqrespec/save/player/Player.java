@@ -39,6 +39,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.lang.System.Logger.Level.*;
+
 public class Player {
     private static final System.Logger logger = Log.getLogger(Player.class);
 
@@ -76,7 +78,7 @@ public class Player {
             getSaveData().setLocation(saveLocation);
             playerChrPath = gameInfo.playerChr(playerName, saveLocation);
 
-            logger.log(System.Logger.Level.INFO, "Loading character ''{0}''", playerChrPath);
+            logger.log(INFO, "Loading character ''{0}''", playerChrPath);
 
 
             getSaveData().setPlayerChr(playerChrPath);
@@ -93,7 +95,7 @@ public class Player {
             prepareSkillsList();
         } catch (RuntimeException e) {
             reset();
-            logger.log(System.Logger.Level.ERROR, "Error loading character", e);
+            logger.log(ERROR, "Error loading character", e);
             throw new UnhandledRuntimeException("Error loading character", e);
         }
         return true;
@@ -140,7 +142,7 @@ public class Player {
         for (Skill skill : playerMasteries) {
             PlayerSkill ps = playerSkills.get(skill.getRecordPath());
             if (ps == null) {
-                logger.log(System.Logger.Level.ERROR, "Error, skill not found while loading character: " + skill.getRecordPath());
+                logger.log(ERROR, "Error, skill not found while loading character: " + skill.getRecordPath());
                 continue;
             }
             int level = ps.getSkillLevel();
@@ -183,7 +185,7 @@ public class Player {
                 sb.setBlockStart(b.getStart());
                 if (sb.getSkillName() != null) {
                     if (!db.recordExists(sb.getSkillName())) {
-                        logger.log(System.Logger.Level.WARNING, "The character \"{0}\" have the skill \"{1}\", but this" +
+                        logger.log(WARNING, "The character \"{0}\" have the skill \"{1}\", but this" +
                                 " skill was not found in the game database. Please check if the game installed is compatible" +
                                 " with your save game.", getPlayerSavegameName(), sb.getSkillName());
                         getSaveData().setMissingSkills(true);
@@ -427,7 +429,7 @@ public class Player {
         if (monsters.isEmpty()) {
             return null;
         }
-        return monsters.get(monsters.size() - 1);
+        return monsters.getLast();
     }
 
     public int getStatGreatestMonsterKilledLevel() {
@@ -437,7 +439,7 @@ public class Player {
         if (monsterLevels.isEmpty()) {
             return -1;
         }
-        return monsterLevels.get(monsterLevels.size() - 1);
+        return monsterLevels.getLast();
     }
 
     public int getStatNumberOfDeaths() {
@@ -559,7 +561,7 @@ public class Player {
                 UID tpUid = new UID((byte[]) t.getValue());
                 MapTeleport mapTeleport = DefaultMapTeleport.get(tpUid);
                 if (mapTeleport == null) {
-                    logger.log(System.Logger.Level.WARNING, String.format("teleport not found with uid = '%s' character=(%s) difficulty=%d", tpUid, getPlayerSavegameName(), difficulty));
+                    logger.log(WARNING, String.format("teleport not found with uid = '%s' character=(%s) difficulty=%d", tpUid, getPlayerSavegameName(), difficulty));
                     continue;
                 }
                 Teleport teleport = db.teleports().getTeleport(mapTeleport.getRecordId());
@@ -601,7 +603,7 @@ public class Player {
         for (VariableInfo stagingVar : teleportDifficulty.getBlockInfo().getStagingVariables().values()) {
             if (stagingVar.getVariableType().equals(VariableType.UID) && stagingVar.getName().equals(Constants.Save.VAR_TELEPORTUID)
                     && (new UID((byte[]) stagingVar.getValue())).equals(uid)) {
-                logger.log(System.Logger.Level.ERROR, "------------- removing portal " + uid + ".");
+                logger.log(ERROR, "------------- removing portal " + uid + ".");
                 toRemove.add(stagingVar);
             }
         }
@@ -629,7 +631,7 @@ public class Player {
         for (VariableInfo stagingVar : teleportDifficulty.getBlockInfo().getStagingVariables().values()) {
             if (stagingVar.getVariableType().equals(VariableType.UID) && stagingVar.getName().equals(Constants.Save.VAR_TELEPORTUID)
                     && (new UID((byte[]) stagingVar.getValue())).equals(uid)) {
-                logger.log(System.Logger.Level.ERROR, "------------- portal " + uid + "already exists");
+                logger.log(ERROR, "------------- portal " + uid + "already exists");
                 break;
             }
         }
@@ -638,7 +640,7 @@ public class Player {
             if (vi.getVariableType().equals(VariableType.UID) && vi.getName().equals(Constants.Save.VAR_TELEPORTUID)) {
                 MapTeleport currentTeleport = DefaultMapTeleport.get(new UID((byte[]) vi.getValue()));
                 if (currentTeleport != null && currentTeleport.getUid().equals(uid)) {
-                    logger.log(System.Logger.Level.ERROR, "------------- portal " + uid + "already exists");
+                    logger.log(ERROR, "------------- portal " + uid + "already exists");
                     return;
                 }
             }

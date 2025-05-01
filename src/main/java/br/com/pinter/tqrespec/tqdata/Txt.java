@@ -33,9 +33,11 @@ import org.apache.commons.text.WordUtils;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import static java.lang.System.Logger.Level.ERROR;
+
 @Singleton
 public class Txt {
-    private static final System.Logger logger = Log.getLogger(Txt.class.getName());
+    private static final System.Logger logger = Log.getLogger(Txt.class);
 
     @Inject
     private GameInfo gameInfo;
@@ -48,7 +50,7 @@ public class Txt {
                 text = new Text(gameInfo.getTextPath(), Constants.LOCALE_TEXT.get(State.get().getLocale()));
             }
         } catch (FileNotFoundException e) {
-            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             throw new UnhandledRuntimeException("Error loading text resource.");
         }
     }

@@ -32,8 +32,10 @@ import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static java.lang.System.Logger.Level.DEBUG;
+
 public class StashParser extends FileParser {
-    private static final System.Logger logger = Log.getLogger(StashParser.class.getName());
+    private static final System.Logger logger = Log.getLogger(StashParser.class);
     private final String playerPath;
 
     public StashParser(String playerPath) {
@@ -49,16 +51,18 @@ public class StashParser extends FileParser {
         if (!Files.exists(Paths.get(getStashFileName()))) {
             return false;
         }
-        try (FileChannel in = new FileInputStream(getStashFileName()).getChannel()) {
-            setBuffer(ByteBuffer.allocate((int) in.size()));
-            this.getBuffer().order(ByteOrder.LITTLE_ENDIAN);
+        try (FileInputStream chr = new FileInputStream(getStashFileName())) {
+            try (FileChannel in = chr.getChannel()) {
+                setBuffer(ByteBuffer.allocate((int) in.size()));
+                this.getBuffer().order(ByteOrder.LITTLE_ENDIAN);
 
-            while (true) {
-                if (in.read(this.getBuffer()) <= 0) break;
+                while (true) {
+                    if (in.read(this.getBuffer()) <= 0) break;
+                }
             }
         }
 
-        logger.log(System.Logger.Level.DEBUG, "File ''{0}'' read to buffer: ''{1}''", getStashFileName(), this.getBuffer());
+        logger.log(DEBUG, "File ''{0}'' read to buffer: ''{1}''", getStashFileName(), this.getBuffer());
         return this.getBuffer() != null;
     }
 
@@ -72,7 +76,7 @@ public class StashParser extends FileParser {
         if (this.getBuffer() == null || this.getBuffer().capacity() <= 50) {
             throw new IOException("Can't read stash from" + playerPath);
         }
-        logger.log(System.Logger.Level.DEBUG, "Stash ''{0}'' loaded, size=''{1}''", playerPath, this.getBuffer().capacity());
+        logger.log(DEBUG, "Stash ''{0}'' loaded, size=''{1}''", playerPath, this.getBuffer().capacity());
     }
 
     @Override

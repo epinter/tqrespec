@@ -28,8 +28,8 @@ import java.util.logging.Logger;
 public class OutputStreamLog extends OutputStream {
     private StringBuilder stringBuilder = new StringBuilder();
     private StringBuilder stringBuilderArray = new StringBuilder();
-    private Level level;
-    private Logger logger = Logger.getLogger(OutputStreamLog.class.getName());
+    private final Level level;
+    private final Logger logger = Logger.getLogger(OutputStreamLog.class.getName());
 
     public OutputStreamLog(Level level) {
         this.level = level;

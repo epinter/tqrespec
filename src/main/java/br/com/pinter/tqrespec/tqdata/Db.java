@@ -33,9 +33,12 @@ import com.google.inject.Singleton;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.INFO;
+
 @Singleton
 public class Db {
-    private static final System.Logger logger = Log.getLogger(Db.class.getName());
+    private static final System.Logger logger = Log.getLogger(Db.class);
     private Database database;
     private Db.Platform platform = Db.Platform.WINDOWS;
     @Inject
@@ -53,14 +56,14 @@ public class Db {
                         && !Path.of(gameInfo.getGamePath(), "FORCE_WINDOWS.txt").toFile().exists()
                         && (recordExists("Records\\InGameUI\\Player Character\\Mobile\\CharStatsMobile.dbr")
                         || recordExists("Records\\xpack\\ui\\hud\\hud_mobile.dbr"))) {
-                    logger.log(System.Logger.Level.INFO,
+                    logger.log(INFO,
                             "Mobile database detected. If this database is from Windows version, create the file to force detection: "
                                     + Path.of(gameInfo.getGamePath(), "FORCE_WINDOWS.txt").toFile());
                     platform = Platform.MOBILE;
                 }
             }
         } catch (IOException | GameNotFoundException e) {
-            logger.log(System.Logger.Level.ERROR, "", e);
+            logger.log(ERROR, "", e);
             throw new UnhandledRuntimeException("Error loading database.", e);
         }
     }

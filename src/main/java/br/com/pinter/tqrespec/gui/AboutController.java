@@ -43,13 +43,10 @@ import java.util.ResourceBundle;
 public class AboutController implements Initializable {
     @FXML
     private AnchorPane rootelement;
-
     @FXML
     private Label aboutFormTitle;
-
     @FXML
     private Label aboutVersion;
-
     @FXML
     private TextArea aboutText;
 

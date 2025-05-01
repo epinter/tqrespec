@@ -34,14 +34,16 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.util.Optional;
 
+import static java.lang.System.Logger.Level.ERROR;
+
 public class ExceptionHandler {
-    private static final System.Logger logger = Log.getLogger(ExceptionHandler.class.getName());
+    private static final System.Logger logger = Log.getLogger(ExceptionHandler.class);
 
     private ExceptionHandler() {
     }
 
     public static void logAndShow(Throwable e) {
-        logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
+        logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
 
         if (Platform.isFxApplicationThread()) {
             ExceptionHandler.showAlert(e);

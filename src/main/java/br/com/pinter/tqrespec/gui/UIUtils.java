@@ -35,8 +35,10 @@ import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
 
+import static java.lang.System.Logger.Level.*;
+
 public class UIUtils {
-    private static final System.Logger logger = Log.getLogger(UIUtils.class.getName());
+    private static final System.Logger logger = Log.getLogger(UIUtils.class);
 
     public void showError(String message, String contentText) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -85,14 +87,14 @@ public class UIUtils {
             if (br.com.pinter.tqrespec.core.State.get().isLocaleLatin()) {
                 if (State.get().isGameFontFound()) {
                     String cssFontFile = String.format("/fxml/font/font-%s.css", Constants.UI.GAME_FONT_FAMILY.toLowerCase()).replaceAll("\\s+", "_");
-                    logger.log(System.Logger.Level.INFO, "Setting font family to ''{0}'' (''{1}''), stage ''{2}''", Constants.UI.GAME_FONT_FAMILY, cssFontFile, stage.getTitle());
+                    logger.log(INFO, "Setting font family to ''{0}'' (''{1}''), stage ''{2}''", Constants.UI.GAME_FONT_FAMILY, cssFontFile, stage.getTitle());
                     stage.getScene().getStylesheets().add(ResourceHelper.getResource(cssFontFile));
                 } else {
-                    logger.log(System.Logger.Level.INFO, "Setting font family css to default, stage ''{0}''", stage.getTitle());
+                    logger.log(INFO, "Setting font family css to default, stage ''{0}''", stage.getTitle());
                     stage.getScene().getStylesheets().add(ResourceHelper.getResource(Constants.UI.DEFAULT_FONT_CSS));
                 }
             } else {
-                logger.log(System.Logger.Level.INFO, "Setting font family css to default nonlatin, stage ''{0}''", stage.getTitle());
+                logger.log(INFO, "Setting font family css to default nonlatin, stage ''{0}''", stage.getTitle());
                 stage.getScene().getStylesheets().add(ResourceHelper.getResource("/fxml/font/font-nonlatin.css"));
             }
             if (br.com.pinter.tqrespec.core.State.get().isGameFontFound()) {
@@ -101,7 +103,7 @@ public class UIUtils {
                 ));
             }
         } catch (ResourceNotFoundException e) {
-            logger.log(System.Logger.Level.ERROR, "Error", e);
+            logger.log(ERROR, "Error", e);
         }
     }
 
@@ -113,7 +115,7 @@ public class UIUtils {
                 Runtime.getRuntime().exec(new String[]{Constants.XDGOPEN_COMMAND, path});
             }
         } catch (IOException e) {
-            logger.log(System.Logger.Level.WARNING, "unable to open file explorer: ", e);
+            logger.log(WARNING, "unable to open file explorer: ", e);
         }
     }
 }

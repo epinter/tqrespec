@@ -28,9 +28,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
 public class SkillListCell extends ListCell<SkillListViewItem> {
-    private HBox container;
-    private Label skillName;
-    private Label skillPoints;
+    private final HBox container;
+    private final Label skillName;
+    private final Label skillPoints;
 
     @Inject
     private Txt txt;

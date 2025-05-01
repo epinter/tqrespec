@@ -33,7 +33,7 @@ public enum InstallType {
     ALTERNATIVE_STEAM_API(6),
     MANUAL(100);
 
-    private int value;
+    private final int value;
 
     InstallType(int value) {
         this.value = value;

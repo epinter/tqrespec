@@ -33,9 +33,12 @@ import java.time.Duration;
 import java.util.Objects;
 import java.util.Properties;
 
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.ERROR;
+
 @SuppressWarnings({"WeakerAccess", "CanBeFinal", "unused"})
 public class Version implements Comparable<Version> {
-    private static final System.Logger logger = Log.getLogger(Version.class.getName());
+    private static final System.Logger logger = Log.getLogger(Version.class);
 
     private final String versionNumber;
     private String urlPage;
@@ -78,7 +81,7 @@ public class Version implements Comparable<Version> {
         try {
             uri = new URI(urlPropFile);
         } catch (URISyntaxException e) {
-            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
         }
 
         try {
@@ -94,15 +97,15 @@ public class Version implements Comparable<Version> {
                 this.url1 = prop.getProperty("url1");
                 this.url2 = prop.getProperty("url2");
                 this.url3 = prop.getProperty("url3");
-                logger.log(System.Logger.Level.DEBUG, "module: ''{0}'', current_version: ''{1}'', urlPage: ''{2}'', " +
+                logger.log(DEBUG, "module: ''{0}'', current_version: ''{1}'', urlPage: ''{2}'', " +
                         "url1: ''{3}'', url2: ''{4}'', url3: ''{5}''", prop.getProperty("module"), currentVersion, urlPage, url1, url2, url3);
                 lastCheck = this.compareTo(new Version(currentVersion));
                 return lastCheck;
             }
         } catch (IOException e) {
-            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
         } catch (InterruptedException e) {
-            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             Thread.currentThread().interrupt();
         }
         return -2;

@@ -48,9 +48,12 @@ import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.INFO;
+
 @SuppressWarnings("unused")
 public class AttributesPaneController implements Initializable {
-    private static final System.Logger logger = Log.getLogger(AttributesPaneController.class.getName());
+    private static final System.Logger logger = Log.getLogger(AttributesPaneController.class);
     private final BooleanProperty saveDisabled = new SimpleBooleanProperty();
     private MainController mc;
     @FXML
@@ -124,7 +127,6 @@ public class AttributesPaneController implements Initializable {
     private int lifeMin;
     private int manaStep;
     private int manaMin;
-
     private boolean characterIsLoading = false;
 
     @Override
@@ -150,7 +152,7 @@ public class AttributesPaneController implements Initializable {
     }
 
     public void windowShownHandler() {
-        logger.log(System.Logger.Level.INFO, "Font applied: name:''{0}'', family:''{1}''",
+        logger.log(INFO, "Font applied: name:''{0}'', family:''{1}''",
                 healthLabel.getFont().getName(), healthLabel.getFont().getFamily());
     }
 
@@ -327,7 +329,7 @@ public class AttributesPaneController implements Initializable {
     }
 
     public void saveCharHandler() {
-        logger.log(System.Logger.Level.DEBUG, "starting savegame task");
+        logger.log(DEBUG, "starting savegame task");
 
         int strOld = player.getStr();
         int intOld = player.getInt();
@@ -354,7 +356,7 @@ public class AttributesPaneController implements Initializable {
         if (modifierOld != playerProps().getAttrAvailable() && playerProps().getAttrAvailable() >= 0) {
             player.setModifierPoints(playerProps().getAttrAvailable());
         }
-        logger.log(System.Logger.Level.DEBUG, "returning savegame task");
+        logger.log(DEBUG, "returning savegame task");
     }
 
     public void loadCharHandler() {
@@ -384,7 +386,7 @@ public class AttributesPaneController implements Initializable {
         setDexField(playerProps().getDex());
         setLifeField(playerProps().getLife());
         setManaField(playerProps().getMana());
-        logger.log(System.Logger.Level.INFO, "MANA: " + playerProps().getMana());
+
         charClassText.setText(player.getPlayerClassName());
 
         String difficultyTextValue = String.format("%s%02d", Constants.UI.PREFIXTAG_DIFFICULTYLABEL, playerProps().getDifficulty() + 1);

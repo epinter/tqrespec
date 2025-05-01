@@ -38,8 +38,10 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
+import static java.lang.System.Logger.Level.ERROR;
+
 public class Toast {
-    private static final System.Logger logger = Log.getLogger(Toast.class.getName());
+    private static final System.Logger logger = Log.getLogger(Toast.class);
     private static Toast instance;
     private final Stage stage;
 
@@ -106,7 +108,7 @@ public class Toast {
                     try {
                         Thread.sleep(delay);
                     } catch (InterruptedException ex) {
-                        logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, ex);
+                        logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, ex);
                         Thread.currentThread().interrupt();
                     }
 

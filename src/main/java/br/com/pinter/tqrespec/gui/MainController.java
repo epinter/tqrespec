@@ -58,10 +58,13 @@ import java.util.Comparator;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.ERROR;
+
 @SuppressWarnings("unused")
 public class MainController implements Initializable {
+    private static final System.Logger logger = Log.getLogger(MainController.class);
     public static final BooleanProperty mainFormInitialized = new SimpleBooleanProperty();
-    private static final System.Logger logger = Log.getLogger(MainController.class.getName());
     private final BooleanProperty saveDisabled = new SimpleBooleanProperty();
     private UiPlayerProperties playerProperties;
     @FXML
@@ -122,7 +125,7 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        logger.log(System.Logger.Level.DEBUG, "isLocaleLanguageEmpty: " + resources.getLocale().getLanguage().isEmpty());
+        logger.log(DEBUG, "isLocaleLanguageEmpty: " + resources.getLocale().getLanguage().isEmpty());
         if (!State.get().getLocale().equals(Locale.ENGLISH) && resources.getLocale().getLanguage().isEmpty()) {
             ResourceHelper.tryTagText(txt, attributesTab, Constants.UI.TAG_ATTRIBUTESTAB, false, true);
             ResourceHelper.tryTagText(txt, skillsTab, Constants.UI.TAG_SKILLSTAB, false, true);
@@ -186,7 +189,7 @@ public class MainController implements Initializable {
             characterCombo.getItems().setAll(gameInfo.getPlayerCharacterList(SaveLocation.MAIN, SaveLocation.EXTERNAL));
             characterCombo.getItems().sort(Comparator.comparing(PlayerCharacterFile::getPlayerName));
         } catch (ClassCastException | UnsupportedOperationException | IllegalArgumentException e) {
-            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             throw new UnhandledRuntimeException(Constants.ERROR_MSG_EXCEPTION, e);
         }
     }

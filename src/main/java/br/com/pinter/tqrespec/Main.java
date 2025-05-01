@@ -68,10 +68,15 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+import static java.lang.System.Logger.Level.*;
+
 @SuppressWarnings("FieldCanBeLocal")
 public class Main extends Application {
+    private System.Logger logger;
     private final AtomicDouble progress = new AtomicDouble(0.0);
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private StringExpression initialFontBinding;
+    private Future<?> processBarTask;
     @Inject
     private Db db;
     @Inject
@@ -84,9 +89,6 @@ public class Main extends Application {
     private UIUtils uiUtils;
     @Inject
     private GameResources fonts;
-    private System.Logger logger;
-    private StringExpression initialFontBinding;
-    private Future<?> processBarTask;
 
     public static void main(String... args) {
         System.setProperty("javafx.preloader", "br.com.pinter.tqrespec.gui.AppPreloader");
@@ -143,7 +145,7 @@ public class Main extends Application {
             }
             return;
         } catch (GameNotFoundException e) {
-            logger.log(System.Logger.Level.ERROR, "Error", e);
+            logger.log(ERROR, "Error", e);
         }
 
         uiUtils.showError(ResourceHelper.getMessage(Constants.Msg.MAIN_GAMENOTDETECTED), null);
@@ -152,7 +154,7 @@ public class Main extends Application {
     }
 
     private void load(Stage primaryStage) {
-        logger.log(System.Logger.Level.DEBUG, "preloading data");
+        logger.log(DEBUG, "preloading data");
         try {
             gameInfo.getDatabasePath();
             gameInfo.getTextPath();
@@ -160,7 +162,7 @@ public class Main extends Application {
 
         } catch (FileNotFoundException e) {
             uiUtils.showError(ResourceHelper.getMessage(Constants.Msg.MAIN_GAMENOTDETECTED), ResourceHelper.getMessage(Constants.Msg.MAIN_CHOOSEGAMEDIRECTORY));
-            logger.log(System.Logger.Level.ERROR, "game path not detected, showing DirectoryChooser", e);
+            logger.log(ERROR, "game path not detected, showing DirectoryChooser", e);
             chooseDirectory(primaryStage);
         }
 
@@ -186,12 +188,12 @@ public class Main extends Application {
                     }
                     for (String family : Font.getFamilies()) {
                         if (family.equals(Constants.UI.GAME_FONT_FAMILY)) {
-                            logger.log(System.Logger.Level.INFO, "Game font family found ''{0}''", family);
+                            logger.log(INFO, "Game font family found ''{0}''", family);
                             br.com.pinter.tqrespec.core.State.get().setGameFontFound(true);
                         }
                     }
                 } catch (RuntimeException e) {
-                    logger.log(System.Logger.Level.ERROR, "Error loading game fonts", e);
+                    logger.log(ERROR, "Error loading game fonts", e);
                 }
 
                 UIUtils.setStageFontCss(primaryStage);
@@ -199,7 +201,7 @@ public class Main extends Application {
                 try {
                     new Thread(new GameProcessMonitor(gameInfo.getGamePath())).start();
                 } catch (GameNotFoundException e) {
-                    logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
+                    logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
                 }
 
                 return null;
@@ -207,7 +209,7 @@ public class Main extends Application {
         };
         task.setOnFailed(e -> {
             gameInfo.removeSavedDetectedGame();
-            logger.log(System.Logger.Level.ERROR, "Error loading application", e);
+            logger.log(ERROR, "Error loading application", e);
             alertException(primaryStage, e.getSource().getException());
         });
 
@@ -275,7 +277,7 @@ public class Main extends Application {
         prepareInjectionContext();
 
         logger = Log.getLogger(Main.class.getName());
-        logger.log(System.Logger.Level.DEBUG, State.get().getDebugPrefix());
+        logger.log(DEBUG, State.get().getDebugPrefix());
         progressSet(0.0, 0.1);
         try {
             prepareMainStage(primaryStage);
@@ -286,7 +288,7 @@ public class Main extends Application {
     }
 
     public void prepareMainStage(Stage primaryStage) {
-        logger.log(System.Logger.Level.DEBUG, "starting application");
+        logger.log(DEBUG, "starting application");
         ResourceHelper.loadFonts();
 
         Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler::unhandled);
@@ -298,13 +300,13 @@ public class Main extends Application {
                 State.get().setLocale(gameLanguage);
             }
             Locale.setDefault(State.get().getLocale());
-            logger.log(System.Logger.Level.INFO, "Application language set to ''{0}''", State.get().getLocale());
+            logger.log(INFO, "Application language set to ''{0}''", State.get().getLocale());
 
             fxmlLoader.setResources(ResourceBundle.getBundle("i18n.UI", State.get().getLocale()));
             fxmlLoader.setLocation(ResourceHelper.getResourceUrl(Constants.UI.MAIN_FXML));
             root = fxmlLoader.load();
         } catch (IOException e) {
-            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             return;
         }
 

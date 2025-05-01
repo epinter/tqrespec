@@ -27,8 +27,10 @@ import br.com.pinter.tqrespec.util.Constants;
 
 import java.io.IOException;
 
+import static java.lang.System.Logger.Level.ERROR;
+
 public class StashWriter extends FileWriter {
-    private static final System.Logger logger = Log.getLogger(StashWriter.class.getName());
+    private static final System.Logger logger = Log.getLogger(StashWriter.class);
 
     private final StashData saveData;
     private final int crcOffset;
@@ -49,7 +51,7 @@ public class StashWriter extends FileWriter {
             writeBuffer(saveData.getPlayerPath().toString(), Constants.STASH_FILE_BACKUP);
             return true;
         } catch (IOException e) {
-            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
         }
         return false;
     }

@@ -45,11 +45,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.INFO;
 import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class PlayerWriter extends FileWriter {
-    private static final System.Logger logger = Log.getLogger(PlayerWriter.class.getName());
+    private static final System.Logger logger = Log.getLogger(PlayerWriter.class);
     @Inject
     private CurrentPlayerData saveData;
 
@@ -74,7 +76,7 @@ public class PlayerWriter extends FileWriter {
     @SuppressWarnings("SameParameterValue")
     private boolean backupSaveGame(String fileName, String playerName) throws IOException {
         File backupDirectory = new File(gameInfo.getSavePath(), Constants.BACKUP_DIRECTORY);
-        logger.log(System.Logger.Level.INFO, "creating backup at " + backupDirectory.getAbsolutePath());
+        logger.log(INFO, "creating backup at " + backupDirectory.getAbsolutePath());
         Path player = Paths.get(fileName);
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HH");
         String ts = df.format(new Date());
@@ -143,7 +145,7 @@ public class PlayerWriter extends FileWriter {
 
                 return true;
             } catch (IOException e) {
-                logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
+                logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
                 return false;
             }
         }
@@ -158,7 +160,7 @@ public class PlayerWriter extends FileWriter {
                             try {
                                 Files.createDirectory(fs.getPath(targetOnFs.toString(), playerDir.relativize(p).toString()));
                             } catch (IOException e) {
-                                logger.log(System.Logger.Level.ERROR, "Error adding path to zip: " + p, e);
+                                logger.log(ERROR, "Error adding path to zip: " + p, e);
                             }
                         }
                     }
@@ -175,7 +177,7 @@ public class PlayerWriter extends FileWriter {
                             copyFileTimes(p, fs.getPath(targetOnFs.toString(), playerDir.relativize(p).toString()));
                         }
                     } catch (IOException e) {
-                        logger.log(System.Logger.Level.ERROR, "Error adding path to zip: " + p, e);
+                        logger.log(ERROR, "Error adding path to zip: " + p, e);
                     }
                 }
             });
@@ -302,7 +304,7 @@ public class PlayerWriter extends FileWriter {
                 }
             }
         } catch (IOException e) {
-            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             throw new IOException(e);
         } finally {
             State.get().setSaveInProgress(false);
@@ -331,7 +333,7 @@ public class PlayerWriter extends FileWriter {
                 } catch (DirectoryNotEmptyException ignored) {
                     //ignore
                 } catch (IOException e) {
-                    logger.log(System.Logger.Level.ERROR, "Unable to create directory ''{0}''", targetDir);
+                    logger.log(ERROR, "Unable to create directory ''{0}''", targetDir);
                     throw new IOException("Unable to create directory " + targetDir);
                 }
 
@@ -349,7 +351,7 @@ public class PlayerWriter extends FileWriter {
                     Files.copy(file, targetFile, replace ? new CopyOption[]{COPY_ATTRIBUTES, REPLACE_EXISTING}
                             : new CopyOption[]{COPY_ATTRIBUTES});
                 } catch (IOException e) {
-                    logger.log(System.Logger.Level.ERROR, "Unable to create file ''{0}''", targetFile);
+                    logger.log(ERROR, "Unable to create file ''{0}''", targetFile);
                     return FileVisitResult.TERMINATE;
                 }
                 return FileVisitResult.CONTINUE;
@@ -369,7 +371,7 @@ public class PlayerWriter extends FileWriter {
         try {
             Files.walkFileTree(source, fileVisitor);
         } catch (IOException e) {
-            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
         }
     }
 }

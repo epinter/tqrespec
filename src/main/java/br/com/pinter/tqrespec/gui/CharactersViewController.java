@@ -62,126 +62,91 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static java.lang.System.Logger.Level.ERROR;
+
 public class CharactersViewController implements Initializable {
-    private static final System.Logger logger = Log.getLogger(CharactersViewController.class.getName());
+    private static final System.Logger logger = Log.getLogger(CharactersViewController.class);
     private double dragX;
     private double dragY;
     private boolean isMoving = false;
 
     @FXML
     private VBox rootElement;
-
     @FXML
     private Label charFormTitle;
-
     @Inject
     private GameInfo gameInfo;
-
     @Inject
     private PlayerLoader player;
-
     @Inject
     private Txt txt;
-
     @FXML
     private Button exportButton;
-
     @FXML
     private TableView<PlayerCharacter> charactersTable;
-
     @FXML
     private TableColumn<PlayerCharacter, String> colName;
-
     @FXML
     private TableColumn<PlayerCharacter, String> colStore;
-
     @FXML
     private TableColumn<PlayerCharacter, Integer> colLevel;
-
     @FXML
     private TableColumn<PlayerCharacter, String> colGender;
-
     @FXML
     private TableColumn<PlayerCharacter, String> colClass;
-
     @FXML
     private TableColumn<PlayerCharacter, String> colDifficulty;
-
     @FXML
     private TableColumn<PlayerCharacter, Integer> colExperience;
-
     @FXML
     private TableColumn<PlayerCharacter, Integer> colGold;
-
     @FXML
     private TableColumn<PlayerCharacter, Integer> colLife;
-
     @FXML
     private TableColumn<PlayerCharacter, Integer> colMana;
-
     @FXML
     private TableColumn<PlayerCharacter, Integer> colStr;
-
     @FXML
     private TableColumn<PlayerCharacter, Integer> colInt;
-
     @FXML
     private TableColumn<PlayerCharacter, Integer> colDex;
-
     @FXML
     private TableColumn<PlayerCharacter, Integer> colAvailableAttr;
-
     @FXML
     private TableColumn<PlayerCharacter, Integer> colAvailableSkill;
-
     @FXML
     private TableColumn<PlayerCharacter, String> colMasteryOne;
-
     @FXML
     private TableColumn<PlayerCharacter, String> colMasteryTwo;
-
     @FXML
     private TableColumn<PlayerCharacter, String> colPlayTimeInSeconds;
-
     @FXML
     private TableColumn<PlayerCharacter, Integer> colNumberOfDeaths;
-
     @FXML
     private TableColumn<PlayerCharacter, Integer> colNumberOfKills;
-
     @FXML
     private TableColumn<PlayerCharacter, Integer> colGreatestDamageInflicted;
-
     @FXML
     private TableColumn<PlayerCharacter, String> colGreatestMonsterKilled;
-
     @FXML
     private TableColumn<PlayerCharacter, Integer> colExperienceFromKills;
-
     @FXML
     private TableColumn<PlayerCharacter, Integer> colHealthPotionsUsed;
-
     @FXML
     private TableColumn<PlayerCharacter, Integer> colManaPotionsUsed;
-
     @FXML
     private TableColumn<PlayerCharacter, Integer> colNumHitsReceived;
-
     @FXML
     private TableColumn<PlayerCharacter, Integer> colNumHitsInflicted;
-
     @FXML
     private TableColumn<PlayerCharacter, Integer> colCriticalHitsInflicted;
-
     @FXML
     private TableColumn<PlayerCharacter, String> colLastTeleport;
-
-    private List<PlayerCharacter> characters;
-
-    private AtomicBoolean loadingCharacters = new AtomicBoolean(false);
-
     @Inject
     private Archiver archiver;
+
+    private List<PlayerCharacter> characters;
+    private AtomicBoolean loadingCharacters = new AtomicBoolean(false);
 
     @FXML
     public void closeWindow(@SuppressWarnings("unused") MouseEvent evt) {
@@ -246,7 +211,7 @@ public class CharactersViewController implements Initializable {
             try {
                 player.loadPlayer(p.getPlayerName(), p.getLocation());
             } catch (RuntimeException e) {
-                logger.log(System.Logger.Level.ERROR, String.format("Error loading character '%s'", p));
+                logger.log(ERROR, String.format("Error loading character '%s'", p));
                 continue;
             }
             characters.add(player.getCharacter());
@@ -650,7 +615,7 @@ public class CharactersViewController implements Initializable {
                 return String.join(",", fields);
             }).forEach(writer::println);
         } catch (IOException e) {
-            logger.log(System.Logger.Level.ERROR, "Error saving csv file", e);
+            logger.log(ERROR, "Error saving csv file", e);
             throw new UnhandledRuntimeException("Error saving csv file", e);
         }
     }

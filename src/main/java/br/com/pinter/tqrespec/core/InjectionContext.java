@@ -28,9 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class InjectionContext {
-    private Object context;
+    private final Object context;
     private Injector guiceInjector;
-    private List<Module> modules;
+    private final List<Module> modules;
 
     public InjectionContext(Object context, List<Module> modules) {
         this.context = context;

@@ -26,8 +26,8 @@ public class FileBlockType implements BlockType {
     public static final FileBlockType MULTIPLE = new FileBlockType(-3, "MULTIPLE");
     public static final FileBlockType UNKNOWN = new FileBlockType(-1, "UNKNOWN");
 
-    private String name;
-    private int value;
+    private final String name;
+    private final int value;
     private BlockType parent;
 
     public FileBlockType(int value, String name) {

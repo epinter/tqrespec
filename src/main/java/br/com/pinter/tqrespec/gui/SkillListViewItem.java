@@ -21,9 +21,9 @@
 package br.com.pinter.tqrespec.gui;
 
 public class SkillListViewItem {
-    private String skillName;
-    private int skillPoints;
-    private String skillNameText;
+    private final String skillName;
+    private final int skillPoints;
+    private final String skillNameText;
 
     SkillListViewItem(String skillName, int skillPoints, String skillNameText) {
         this.skillName = skillName;

@@ -45,15 +45,17 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.lang.System.Logger.Level.*;
+
 @Singleton
 public class GameInfo {
+    private final System.Logger logger = Log.getLogger(GameInfo.class);
     private static final String DATABASE_DIR = "Database";
     private static final String TEXT_DIR = "Text";
     private static final String DATABASE_FILE = "database.arz";
     private static final String TEXT_FILE = "Text_EN.arc";
     private static final String RESOURCES_DIR = "Resources";
     private static final String REG_KEY_VALVE_STEAM = "SOFTWARE\\Valve\\Steam";
-    private final System.Logger logger = Log.getLogger(GameInfo.class.getName());
     private final List<Path> resourcesText = new ArrayList<>();
     private final List<Path> databases = new ArrayList<>();
     private String gamePath = null;
@@ -111,7 +113,7 @@ public class GameInfo {
 
     private Path getGameSteamPath() {
         Path steamLibraryPath = getSteamLibraryPath();
-        logger.log(System.Logger.Level.DEBUG, "LibraryPathFound -- ''{0}''", steamLibraryPath);
+        logger.log(DEBUG, "LibraryPathFound -- ''{0}''", steamLibraryPath);
         if (steamLibraryPath != null) {
             Path steamGamePath = Paths.get(steamLibraryPath.toString(), Constants.GAME_DIRECTORY_STEAM).toAbsolutePath();
             if (isValidGamePath(steamGamePath)) {
@@ -136,7 +138,7 @@ public class GameInfo {
                             WinNT.KEY_WOW64_32KEY);
                 }
             } catch (Win32Exception e) {
-                logger.log(System.Logger.Level.ERROR, "", e);
+                logger.log(ERROR, "", e);
                 return null;
             }
             steamLibraryFolderVdf = Paths.get(steamPath, "SteamApps", "libraryfolders.vdf").toAbsolutePath();
@@ -148,21 +150,21 @@ public class GameInfo {
 
             List<String> libraryPaths = getLibraryPathsFromSteam(steamLibraryFolderVdf.toString());
 
-            logger.log(System.Logger.Level.DEBUG, "libraryFolderList -- ''{0}''", libraryPaths);
+            logger.log(DEBUG, "libraryFolderList -- ''{0}''", libraryPaths);
 
             for (String directory : libraryPaths) {
-                logger.log(System.Logger.Level.DEBUG, "Trying library -- ''{0}''", directory);
+                logger.log(DEBUG, "Trying library -- ''{0}''", directory);
 
                 Path libraryPath = Paths.get(directory, "steamapps").toAbsolutePath();
                 Path libraryGamePath = Paths.get(libraryPath.toString(), Constants.GAME_DIRECTORY_STEAM).toAbsolutePath();
                 if (isValidGamePath(libraryGamePath)) {
-                    logger.log(System.Logger.Level.DEBUG, "VALID PATH FOUND!! -- ''{0}''", libraryGamePath);
+                    logger.log(DEBUG, "VALID PATH FOUND!! -- ''{0}''", libraryGamePath);
                     steamLibraryPathFound = libraryPath;
                     return libraryPath;
                 }
             }
         } catch (Exception e) {
-            logger.log(System.Logger.Level.DEBUG, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(DEBUG, Constants.ERROR_MSG_EXCEPTION, e);
         }
         return null;
     }
@@ -202,7 +204,7 @@ public class GameInfo {
                         Matcher matcherAppId = regexAppId.matcher(a.group(1));
                         matcherAppId.results().forEach(id -> {
                             if (StringUtils.equals(id.group(1), "475150")) {
-                                logger.log(System.Logger.Level.DEBUG, "Steam AppId found ''{0}''", id.group(1));
+                                logger.log(DEBUG, "Steam AppId found ''{0}''", id.group(1));
                             }
                         });
                     });
@@ -241,7 +243,7 @@ public class GameInfo {
                 }
             }
         } catch (Exception e) {
-            logger.log(System.Logger.Level.DEBUG, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(DEBUG, Constants.ERROR_MSG_EXCEPTION, e);
         }
         return null;
     }
@@ -268,7 +270,7 @@ public class GameInfo {
                 }
             }
         } catch (Win32Exception e) {
-            logger.log(System.Logger.Level.DEBUG, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(DEBUG, Constants.ERROR_MSG_EXCEPTION, e);
         }
 
         return null;
@@ -284,7 +286,7 @@ public class GameInfo {
             installedApps = Advapi32Util.registryGetKeys(WinReg.HKEY_LOCAL_MACHINE,
                     "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall");
         } catch (Exception e) {
-            logger.log(System.Logger.Level.DEBUG, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(DEBUG, Constants.ERROR_MSG_EXCEPTION, e);
         }
 
         for (String app : installedApps)
@@ -292,7 +294,7 @@ public class GameInfo {
                 String appDisplayName = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE,
                         "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\" + app, "DisplayName");
                 if (appDisplayName.matches(regexGameName)) {
-                    logger.log(System.Logger.Level.DEBUG, "Installed: displayname found -- ''{0}''", regexGameName);
+                    logger.log(DEBUG, "Installed: displayname found -- ''{0}''", regexGameName);
                     String installed = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE,
                             "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\" + app, "InstallLocation");
                     Path installedPath = Paths.get(installed).toAbsolutePath();
@@ -300,10 +302,10 @@ public class GameInfo {
                         return installedPath;
                     }
                 } else {
-                    logger.log(System.Logger.Level.DEBUG, "Installed: displayname not found --- ''{0}'' -- ''{1}''", regexGameName, appDisplayName);
+                    logger.log(DEBUG, "Installed: displayname not found --- ''{0}'' -- ''{1}''", regexGameName, appDisplayName);
                 }
             } catch (Exception e) {
-                logger.log(System.Logger.Level.DEBUG, Constants.ERROR_MSG_EXCEPTION, e);
+                logger.log(DEBUG, Constants.ERROR_MSG_EXCEPTION, e);
             }
         return null;
     }
@@ -321,7 +323,7 @@ public class GameInfo {
             pkgList = Advapi32Util.registryGetKeys(WinReg.HKEY_CURRENT_USER,
                     pkgKeyPath);
         } catch (Win32Exception e) {
-            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             return null;
         }
 
@@ -330,7 +332,7 @@ public class GameInfo {
                 String pkgDisplayName = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER,
                         String.format("%s\\%s", pkgKeyPath, pkg), "DisplayName");
                 if (pkgDisplayName.matches(regexGameName)) {
-                    logger.log(System.Logger.Level.DEBUG, "Package: displayname found -- ", regexGameName);
+                    logger.log(DEBUG, "Package: displayname found -- ", regexGameName);
                     String pkgInstalled = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER,
                             String.format("%s\\%s", pkgKeyPath, pkg), "PackageRootFolder");
                     Path pkgInstalledPath = Paths.get(pkgInstalled).toAbsolutePath();
@@ -338,10 +340,10 @@ public class GameInfo {
                         return pkgInstalledPath;
                     }
                 } else {
-                    logger.log(System.Logger.Level.DEBUG, "Package: displayname not found --- ''{0}'' -- ''{1}''", regexGameName, pkgDisplayName);
+                    logger.log(DEBUG, "Package: displayname not found --- ''{0}'' -- ''{1}''", regexGameName, pkgDisplayName);
                 }
             } catch (Win32Exception e) {
-                logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
+                logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             }
         }
 
@@ -361,17 +363,17 @@ public class GameInfo {
             if (isValidGamePath(steamGamePath)) {
                 return steamGamePath;
             } else {
-                logger.log(System.Logger.Level.DEBUG, "GameSteamApiBasedPath: not found at ''{0}''", steamGamePath);
+                logger.log(DEBUG, "GameSteamApiBasedPath: not found at ''{0}''", steamGamePath);
             }
 
             Path steamGameParentPath = Paths.get(steamPath).getParent().toAbsolutePath();
             if (isValidGamePath(steamGameParentPath)) {
                 return steamGameParentPath;
             } else {
-                logger.log(System.Logger.Level.DEBUG, "GameSteamApiBasedPath: not found at ''{0}''", steamGameParentPath);
+                logger.log(DEBUG, "GameSteamApiBasedPath: not found at ''{0}''", steamGameParentPath);
             }
         } catch (Exception e) {
-            logger.log(System.Logger.Level.DEBUG, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(DEBUG, Constants.ERROR_MSG_EXCEPTION, e);
         }
         return null;
     }
@@ -380,7 +382,7 @@ public class GameInfo {
         //search AE in Windows registry
         Path installedPath = getGameInstalledPath(Constants.REGEX_REGISTRY_INSTALL);
         if (isValidGamePath(installedPath)) {
-            logger.log(System.Logger.Level.DEBUG, "Installed: found");
+            logger.log(DEBUG, "Installed: found");
             installedVersion = GameVersion.TQAE;
             installType = InstallType.WINDOWS;
             return installedPath;
@@ -389,7 +391,7 @@ public class GameInfo {
         //search AE in Steam
         Path gameSteam = getGameSteamPath();
         if (isValidGamePath(gameSteam)) {
-            logger.log(System.Logger.Level.DEBUG, "SteamLibrary: found");
+            logger.log(DEBUG, "SteamLibrary: found");
             installedVersion = GameVersion.TQAE;
             installType = InstallType.STEAM;
             return gameSteam;
@@ -398,7 +400,7 @@ public class GameInfo {
         //search AE in GOG
         Path gogPath = getGameGogPath();
         if (isValidGamePath(gogPath)) {
-            logger.log(System.Logger.Level.DEBUG, "Gog: found");
+            logger.log(DEBUG, "Gog: found");
             installedVersion = GameVersion.TQAE;
             installType = InstallType.GOG;
             return gogPath;
@@ -407,7 +409,7 @@ public class GameInfo {
         //try Windows registry with more generic name, and guess the version
         Path installedPathFallback = getGameInstalledPath(Constants.REGEX_REGISTRY_INSTALL_FALLBACK);
         if (isValidGamePath(installedPathFallback)) {
-            logger.log(System.Logger.Level.DEBUG, "Installed: found");
+            logger.log(DEBUG, "Installed: found");
             installType = InstallType.WINDOWS;
             installedVersion = getGameVersion(installedPathFallback);
             if (!GameVersion.UNKNOWN.equals(installedVersion)) {
@@ -418,7 +420,7 @@ public class GameInfo {
         //search AE in MS Store
         Path microsoftStorePath = getGameMicrosoftStorePath();
         if (isValidGamePath(microsoftStorePath)) {
-            logger.log(System.Logger.Level.DEBUG, "Package: found");
+            logger.log(DEBUG, "Package: found");
             installedVersion = GameVersion.TQAE;
             installType = InstallType.MICROSOFT_STORE;
             return microsoftStorePath;
@@ -427,7 +429,7 @@ public class GameInfo {
         //Anniversary Edition not found, search for TQIT
         Path discPath = getGameDiscTqitPath();
         if (isValidGamePath(discPath)) {
-            logger.log(System.Logger.Level.DEBUG, "Disc: found");
+            logger.log(DEBUG, "Disc: found");
             installedVersion = GameVersion.TQIT;
             detectTqBasePath(discPath);
             return discPath;
@@ -436,7 +438,7 @@ public class GameInfo {
         //Search versions that incorrectly uses SteamPath registry
         Path alternativeSteamBasedPath = getGameSteamApiBasedPath();
         if (isValidGamePath(alternativeSteamBasedPath)) {
-            logger.log(System.Logger.Level.DEBUG, "'Alternative' (modified dll) installation: found");
+            logger.log(DEBUG, "'Alternative' (modified dll) installation: found");
             installedVersion = getGameVersion(alternativeSteamBasedPath);
             installType = InstallType.ALTERNATIVE_STEAM_API;
             return alternativeSteamBasedPath;
@@ -497,9 +499,9 @@ public class GameInfo {
                 installType = InstallType.MANUAL;
             }
             setGamePath(manualPath.toString());
-            logger.log(System.Logger.Level.INFO, "Path manually set: path:{0};version:{1}:type:{2}", manualPath, installedVersion, installType);
+            logger.log(INFO, "Path manually set: path:{0};version:{1}:type:{2}", manualPath, installedVersion, installType);
         } else {
-            logger.log(System.Logger.Level.ERROR, "Path ''{0}'' is invalid", manualPath);
+            logger.log(ERROR, "Path ''{0}'' is invalid", manualPath);
             throw new GameNotFoundException(ResourceHelper.getMessage(Constants.Msg.MAIN_GAMENOTDETECTED));
         }
     }
@@ -512,9 +514,9 @@ public class GameInfo {
             installedVersion = GameVersion.TQIT;
             installType = detectTqItInstallType(manualTqItPath);
             setGamePath(tqItPath);
-            logger.log(System.Logger.Level.INFO, "Path manually set: path:{0};version:{1}:type:{2}", manualTqItPath, installedVersion, installType);
+            logger.log(INFO, "Path manually set: path:{0};version:{1}:type:{2}", manualTqItPath, installedVersion, installType);
         } else {
-            logger.log(System.Logger.Level.ERROR, "Path ''{0}'' is invalid", manualTqPath);
+            logger.log(ERROR, "Path ''{0}'' is invalid", manualTqPath);
             throw new GameNotFoundException(ResourceHelper.getMessage(Constants.Msg.MAIN_GAMENOTDETECTED));
         }
     }
@@ -526,13 +528,13 @@ public class GameInfo {
                 searchGamepathResources();
             } catch (RuntimeException e) {
                 gamePath = null;
-                logger.log(System.Logger.Level.ERROR, "Exception", e);
+                logger.log(ERROR, "Exception", e);
                 throw new GameNotFoundException("Game path not found", e);
             }
             saveDetectedGame();
-            logger.log(System.Logger.Level.INFO, "Using databases ''{0}''", databases.toString());
-            logger.log(System.Logger.Level.INFO, "Using text ''{0}''", resourcesText.toString());
-            logger.log(System.Logger.Level.INFO, "GameVersion:''{0}'';InstallType:''{1}''", installedVersion, installType);
+            logger.log(INFO, "Using databases ''{0}''", databases.toString());
+            logger.log(INFO, "Using text ''{0}''", resourcesText.toString());
+            logger.log(INFO, "GameVersion:''{0}'';InstallType:''{1}''", installedVersion, installType);
             return gamePath;
         } else {
             throw new GameNotFoundException(ResourceHelper.getMessage(Constants.Msg.MAIN_GAMENOTDETECTED));
@@ -546,9 +548,9 @@ public class GameInfo {
             dlcRagnarok = true;
             dlcAtlantis = true;
             gamePath = path;
-            logger.log(System.Logger.Level.INFO, "Using databases ''{0}''", databases.toString());
-            logger.log(System.Logger.Level.INFO, "Using text ''{0}''", resourcesText.toString());
-            logger.log(System.Logger.Level.INFO, "GameVersion:''{0}'';InstallType:''{1}''", installedVersion, installType);
+            logger.log(INFO, "Using databases ''{0}''", databases.toString());
+            logger.log(INFO, "Using text ''{0}''", resourcesText.toString());
+            logger.log(INFO, "GameVersion:''{0}'';InstallType:''{1}''", installedVersion, installType);
             return gamePath;
         }
 
@@ -581,7 +583,7 @@ public class GameInfo {
                     throw new GameNotFoundException("TQ base game not found for steam-version of TQIT: " + gamePath);
                 }
             }
-            logger.log(System.Logger.Level.DEBUG, "Last-used game path found.");
+            logger.log(DEBUG, "Last-used game path found.");
             return setGamePath(lastUsedPath);
         }
         return null;
@@ -589,10 +591,10 @@ public class GameInfo {
 
     public String getGamePath() throws GameNotFoundException {
         if (isValidLocalPath(Paths.get(Constants.DEV_GAMEDATA))) {
-            logger.log(System.Logger.Level.INFO, "Local gamedata path found");
+            logger.log(INFO, "Local gamedata path found");
             return setDevGamePath(Constants.DEV_GAMEDATA);
         } else if (isValidLocalPath(Paths.get(Constants.PARENT_GAMEDATA))) {
-            logger.log(System.Logger.Level.INFO, "Parent gamedata path found");
+            logger.log(INFO, "Parent gamedata path found");
             return setDevGamePath(Constants.PARENT_GAMEDATA);
         }
 
@@ -611,11 +613,11 @@ public class GameInfo {
         }
 
         if (StringUtils.isEmpty(gamePath) && !SystemUtils.IS_OS_WINDOWS) {
-            logger.log(System.Logger.Level.DEBUG, "OS is not windows, using dev game path");
+            logger.log(DEBUG, "OS is not windows, using dev game path");
             return setDevGamePath(Constants.DEV_GAMEDATA);
         }
 
-        logger.log(System.Logger.Level.DEBUG, "Game data found: ''{0}''", gamePath);
+        logger.log(DEBUG, "Game data found: ''{0}''", gamePath);
         if (StringUtils.isEmpty(gamePath)) {
             removeSavedDetectedGame();
             throw new GameNotFoundException(ResourceHelper.getMessage(Constants.Msg.MAIN_GAMENOTDETECTED));
@@ -687,13 +689,13 @@ public class GameInfo {
             addDatabasePath(Paths.get(gamePath, DATABASE_DIR, DATABASE_FILE));
             addTextPath(Paths.get(gamePath, TEXT_DIR));
             addTextPath(Paths.get(gamePath, RESOURCES_DIR));
-            logger.log(System.Logger.Level.DEBUG, "steam tqit");
+            logger.log(DEBUG, "steam tqit");
         } else if (GameVersion.TQIT.equals(installedVersion) && InstallType.LEGACY_DISC.equals(installType)) {
             addDatabasePath(Paths.get(tqBasePath.toString(), DATABASE_DIR, DATABASE_FILE));
             addDatabasePath(Paths.get(gamePath, DATABASE_DIR, DATABASE_FILE));
             addTextPath(Paths.get(tqBasePath.toString(), TEXT_DIR));
             addTextPath(Paths.get(gamePath, RESOURCES_DIR));
-            logger.log(System.Logger.Level.DEBUG, "legacy disc");
+            logger.log(DEBUG, "legacy disc");
         } else if (GameVersion.TQAE.equals(installedVersion)) {
             addDatabasePath(Paths.get(gamePath, DATABASE_DIR, DATABASE_FILE));
             addTextPath(Paths.get(gamePath, TEXT_DIR));
@@ -716,14 +718,14 @@ public class GameInfo {
                 //noinspection ResultOfMethodCallIgnored
                 gamedataSavePath.mkdir();
             } catch (SecurityException e) {
-                logger.log(System.Logger.Level.INFO, "unable to create SaveData directory at " + gamedataSavePath.getAbsolutePath());
+                logger.log(INFO, "unable to create SaveData directory at " + gamedataSavePath.getAbsolutePath());
             }
         }
     }
 
     public String getSavePath() {
         String userHome = System.getProperty("user.home");
-        logger.log(System.Logger.Level.DEBUG, "SavePath: user.home is ''{0}''", userHome);
+        logger.log(DEBUG, "SavePath: user.home is ''{0}''", userHome);
 
         if (!SystemUtils.IS_OS_WINDOWS) {
             if (gamePath == null || steamLibraryPathFound == null) {
@@ -751,7 +753,7 @@ public class GameInfo {
 
         Path savePath = Paths.get(saveDirectory, Constants.SAVEGAME_SUBDIR);
         if (Files.exists(savePath)) {
-            logger.log(System.Logger.Level.DEBUG, "SavePath: found");
+            logger.log(DEBUG, "SavePath: found");
             return savePath.toAbsolutePath().toString();
         }
         return null;
@@ -856,7 +858,7 @@ public class GameInfo {
 
     private String getExternalSaveDataPath() {
         if (Paths.get(Constants.EXT_SAVEDATA).toFile().isDirectory()) {
-            logger.log(System.Logger.Level.DEBUG, "External save path found: " + Paths.get(Constants.EXT_SAVEDATA));
+            logger.log(DEBUG, "External save path found: " + Paths.get(Constants.EXT_SAVEDATA));
             return Constants.EXT_SAVEDATA;
         }
 
@@ -903,7 +905,7 @@ public class GameInfo {
         try {
             language = getGameOptionValue("language");
         } catch (IOException e) {
-            logger.log(System.Logger.Level.ERROR, Constants.ERROR_MSG_EXCEPTION, e);
+            logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             return Locale.ENGLISH;
         }
         return Constants.GAMELANGUAGE_LOCALE.get(language);
@@ -936,7 +938,7 @@ public class GameInfo {
                 if (opt.length == 2 && opt[1] != null) {
                     gameOptions.put(opt[0].trim(), opt[1].replace("\"", "").trim());
                 } else {
-                    logger.log(System.Logger.Level.ERROR, "error reading game options.txt file, line ''{0}''", line);
+                    logger.log(ERROR, "error reading game options.txt file, line ''{0}''", line);
                 }
             }
         }
@@ -962,7 +964,7 @@ public class GameInfo {
             databasePaths = pathsListToArray(databases);
         } catch (GameNotFoundException | FileNotFoundException e) {
             removeSavedDetectedGame();
-            logger.log(System.Logger.Level.ERROR, "", e);
+            logger.log(ERROR, "", e);
             throw new FileNotFoundException("Database not found");
         }
         return databasePaths;
@@ -977,7 +979,7 @@ public class GameInfo {
             textPaths = pathsListToArray(resourcesText);
         } catch (GameNotFoundException | FileNotFoundException e) {
             removeSavedDetectedGame();
-            logger.log(System.Logger.Level.ERROR, "", e);
+            logger.log(ERROR, "", e);
             throw new FileNotFoundException("Text resources not found");
         }
         return textPaths;
@@ -990,7 +992,7 @@ public class GameInfo {
             }
             return Path.of(gamePath, "Resources").toString();
         } catch (GameNotFoundException e) {
-            logger.log(System.Logger.Level.ERROR, "", e);
+            logger.log(ERROR, "", e);
             throw new FileNotFoundException("Resources path not found");
         }
     }

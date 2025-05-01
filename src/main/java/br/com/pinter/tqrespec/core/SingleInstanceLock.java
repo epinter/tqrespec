@@ -30,8 +30,10 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.Files;
 
+import static java.lang.System.Logger.Level.ERROR;
+
 public class SingleInstanceLock {
-    private static final System.Logger logger = Log.getLogger(SingleInstanceLock.class.getName());
+    private static final System.Logger logger = Log.getLogger(SingleInstanceLock.class);
     private final File lockFile = new File(System.getProperty("java.io.tmpdir"), "tqrespec.pid");
     private FileChannel fileChannel;
     private FileLock lock;
@@ -59,7 +61,7 @@ public class SingleInstanceLock {
         try {
             Files.delete(lockFile.toPath());
         } catch (IOException e) {
-            logger.log(System.Logger.Level.ERROR, "Error deleting lockfile ''{0}''", lockFile.getPath());
+            logger.log(ERROR, "Error deleting lockfile ''{0}''", lockFile.getPath());
         }
     }
 
@@ -70,7 +72,7 @@ public class SingleInstanceLock {
                 fileChannel.close();
                 deleteLock();
             } catch (IOException e) {
-                logger.log(System.Logger.Level.ERROR, "Error deleting lockfile ''{0}''", lockFile.getPath());
+                logger.log(ERROR, "Error deleting lockfile ''{0}''", lockFile.getPath());
             }
         }
     }

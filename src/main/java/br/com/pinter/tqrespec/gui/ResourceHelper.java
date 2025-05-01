@@ -41,8 +41,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import static java.lang.System.Logger.Level.INFO;
+
 public class ResourceHelper {
-    private static final System.Logger logger = Log.getLogger(ResourceHelper.class.getName());
+    private static final System.Logger logger = Log.getLogger(ResourceHelper.class);
 
     private ResourceHelper() {
     }
@@ -134,7 +136,7 @@ public class ResourceHelper {
         Font loaded = null;
         loaded = Font.loadFont(is, Constants.UI.DEFAULT_FONT_SIZE);
         if (loaded != null) {
-            logger.log(System.Logger.Level.INFO, "Loading game font file:''{0}''; name:''{1}''; family:''{2}''",
+            logger.log(INFO, "Loading game font file:''{0}''; name:''{1}''; family:''{2}''",
                     fileName, loaded.getName(), loaded.getFamily());
         }
     }
@@ -143,7 +145,7 @@ public class ResourceHelper {
         Constants.UI.FONTS_LOADLIST.forEach(f -> {
             Font loaded = null;
             if ((loaded = Font.loadFont(getResource(f), Constants.UI.DEFAULT_FONT_SIZE)) != null) {
-                logger.log(System.Logger.Level.INFO, "Font loaded: name:''{0}''; family''{1}''", f, loaded.getFamily());
+                logger.log(INFO, "Font loaded: name:''{0}''; family:''{1}''", f, loaded.getFamily());
             }
         });
     }
