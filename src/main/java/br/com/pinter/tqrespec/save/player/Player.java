@@ -418,6 +418,24 @@ public class Player {
         return getVariableValueInteger("money");
     }
 
+    public int getAltMoney() {
+        if (getSaveData().getDataMap().hasVariable("altMoney")) {
+            return getVariableValueInteger("altMoney");
+        }
+
+        logger.log(INFO, "altMoney variable not found for character {0}", saveData.getPlayerName());
+        return 0;
+    }
+
+    public void setAltMoney(int altMoney) {
+        if (!getSaveData().getDataMap().hasVariable("altMoney")) {
+            logger.log(INFO, "altMoney variable not found for character {0}", saveData.getPlayerName());
+            return;
+        }
+
+        getSaveData().getDataMap().setInt("altMoney", altMoney);
+    }
+
     public int getStatPlayTimeInSeconds() {
         return getVariableValueInteger("playTimeInSeconds");
     }

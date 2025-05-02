@@ -261,6 +261,10 @@ public class FileDataMap implements DeepCloneable {
         return null;
     }
 
+    public boolean hasVariable(String name) {
+        return getFirst(name) != null;
+    }
+
     public void validate() {
         getBlockInfo().values().stream().flatMap(b -> b.getVariables().values().stream()).toList().forEach(v -> {
             BlockInfo currentBlock = blockInfo.get(v.getBlockOffset());
