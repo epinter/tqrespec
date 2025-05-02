@@ -29,7 +29,8 @@ public enum DefaultAct {
     ORIENT(3),
     HADES(4),
     NORTH(5),
-    ATLANTIS(6);
+    ATLANTIS(6),
+    EAST(7);
 
     private int value;
 

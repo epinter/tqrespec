@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DefaultMapTeleport extends MapTeleport {
-    private static List<DefaultMapTeleport> tp = new ArrayList<>();
+    private static List<MapTeleport> tp = new ArrayList<>();
 
     static {
         /* Greece */
@@ -130,6 +130,28 @@ public class DefaultMapTeleport extends MapTeleport {
                 DefaultAct.ATLANTIS, "RECORDS\\XPACK3\\ITEMS\\SHRINES\\TELEPORT\\TELEPORTSHRINE_04_OUTERATLANTIS.DBR"));
         tp.add(new DefaultMapTeleport(44, new UID("2937963017-2545699419-2641637983-3828584092"),
                 DefaultAct.ATLANTIS, "RECORDS\\XPACK3\\ITEMS\\SHRINES\\TELEPORT\\TELEPORTSHRINE_05_INNERATLANTIS.DBR"));
+
+        /* East (DLC) */
+        tp.add(new DefaultMapTeleport(45, new UID("3129847605-3490202547-2380758241-723818998"),
+                DefaultAct.EAST, "RECORDS\\ITEM\\SHRINES\\TELEPORTCHINA\\TELEPORTSHRINESANDYSHORES01.DBR"));
+        tp.add(new DefaultMapTeleport(46, new UID("1405924112-873809342-3035070156-3862950636"),
+                DefaultAct.EAST, "RECORDS\\ITEM\\SHRINES\\TELEPORTCHINA\\TELEPORTSHRINELAIVILLAGE10.DBR"));
+        tp.add(new DefaultMapTeleport(47, new UID("2894238962-2513192589-2872538379-869933337"),
+                DefaultAct.EAST, "RECORDS\\ITEM\\SHRINES\\TELEPORTCHINA\\TELEPORTSHRINESILKROAD02.DBR"));
+        tp.add(new DefaultMapTeleport(48, new UID("2429796087-4202513727-2148846742-2700624635"),
+                DefaultAct.EAST, "RECORDS\\ITEM\\SHRINES\\TELEPORTCHINA\\TELEPORTSHRINEPINGYANG03.DBR"));
+        tp.add(new DefaultMapTeleport(49, new UID("3797955852-3378203590-2591013785-1615468850"),
+                DefaultAct.EAST, "RECORDS\\ITEM\\SHRINES\\TELEPORTCHINA\\TELEPORTSHRINEEIGHTPILLARS04.DBR"));
+        tp.add(new DefaultMapTeleport(50, new UID("2716059738-4107161326-2566288948-3177378579"),
+                DefaultAct.EAST, "RECORDS\\ITEM\\SHRINES\\TELEPORTCHINA\\TELEPORTSHRINETOPOFTHEWORLD08.DBR"));
+        tp.add(new DefaultMapTeleport(51, new UID("1931105724-4036841229-2522653267-2325817371"),
+                DefaultAct.EAST, "RECORDS\\ITEM\\SHRINES\\TELEPORTCHINA\\TELEPORTSHRINEEGYPTCAMP05.DBR"));
+        tp.add(new DefaultMapTeleport(52, new UID("3767095600-1567179805-3194534118-156020403"),
+                DefaultAct.EAST, "RECORDS\\ITEM\\SHRINES\\TELEPORTCHINA\\TELEPORTSHRINEEGYPTABYDOS09.DBR"));
+        tp.add(new DefaultMapTeleport(53, new UID("3846349248-1895321370-2153346405-2862765892"),
+                DefaultAct.EAST, "RECORDS\\ITEM\\SHRINES\\TELEPORTCHINA\\TELEPORTSHRINEEGYPTCITY06.DBR"));
+        tp.add(new DefaultMapTeleport(54, new UID("2083417698-3042987760-2257834914-3140259809"),
+                DefaultAct.EAST, "RECORDS\\ITEM\\SHRINES\\TELEPORTCHINA\\TELEPORTSHRINEMARSHLAND07.DBR"));
     }
 
     public DefaultMapTeleport(int order, UID uid, DefaultAct act, String recordId) {
@@ -146,5 +168,9 @@ public class DefaultMapTeleport extends MapTeleport {
 
     public static MapTeleport get(String recordId) {
         return tp.stream().filter(f -> f.getRecordId().equals(recordId)).findFirst().orElse(null);
+    }
+
+    public static List<MapTeleport> getAll() {
+        return tp;
     }
 }
