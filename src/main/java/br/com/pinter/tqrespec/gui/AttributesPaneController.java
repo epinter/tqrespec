@@ -95,6 +95,8 @@ public class AttributesPaneController implements Initializable {
     @FXML
     private Spinner<Integer> manaSpinner;
     @FXML
+    private Spinner<Integer> skillSpinner;
+    @FXML
     private Label availPointsText;
     @FXML
     private Label experienceText;
@@ -108,6 +110,8 @@ public class AttributesPaneController implements Initializable {
     private Label difficultyText;
     @FXML
     private ComboBox<String> gender;
+    @FXML
+    private Label electrumText;
     @Inject
     private UIUtils uiUtils;
 
@@ -117,6 +121,7 @@ public class AttributesPaneController implements Initializable {
     private ObjectProperty<Integer> lifeProperty;
     private ObjectProperty<Integer> manaProperty;
     private ObjectProperty<Integer> availProperty;
+    private ObjectProperty<Integer> skillProperty;
     private int strStep;
     private int strMin;
     private int intStep;
@@ -151,6 +156,7 @@ public class AttributesPaneController implements Initializable {
         strSpinner.setTooltip(uiUtils.simpleTooltip(ResourceHelper.getMessage("main.tooltipStrSpinner")));
         intSpinner.setTooltip(uiUtils.simpleTooltip(ResourceHelper.getMessage("main.tooltipIntSpinner")));
         dexSpinner.setTooltip(uiUtils.simpleTooltip(ResourceHelper.getMessage("main.tooltipDexSpinner")));
+        skillSpinner.setTooltip(uiUtils.simpleTooltip(ResourceHelper.getMessage("main.tooltip.skillSpinner")));
     }
 
     private UiPlayerProperties playerProps() {
@@ -180,6 +186,7 @@ public class AttributesPaneController implements Initializable {
         strSpinner.setDisable(disable);
         intSpinner.setDisable(disable);
         dexSpinner.setDisable(disable);
+        skillSpinner.setDisable(disable);
     }
 
     public void disableControls(boolean disable) {
@@ -191,6 +198,7 @@ public class AttributesPaneController implements Initializable {
         experienceText.setDisable(disable);
         charLevelText.setDisable(disable);
         goldText.setDisable(disable);
+        electrumText.setDisable(disable);
     }
 
     private void setStrField(int value) {
@@ -263,6 +271,19 @@ public class AttributesPaneController implements Initializable {
                 attributesChanged((int) oldValue, (int) newValue, manaStep, playerProps().manaProperty())));
     }
 
+    private void setSkillField(int value) {
+        skillProperty = playerProps().skillAvailableProperty().asObject();
+        SkillIntegerSpinnerValueFactory skillFactory = new SkillIntegerSpinnerValueFactory(
+                0, Integer.MAX_VALUE, playerProps().getSkillAvailable(), 1);
+        skillSpinner.setValueFactory(skillFactory);
+        skillSpinner.getValueFactory().valueProperty().bindBidirectional(skillProperty);
+        playerProps().skillAvailableProperty().addListener(((observable, oldValue, newValue) -> {
+            if(newValue.intValue() > 0) {
+                playerProps().setSkillAvailable(newValue.intValue());
+            }
+        }));
+    }
+
     private void attributesChanged(int oldValue, int newValue, int step, IntegerProperty currentAttr) {
         if (newValue > oldValue && playerProps().getAttrAvailable() > 0) {
             int diff = newValue - oldValue;
@@ -296,6 +317,7 @@ public class AttributesPaneController implements Initializable {
         experienceText.setText("");
         charLevelText.setText("");
         goldText.setText("");
+        electrumText.setText("");
         charClassText.setText("");
         difficultyText.setText("");
 
@@ -314,23 +336,29 @@ public class AttributesPaneController implements Initializable {
         if (manaSpinner.getValueFactory() != null && manaSpinner.getValueFactory().valueProperty().isBound()) {
             manaSpinner.getValueFactory().valueProperty().unbindBidirectional(manaProperty);
         }
+        if (skillSpinner.getValueFactory() != null && skillSpinner.getValueFactory().valueProperty().isBound()) {
+            skillSpinner.getValueFactory().valueProperty().unbindBidirectional(skillProperty);
+        }
         if (!characterIsLoading) {
             strSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 0));
             intSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 0));
             dexSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 0));
             lifeSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 0));
             manaSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 0));
+            skillSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 0));
             strSpinner.getValueFactory().setValue(0);
             intSpinner.getValueFactory().setValue(0);
             dexSpinner.getValueFactory().setValue(0);
             lifeSpinner.getValueFactory().setValue(0);
             manaSpinner.getValueFactory().setValue(0);
+            skillSpinner.getValueFactory().setValue(0);
         }
         strSpinner.setValueFactory(null);
         intSpinner.setValueFactory(null);
         dexSpinner.setValueFactory(null);
         lifeSpinner.setValueFactory(null);
         manaSpinner.setValueFactory(null);
+        skillSpinner.setValueFactory(null);
         gender.getSelectionModel().clearSelection();
     }
 
@@ -341,6 +369,8 @@ public class AttributesPaneController implements Initializable {
         int lifeOld = player.getLife();
         int manaOld = player.getMana();
         int modifierOld = player.getModifierPoints();
+        int skillOld = player.getAvailableSkillPoints();
+        int altMoneyOld = player.getAltMoney();
 
         if (strOld != playerProps().getStr() && playerProps().getStr() > 0) {
             player.setStr(playerProps().getStr());
@@ -359,6 +389,9 @@ public class AttributesPaneController implements Initializable {
         }
         if (modifierOld != playerProps().getAttrAvailable() && playerProps().getAttrAvailable() >= 0) {
             player.setModifierPoints(playerProps().getAttrAvailable());
+        }
+        if (altMoneyOld != playerProps().getElectrum() && playerProps().getElectrum() >= 0) {
+            player.setAltMoney(playerProps().getElectrum());
         }
     }
 
@@ -397,6 +430,7 @@ public class AttributesPaneController implements Initializable {
         setDexField(playerProps().getDex());
         setLifeField(playerProps().getLife());
         setManaField(playerProps().getMana());
+        setSkillField(playerProps().getSkillAvailable());
 
         charClassText.setText(player.getPlayerClassName());
 
@@ -410,6 +444,7 @@ public class AttributesPaneController implements Initializable {
         experienceText.setText(NumberFormat.getInstance().format(playerProps().getXp()));
         charLevelText.setText(String.valueOf(playerProps().getCharLevel()));
         goldText.setText(NumberFormat.getInstance().format(playerProps().getGold()));
+        electrumText.setText(NumberFormat.getInstance().format(playerProps().getElectrum()));
 
         gender.getItems().setAll(ResourceHelper.getMessage("main.gender.male"), ResourceHelper.getMessage("main.gender.female"));
         int genderSelection;
@@ -449,6 +484,21 @@ public class AttributesPaneController implements Initializable {
 
     public void setMainController(MainController mainController) {
         this.mc = mainController;
+    }
+
+    class SkillIntegerSpinnerValueFactory extends SpinnerValueFactory.IntegerSpinnerValueFactory {
+
+        SkillIntegerSpinnerValueFactory(int min, int max, int initialValue, int amountToStepBy) {
+            super(min, max, initialValue, amountToStepBy);
+        }
+
+        @Override
+        public void decrement(int v) {
+        }
+
+        @Override
+        public void increment(int v) {
+        }
     }
 }
 

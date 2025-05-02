@@ -39,6 +39,7 @@ public class UiPlayerProperties {
     private IntegerProperty difficulty = new SimpleIntegerProperty();
     private IntegerProperty firstMasteryLevel = new SimpleIntegerProperty();
     private IntegerProperty secondMasteryLevel = new SimpleIntegerProperty();
+    private IntegerProperty electrum = new SimpleIntegerProperty();
 
     public UiPlayerProperties(Player player) {
         this.player = player;
@@ -55,6 +56,7 @@ public class UiPlayerProperties {
         skillAvailable.set(player.getAvailableSkillPoints());
         firstMasteryLevel.set(Math.max(player.getMasteryLevel(0), 0));
         secondMasteryLevel.set(Math.max(player.getMasteryLevel(1), 0));
+        electrum.set(player.getAltMoney());
     }
 
     public void reset() {
@@ -227,6 +229,18 @@ public class UiPlayerProperties {
 
     public void setSecondMasteryLevel(int secondMasteryLevel) {
         this.secondMasteryLevel.set(secondMasteryLevel);
+    }
+
+    public int getElectrum() {
+        return electrum.get();
+    }
+
+    public IntegerProperty electrumProperty() {
+        return electrum;
+    }
+
+    public void setElectrum(int electrum) {
+        this.electrum.set(electrum);
     }
 
     public void reloadMasteriesLevels() {
