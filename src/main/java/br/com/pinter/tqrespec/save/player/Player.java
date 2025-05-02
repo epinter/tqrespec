@@ -575,7 +575,7 @@ public class Player {
     public List<MapTeleport> getDefaultMapTeleports(int difficulty) {
         List<MapTeleport> ret = new ArrayList<>();
         if (getTeleports().size() >= difficulty + 1) {
-            for (VariableInfo t : getTeleports().get(difficulty).getTeleportList()) {
+            for (VariableInfo t : getTeleports().get(difficulty).getVariables()) {
                 UID tpUid = new UID((byte[]) t.getValue());
                 MapTeleport mapTeleport = DefaultMapTeleport.get(tpUid);
                 if (mapTeleport == null) {
@@ -654,7 +654,7 @@ public class Player {
             }
         }
 
-        for (VariableInfo vi : teleportDifficulty.getTeleportList()) {
+        for (VariableInfo vi : teleportDifficulty.getVariables()) {
             if (vi.getVariableType().equals(VariableType.UID) && vi.getName().equals(Constants.Save.VAR_TELEPORTUID)) {
                 MapTeleport currentTeleport = DefaultMapTeleport.get(new UID((byte[]) vi.getValue()));
                 if (currentTeleport != null && currentTeleport.getUid().equals(uid)) {

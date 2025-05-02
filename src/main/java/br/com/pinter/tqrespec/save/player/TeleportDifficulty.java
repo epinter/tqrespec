@@ -21,8 +21,10 @@
 package br.com.pinter.tqrespec.save.player;
 
 import br.com.pinter.tqrespec.save.BlockInfo;
+import br.com.pinter.tqrespec.save.UID;
 import br.com.pinter.tqrespec.save.VariableInfo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TeleportDifficulty {
@@ -30,14 +32,21 @@ public class TeleportDifficulty {
     private final int size;
     private final int offset;
     private final BlockInfo blockInfo;
-    private final List<VariableInfo> teleportList;
+    private final List<VariableInfo> variables;
+    private final List<UID> teleports = new ArrayList<>();
 
-    public TeleportDifficulty(int difficulty, int size, int offset, List<VariableInfo> teleportList, BlockInfo blockInfo) {
+    public TeleportDifficulty(int difficulty, int size, int offset, List<VariableInfo> variables, BlockInfo blockInfo) {
         this.difficulty = difficulty;
         this.size = size;
         this.offset = offset;
-        this.teleportList = teleportList;
+        this.variables = variables;
         this.blockInfo = blockInfo;
+        for (VariableInfo v : variables) {
+            if (v.isUid()) {
+                teleports.add(new UID((byte[]) v.getValue()));
+            }
+        }
+
     }
 
     public int getDifficulty() {
@@ -52,8 +61,12 @@ public class TeleportDifficulty {
         return offset;
     }
 
-    public List<VariableInfo> getTeleportList() {
-        return teleportList;
+    public List<VariableInfo> getVariables() {
+        return variables;
+    }
+
+    public List<UID> getTeleports() {
+        return teleports;
     }
 
     public BlockInfo getBlockInfo() {
@@ -66,7 +79,7 @@ public class TeleportDifficulty {
                 "difficulty=" + difficulty +
                 ", size=" + size +
                 ", offset=" + offset +
-                ", teleportList=" + teleportList +
+                ", teleportList=" + variables +
                 '}';
     }
 }

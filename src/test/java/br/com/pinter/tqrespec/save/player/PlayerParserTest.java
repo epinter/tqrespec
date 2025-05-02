@@ -264,8 +264,8 @@ class PlayerParserTest {
         boolean hadesEpic = false;
         boolean hadesLegendary = false;
         for (TeleportDifficulty t : saveTeleports) {
-            assertTrue(t.getTeleportList().size() > 0);
-            for (VariableInfo v : t.getTeleportList()) {
+            assertTrue(t.getVariables().size() > 0);
+            for (VariableInfo v : t.getVariables()) {
                 UID uid = new UID((byte[]) v.getValue());
                 switch (uid.getUid()) {
                     case helos -> {
