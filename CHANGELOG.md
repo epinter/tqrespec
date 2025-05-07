@@ -1,4 +1,28 @@
 # Changelog
+## [1.0.0] - 2025-05-08
+### Fixed
+- Fixed linux script not passing debug parameter
+- Updated google-guava library, fixes a bug
+- Minor UI improvents and fixes
+
+### Changed
+- Improved Linux support
+
+### Added
+- Full backup of character, can be enabled in Misc tab
+- Detect Steam game and savegame paths on Linux
+- Electrum
+- Editing of Skill points available
+- Gold editing
+- Electrum editing
+- Level editing
+- Unrestricted attributes editing (not locked by points available)
+- Reset character stats
+- Teleports add/remove
+- Automatic 'Legendary Hero' restriction removal when unlocking teleports to normal/epic difficulties
+- Unlocks all inventory bags
+- More tests to improve reliability
+
 ## [0.14.0] - 2025-01-19
 ### Fixed
 - Don't remove altMoney(Electrum) when converting save to mobile, issue #54

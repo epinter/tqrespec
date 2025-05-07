@@ -6,7 +6,6 @@
 [![Release Date](https://img.shields.io/github/release-date/epinter/tqrespec.svg)](https://github.com/epinter/tqrespec/releases/latest)
 [![Steam views](https://img.shields.io/steam/views/1262483108.svg)](https://steamcommunity.com/sharedfiles/filedetails/?id=1262483108)
 [![License](https://img.shields.io/github/license/epinter/tqrespec.svg)](https://github.com/epinter/tqrespec/blob/master/LICENSE)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=epinter_tqrespec&metric=alert_status)](https://sonarcloud.io/dashboard?id=epinter_tqrespec)
 
 ## Introduction
 
