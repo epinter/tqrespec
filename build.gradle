@@ -299,6 +299,7 @@ tasks.register('jlink', Exec) {
                     '-J-Djlink.debug=true',
                     '--module-path', layout.buildDirectory.dir("appimage-modules").get().asFile,
                     '--add-modules', "ALL-MODULE-PATH",
+                    '--add-modules', 'jdk.crypto.cryptoki',
                     '--output', layout.buildDirectory.dir("jre-image").get().asFile,
                     '--compress', 'zip-6',
                     '--no-header-files',
