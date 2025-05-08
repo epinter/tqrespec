@@ -20,6 +20,7 @@
 
 package br.com.pinter.tqrespec.util;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import javafx.scene.text.Font;
 
@@ -93,6 +94,13 @@ public final class Constants {
             .put(Locale.of("uk"), "UK").build();
 
     private Constants() {
+    }
+
+    public static final class Writer {
+        public static final List<String> BACKUP_IGNORE = ImmutableList.of(
+                "(?i)^backup.*"
+        );
+        public static final String BACKUP_PATHMATCHER = "regex:(?i).*\\.(que|dat|myw)";
     }
 
     public static final class Save {

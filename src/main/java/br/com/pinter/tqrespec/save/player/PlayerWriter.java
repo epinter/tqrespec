@@ -24,7 +24,11 @@ import br.com.pinter.tqrespec.Settings;
 import br.com.pinter.tqrespec.core.State;
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.logging.Log;
-import br.com.pinter.tqrespec.save.*;
+import br.com.pinter.tqrespec.save.FileDataHolder;
+import br.com.pinter.tqrespec.save.FileDataMap;
+import br.com.pinter.tqrespec.save.FileWriter;
+import br.com.pinter.tqrespec.save.Platform;
+import br.com.pinter.tqrespec.save.SaveLocation;
 import br.com.pinter.tqrespec.save.stash.StashLoader;
 import br.com.pinter.tqrespec.save.stash.StashWriter;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
@@ -37,12 +41,25 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.*;
+import java.nio.file.CopyOption;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import static java.lang.System.Logger.Level.ERROR;
@@ -101,21 +118,43 @@ public class PlayerWriter extends FileWriter {
                     Files.walkFileTree(player.getParent(), new SimpleFileVisitor<>() {
                         @Override
                         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                            Objects.requireNonNull(file);
+                            Objects.requireNonNull(attrs);
                             Path subPath = file.subpath(player.getParent().getNameCount() - 1, file.getNameCount());
                             final Path dest = zipFs.getPath(root.toString(), subPath.toString());
+                            if (!Files.exists(zipFs.getPath(subPath.subpath(0, subPath.getNameCount() - 1).toString()))) {
+                                // dest directory doesn't exists
+                                return FileVisitResult.CONTINUE;
+                            }
+
                             Files.copy(file, dest, StandardCopyOption.REPLACE_EXISTING);
                             return FileVisitResult.CONTINUE;
                         }
 
                         @Override
                         public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                            Objects.requireNonNull(dir);
+                            Objects.requireNonNull(attrs);
+                            Path rootDir = zipFs.getPath(root.toString(), "/" + player.getName(player.getNameCount() - 2));
+                            if (!Files.exists(rootDir)) {
+                                Files.createDirectories(rootDir);
+                            }
                             if (player.getParent().getNameCount() == dir.getNameCount()) {
                                 return FileVisitResult.CONTINUE;
                             }
+
                             Path subPath = dir.subpath(player.getParent().getNameCount() - 1, dir.getNameCount());
+                            for (String toIgnore : Constants.Writer.BACKUP_IGNORE) {
+                                //ignore all backup* directories inside player directory
+                                if (subPath.subpath(1, subPath.getNameCount()).toString().matches(toIgnore)) {
+                                    return FileVisitResult.CONTINUE;
+                                }
+                            }
 
                             final Path createDir = zipFs.getPath(root.toString(), subPath.toString());
-                            Files.createDirectories(createDir);
+                            if (!Files.exists(createDir)) {
+                                Files.createDirectories(createDir);
+                            }
                             return FileVisitResult.CONTINUE;
                         }
                     });
@@ -156,29 +195,38 @@ public class PlayerWriter extends FileWriter {
     public void addLevelsFilesToFs(FileSystem fs, Path playerDir, Path targetOnFs) throws IOException {
         try (Stream<Path> levelsDirs = Files.walk(playerDir)) {
             levelsDirs.forEach(p -> {
-                        if (playerDir.relativize(p).startsWith("Levels_World_World01.map") && p.toFile().isDirectory()) {
-                            try {
-                                Files.createDirectory(fs.getPath(targetOnFs.toString(), playerDir.relativize(p).toString()));
-                            } catch (IOException e) {
-                                logger.log(ERROR, "Error adding path to zip: " + p, e);
-                            }
-                        }
+                Path destDir = fs.getPath(targetOnFs.toString(), playerDir.relativize(p).toString());
+                if (Files.exists(destDir)) {
+                    return;
+                }
+                for (String toIgnore : Constants.Writer.BACKUP_IGNORE) {
+                    //ignore all backup* directories inside player directory
+                    if (p.getFileName().toString().matches(toIgnore)) {
+                        return;
                     }
-            );
+                }
+                try {
+                    if (p.toFile().isDirectory() && Files.exists(destDir.getParent())) {
+                        Files.createDirectory(destDir);
+                    }
+                } catch (IOException e) {
+                    logger.log(ERROR, "Error adding path to zip: " + p, e);
+                }
+            });
         }
 
         try (Stream<Path> levelsFiles = Files.walk(playerDir)) {
             levelsFiles.forEach(p -> {
-                PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher("glob:**/Levels_World_World01.map/**/*.{que,dat,myw}");
-                if (playerDir.relativize(p).startsWith("Levels_World_World01.map")) {
-                    try {
-                        if (pathMatcher.matches(p)) {
-                            Files.copy(p, fs.getPath(targetOnFs.toString(), playerDir.relativize(p).toString()));
-                            copyFileTimes(p, fs.getPath(targetOnFs.toString(), playerDir.relativize(p).toString()));
-                        }
-                    } catch (IOException e) {
-                        logger.log(ERROR, "Error adding path to zip: " + p, e);
+                PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher(Constants.Writer.BACKUP_PATHMATCHER);
+                try {
+                    Path destFile = fs.getPath(targetOnFs.toString(), playerDir.relativize(p).toString());
+                    Path destDir = destFile.getParent();
+                    if (pathMatcher.matches(p) && !p.toFile().isDirectory() && Files.exists(destDir)) {
+                        Files.copy(p, destFile);
+                        copyFileTimes(p, destFile);
                     }
+                } catch (IOException e) {
+                    logger.log(ERROR, "Error adding path to zip: " + p, e);
                 }
             });
         }
