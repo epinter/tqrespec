@@ -36,13 +36,21 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.util.converter.NumberStringConverter;
 
 import java.net.URL;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import static java.lang.System.Logger.Level.INFO;
 
@@ -51,6 +59,35 @@ public class AttributesPaneController implements Initializable {
     private static final System.Logger logger = Log.getLogger(AttributesPaneController.class);
     private final BooleanProperty saveDisabled = new SimpleBooleanProperty();
     private MainController mc;
+
+    private ObjectProperty<Integer> strProperty;
+    private ObjectProperty<Integer> intProperty;
+    private ObjectProperty<Integer> dexProperty;
+    private ObjectProperty<Integer> lifeProperty;
+    private ObjectProperty<Integer> manaProperty;
+    private ObjectProperty<Integer> availProperty;
+    private ObjectProperty<Integer> skillProperty;
+    private ObjectProperty<Integer> charLevelProperty;
+    private int strStep;
+    private int strMin;
+    private int intStep;
+    private int intMin;
+    private int dexStep;
+    private int dexMin;
+    private int lifeStep;
+    private int lifeMin;
+    private int manaStep;
+    private int manaMin;
+    private boolean characterIsLoading = false;
+
+    @Inject
+    private Db db;
+    @Inject
+    private Txt txt;
+    @Inject
+    private Player player;
+    @Inject
+    private UIUtils uiUtils;
 
     @FXML
     private Label strengthLabel;
@@ -74,12 +111,6 @@ public class AttributesPaneController implements Initializable {
     private Label charClassLabel;
     @FXML
     private Label difficultyLabel;
-    @Inject
-    private Db db;
-    @Inject
-    private Txt txt;
-    @Inject
-    private Player player;
     @FXML
     private Spinner<Integer> strSpinner;
     @FXML
@@ -110,28 +141,6 @@ public class AttributesPaneController implements Initializable {
     private ComboBox<String> gender;
     @FXML
     private TextField electrumText;
-    @Inject
-    private UIUtils uiUtils;
-
-    private ObjectProperty<Integer> strProperty;
-    private ObjectProperty<Integer> intProperty;
-    private ObjectProperty<Integer> dexProperty;
-    private ObjectProperty<Integer> lifeProperty;
-    private ObjectProperty<Integer> manaProperty;
-    private ObjectProperty<Integer> availProperty;
-    private ObjectProperty<Integer> skillProperty;
-    private ObjectProperty<Integer> charLevelProperty;
-    private int strStep;
-    private int strMin;
-    private int intStep;
-    private int intMin;
-    private int dexStep;
-    private int dexMin;
-    private int lifeStep;
-    private int lifeMin;
-    private int manaStep;
-    private int manaMin;
-    private boolean characterIsLoading = false;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {

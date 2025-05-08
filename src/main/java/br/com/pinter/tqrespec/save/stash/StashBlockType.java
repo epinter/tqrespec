@@ -22,7 +22,7 @@ package br.com.pinter.tqrespec.save.stash;
 
 import br.com.pinter.tqrespec.save.FileBlockType;
 
-public class StashBlockType extends FileBlockType {
+class StashBlockType extends FileBlockType {
     static final FileBlockType STASH_MAIN = new FileBlockType(0, "STASH_MAIN");
     static final FileBlockType STASH_ITEM = new FileBlockType(1, "STASH_ITEM");
     static final FileBlockType STASH_ITEM_PREFIX = new FileBlockType(2, "STASH_ITEM_PREFIX");

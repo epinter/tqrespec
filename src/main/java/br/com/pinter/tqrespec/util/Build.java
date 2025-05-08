@@ -32,7 +32,7 @@ import java.util.Objects;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
-public class Build {
+public final class Build {
     private static String buildVersion;
     private static String buildTitle;
 

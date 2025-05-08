@@ -20,7 +20,12 @@
 
 package br.com.pinter.tqrespec.save.player;
 
-import br.com.pinter.tqrespec.save.*;
+import br.com.pinter.tqrespec.save.BlockType;
+import br.com.pinter.tqrespec.save.FileBlockType;
+import br.com.pinter.tqrespec.save.FileVariable;
+import br.com.pinter.tqrespec.save.InvalidVariableException;
+import br.com.pinter.tqrespec.save.Platform;
+import br.com.pinter.tqrespec.save.VariableType;
 
 import java.util.EnumMap;
 import java.util.HashMap;

@@ -21,7 +21,16 @@
 package br.com.pinter.tqrespec.save.player;
 
 import br.com.pinter.tqrespec.logging.Log;
-import br.com.pinter.tqrespec.save.*;
+import br.com.pinter.tqrespec.save.BlockInfo;
+import br.com.pinter.tqrespec.save.BlockType;
+import br.com.pinter.tqrespec.save.FileBlockType;
+import br.com.pinter.tqrespec.save.FileParser;
+import br.com.pinter.tqrespec.save.FileVariable;
+import br.com.pinter.tqrespec.save.IncompatibleSavegameException;
+import br.com.pinter.tqrespec.save.InvalidVariableException;
+import br.com.pinter.tqrespec.save.Platform;
+import br.com.pinter.tqrespec.save.VariableInfo;
+import br.com.pinter.tqrespec.save.VariableType;
 import br.com.pinter.tqrespec.tqdata.GameVersion;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableListMultimap;

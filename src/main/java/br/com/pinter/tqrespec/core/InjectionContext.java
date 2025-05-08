@@ -20,8 +20,11 @@
 
 package br.com.pinter.tqrespec.core;
 
-import com.google.inject.*;
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.google.inject.Provides;
 import javafx.fxml.FXMLLoader;
 
 import java.util.ArrayList;

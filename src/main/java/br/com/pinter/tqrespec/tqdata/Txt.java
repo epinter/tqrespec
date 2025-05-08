@@ -39,13 +39,11 @@ import static java.lang.System.Logger.Level.ERROR;
 @Singleton
 public class Txt {
     private static final System.Logger logger = Log.getLogger(Txt.class);
+    private Text text;
+    private Text textEn;
 
     @Inject
     private GameInfo gameInfo;
-
-    private Text text;
-
-    private Text textEn;
 
     public void initialize() {
         try {

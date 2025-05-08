@@ -20,12 +20,21 @@
 
 package br.com.pinter.tqrespec.gui;
 
-import br.com.pinter.tqrespec.core.*;
+import br.com.pinter.tqrespec.core.MyEventHandler;
+import br.com.pinter.tqrespec.core.MyTask;
+import br.com.pinter.tqrespec.core.State;
+import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
+import br.com.pinter.tqrespec.core.WorkerThread;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.SaveLocation;
 import br.com.pinter.tqrespec.save.player.Player;
 import br.com.pinter.tqrespec.save.player.PlayerWriter;
-import br.com.pinter.tqrespec.tqdata.*;
+import br.com.pinter.tqrespec.tqdata.Db;
+import br.com.pinter.tqrespec.tqdata.DefaultMapTeleport;
+import br.com.pinter.tqrespec.tqdata.GameInfo;
+import br.com.pinter.tqrespec.tqdata.MapTeleport;
+import br.com.pinter.tqrespec.tqdata.PlayerCharacterFile;
+import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Build;
 import br.com.pinter.tqrespec.util.Constants;
 import com.google.inject.Inject;
@@ -39,7 +48,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
@@ -51,9 +65,16 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.ResourceBundle;
 
-import static java.lang.System.Logger.Level.*;
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.WARNING;
 
 @SuppressWarnings("unused")
 public class MainController implements Initializable {
@@ -527,7 +548,7 @@ public class MainController implements Initializable {
 
         Toast.cancel();
 
-        if (!(evt.getSource() instanceof ComboBox)) {
+        if (!(evt.getSource() instanceof ComboBox<?> character)) {
             return;
         }
 
@@ -535,7 +556,6 @@ public class MainController implements Initializable {
         freeLvl.set(false);
         saveDisabled.set(true);
         characterCombo.setDisable(true);
-        ComboBox<?> character = (ComboBox<?>) evt.getSource();
 
         PlayerCharacterFile playerCharacterFile = (PlayerCharacterFile) character.getSelectionModel().getSelectedItem();
         if (playerCharacterFile == null || StringUtils.isEmpty((playerCharacterFile.getPlayerName()))) {
@@ -605,7 +625,6 @@ public class MainController implements Initializable {
                             ResourceHelper.getMessage("main.mobileDatabaseToast_content"),
                             12000);
                 }
-
             }
         });
 

@@ -26,7 +26,7 @@ import br.com.pinter.tqrespec.save.VariableType;
 
 import java.util.HashMap;
 
-public class StashFileVariable implements FileVariable {
+class StashFileVariable implements FileVariable {
     private static final HashMap<String, StashFileVariable> map = new HashMap<>();
 
     static {

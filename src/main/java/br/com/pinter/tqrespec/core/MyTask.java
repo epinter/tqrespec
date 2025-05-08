@@ -23,7 +23,6 @@ package br.com.pinter.tqrespec.core;
 import javafx.concurrent.Task;
 
 public abstract class MyTask<T> extends Task<T> {
-
     protected MyTask() {
         super();
         setOnFailed(workerStateEvent -> {

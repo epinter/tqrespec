@@ -29,7 +29,6 @@ import javafx.stage.Stage;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-@SuppressWarnings("unused")
 public class ResizeListener implements EventHandler<MouseEvent> {
     private final Stage stage;
     private final AtomicBoolean cursorChanged = new AtomicBoolean(false);

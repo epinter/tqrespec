@@ -27,7 +27,12 @@ import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.SaveLocation;
 import br.com.pinter.tqrespec.save.player.Archiver;
 import br.com.pinter.tqrespec.save.player.PlayerLoader;
-import br.com.pinter.tqrespec.tqdata.*;
+import br.com.pinter.tqrespec.tqdata.GameInfo;
+import br.com.pinter.tqrespec.tqdata.MapTeleport;
+import br.com.pinter.tqrespec.tqdata.Mastery;
+import br.com.pinter.tqrespec.tqdata.PlayerCharacter;
+import br.com.pinter.tqrespec.tqdata.PlayerCharacterFile;
+import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Build;
 import br.com.pinter.tqrespec.util.Constants;
 import com.google.inject.Inject;
@@ -37,7 +42,15 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -46,7 +59,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-import javafx.stage.*;
+import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -69,17 +87,20 @@ public class CharactersViewController implements Initializable {
     private double dragX;
     private double dragY;
     private boolean isMoving = false;
+    private List<PlayerCharacter> characters;
+    private final AtomicBoolean loadingCharacters = new AtomicBoolean(false);
 
-    @FXML
-    private VBox rootElement;
-    @FXML
-    private Label charFormTitle;
     @Inject
     private GameInfo gameInfo;
     @Inject
     private PlayerLoader player;
     @Inject
     private Txt txt;
+
+    @FXML
+    private VBox rootElement;
+    @FXML
+    private Label charFormTitle;
     @FXML
     private Button exportButton;
     @FXML
@@ -145,9 +166,6 @@ public class CharactersViewController implements Initializable {
     @Inject
     private Archiver archiver;
 
-    private List<PlayerCharacter> characters;
-    private AtomicBoolean loadingCharacters = new AtomicBoolean(false);
-
     @FXML
     public void closeWindow(@SuppressWarnings("unused") MouseEvent evt) {
         close();
@@ -203,7 +221,6 @@ public class CharactersViewController implements Initializable {
         Platform.runLater(() -> {
             charactersTable.setPlaceholder(new Label(ResourceHelper.getMessage("characters.loadingPlaceholder")));
             rootElement.getScene().setCursor(Cursor.WAIT);
-
         });
 
         characters = new ArrayList<>();

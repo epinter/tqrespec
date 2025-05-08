@@ -78,23 +78,15 @@ public class JULLogger implements System.Logger {
 
     @Override
     public boolean isLoggable(Level level) {
-        switch (level) {
-            case OFF:
-                return false;
-            case TRACE:
-                return logger.isLoggable(java.util.logging.Level.FINER);
-            case DEBUG:
-                return logger.isLoggable(java.util.logging.Level.FINE);
-            case INFO:
-                return logger.isLoggable(java.util.logging.Level.INFO);
-            case WARNING:
-                return logger.isLoggable(java.util.logging.Level.WARNING);
-            case ERROR:
-                return logger.isLoggable(java.util.logging.Level.SEVERE);
-            case ALL:
-            default:
-                return true;
-        }
+        return switch (level) {
+            case OFF -> false;
+            case TRACE -> logger.isLoggable(java.util.logging.Level.FINER);
+            case DEBUG -> logger.isLoggable(java.util.logging.Level.FINE);
+            case INFO -> logger.isLoggable(java.util.logging.Level.INFO);
+            case WARNING -> logger.isLoggable(java.util.logging.Level.WARNING);
+            case ERROR -> logger.isLoggable(java.util.logging.Level.SEVERE);
+            default -> true;
+        };
     }
 
     @Override
@@ -114,21 +106,11 @@ public class JULLogger implements System.Logger {
         }
 
         switch (level) {
-            case TRACE:
-                logger.log(java.util.logging.Level.FINER, msg);
-                break;
-            case DEBUG:
-                logger.log(java.util.logging.Level.FINE, msg);
-                break;
-            case WARNING:
-                logger.log(java.util.logging.Level.WARNING, msg);
-                break;
-            case ERROR:
-                logger.log(java.util.logging.Level.SEVERE, msg);
-                break;
-            case ALL:
-            default:
-                logger.log(java.util.logging.Level.INFO, msg);
+            case TRACE -> logger.log(java.util.logging.Level.FINER, msg);
+            case DEBUG -> logger.log(java.util.logging.Level.FINE, msg);
+            case WARNING -> logger.log(java.util.logging.Level.WARNING, msg);
+            case ERROR -> logger.log(java.util.logging.Level.SEVERE, msg);
+            default -> logger.log(java.util.logging.Level.INFO, msg);
         }
     }
 
@@ -144,28 +126,16 @@ public class JULLogger implements System.Logger {
         }
 
         switch (level) {
-            case TRACE:
-                logger.log(java.util.logging.Level.FINER, msg, throwable);
-                break;
-            case DEBUG:
-                logger.log(java.util.logging.Level.FINE, msg, throwable);
-                break;
-            case WARNING:
-                logger.log(java.util.logging.Level.WARNING, msg, throwable);
-                break;
-            case ERROR:
-                logger.log(java.util.logging.Level.SEVERE, msg, throwable);
-                break;
-            case ALL:
-            default:
-                logger.log(java.util.logging.Level.INFO, msg, throwable);
+            case TRACE -> logger.log(java.util.logging.Level.FINER, msg, throwable);
+            case DEBUG -> logger.log(java.util.logging.Level.FINE, msg, throwable);
+            case WARNING -> logger.log(java.util.logging.Level.WARNING, msg, throwable);
+            case ERROR -> logger.log(java.util.logging.Level.SEVERE, msg, throwable);
+            default -> logger.log(java.util.logging.Level.INFO, msg, throwable);
         }
     }
 
     @Override
     public void log(Level level, ResourceBundle resourceBundle, String format, Object... params) {
-        String msg = MessageFormat.format(format, params);
-
-        this.log(level, msg);
+        this.log(level, MessageFormat.format(format, params));
     }
 }

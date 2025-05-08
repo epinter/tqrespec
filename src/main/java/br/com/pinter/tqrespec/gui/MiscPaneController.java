@@ -29,7 +29,11 @@ import br.com.pinter.tqrespec.save.Platform;
 import br.com.pinter.tqrespec.save.exporter.Exporter;
 import br.com.pinter.tqrespec.save.player.Player;
 import br.com.pinter.tqrespec.save.player.PlayerWriter;
-import br.com.pinter.tqrespec.tqdata.*;
+import br.com.pinter.tqrespec.tqdata.Db;
+import br.com.pinter.tqrespec.tqdata.DefaultAct;
+import br.com.pinter.tqrespec.tqdata.DefaultMapTeleport;
+import br.com.pinter.tqrespec.tqdata.MapTeleport;
+import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Constants;
 import com.google.inject.Inject;
 import javafx.beans.binding.Bindings;
@@ -41,7 +45,16 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.CustomMenuItem;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import org.apache.commons.lang3.StringUtils;
 
@@ -51,16 +64,32 @@ import java.net.URL;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.ResourceBundle;
 
-import static java.lang.System.Logger.Level.*;
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.WARNING;
 
 public class MiscPaneController implements Initializable {
     private static final System.Logger logger = Log.getLogger(MiscPaneController.class.getName());
-
     private final BooleanProperty saveDisabled = new SimpleBooleanProperty();
     private final BooleanProperty charNameBlankBlocked = new SimpleBooleanProperty(false);
     private MainController mainController;
+
+    @Inject
+    private Player player;
+    @Inject
+    private PlayerWriter playerWriter;
+    @Inject
+    private UIUtils uiUtils;
+    @Inject
+    private Db db;
+    @Inject
+    private Txt txt;
+
     @FXML
     private Button copyButton;
     @FXML
@@ -105,18 +134,6 @@ public class MiscPaneController implements Initializable {
     private Label statcriticalreceivedText;
     @FXML
     private Label statcriticalinflictedText;
-
-
-    @Inject
-    private Player player;
-    @Inject
-    private PlayerWriter playerWriter;
-    @Inject
-    private UIUtils uiUtils;
-    @Inject
-    private Db db;
-    @Inject
-    private Txt txt;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -178,7 +195,7 @@ public class MiscPaneController implements Initializable {
         } else {
             copyButton.setDisable(true);
         }
-        if(disable) {
+        if (disable) {
             unlockBagsButton.setDisable(true);
         }
         copyCharInput.setDisable(disable);

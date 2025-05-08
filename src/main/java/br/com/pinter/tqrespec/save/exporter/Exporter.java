@@ -27,14 +27,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class Exporter {
     private final File filename;
     private final FileDataMap fileDataMap;
     private final Map<Integer, List<Integer>> children;
-
 
     public Exporter(File filename, FileDataMap fileDataMap) {
         this.filename = filename;
@@ -66,7 +70,6 @@ public class Exporter {
         } else {
             root = new Node();
         }
-
 
         for (BlockInfo levelZeroBlock : rootBlocks) {
             if (levelZeroBlock.getStart() == 0) {

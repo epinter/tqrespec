@@ -50,12 +50,10 @@ public class ExceptionHandler {
         }
     }
 
-    @SuppressWarnings("unused")
     public static void unhandled(Thread t, Throwable e) {
         logAndShow(e);
     }
 
-    @SuppressWarnings("unused")
     private static void showAlert(Throwable e) {
         String header = ExceptionUtils.getRootCause(e).toString();
         if (header == null) {
@@ -89,13 +87,10 @@ public class ExceptionHandler {
         ButtonType abort = new ButtonType("Abort");
         alert.getButtonTypes().setAll(abort);
 
-
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == abort) {
             Platform.exit();
             System.exit(0);
         }
     }
-
-
 }

@@ -46,7 +46,6 @@ public class TeleportDifficulty {
                 teleports.add(new UID((byte[]) v.getValue()));
             }
         }
-
     }
 
     public int getDifficulty() {

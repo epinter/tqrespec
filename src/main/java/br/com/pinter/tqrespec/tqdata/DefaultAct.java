@@ -32,7 +32,7 @@ public enum DefaultAct {
     ATLANTIS(6),
     EAST(7);
 
-    private int value;
+    private final int value;
 
     DefaultAct(int value) {
         this.value = value;

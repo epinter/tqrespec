@@ -26,9 +26,14 @@ import br.com.pinter.tqrespec.tqdata.GameVersion;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+@SuppressWarnings("SameParameterValue")
 public class FileDataMap implements DeepCloneable {
     private static final String ALERT_INVALIDDATA = "alert.changesinvaliddata";
     private static final String MULTIPLE_DEFINITIONS_ERROR = "Variable is defined on multiple locations, aborting";

@@ -26,7 +26,13 @@ import br.com.pinter.tqrespec.util.Constants;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.logging.*;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 public class Log {
     private Log() {

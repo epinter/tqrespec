@@ -35,7 +35,9 @@ import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
 
-import static java.lang.System.Logger.Level.*;
+import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.INFO;
+import static java.lang.System.Logger.Level.WARNING;
 
 public class UIUtils {
     private static final System.Logger logger = Log.getLogger(UIUtils.class);

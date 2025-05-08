@@ -21,7 +21,12 @@
 package br.com.pinter.tqrespec.save.stash;
 
 import br.com.pinter.tqrespec.logging.Log;
-import br.com.pinter.tqrespec.save.*;
+import br.com.pinter.tqrespec.save.BlockInfo;
+import br.com.pinter.tqrespec.save.BlockType;
+import br.com.pinter.tqrespec.save.FileParser;
+import br.com.pinter.tqrespec.save.FileVariable;
+import br.com.pinter.tqrespec.save.Platform;
+import br.com.pinter.tqrespec.save.VariableInfo;
 import br.com.pinter.tqrespec.util.Constants;
 
 import java.io.FileInputStream;
@@ -34,7 +39,7 @@ import java.nio.file.Paths;
 
 import static java.lang.System.Logger.Level.DEBUG;
 
-public class StashParser extends FileParser {
+class StashParser extends FileParser {
     private static final System.Logger logger = Log.getLogger(StashParser.class);
     private final String playerPath;
 

@@ -21,13 +21,23 @@
 package br.com.pinter.tqrespec;
 
 import br.com.pinter.tqdatabase.Database;
-import br.com.pinter.tqrespec.core.*;
+import br.com.pinter.tqrespec.core.ExceptionHandler;
+import br.com.pinter.tqrespec.core.GameNotFoundException;
+import br.com.pinter.tqrespec.core.GameProcessMonitor;
+import br.com.pinter.tqrespec.core.GuiceModule;
+import br.com.pinter.tqrespec.core.InjectionContext;
+import br.com.pinter.tqrespec.core.SingleInstanceLock;
+import br.com.pinter.tqrespec.core.State;
 import br.com.pinter.tqrespec.gui.MainController;
 import br.com.pinter.tqrespec.gui.ResizeListener;
 import br.com.pinter.tqrespec.gui.ResourceHelper;
 import br.com.pinter.tqrespec.gui.UIUtils;
 import br.com.pinter.tqrespec.logging.Log;
-import br.com.pinter.tqrespec.tqdata.*;
+import br.com.pinter.tqrespec.tqdata.Db;
+import br.com.pinter.tqrespec.tqdata.GameInfo;
+import br.com.pinter.tqrespec.tqdata.GameResources;
+import br.com.pinter.tqrespec.tqdata.GameVersion;
+import br.com.pinter.tqrespec.tqdata.Txt;
 import br.com.pinter.tqrespec.util.Build;
 import br.com.pinter.tqrespec.util.Constants;
 import com.google.common.util.concurrent.AtomicDouble;
@@ -61,14 +71,20 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-import static java.lang.System.Logger.Level.*;
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.INFO;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class Main extends Application {
@@ -351,7 +367,7 @@ public class Main extends Application {
             }
         }));
 
-        //handler to prepare controls on startup, the use of initialize and risk of crash
+        //handler to prepare controls on startup, the use of initialize can lead to crash
         primaryStage.addEventHandler(WindowEvent.WINDOW_SHOWN, window -> MainController.mainFormInitialized.setValue(true));
     }
 

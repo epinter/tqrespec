@@ -45,9 +45,11 @@ public class SingleInstanceLock {
     }
 
     public void lock() throws IOException {
+        //noinspection resource
         fileChannel = new RandomAccessFile(lockFile, "rw").getChannel();
         lock = fileChannel.tryLock();
         String pid = String.valueOf(ProcessHandle.current().pid());
+        //noinspection ResultOfMethodCallIgnored
         fileChannel.write(ByteBuffer.wrap(pid.getBytes()));
 
         if (lock == null) {

@@ -45,6 +45,7 @@ public abstract class MapTeleport {
         this.uid = o.uid;
         this.recordId = o.recordId;
         this.act = o.act;
+        this.name = o.name;
         this.tag = o.tag;
     }
 

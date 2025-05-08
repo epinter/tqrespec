@@ -41,6 +41,7 @@ public class Db {
     private static final System.Logger logger = Log.getLogger(Db.class);
     private Database database;
     private Db.Platform platform = Db.Platform.WINDOWS;
+
     @Inject
     private GameInfo gameInfo;
 

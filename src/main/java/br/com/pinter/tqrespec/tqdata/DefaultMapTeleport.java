@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DefaultMapTeleport extends MapTeleport {
-    private static List<MapTeleport> tp = new ArrayList<>();
+    private static final List<MapTeleport> tp = new ArrayList<>();
 
     static {
         /* Greece */

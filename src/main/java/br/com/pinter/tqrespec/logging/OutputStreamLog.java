@@ -58,7 +58,7 @@ public class OutputStreamLog extends OutputStream {
         char c = (char) b;
 
         if (c == '\r' || c == '\n') {
-            if (stringBuilder.length() > 0) {
+            if (!stringBuilder.isEmpty()) {
                 logger.log(level, "{0}", stringBuilder);
                 stringBuilder = new StringBuilder();
             }

@@ -36,8 +36,7 @@ import java.util.Properties;
 import static java.lang.System.Logger.Level.DEBUG;
 import static java.lang.System.Logger.Level.ERROR;
 
-@SuppressWarnings({"WeakerAccess", "CanBeFinal", "unused"})
-public class Version implements Comparable<Version> {
+public final class Version implements Comparable<Version> {
     private static final System.Logger logger = Log.getLogger(Version.class);
 
     private final String versionNumber;
@@ -75,8 +74,7 @@ public class Version implements Comparable<Version> {
         return lastCheck;
     }
 
-    @SuppressWarnings("UnusedReturnValue")
-    public int checkNewerVersion(String urlPropFile) {
+    public void checkNewerVersion(String urlPropFile) {
         URI uri = null;
         try {
             uri = new URI(urlPropFile);
@@ -100,7 +98,6 @@ public class Version implements Comparable<Version> {
                 logger.log(DEBUG, "module: ''{0}'', current_version: ''{1}'', urlPage: ''{2}'', " +
                         "url1: ''{3}'', url2: ''{4}'', url3: ''{5}''", prop.getProperty("module"), currentVersion, urlPage, url1, url2, url3);
                 lastCheck = this.compareTo(new Version(currentVersion));
-                return lastCheck;
             }
         } catch (IOException e) {
             logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
@@ -108,22 +105,22 @@ public class Version implements Comparable<Version> {
             logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
             Thread.currentThread().interrupt();
         }
-        return -2;
     }
 
     public String downloadVersionDescriptor(URI uri) throws IOException, InterruptedException {
-        HttpClient client = HttpClient.newBuilder()
+        HttpResponse<String> response;
+        try (HttpClient client = HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.ALWAYS)
                 .connectTimeout(Duration.ofSeconds(20))
-                .build();
+                .build()) {
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .timeout(Duration.ofSeconds(20))
-                .uri(uri)
-                .GET().build();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .timeout(Duration.ofSeconds(20))
+                    .uri(uri)
+                    .GET().build();
 
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        }
         return response.body();
     }
 

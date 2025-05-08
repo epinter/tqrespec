@@ -27,7 +27,12 @@ import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.save.SaveLocation;
 import br.com.pinter.tqrespec.util.Constants;
 import com.google.inject.Singleton;
-import com.sun.jna.platform.win32.*;
+import com.sun.jna.platform.win32.Advapi32Util;
+import com.sun.jna.platform.win32.Shell32Util;
+import com.sun.jna.platform.win32.ShlObj;
+import com.sun.jna.platform.win32.Win32Exception;
+import com.sun.jna.platform.win32.WinNT;
+import com.sun.jna.platform.win32.WinReg;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -41,11 +46,18 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static java.lang.System.Logger.Level.*;
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.INFO;
 
 @Singleton
 public class GameInfo {
@@ -66,6 +78,7 @@ public class GameInfo {
     private GameVersion installedVersion = GameVersion.UNKNOWN;
     private boolean dlcRagnarok = false;
     private boolean dlcAtlantis = false;
+    private boolean dlcEmbers = false;
 
     private boolean isValidGamePath(Path path) {
         if (path == null) {
@@ -99,16 +112,8 @@ public class GameInfo {
         return gamePathFileExists(basePath, "Titan Quest.exe");
     }
 
-    private boolean existsXpack(Path basePath) {
-        return gamePathFileExists(basePath, RESOURCES_DIR, "XPack");
-    }
-
-    private boolean existsXpack2(Path basePath) {
-        return gamePathFileExists(basePath, RESOURCES_DIR, "XPack2");
-    }
-
-    private boolean existsXpack3(Path basePath) {
-        return gamePathFileExists(basePath, RESOURCES_DIR, "XPack3");
+    private boolean existsXpack(Path basePath, int n) {
+        return gamePathFileExists(basePath, RESOURCES_DIR, String.format("XPack%s", n == 1 ? "" : n));
     }
 
     private Path getGameSteamPath() {
@@ -124,7 +129,7 @@ public class GameInfo {
     }
 
     private Path getSteamLibraryPath() {
-        String steamPath = null;
+        String steamPath;
         Path steamLibraryFolderVdf;
 
         if (SystemUtils.IS_OS_WINDOWS) {
@@ -628,34 +633,34 @@ public class GameInfo {
     private boolean isTqPath(Path path) {
         return gamePathFileExists(path, TEXT_DIR, TEXT_FILE)
                 && gamePathFileExists(path, "Titan Quest.exe")
-                && !existsXpack(path);
+                && !existsXpack(path, 1);
     }
 
     private boolean isTqitDisc(Path path) {
         return gamePathFileExists(path, RESOURCES_DIR, TEXT_FILE)
                 && existsTqitExe(path)
-                && existsXpack(path)
+                && existsXpack(path, 1)
                 && !existsTqAeExe(path)
                 && !existsLegacyTqExe(path)
-                && !existsXpack2(path)
-                && !existsXpack3(path);
+                && !existsXpack(path, 2)
+                && !existsXpack(path, 3);
     }
 
     private boolean isTqitSteam(Path path) {
         return gamePathFileExists(path, TEXT_DIR, TEXT_FILE)
                 && gamePathFileExists(path, RESOURCES_DIR, TEXT_FILE)
-                && existsXpack(path)
+                && existsXpack(path, 1)
                 && existsTqitExe(path)
                 && existsLegacyTqExe(path)
-                && !existsXpack2(path)
-                && !existsXpack3(path);
+                && !existsXpack(path, 2)
+                && !existsXpack(path, 3);
     }
 
     private boolean isTqAe(Path path) {
         return !gamePathFileExists(path, RESOURCES_DIR, TEXT_FILE)
                 && !existsTqitExe(path)
                 && gamePathFileExists(path, TEXT_DIR, TEXT_FILE)
-                && existsXpack(path);
+                && existsXpack(path, 1);
     }
 
     private GameVersion getGameVersion(Path path) {
@@ -699,11 +704,14 @@ public class GameInfo {
         } else if (GameVersion.TQAE.equals(installedVersion)) {
             addDatabasePath(Paths.get(gamePath, DATABASE_DIR, DATABASE_FILE));
             addTextPath(Paths.get(gamePath, TEXT_DIR));
-            if (existsXpack2(Paths.get(gamePath))) {
+            if (existsXpack(Paths.get(gamePath), 2)) {
                 dlcRagnarok = true;
             }
-            if (existsXpack3(Paths.get(gamePath))) {
+            if (existsXpack(Paths.get(gamePath), 3)) {
                 dlcAtlantis = true;
+            }
+            if (existsXpack(Paths.get(gamePath), 4)) {
+                dlcEmbers = true;
             }
         } else {
             gamePath = null;
@@ -1011,5 +1019,9 @@ public class GameInfo {
 
     public boolean isDlcAtlantis() {
         return dlcAtlantis;
+    }
+
+    public boolean isDlcEmbers() {
+        return dlcEmbers;
     }
 }

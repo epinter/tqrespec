@@ -37,7 +37,12 @@ import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
@@ -50,14 +55,18 @@ import java.util.ResourceBundle;
 public class SkillsPaneController implements Initializable {
     private final BooleanProperty saveDisabled = new SimpleBooleanProperty();
     private MainController mc;
-    @FXML
-    public GridPane skillsGridPane;
+
     @Inject
     private Db db;
     @Inject
     private Txt txt;
     @Inject
     private Player player;
+    @Inject
+    private UIUtils uiUtils;
+
+    @FXML
+    public GridPane skillsGridPane;
     @FXML
     private ListView<SkillListViewItem> firstMasteryListView;
     @FXML
@@ -84,8 +93,6 @@ public class SkillsPaneController implements Initializable {
     private MenuButton firstMasteryButton;
     @FXML
     private MenuButton secondMasteryButton;
-    @Inject
-    private UIUtils uiUtils;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -101,10 +108,6 @@ public class SkillsPaneController implements Initializable {
 
     private UiPlayerProperties playerProps() {
         return mc.playerProps();
-    }
-
-    public boolean isSaveDisabled() {
-        return saveDisabled.get();
     }
 
     public void setSaveDisabled(boolean saveDisabled) {
@@ -233,17 +236,6 @@ public class SkillsPaneController implements Initializable {
         playerProps().reloadMasteriesLevels();
 
         disableControls(false);
-    }
-
-    private int getMasteryLevel(int i) {
-        List<Skill> masteries = player.getPlayerMasteries();
-
-        if (!(masteries.size() == 1 && i > 0) && !masteries.isEmpty()) {
-            PlayerSkill sb = player.getPlayerSkills().get(masteries.get(i).getRecordPath());
-            return player.getMasteryLevel(sb);
-        } else {
-            return -1;
-        }
     }
 
     private void fillMastery(int i) {

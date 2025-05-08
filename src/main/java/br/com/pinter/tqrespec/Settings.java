@@ -25,9 +25,7 @@ import br.com.pinter.tqrespec.tqdata.InstallType;
 
 import java.util.prefs.Preferences;
 
-@SuppressWarnings("unused")
 public class Settings {
-
     public static void removeLastDetectedGame() {
         Preferences prefs = Preferences.userNodeForPackage(Settings.class);
         prefs.remove(Options.LAST_DETECTED_GAMEPATH.getKey());
@@ -110,7 +108,7 @@ public class Settings {
         ALWAYS_FULL_BACKUP("always_fullbackup"),
         ;
 
-        private String key;
+        private final String key;
 
         Options(String key) {
             this.key = key;
