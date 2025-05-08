@@ -1,4 +1,8 @@
 # Changelog
+## [1.0.1] - 2025-05-08
+### Fixed
+- Fixed full backup on Linux
+
 ## [1.0.0] - 2025-05-08
 ### Fixed
 - Fixed linux script not passing debug parameter
