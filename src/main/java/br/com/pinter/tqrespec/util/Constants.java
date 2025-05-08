@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class Constants {
+public final class Constants {
     public static final String APPNAME = "TQRespec";
     public static final String LOGFILE = new File(System.getProperty("java.io.tmpdir"), "tqrespec.log").getAbsolutePath();
     public static final String LOGLEVELS = "br.com.pinter.tqrespec=INFO;br.com.pinter.tqdatabase=INFO";
@@ -95,7 +95,7 @@ public class Constants {
     private Constants() {
     }
 
-    public static class Save {
+    public static final class Save {
         public static final String SKILL_NAME = "skillName";
         public static final String SKILL_ENABLED = "skillEnabled";
         public static final String SKILL_ACTIVE = "skillActive";
@@ -117,7 +117,7 @@ public class Constants {
 
     }
 
-    public static class UI {
+    public static final class UI {
         public static final String MAIN_FXML = "/fxml/main.fxml";
         public static final String ABOUT_FXML = "/fxml/about.fxml";
         public static final String MAIN_CSS = "/fxml/main.css";
@@ -176,7 +176,7 @@ public class Constants {
         }
     }
 
-    public static class Msg {
+    public static final class Msg {
         public static final String MAIN_GAMENOTDETECTED = "main.gameNotDetected";
         public static final String MAIN_CHOOSEGAMEDIRECTORY = "main.chooseGameDirectory";
         public static final String CHARACTERS_TITLE_MASTERY = "characters.masteryTitle";
