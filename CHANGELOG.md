@@ -1,4 +1,8 @@
 # Changelog
+## [1.0.2] - 2025-05-08
+### Fixed
+- Fixed version check
+
 ## [1.0.1] - 2025-05-08
 ### Fixed
 - Fixed full backup on Linux
