@@ -220,6 +220,8 @@
     -fx-background-color: #f6f0d0;
 }
 
+.tq-charactercombo .list-view .list-cell:hover .character-combobox-name,
+.tq-charactercombo .list-view .list-cell:hover .character-combobox-type,
 .combo-box .combo-box-popup .list-view .list-cell:hover {
     -fx-background-color: -fx-accent;
     -fx-text-fill: #000000;
@@ -231,8 +233,17 @@
     -fx-text-fill: #ffffff;
 }
 
+.tq-charactercombo .list-cell .character-combobox-name,
+.tq-charactercombo .list-cell .character-combobox-type {
+    -fx-text-fill: #ffffff;
+}
+
 .tq-charactercombo {
 	-fx-font-size: 1.3em;
+}
+
+.tq-charactercombo .character-combobox-type {
+    -fx-font-size: 0.6em;
 }
 
 .tq-charactercombo .list-cell{
