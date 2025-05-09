@@ -50,7 +50,12 @@ public class ResourceHelper {
     }
 
     public static List<Image> getAppIcons() {
-        return Arrays.asList(loadImage("icon/icon64.png"), loadImage("icon/icon32.png"), loadImage("icon/icon16.png"));
+        return Arrays.asList(
+                loadImage("icon/icon256.png"),
+                loadImage("icon/icon128.png"),
+                loadImage("icon/icon64.png"),
+                loadImage("icon/icon32.png"),
+                loadImage("icon/icon16.png"));
     }
 
     public static Image loadImage(String url) {

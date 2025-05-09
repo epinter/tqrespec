@@ -335,6 +335,10 @@ tasks.register('appimage', Exec) {
     dependsOn clean
     dependsOn jlink
     workingDir layout.buildDirectory
+    def appIcon = "${projectDir}/src/main/resources/icon/icon256.ico"
+    if(!OS.isWindows()) {
+        appIcon = "${projectDir}/src/main/resources/icon/icon256.png"
+    }
     if (moduleInfoPresent) {
         commandLine binjpackage,
                 '--type', 'app-image',
@@ -343,7 +347,7 @@ tasks.register('appimage', Exec) {
                 '--module', "${moduleName}/${application.mainClass.get()}",
                 '--dest', layout.buildDirectory.dir("app-image").get().asFile,
                 '--name', distAppName,
-                '--icon', "${projectDir}/src/main/resources/icon/icon64.ico",
+                '--icon', "${appIcon}",
                 '--app-version', project.version,
                 '--vendor', 'Emerson Pinter',
                 '--input', layout.buildDirectory.dir("appimage-files").get().asFile,
@@ -359,7 +363,7 @@ tasks.register('appimage', Exec) {
                 '--runtime-image', layout.buildDirectory.dir("jre-image").get().asFile,
                 '--dest', layout.buildDirectory.dir("app-image").get().asFile,
                 '--name', distAppName,
-                '--icon', "${projectDir}/src/main/resources/icon/icon64.ico",
+                '--icon', "${appIcon}",
                 '--app-version', project.version,
                 '--vendor', 'Emerson Pinter',
                 '--input', layout.buildDirectory.dir("appimage-files").get().asFile,
