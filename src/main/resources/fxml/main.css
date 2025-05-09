@@ -235,6 +235,10 @@
 	-fx-font-size: 1.3em;
 }
 
+.character-combobox-type {
+    -fx-font-size: 0.6em;
+}
+
 .tq-charactercombo .list-cell{
 	-fx-font-size: 1.2em;
 }
