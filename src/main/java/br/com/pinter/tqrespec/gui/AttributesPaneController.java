@@ -78,6 +78,9 @@ public class AttributesPaneController implements Initializable {
     private int lifeMin;
     private int manaStep;
     private int manaMin;
+    private int attrPointsStep;
+    private int skillPointsStep;
+    private int maxLevel;
     private boolean characterIsLoading = false;
 
     @Inject
@@ -362,27 +365,27 @@ public class AttributesPaneController implements Initializable {
     }
 
     private void setCharLevelField(int value) {
-        if (value < 1 || value > 85) {
+        if (value < 1 || value > maxLevel) {
             return;
         }
         charLevelProperty = playerProps().charLevelProperty().asObject();
         LevelIntegerSpinnerValueFactory charLevelFactory = new LevelIntegerSpinnerValueFactory(
-                1, 85, playerProps().getAttrAvailable(), playerProps().attrAvailableProperty(), playerProps().skillAvailableProperty());
+                1, maxLevel, playerProps().getAttrAvailable(), playerProps().attrAvailableProperty(), playerProps().skillAvailableProperty());
         charLevelSpinner.setValueFactory(charLevelFactory);
         charLevelSpinner.getValueFactory().valueProperty().bindBidirectional(charLevelProperty);
         playerProps().charLevelProperty().addListener(
                 (observable, oldValue, newValue) -> {
                     if (newValue.intValue() > oldValue.intValue()) {
-                        playerProps().setAttrAvailable(playerProps().getAttrAvailable() + 2);
-                        playerProps().setSkillAvailable(playerProps().getSkillAvailable() + 3);
+                        playerProps().setAttrAvailable(playerProps().getAttrAvailable() + attrPointsStep);
+                        playerProps().setSkillAvailable(playerProps().getSkillAvailable() + skillPointsStep);
                     }
 
                     if (newValue.intValue() < oldValue.intValue()) {
-                        if (mc.isFreeLvl() && (playerProps().getAttrAvailable() - 2) >= 0 || !mc.isFreeLvl()) {
-                            playerProps().setAttrAvailable(playerProps().getAttrAvailable() - 2);
+                        if (mc.isFreeLvl() && (playerProps().getAttrAvailable() - attrPointsStep) >= 0 || !mc.isFreeLvl()) {
+                            playerProps().setAttrAvailable(playerProps().getAttrAvailable() - attrPointsStep);
                         }
-                        if (mc.isFreeLvl() && (playerProps().getSkillAvailable() - 3) >= 0 || !mc.isFreeLvl()) {
-                            playerProps().setSkillAvailable(playerProps().getSkillAvailable() - 3);
+                        if (mc.isFreeLvl() && (playerProps().getSkillAvailable() - skillPointsStep) >= 0 || !mc.isFreeLvl()) {
+                            playerProps().setSkillAvailable(playerProps().getSkillAvailable() - skillPointsStep);
                         }
                     }
                     playerProps().setCharLevel(newValue.intValue());
@@ -493,6 +496,9 @@ public class AttributesPaneController implements Initializable {
         lifeMin = Math.round(db.player().getPc().getCharacterLife());
         manaStep = db.player().getPlayerLevels().getManaIncrement();
         manaMin = Math.round(db.player().getPc().getCharacterMana());
+        attrPointsStep = db.player().getPlayerLevels().getCharacterModifierPoints();
+        skillPointsStep = db.player().getPlayerLevels().getSkillModifierPoints();
+        maxLevel = db.player().getPlayerLevels().getMaxPlayerLevel();
 
         clearProperties();
         if (playerProps().getAttrAvailable() < 0 || playerProps().getStr() < 0 || playerProps().getDex() < 0
@@ -666,7 +672,8 @@ public class AttributesPaneController implements Initializable {
             int step = v * this.getAmountToStepBy();
             int newValue = oldValue - step;
 
-            if (newValue >= this.getMin() && ((!mc.isFreeLvl() && attrAvailable.get() >= 2 && skillAvailable.get() >= 3) || mc.isFreeLvl())) {
+            if (newValue >= this.getMin() && ((!mc.isFreeLvl() && attrAvailable.get() >= attrPointsStep && skillAvailable.get() >= skillPointsStep)
+                    || mc.isFreeLvl())) {
                 setValue(newValue);
             }
         }
