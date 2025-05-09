@@ -209,6 +209,7 @@ public class MainController implements Initializable {
         try {
             characterCombo.getSelectionModel().clearSelection();
             characterCombo.getItems().setAll(gameInfo.getPlayerCharacterList(SaveLocation.MAIN, SaveLocation.EXTERNAL));
+            characterCombo.setCellFactory(p -> new CharacterListCell());
             characterCombo.getItems().sort(Comparator.comparing(PlayerCharacterFile::getPlayerName));
         } catch (ClassCastException | UnsupportedOperationException | IllegalArgumentException e) {
             logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
