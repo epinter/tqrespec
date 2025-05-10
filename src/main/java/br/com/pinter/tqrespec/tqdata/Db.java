@@ -24,6 +24,7 @@ import br.com.pinter.tqdatabase.Database;
 import br.com.pinter.tqdatabase.Player;
 import br.com.pinter.tqdatabase.Skills;
 import br.com.pinter.tqdatabase.Teleports;
+import br.com.pinter.tqdatabase.models.DbRecord;
 import br.com.pinter.tqrespec.core.GameNotFoundException;
 import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.logging.Log;
@@ -82,6 +83,18 @@ public class Db {
     public Teleports teleports() {
         initialize();
         return database.teleports();
+    }
+
+    public DbRecord getRecord(String recordPath) {
+        return database.getRecord(recordPath);
+    }
+
+    public void loadMod(Path dbPath) throws IOException {
+        database.loadMod(dbPath);
+    }
+
+    public void unloadMods() {
+        database.unloadMods();
     }
 
     public void preloadAll() {

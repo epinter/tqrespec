@@ -32,6 +32,9 @@ import org.apache.commons.text.WordUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import static java.lang.System.Logger.Level.ERROR;
@@ -39,19 +42,19 @@ import static java.lang.System.Logger.Level.ERROR;
 @Singleton
 public class Txt {
     private static final System.Logger logger = Log.getLogger(Txt.class);
-    private Text text;
-    private Text textEn;
+    private final List<Text> text = new ArrayList<>();
+    private final List<Text> textMod = new ArrayList<>();
 
     @Inject
     private GameInfo gameInfo;
 
     public void initialize() {
         try {
-            if (text == null) {
+            if (text.isEmpty()) {
+                text.add(new Text(gameInfo.getTextPath(), Constants.LOCALE_TEXT.get(State.get().getLocale())));
                 if (!State.get().getLocale().equals(Locale.ENGLISH)) {
-                    textEn = new Text(gameInfo.getTextPath(), Constants.LOCALE_TEXT.get(Locale.ENGLISH), false);
+                    text.add(new Text(gameInfo.getTextPath(), Constants.LOCALE_TEXT.get(Locale.ENGLISH), false));
                 }
-                text = new Text(gameInfo.getTextPath(), Constants.LOCALE_TEXT.get(State.get().getLocale()));
             }
         } catch (FileNotFoundException e) {
             logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
@@ -59,32 +62,40 @@ public class Txt {
         }
     }
 
-    public String getString(String str) {
+    public String getString(String tag) {
         initialize();
-        try {
-            return text.getString(str);
-        } catch (IOException ignore) {
-            return null;
+        if (StringUtils.isBlank(tag)) {
+            return tag;
         }
-    }
-
-    public String getStringEn(String str) {
-        initialize();
         try {
-            if (textEn != null) {
-                return textEn.getString(str);
-            } else {
-                return text.getString(str);
+            for (Text t : textMod) {
+                String str = t.getString(tag);
+                if (!StringUtils.isBlank(str) && !tag.equals(str)) {
+                    return str;
+                }
             }
+            for (Text t : text) {
+                String str = t.getString(tag);
+                if (!StringUtils.isBlank(str) && !tag.equals(str)) {
+                    return str;
+                }
+            }
+
         } catch (IOException ignore) {
             return null;
         }
+        return null;
     }
 
     public void preload() {
         initialize();
         try {
-            text.preload();
+            for (Text t : text) {
+                t.preload();
+            }
+            for (Text t : textMod) {
+                t.preload();
+            }
         } catch (IOException e) {
             throw new UnhandledRuntimeException("Error loading text resource", e);
         }
@@ -99,4 +110,20 @@ public class Txt {
         return !StringUtils.isBlank(tag) && !StringUtils.isBlank(str) && !tag.equals(str);
     }
 
+    public void loadMod(Path path) {
+        String[] paths = new String[]{path.toAbsolutePath().toString()};
+
+        textMod.add(new Text(paths, Constants.LOCALE_TEXT.get(State.get().getLocale()), false));
+        if (!State.get().getLocale().equals(Locale.ENGLISH)) {
+            textMod.add(new Text(paths, Constants.LOCALE_TEXT.get(Locale.ENGLISH), false));
+        }
+        text.getFirst().clearCache();
+        preload();
+    }
+
+    public void unloadMods() {
+        textMod.clear();
+        text.getFirst().clearCache();
+        preload();
+    }
 }
