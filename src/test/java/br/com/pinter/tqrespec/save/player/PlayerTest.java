@@ -37,6 +37,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 public class PlayerTest {
     private static final System.Logger logger = Log.getLogger(PlayerTest.class);
+    private Path playerChr;
+    private Injector injector;
 
     @Mock
     private CurrentPlayerData mockSaveData;
@@ -47,6 +49,7 @@ public class PlayerTest {
     @Inject
     private Db txt;
 
+    @Inject
     @InjectMocks
     private CurrentPlayerData saveData;
 
@@ -58,10 +61,6 @@ public class PlayerTest {
 
     @InjectMocks
     private PlayerParser playerParser;
-
-    private Path playerChr;
-
-    private Injector injector;
 
     @BeforeEach
     void setUp() throws IOException {

@@ -81,6 +81,9 @@ public class Player {
     }
 
     public FileDataMap getDataMap() {
+        if(saveData.getBuffer() == null) {
+            throw new IllegalStateException("Buffer is empty");
+        }
         return saveData.getDataMap();
     }
 
