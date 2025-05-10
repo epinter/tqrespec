@@ -240,12 +240,7 @@ public class MiscPaneController implements Initializable {
                 List<MapTeleport> playerTeleports = player.getDefaultMapTeleports(difficulty.getId());
                 Menu md = new Menu(difficulty.getName());
                 for (DefaultAct act : DefaultAct.values()) {
-                    String actName;
-                    if (txt.isTagStringValid(act.getTag())) {
-                        actName = txt.getString(act.getTag());
-                    } else {
-                        actName = txt.getStringEn(act.getTag());
-                    }
+                    String actName = txt.getString(act.getTag());
                     Menu ma = new Menu(actName);
                     ma.getStyleClass().add("tq-submenuteleport");
                     md.getItems().add(ma);
@@ -530,8 +525,6 @@ public class MiscPaneController implements Initializable {
             String name = db.teleports().getTeleport(m.getRecordId()).getDescription();
             if (txt.isTagStringValid(m.getTag())) {
                 name = txt.getString(m.getTag());
-            } else if (txt.getStringEn(m.getTag()) != null) {
-                name = txt.getStringEn(m.getTag());
             } else if (txt.getString(name) != null) {
                 name = txt.getString(name);
             }

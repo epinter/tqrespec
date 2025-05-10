@@ -28,7 +28,7 @@ public class DifficultyItem {
         this.id = id;
         this.name = name;
         if (id < 0 || id > 2) {
-            throw new IllegalArgumentException("invalid difficulty id");
+            throw new IllegalArgumentException("invalid difficulty id " + id);
         }
     }
 
