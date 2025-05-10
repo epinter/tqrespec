@@ -26,6 +26,8 @@ import br.com.pinter.tqrespec.save.UID;
 import br.com.pinter.tqrespec.save.VariableInfo;
 import br.com.pinter.tqrespec.tqdata.GameVersion;
 import br.com.pinter.tqrespec.util.Constants;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,35 +38,46 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
-import java.util.logging.Level;
 
 import static java.lang.System.Logger.Level.ERROR;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 @ExtendWith(MockitoExtension.class)
 class PlayerParserTest {
     private static final System.Logger logger = Log.getLogger(PlayerParserTest.class.getName());
+    private Injector injector;
+    private PlayerParser playerParser;
 
     @Mock
     private CurrentPlayerData mockSaveData;
 
+    @Inject
     @InjectMocks
     private CurrentPlayerData saveData;
 
     @InjectMocks
     private PlayerLoader player;
 
-    private PlayerParser playerParser;
 
     @BeforeEach
     void setUp() throws IOException {
         MockitoAnnotations.openMocks(this);
+        try {
+            injector = GuiceInjector.init(this);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
 
         File playerChr = new File("src/test/resources/_savegame/Player.chr");
         if (!playerChr.exists()) {
@@ -105,7 +118,7 @@ class PlayerParserTest {
     private void parse() {
         try {
             saveData.reset();
-            playerParser.parse();
+            saveData.setBuffer(playerParser.load());
             saveData.getDataMap().setBlockInfo(playerParser.getBlockInfo());
             saveData.setHeaderInfo(playerParser.getHeaderInfo());
             saveData.getDataMap().setVariableLocation(playerParser.getVariableLocation());
@@ -250,7 +263,8 @@ class PlayerParserTest {
     @Test
     void matchTeleports_Should_matchTeleportsFromSavegame() {
         parse();
-        Mockito.when(mockSaveData.getDataMap()).thenReturn(saveData.getDataMap());
+        injector.injectMembers(player);
+
         List<TeleportDifficulty> saveTeleports = player.getTeleportDifficulty();
         assertEquals(3, saveTeleports.size());
         Map<Integer, List<UID>> teleports = new HashMap<>();
