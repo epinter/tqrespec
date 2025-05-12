@@ -26,6 +26,7 @@ import br.com.pinter.tqrespec.util.Constants;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Path;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
@@ -46,12 +47,12 @@ public class Log {
         return System.getLogger(cls.getName());
     }
 
-    public static FileHandler getLogFileHandler() {
+    private static FileHandler getLogFileHandler(Path logFile) {
         FileHandler fileHandler;
         try {
             System.setProperty("java.util.logging.SimpleFormatter.format",
                     "%1$tb %1$td, %1$tY %1$tH:%1$tM:%1$tS.%1$tL %2$s%n\t%4$s: %5$s%6$s%n%n");
-            fileHandler = new FileHandler(Constants.LOGFILE, false);
+            fileHandler = new FileHandler(logFile.toAbsolutePath().toString(), false);
             fileHandler.setFormatter(new SimpleFormatter());
 
         } catch (IOException e) {
@@ -61,9 +62,19 @@ public class Log {
     }
 
     public static void setupGlobalLogging() {
+        setupGlobalLogging(Path.of(Constants.LOGFILE));
+        redirectStd();
+    }
+
+    private static void redirectStd() {
+        System.setOut(new PrintStream(new OutputStreamLog(Level.INFO)));
+        System.setErr(new PrintStream(new OutputStreamLog(Level.SEVERE)));
+    }
+
+    public static void setupGlobalLogging(Path logFile) {
         Logger rootLogger = LogManager.getLogManager().getLogger("");
 
-        rootLogger.addHandler(getLogFileHandler());
+        rootLogger.addHandler(getLogFileHandler(logFile));
         for (Handler h : rootLogger.getHandlers()) {
             if (h instanceof ConsoleHandler) {
                 rootLogger.removeHandler(h);
@@ -76,8 +87,6 @@ public class Log {
                 rootLogger.setLevel(level);
             }
         }
-        System.setOut(new PrintStream(new OutputStreamLog(Level.INFO)));
-        System.setErr(new PrintStream(new OutputStreamLog(Level.SEVERE)));
     }
 
 }
