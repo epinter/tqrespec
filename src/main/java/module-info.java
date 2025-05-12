@@ -47,6 +47,7 @@ module br.com.pinter.tqrespec {
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.annotation;
     requires br.com.pinter.tqdatabase;
+    requires info.picocli;
     exports br.com.pinter.tqrespec;
     exports br.com.pinter.tqrespec.core;
     exports br.com.pinter.tqrespec.gui;
@@ -63,4 +64,7 @@ module br.com.pinter.tqrespec {
     opens br.com.pinter.tqrespec.util to com.google.guice, javafx.fxml;
     exports br.com.pinter.tqrespec.save.exporter;
     opens br.com.pinter.tqrespec.save.exporter to com.google.guice, javafx.fxml;
+    opens dev.pinter.tqextract to com.google.guice, info.picocli;
+    opens dev.pinter.tqextract.decompiler to com.google.guice;
+
 }

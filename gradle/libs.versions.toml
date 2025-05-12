@@ -8,6 +8,7 @@ commons-lang3 = "3.14.0"
 commons-text = "1.12.0"
 jna = "5.14.0"
 jackson = "2.17.1"
+picocli = "4.7.7"
 
 [libraries]
 junit = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
@@ -23,3 +24,4 @@ jna = { module = "net.java.dev.jna:jna-platform-jpms", version.ref = "jna" }
 jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson" }
 jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "jackson" }
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
+picocli = {module = "info.picocli:picocli", version.ref = "picocli"}

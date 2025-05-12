@@ -33,7 +33,7 @@ import java.util.Map;
 public final class Constants {
     public static final String APPNAME = "TQRespec";
     public static final String LOGFILE = new File(System.getProperty("java.io.tmpdir"), "tqrespec.log").getAbsolutePath();
-    public static final String LOGLEVELS = "br.com.pinter.tqrespec=INFO;br.com.pinter.tqdatabase=INFO";
+    public static final String LOGLEVELS = "br.com.pinter.tqrespec=INFO;br.com.pinter.tqdatabase=INFO;dev.pinter.tqextract=INFO;dev.pinter=INFO;br.com.pinter=INFO";
     public static final String REGEX_REGISTRY_INSTALL = "Titan Quest.*Anniversary.*";
     public static final String REGEX_REGISTRY_PACKAGE = "(?i:Titan Quest.*)";
     public static final String REGEX_REGISTRY_INSTALL_FALLBACK = "Titan Quest.*";

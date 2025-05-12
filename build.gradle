@@ -43,8 +43,8 @@ project.ext {
     moduleInfoPresent = false
     osArch = System.getProperty("os.arch").toLowerCase()
     javafxSdkDir = file(String.format("%s/sdk/javafx-sdk-%s-%s-%s",
-                                    projectDir, compileJava.javaCompiler.get().metadata.languageVersion,
-                                    OS.toFamilyName().toLowerCase(), osArch))
+            projectDir, compileJava.javaCompiler.get().metadata.languageVersion,
+            OS.toFamilyName().toLowerCase(), osArch))
     javafxSdkBinDir = file("${javafxSdkDir}/bin")
     javafxSdkLibDir = file("${javafxSdkDir}/lib")
     appArchiveOs = ""
@@ -55,8 +55,8 @@ project.ext {
     patchjarDir = layout.buildDirectory.dir('patchedjar').get().asFile.getPath()
     // modules dependencies to be passed to jdeps
     patchJarModuleDeps = [
-        "com.google.guice": ["com.google.common", "aopalliance", "jakarta.inject"],
-        "com.google.common": ["com.google.errorprone.annotations", "j2objc.annotations", "jsr305", "failureaccess"],
+            "com.google.guice" : ["com.google.common", "aopalliance", "jakarta.inject"],
+            "com.google.common": ["com.google.errorprone.annotations", "j2objc.annotations", "jsr305", "failureaccess"],
     ]
     //ignore dependencies when generating module-info for the given package
     //use only when all required deps are satisfied
@@ -75,11 +75,11 @@ if (project.hasProperty('buildVersion')) {
     project.version = project.properties.get("buildVersion")
 }
 
-if(!OS.isWindows()) {
-    ext['appArchiveOs'] = String.format("-%s",OS.toFamilyName().toLowerCase())
+if (!OS.isWindows()) {
+    ext['appArchiveOs'] = String.format("-%s", OS.toFamilyName().toLowerCase())
 }
 if (osArch != "amd64") {
-    ext['appArchiveArch'] = String.format("-%s",ext.osArch)
+    ext['appArchiveArch'] = String.format("-%s", ext.osArch)
 }
 
 ext['buildPackageName'] = "${distAppName}-${project.version}${ext.appArchiveOs}${ext.appArchiveArch}"
@@ -95,7 +95,7 @@ configurations {
 
 dependencies {
     implementation fileTree(dir: javafxSdkLibDir, include: [
-                    'javafx.base.jar', 'javafx.controls.jar', 'javafx.fxml.jar', 'javafx.graphics.jar'])
+            'javafx.base.jar', 'javafx.controls.jar', 'javafx.fxml.jar', 'javafx.graphics.jar'])
     implementation libs.guava
     implementation libs.guice
     implementation libs.commons.lang3
@@ -104,6 +104,7 @@ dependencies {
     implementation libs.jackson.core
     implementation libs.jackson.annotations
     implementation libs.jackson.databind
+    implementation libs.picocli
 
     implementation project(':tqdatabase')
 
@@ -195,6 +196,20 @@ if (moduleInfoPresent) {
     }
 }
 
+tasks.register('runExtract', JavaExec) {
+    dependsOn clean
+    dependsOn compileJava
+    group = 'tqrespec'
+
+    jvmArgs = [
+            '-XX:+UseZGC',
+            '-Dguice_bytecode_gen_option=DISABLED',
+            '-XX:MinHeapFreeRatio=10', '-XX:MaxHeapFreeRatio=15',
+            '--module-path', run.classpath.asPath
+    ] as List<String>
+    mainModule = "${moduleName}/dev.pinter.tqextract.Cli"
+}
+
 tasks.register('copyToLib', Copy) {
     group = 'tqrespec'
     doFirst {
@@ -248,7 +263,7 @@ tasks.register('copyAppimageModules', Copy) {
 
     from tasks.jar.outputs.files.collect { it.getPath() }
     from configurations.runtimeClasspath.filter {
-        !file(patchjarDir).listFiles().collect {p -> p.getName().toLowerCase()}.contains(it.getName().toLowerCase())
+        !file(patchjarDir).listFiles().collect { p -> p.getName().toLowerCase() }.contains(it.getName().toLowerCase())
     }
     from project(':tqdatabase').tasks.jar.outputs.files.collect { it.getPath() }
 
@@ -330,66 +345,93 @@ tasks.register('archiveAppimage', Zip) {
     destinationDirectory = layout.buildDirectory.dir("appimage-dist").get().asFile
 }
 
-tasks.register('appimage', Exec) {
+tasks.register('appimage') {
     group = 'tqrespec'
     dependsOn clean
     dependsOn jlink
-    workingDir layout.buildDirectory
-    def appIcon = "${projectDir}/src/main/resources/icon/icon256.ico"
-    if(!OS.isWindows()) {
-        appIcon = "${projectDir}/src/main/resources/icon/icon256.png"
+
+    doFirst {
+        def appIcon = "${projectDir}/src/main/resources/icon/icon256.ico"
+        if (!OS.isWindows()) {
+            appIcon = "${projectDir}/src/main/resources/icon/icon256.png"
+        }
+
+        def tqextractLauncher = File.createTempFile("tqextractlauncher", ".properties", file(layout.buildDirectory))
+        tqextractLauncher.write("module=${moduleName}/dev.pinter.tqextract.Cli" + System.lineSeparator())
+        tqextractLauncher.append("java-options=-XX:+UseG1GC -XX:G1PeriodicGCInterval=10000 -XX:SoftMaxHeapSize=1024M" +
+                " -XX:MinHeapFreeRatio=2 -XX:MaxHeapFreeRatio=10" +
+                " -Dguice_bytecode_gen_option=DISABLED" + System.lineSeparator())
+        if (OS.isWindows()) {
+            tqextractLauncher.append("win-console=true" + System.lineSeparator())
+        }
+        tqextractLauncher.deleteOnExit()
+
+        def jpackage = providers.exec {
+            ignoreExitValue true
+            workingDir file(layout.buildDirectory).absolutePath
+            if (moduleInfoPresent) {
+                commandLine binjpackage,
+                        '--type', 'app-image',
+                        '--verbose',
+                        '--runtime-image', layout.buildDirectory.dir("jre-image").get().asFile,
+                        '--module', "${moduleName}/${application.mainClass.get()}",
+                        '--dest', layout.buildDirectory.dir("app-image").get().asFile,
+                        '--name', distAppName,
+                        '--icon', "${appIcon}",
+                        '--app-version', version,
+                        '--vendor', 'Emerson Pinter',
+                        '--input', layout.buildDirectory.dir("appimage-files").get().asFile,
+                        '--description', 'The respec tool for Titan Quest game',
+                        '--add-launcher', "tqextract-cli=${tqextractLauncher.absolutePath}",
+                        '--java-options',
+                        '-XX:+UseSerialGC ' +
+                                '-Dguice_bytecode_gen_option=DISABLED ' +
+                                '-XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=15 '
+            } else {
+                commandLine binjpackage,
+                        '--type', 'app-image',
+                        '--verbose',
+                        '--runtime-image', layout.buildDirectory.dir("jre-image").get().asFile,
+                        '--dest', layout.buildDirectory.dir("app-image").get().asFile,
+                        '--name', distAppName,
+                        '--icon', "${appIcon}",
+                        '--app-version', version,
+                        '--vendor', 'Emerson Pinter',
+                        '--input', layout.buildDirectory.dir("appimage-files").get().asFile,
+                        '--description', 'The respec tool for Titan Quest game',
+                        '--main-jar', jar.outputs.files.collect { it.getName() }.get(0),
+                        '--main-class', $ { application.mainClass.get() },
+                        '--java-options',
+                        '-XX:+UseSerialGC ' +
+                                '-Dguice_bytecode_gen_option=DISABLED ' +
+                                '-XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=15 ' +
+                                '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED ' +
+                                '--add-opens java.base/java.lang=ALL-UNNAMED '
+            }
+        }
+
+        if (jpackage.result.get().exitValue == 0) {
+            System.out.println jpackage.standardOutput.asText.get()
+            System.out.println jpackage.standardError.asText.get()
+        } else {
+            System.err.println jpackage.standardOutput.asText.get()
+            System.err.println jpackage.standardError.asText.get()
+        }
     }
-    if (moduleInfoPresent) {
-        commandLine binjpackage,
-                '--type', 'app-image',
-                '--verbose',
-                '--runtime-image', layout.buildDirectory.dir("jre-image").get().asFile,
-                '--module', "${moduleName}/${application.mainClass.get()}",
-                '--dest', layout.buildDirectory.dir("app-image").get().asFile,
-                '--name', distAppName,
-                '--icon', "${appIcon}",
-                '--app-version', project.version,
-                '--vendor', 'Emerson Pinter',
-                '--input', layout.buildDirectory.dir("appimage-files").get().asFile,
-                '--description', 'The respec tool for Titan Quest game',
-                '--java-options',
-                '-XX:+UseSerialGC ' +
-                        '-Dguice_bytecode_gen_option=DISABLED ' +
-                        '-XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=15 '
-    } else {
-        commandLine binjpackage,
-                '--type', 'app-image',
-                '--verbose',
-                '--runtime-image', layout.buildDirectory.dir("jre-image").get().asFile,
-                '--dest', layout.buildDirectory.dir("app-image").get().asFile,
-                '--name', distAppName,
-                '--icon', "${appIcon}",
-                '--app-version', project.version,
-                '--vendor', 'Emerson Pinter',
-                '--input', layout.buildDirectory.dir("appimage-files").get().asFile,
-                '--description', 'The respec tool for Titan Quest game',
-                '--main-jar', jar.outputs.files.collect { it.getName() }.get(0),
-                '--main-class', ${application.mainClass.get()},
-                '--java-options',
-                '-XX:+UseSerialGC ' +
-                        '-Dguice_bytecode_gen_option=DISABLED ' +
-                        '-XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=15 ' +
-                        '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED ' +
-                        '--add-opens java.base/java.lang=ALL-UNNAMED '
-    }
+
     doLast {
         copy {
             if (OS.isWindows()) {
                 from javafxSdkBinDir.listFiles().findAll {
                     it.getName().equalsIgnoreCase("decora_sse.dll") ||
-                    it.getName().equalsIgnoreCase("fxplugins.dll") ||
-                    it.getName().equalsIgnoreCase("glass.dll") ||
-                    it.getName().equalsIgnoreCase("javafx_font.dll") ||
-                    it.getName().equalsIgnoreCase("javafx_iio.dll") ||
-                    it.getName().equalsIgnoreCase("glib-lite.dll") ||
-                    it.getName().equalsIgnoreCase("prism_common.dll") ||
-                    it.getName().equalsIgnoreCase("prism_d3d.dll") ||
-                    it.getName().equalsIgnoreCase("prism_sw.dll")
+                            it.getName().equalsIgnoreCase("fxplugins.dll") ||
+                            it.getName().equalsIgnoreCase("glass.dll") ||
+                            it.getName().equalsIgnoreCase("javafx_font.dll") ||
+                            it.getName().equalsIgnoreCase("javafx_iio.dll") ||
+                            it.getName().equalsIgnoreCase("glib-lite.dll") ||
+                            it.getName().equalsIgnoreCase("prism_common.dll") ||
+                            it.getName().equalsIgnoreCase("prism_d3d.dll") ||
+                            it.getName().equalsIgnoreCase("prism_sw.dll")
                 }.collect()
 
                 into layout.buildDirectory.dir("app-image/${distAppName}")
@@ -420,6 +462,10 @@ tasks.register('appimage', Exec) {
         if (OS.isLinux()) {
             copy {
                 from "${projectDir}/src/dist/TQRespec.sh"
+                into layout.buildDirectory.dir("app-image/${distAppName}")
+            }
+            copy {
+                from "${projectDir}/src/dist/tqextract-cli.sh"
                 into layout.buildDirectory.dir("app-image/${distAppName}")
             }
         }
