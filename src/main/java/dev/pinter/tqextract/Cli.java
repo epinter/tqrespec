@@ -20,11 +20,13 @@
 
 package dev.pinter.tqextract;
 
+import br.com.pinter.tqdatabase.Resources;
 import br.com.pinter.tqrespec.core.GameNotFoundException;
 import br.com.pinter.tqrespec.core.GuiceModule;
 import br.com.pinter.tqrespec.core.InjectionContext;
 import br.com.pinter.tqrespec.logging.Log;
 import br.com.pinter.tqrespec.tqdata.GameInfo;
+import br.com.pinter.tqrespec.util.Build;
 import com.google.inject.Inject;
 import com.google.inject.Module;
 import picocli.CommandLine;
@@ -44,6 +46,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static java.lang.System.Logger.Level.INFO;
 
 @Command(name = "tqextract-cli", mixinStandardHelpOptions = true, sortSynopsis = false,
+        versionProvider = Cli.VersionProvider.class,
         subcommands = {
                 Cli.OptionExtractAll.class,
                 Cli.OptionExtractArc.class,
@@ -84,7 +87,7 @@ public class Cli {
     }
 
     @Command(name = "all", mixinStandardHelpOptions = true,
-            description = "Extract all game files, arc and arz. All TEX are converted to DDS.")
+            description = "Extract all game files, arc and arz.")
     static class OptionExtractAll implements Runnable {
         @ParentCommand
         private Cli parent;
@@ -92,8 +95,14 @@ public class Cli {
         @Option(names = {"--no-mapdecompiler"}, description = "Disable map decompiler when a map is found")
         private boolean skipDecompiler;
 
-        @Option(names = {"--no-texconversion"}, description = "Disable TEX conversion to DDS")
-        private boolean skipTexConversion;
+        @Option(names = {"--tex-todds"}, description = "Exports all .TEX as DDS")
+        private boolean texAsDds;
+
+        @Option(names = {"--tex-topng"}, description = "Exports all .TEX as PNG")
+        private boolean texAsPng;
+
+        @Option(names = {"--dds-ignoremipmaps"}, description = "Ignores mipmaps when exporting to DDS, just the main surface is exported")
+        private boolean ignoreMipmaps;
 
         @Option(names = {"--wrlscaling"}, description = """
                 Scaling of images written to WRL, used in the layout mode of the Editor.
@@ -111,7 +120,14 @@ public class Cli {
 
             Extract extract = parent.createExtract();
             extract.setMapWrlScaling(mapWrlScaling);
-            extract.setConvertTexToDds(!skipTexConversion);
+            if (texAsPng) {
+                extract.setConvertTexToPng(true);
+            } else if (texAsDds) {
+                extract.setConvertTexToDds(true);
+            }
+            if (ignoreMipmaps) {
+                extract.setConvertTexIgnoreMip(true);
+            }
             extract.setDecompileMap(!skipDecompiler);
 
             try {
@@ -133,8 +149,17 @@ public class Cli {
         @Option(names = {"--no-mapdecompiler"}, description = "Disable map decompiler when a MAP is found")
         private boolean skipDecompiler;
 
-        @Option(names = {"--no-texconversion"}, description = "Disable TEX conversion to DDS")
-        private boolean skipTexConversion;
+        @Option(names = {"--tex-todds"}, description = "Exports all .TEX as DDS")
+        private boolean texAsDds;
+
+        @Option(names = {"--tex-topng"}, description = "Exports all .TEX as PNG")
+        private boolean texAsPng;
+
+        @Option(names = {"--dds-ignoremipmaps"}, description = "Ignores mipmaps when exporting to DDS")
+        private boolean ignoreMipmaps;
+
+        @Option(names = {"--list"}, description = "List all resources in the ARC. Works only with input-file, not input-directory.")
+        private boolean listArcContent;
 
         @Option(names = {"--wrlscaling"}, description = """
                 Scaling of images written to WRL, used in the layout mode of the Editor.
@@ -164,6 +189,23 @@ public class Cli {
                 System.exit(1);
             }
 
+            if (input.inputDir != null && listArcContent) {
+                System.err.println("Invalid argument.");
+                return;
+            }
+
+            if (input.inputArc != null && listArcContent) {
+                try {
+                    Resources arc = new Resources(input.inputArc);
+                    if (arc.getNames() != null) {
+                        arc.getNames().stream().sorted().forEach(System.out::println);
+                    }
+                    return;
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
             if (parent.outputDir == null) {
                 System.err.println("ERROR: Output directory not specified");
                 System.exit(1);
@@ -181,7 +223,14 @@ public class Cli {
 
             Extract extract = parent.createExtract();
             extract.setMapWrlScaling(mapWrlScaling);
-            extract.setConvertTexToDds(!skipTexConversion);
+            if (texAsPng) {
+                extract.setConvertTexToPng(true);
+            } else if (texAsDds) {
+                extract.setConvertTexToDds(true);
+            }
+            if (ignoreMipmaps) {
+                extract.setConvertTexIgnoreMip(true);
+            }
             extract.setDecompileMap(!skipDecompiler);
 
             try {
@@ -292,6 +341,13 @@ public class Cli {
                     System.out.println();
                 }
             }
+        }
+    }
+
+    static class VersionProvider implements CommandLine.IVersionProvider {
+        @Override
+        public String[] getVersion() {
+            return new String[]{Build.title() + " " + Build.version()};
         }
     }
 }

@@ -6,4 +6,4 @@ resolvepath() {
 MYDIR=$(resolvepath $DIRNAME)
 
 cd "${MYDIR}"
-exec "${MYDIR}/bin/tqextract-cli" "$@"
+exec "${MYDIR}/bin/texconverter-cli" "$@"

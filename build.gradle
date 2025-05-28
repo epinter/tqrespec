@@ -361,6 +361,14 @@ tasks.register('appimage') {
         tqextractLauncher.append("java-options=-XX:+UseG1GC -XX:G1PeriodicGCInterval=10000 -XX:SoftMaxHeapSize=1024M" +
                 " -XX:MinHeapFreeRatio=2 -XX:MaxHeapFreeRatio=10" +
                 " -Dguice_bytecode_gen_option=DISABLED" + System.lineSeparator())
+
+        def texconverterLauncher = File.createTempFile("texconverterlauncher", ".properties", file(layout.buildDirectory))
+        texconverterLauncher.write("module=${moduleName}/dev.pinter.tqextract.TexConverterCli" + System.lineSeparator())
+        texconverterLauncher.append("java-options=-XX:+UseG1GC -XX:G1PeriodicGCInterval=10000 -XX:SoftMaxHeapSize=1024M" +
+                " -XX:MinHeapFreeRatio=2 -XX:MaxHeapFreeRatio=10" +
+                " -Dguice_bytecode_gen_option=DISABLED" + System.lineSeparator())
+
+
         if (OS.isWindows()) {
             tqextractLauncher.append("win-console=true" + System.lineSeparator())
         }
@@ -383,6 +391,7 @@ tasks.register('appimage') {
                         '--input', layout.buildDirectory.dir("appimage-files").get().asFile,
                         '--description', 'The respec tool for Titan Quest game',
                         '--add-launcher', "tqextract-cli=${tqextractLauncher.absolutePath}",
+                        '--add-launcher', "texconverter-cli=${texconverterLauncher.absolutePath}",
                         '--java-options',
                         '-XX:+UseSerialGC ' +
                                 '-Dguice_bytecode_gen_option=DISABLED ' +
@@ -461,11 +470,9 @@ tasks.register('appimage') {
         }
         if (OS.isLinux()) {
             copy {
-                from "${projectDir}/src/dist/TQRespec.sh"
-                into layout.buildDirectory.dir("app-image/${distAppName}")
-            }
-            copy {
                 from "${projectDir}/src/dist/tqextract-cli.sh"
+                from "${projectDir}/src/dist/texconverter-cli.sh"
+                from "${projectDir}/src/dist/TQRespec.sh"
                 into layout.buildDirectory.dir("app-image/${distAppName}")
             }
         }

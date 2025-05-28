@@ -22,6 +22,7 @@ package dev.pinter.tqextract;
 
 import br.com.pinter.tqdatabase.Database;
 import br.com.pinter.tqdatabase.Resources;
+import br.com.pinter.tqdatabase.data.TextureConverter;
 import br.com.pinter.tqdatabase.models.DbRecord;
 import br.com.pinter.tqdatabase.models.ResourceFile;
 import br.com.pinter.tqdatabase.models.ResourceType;
@@ -29,8 +30,15 @@ import br.com.pinter.tqdatabase.models.Texture;
 import br.com.pinter.tqdatabase.models.TextureType;
 import br.com.pinter.tqrespec.logging.Log;
 import dev.pinter.tqextract.decompiler.MapDecompiler;
+import dev.pinter.tqextract.image.DDSReader;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.function.TriFunction;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
+import java.awt.image.Raster;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
@@ -62,7 +70,9 @@ public class Extract {
     private final ExecutorService executorArc;
     private final ExecutorService executorMap;
     private final ExecutorService executorArz;
-    private boolean convertTexToDds = true;
+    private boolean convertTexToDds = false;
+    private boolean convertTexToPng = false;
+    private boolean convertTexIgnoreMip = false;
     private boolean decompileMap = true;
     private final Path outputDir;
     private int mapWrlScaling = 0;
@@ -96,6 +106,14 @@ public class Extract {
 
     public void setConvertTexToDds(boolean convertTexToDds) {
         this.convertTexToDds = convertTexToDds;
+    }
+
+    public void setConvertTexToPng(boolean convertTexToPng) {
+        this.convertTexToPng = convertTexToPng;
+    }
+
+    public void setConvertTexIgnoreMip(boolean convertTexIgnoreMip) {
+        this.convertTexIgnoreMip = convertTexIgnoreMip;
     }
 
     public void setDecompileMap(boolean decompileMap) {
@@ -328,10 +346,32 @@ public class Extract {
 
     private void extractTexture(ResourceFile resourceFile, Path destDir) throws IOException {
         Path texture;
-        byte[] data;
-        if (convertTexToDds && isTex(resourceFile)) {
+        byte[] data = new byte[0];
+        if (!isTex(resourceFile)) {
+            return;
+        }
+
+        if (convertTexToPng) {
+            texture = Path.of(destDir.toString(), resourceFile.getPath().toString().replaceAll("(?i)(.*)\\.tex$", "$1.png"));
+            Texture dds = new TextureConverter((Texture) resourceFile).convert(TextureType.DDS, true);
+
+            int[] pixels;
+            try {
+                pixels = DDSReader.readARGB(dds.getData());
+            } catch (NotImplementedException e) {
+                logger.log(ERROR, "Error converting ''{0}'' to PNG", texture.toString(), e);
+                throw e;
+            }
+
+            if (pixels != null) {
+                BufferedImage image = new BufferedImage(dds.getWidth(), dds.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                image.setData(Raster.createRaster(image.getSampleModel(), new DataBufferInt(pixels, pixels.length, 0), new Point()));
+                ImageIO.write(image, "png", texture.toFile());
+                return;
+            }
+        } else if (convertTexToDds) {
             texture = Path.of(destDir.toString(), resourceFile.getPath().toString().replaceAll("(?i)(.*)\\.tex$", "$1.dds"));
-            data = ((Texture) resourceFile).convert(TextureType.DDS).getData();
+            data = new TextureConverter((Texture) resourceFile).convert(TextureType.DDS, convertTexIgnoreMip).getData();
         } else {
             texture = Path.of(destDir.toString(), resourceFile.getPath().toString());
             data = resourceFile.getData();
