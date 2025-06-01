@@ -1,4 +1,17 @@
 # Changelog
+## [1.0.3] - 2025-06-01
+### Added
+- Added tag to characters list (for external saves).
+- Added tool to extract game files, for ARC and ARZ. With option to convert textures. See the [README.md](src/main/java/dev/pinter/tqextract/README.md).
+- Added tool to convert TEX textures.
+- Added map decompiler.
+
+### Changed
+- Updated Russian translation ([#57](https://github.com/epinter/tqrespec/pull/57)). By [@chefranov](https://github.com/chefranov).
+- Updated Ukrainian translation ([#57](https://github.com/epinter/tqrespec/pull/57)).  By [@chefranov](https://github.com/chefranov).
+- Improve Linux scripts, now there's an option to create a .desktop.
+- Read attribute, level and skill points from database.
+
 ## [1.0.2] - 2025-05-08
 ### Fixed
 - Fixed version check
