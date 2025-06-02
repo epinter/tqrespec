@@ -105,6 +105,10 @@ public class MapDecompiler {
 
     public void createSd() throws IOException {
         Path sdPath = Path.of(outputDir.toString(), "Levels", "World", "world01.sd");
+        if (sdPath.getParent().toFile().mkdirs() && !Files.exists(sdPath.getParent())) {
+            throw new IOException("Erro creating destination directory");
+        }
+
         MapBlock sector = mapBlocks.get(SECTOR.value());
 
         try (RandomAccessFileLE map = new RandomAccessFileLE(worldMap.toString(), "r")) {
