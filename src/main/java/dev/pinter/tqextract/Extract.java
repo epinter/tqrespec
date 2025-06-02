@@ -177,6 +177,9 @@ public class Extract {
 
     public void extractArz(Path arz) throws IOException {
         extractArz(arz, outputDir);
+        executorArc.shutdown();
+        executorMap.shutdown();
+        executorArz.shutdown();
     }
 
     private void waitMessage() {
