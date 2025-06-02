@@ -44,6 +44,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -54,6 +55,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import static java.lang.System.Logger.Level.DEBUG;
 import static java.lang.System.Logger.Level.ERROR;
@@ -84,20 +86,20 @@ public class GameInfo {
         if (path == null) {
             return false;
         }
-        return Paths.get(path.toString(), DATABASE_DIR).toFile().isDirectory()
-                && Paths.get(path.toString(), RESOURCES_DIR).toFile().isDirectory();
+        return resolvePath(Paths.get(path.toString(), DATABASE_DIR)).toFile().isDirectory()
+                && resolvePath(Paths.get(path.toString(), RESOURCES_DIR)).toFile().isDirectory();
     }
 
     private boolean isValidLocalPath(Path path) {
         if (path == null) {
             return false;
         }
-        return Paths.get(path.toString(), DATABASE_DIR, DATABASE_FILE).toFile().isFile()
-                && Paths.get(path.toString(), TEXT_DIR).toFile().isDirectory();
+        return resolvePath(Paths.get(path.toString(), DATABASE_DIR, DATABASE_FILE)).toFile().isFile()
+                && resolvePath(Paths.get(path.toString(), TEXT_DIR)).toFile().isDirectory();
     }
 
     private boolean gamePathFileExists(Path basePath, String... path) {
-        return Paths.get(basePath.toString(), DATABASE_DIR).toFile().isDirectory() && Paths.get(basePath.toString(), path).toFile().exists();
+        return resolvePath(Paths.get(basePath.toString(), DATABASE_DIR)).toFile().isDirectory() && resolvePath(Paths.get(basePath.toString(), path)).toFile().exists();
     }
 
     private boolean existsTqitExe(Path basePath) {
@@ -547,7 +549,7 @@ public class GameInfo {
     }
 
     private String setDevGamePath(String path) {
-        if (Paths.get(path, DATABASE_DIR).toFile().isDirectory() && Paths.get(path, TEXT_DIR).toFile().isDirectory()) {
+        if (resolvePath(Paths.get(path, DATABASE_DIR)).toFile().isDirectory() && resolvePath(Paths.get(path, TEXT_DIR)).toFile().isDirectory()) {
             addDatabasePath(Paths.get(path, DATABASE_DIR, DATABASE_FILE));
             addTextPath(Paths.get(path, TEXT_DIR));
             dlcRagnarok = true;
@@ -673,14 +675,26 @@ public class GameInfo {
     }
 
     private void addDatabasePath(Path path) {
-        if (!databases.contains(path)) {
-            databases.add(path);
+        Path realPath = resolvePath(path);
+        if (!databases.contains(realPath)) {
+            databases.add(realPath);
         }
     }
 
+    private Path resolvePath(Path path) {
+        try (Stream<Path> stream = Files.list(path.getParent())) {
+            return stream.filter(f -> f.getFileName().toString().equalsIgnoreCase(path.getFileName().toString())).toList().getFirst();
+        } catch (NoSuchFileException ignored) {
+        } catch (IOException e) {
+            logger.log(ERROR, "Error", e);
+        }
+        return path;
+    }
+
     private void addTextPath(Path path) {
-        if (!resourcesText.contains(path)) {
-            resourcesText.add(path);
+        Path realPath = resolvePath(path);
+        if (!resourcesText.contains(realPath)) {
+            resourcesText.add(realPath);
         }
     }
 
@@ -865,7 +879,7 @@ public class GameInfo {
     }
 
     private String getExternalSaveDataPath() {
-        if (Paths.get(Constants.EXT_SAVEDATA).toFile().isDirectory()) {
+        if (resolvePath(Paths.get(Constants.EXT_SAVEDATA)).toFile().isDirectory()) {
             logger.log(DEBUG, "External save path found: " + Paths.get(Constants.EXT_SAVEDATA));
             return Constants.EXT_SAVEDATA;
         }
