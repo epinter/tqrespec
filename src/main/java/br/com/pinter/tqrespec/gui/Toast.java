@@ -58,11 +58,24 @@ public class Toast {
         Label msg2 = new Label();
         VBox vBoxMsg = new VBox(msg);
         vBoxMsg.setFillWidth(true);
-        vBoxMsg.setPadding(new Insets(5, 5, 20, 5));
-        VBox vBoxMsg2 = new VBox(msg2);
-        vBoxMsg2.setFillWidth(true);
-        vBoxMsg2.setPadding(new Insets(0, 5, 5, 5));
-        VBox container = new VBox(vBoxMsg, vBoxMsg2);
+        VBox container;
+
+        if (content != null && !content.isBlank()) {
+            vBoxMsg.setPadding(new Insets(5, 5, 20, 5));
+            VBox vBoxMsg2 = new VBox(msg2);
+            vBoxMsg2.setFillWidth(true);
+            vBoxMsg2.setPadding(new Insets(0, 5, 5, 5));
+            msg2.setAlignment(Pos.BOTTOM_LEFT);
+            msg2.setTextAlignment(TextAlignment.LEFT);
+            msg2.getStyleClass().add(Constants.UI.TOAST_CONTENT_STYLE);
+            msg2.setText(content);
+            msg2.setWrapText(true);
+            container = new VBox(vBoxMsg, vBoxMsg2);
+        } else {
+            vBoxMsg.setPadding(new Insets(5, 5, 5, 5));
+            container = new VBox(vBoxMsg);
+        }
+
         container.setFillWidth(true);
 
         msg.setAlignment(Pos.CENTER);
@@ -71,13 +84,6 @@ public class Toast {
         msg.setWrapText(true);
         msg.setText(header);
         msg.getStyleClass().add(Constants.UI.TOAST_HEADER_STYLE);
-
-
-        msg2.setAlignment(Pos.BOTTOM_LEFT);
-        msg2.setTextAlignment(TextAlignment.LEFT);
-        msg2.getStyleClass().add(Constants.UI.TOAST_CONTENT_STYLE);
-        msg2.setText(content);
-        msg2.setWrapText(true);
 
 
         msg.setMaxWidth(stage.getWidth() / 1.8);
