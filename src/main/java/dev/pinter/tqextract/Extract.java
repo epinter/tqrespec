@@ -161,7 +161,7 @@ public class Extract {
         printInfo("Files will be extracted to '%s'", outputDir);
         printInfo("Found ARC '%s'", arc);
         logger.log(INFO, "Found ARC ''{0}''", arc);
-        processArc(arc, Path.of(outputDir.toString(), arc.getParent().relativize(arc).toString()), executorArc);
+        processArc(arc, Path.of(outputDir.toString(), arc.toAbsolutePath().getParent().relativize(arc.toAbsolutePath()).toString()), executorArc);
         latch.countDown();
         logger.log(INFO, "ARC extraction starting");
         CompletableFuture.allOf(arcFutures.toArray(new CompletableFuture<?>[0]))
@@ -237,7 +237,7 @@ public class Extract {
 
             @Override
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                if (Files.exists(Path.of(dir.getParent().toString(), "TQ.exe"))
+                if (Files.exists(Path.of(dir.toAbsolutePath().getParent().toString(), "TQ.exe"))
                         && dir.getFileName().toString().equalsIgnoreCase("SteamWorkshop")) {
                     return FileVisitResult.SKIP_SUBTREE;
                 }
@@ -303,18 +303,18 @@ public class Extract {
             ResourceFile entry = rec.getFile(resourceName);
             outfile = Path.of(destDir.toString(), entry.getPath().toString());
 
-            if (outfile.getParent() == null) {
+            if (outfile.toAbsolutePath().getParent() == null) {
                 throw new IllegalArgumentException("Invalid directory " + outfile);
             }
 
-            if (!outfile.getParent().toFile().mkdirs() && !Files.exists(outfile.getParent())) {
-                throw new RuntimeException("Failed to create directory " + outfile.getParent());
+            if (!outfile.toAbsolutePath().getParent().toFile().mkdirs() && !Files.exists(outfile.toAbsolutePath().getParent())) {
+                throw new RuntimeException("Failed to create directory " + outfile.toAbsolutePath().getParent());
             }
 
 
             if (entry.getResourceType() == ResourceType.TEXTURE) {
                 logger.log(DEBUG, "[{0}] Texture found: name:''{1}''; type:{2};",
-                        Path.of(rec.getPath().getParent().getFileName().toString(), rec.getPath().getFileName().toString()),
+                        Path.of(rec.getPath().toAbsolutePath().getParent().getFileName().toString(), rec.getPath().getFileName().toString()),
                         entry.getName(), ((Texture) entry).getTextureType());
                 extractTexture(entry, destDir);
             } else if (entry.getResourceType() == ResourceType.MAP) {
@@ -326,7 +326,7 @@ public class Extract {
                         try {
                             MapDecompiler mapDecompiler = new MapDecompiler(
                                     outfile,
-                                    Path.of(outfile.getParent().toString(), "source." + outfile.getFileName().toString()),
+                                    Path.of(outfile.toAbsolutePath().getParent().toString(), "source." + outfile.getFileName().toString()),
                                     mapWrlScaling);
                             mapDecompiler.extractAll();
                             logger.log(INFO, "Map ''{0}'' extraction finished.", entry.getPath());
