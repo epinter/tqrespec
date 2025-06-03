@@ -28,6 +28,7 @@ import br.com.pinter.tqrespec.core.GuiceModule;
 import br.com.pinter.tqrespec.core.InjectionContext;
 import br.com.pinter.tqrespec.core.SingleInstanceLock;
 import br.com.pinter.tqrespec.core.State;
+import br.com.pinter.tqrespec.core.UnhandledRuntimeException;
 import br.com.pinter.tqrespec.gui.MainController;
 import br.com.pinter.tqrespec.gui.ResizeListener;
 import br.com.pinter.tqrespec.gui.ResourceHelper;
@@ -225,8 +226,12 @@ public class Main extends Application {
         };
         task.setOnFailed(e -> {
             gameInfo.removeSavedDetectedGame();
-            logger.log(ERROR, "Error loading application", e);
-            alertException(primaryStage, e.getSource().getException());
+            if (e != null && e.getSource() != null) {
+                logger.log(ERROR, "Error loading application", e.getSource().getException());
+                alertException(primaryStage, e.getSource().getException());
+            } else {
+                alertException(primaryStage, new UnhandledRuntimeException("Error loading application"));
+            }
         });
 
         task.setOnSucceeded(e -> primaryStage.show());
