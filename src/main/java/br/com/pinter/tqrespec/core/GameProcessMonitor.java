@@ -20,9 +20,10 @@
 
 package br.com.pinter.tqrespec.core;
 
+import org.apache.commons.lang3.SystemUtils;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static br.com.pinter.tqrespec.util.Constants.PROCESS_SCAN_INTERVAL_MS;
@@ -44,19 +45,30 @@ public class GameProcessMonitor implements Runnable {
                 }
 
                 foundRunning.set(false);
-                ProcessHandle.allProcesses().forEach(p -> {
-                    String command = p.info().command().orElse(null);
-                    if (Objects.nonNull(command)) {
-                        Path processCommand = Paths.get(command);
+                if (SystemUtils.IS_OS_WINDOWS) {
+                    ProcessHandle.allProcesses().forEach(p -> {
+                        String command = p.info().command().orElse(null);
+                        if (command != null) {
+                            Path processCommand = Paths.get(command);
+                            Path gamePath = Paths.get(directory);
+                            if (processCommand.getFileName().toString().equalsIgnoreCase("tq.exe")
+                                    || (processCommand.startsWith(gamePath) &&
+                                    processCommand.getFileName().toString().toLowerCase().endsWith(".exe")
+                                    && !processCommand.getFileName().toString().equalsIgnoreCase("tqrespec.exe"))) {
+                                foundRunning.set(true);
+                            }
+                        }
+                    });
+                } else {
+                    ProcessHandle.allProcesses().forEach(p -> {
+                        String command = p.info().commandLine().orElse(null);
                         Path gamePath = Paths.get(directory);
-                        if (processCommand.getFileName().toString().equalsIgnoreCase("tq.exe")
-                                || (processCommand.startsWith(gamePath) &&
-                                processCommand.getFileName().toString().toLowerCase().endsWith(".exe")
-                                && !processCommand.getFileName().toString().equalsIgnoreCase("tqrespec.exe"))) {
+                        if (command != null && command.matches("(?i).*" + gamePath.toAbsolutePath() + "\\b.*")
+                                && command.matches("(?i).*\\btq.exe\\b.*")) {
                             foundRunning.set(true);
                         }
-                    }
-                });
+                    });
+                }
                 State.get().setGameRunning(foundRunning.get());
                 //noinspection BusyWait
                 Thread.sleep(PROCESS_SCAN_INTERVAL_MS);
