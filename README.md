@@ -15,9 +15,9 @@ extract and run.
 
 #### ***Requirements***
 
-This software runs on Windows or Linux, both must be 64bit. You don't need to have java or any other software installed,
-but if you have problems like missing dlls, check if you
-have [Microsoft Visual C++ Redist 2015-2022](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist) installed.
+This software runs on Windows or Linux, both must be 64bit. You don't need to have Java or any other software installed,
+but if you have problems like missing dlls, check
+if [Microsoft Visual C++ Redist 2015-2022](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist) is updated.
 
 ## **How to use**
 
@@ -29,29 +29,15 @@ You shouldn't modify your characters while the game is running, this can corrupt
 
 #### ***Screenshots***
 
-- *Attributes*
+![TQRespec Screenshot 1](assets/screenshot_attributes.png "Attributes")
 
-  ![TQRespec Screenshot 1](assets/screenshot_attributes.png "Attributes")
+![TQRespec Screenshot 2](assets/screenshot_skills.png "Skills")
 
+![TQRespec Screenshot 3](assets/screenshot_misc.png "Misc")
 
-- *Remove Skills and masteries*
+![TQRespec Screenshot 4](assets/screenshot_characters.png "Characters")
 
-  ![TQRespec Screenshot 2](assets/screenshot_skills.png "Skills")
-
-
-- *Copy, Backup, Convert and JSON export*
-
-  ![TQRespec Screenshot 3](assets/screenshot_misc.png "Misc")
-
-
-- *Characters list and export CSV*
-
-  ![TQRespec Screenshot 4](assets/screenshot_characters.png "Characters")
-
-
-- *Characters Archive and Unarchive **(archive to hide character in game)***
-
-  ![TQRespec Screenshot 5](assets/screenshot_archive.png "Archive")
+![TQRespec Screenshot 5](assets/screenshot_archive.png "Archive")
 
 #### ***Running without the game installed***
 
@@ -84,6 +70,11 @@ The savegame needs to be at the same location as the game uses (Documents/My Gam
 #### ***Use it!***
 
 Select the character you want to change. Now you can see some information like Class and Difficulty, and start to change your savegame.
+
+#### ***Mod support***
+
+When a mod is selected, the database from the mod is loaded over the game's database. So skills, text, attribute points modifier and skill points modifier
+overrides the game. The portals are not loaded from the mod, they are hard-coded.
 
 #### ***Attributes***
 
@@ -240,15 +231,7 @@ TQRespec.exe --debug=9
 * Italian (it): ***Loris Gabriele***
 * French (fr): ***Etienne Lamoureux***
 
-### ***Note***
-
-Contributions are always welcome. They will be accepted or rejected depending on the scope and predefined objectives of the project. Look at
-the open [issues](https://github.com/epinter/tqrespec/issues) and milestones to know how you can help. Feel free to open an issue and
-suggest a feature you want to see available.
-
 ## **Thanks**
 
 ### ***THQ and [Iron Lore](https://en.wikipedia.org/wiki/Iron_Lore_Entertainment) for creation of this game that we love since 2006,
-
 and [THQ Nordic](https://www.thqnordic.com) for all the content and improvements***
-
