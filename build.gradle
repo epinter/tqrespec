@@ -373,6 +373,7 @@ tasks.register('appimage') {
 
         if (OS.isWindows()) {
             tqextractLauncher.append("win-console=true" + System.lineSeparator())
+            texconverterLauncher.append("win-console=true" + System.lineSeparator())
         }
         tqextractLauncher.deleteOnExit()
 
@@ -392,6 +393,7 @@ tasks.register('appimage') {
                         '--vendor', 'Emerson Pinter',
                         '--input', layout.buildDirectory.dir("appimage-files").get().asFile,
                         '--description', 'The respec tool for Titan Quest game',
+                        '--copyright', 'Copyright (C) 2025 Emerson Pinter',
                         '--add-launcher', "tqextract-cli=${tqextractLauncher.absolutePath}",
                         '--add-launcher', "texconverter-cli=${texconverterLauncher.absolutePath}",
                         '--java-options',
@@ -411,6 +413,7 @@ tasks.register('appimage') {
                         '--vendor', 'Emerson Pinter',
                         '--input', layout.buildDirectory.dir("appimage-files").get().asFile,
                         '--description', 'The respec tool for Titan Quest game',
+                        '--copyright', 'Copyright (C) 2025 Emerson Pinter',
                         '--main-jar', jar.outputs.files.collect { it.getName() }.get(0),
                         '--main-class', $ { application.mainClass.get() },
                         '--java-options',
