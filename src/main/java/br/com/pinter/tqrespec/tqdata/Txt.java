@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.INFO;
 
 @Singleton
 public class Txt {
@@ -114,9 +115,6 @@ public class Txt {
         String[] paths = new String[]{path.toAbsolutePath().toString()};
 
         textMod.add(new Text(paths, Constants.LOCALE_TEXT.get(State.get().getLocale()), false));
-        if (!State.get().getLocale().equals(Locale.ENGLISH)) {
-            textMod.add(new Text(paths, Constants.LOCALE_TEXT.get(Locale.ENGLISH), false));
-        }
         text.getFirst().clearCache();
         preload();
     }

@@ -239,7 +239,7 @@
 }
 
 .tq-charactercombo {
-	-fx-font-size: 1.3em;
+	-fx-font-size: 1.2em;
 }
 
 .tq-charactercombo .character-combobox-type {
@@ -247,23 +247,23 @@
 }
 
 .tq-charactercombo .list-cell{
-	-fx-font-size: 1.2em;
+	-fx-font-size: 1.1em;
 }
 
 .tq-gendercombo {
-	-fx-font-size: 1.3em;
+	-fx-font-size: 1.2em;
 }
 
 .tq-gendercombo .list-cell{
-	-fx-font-size: 1.2em;
+	-fx-font-size: 1.1em;
 }
 
 .tq-difficultycombo {
-	-fx-font-size: 1.3em;
+	-fx-font-size: 1.2em;
 }
 
 .tq-difficultycombo .list-cell{
-	-fx-font-size: 1.2em;
+	-fx-font-size: 1.1em;
 }
 /************/
 

@@ -41,6 +41,7 @@ import com.google.inject.Inject;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -65,15 +66,19 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.System.Logger.Level.DEBUG;
 import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.INFO;
 import static java.lang.System.Logger.Level.WARNING;
 
 @SuppressWarnings("unused")
@@ -84,6 +89,7 @@ public class MainController implements Initializable {
     private UiPlayerProperties playerProperties;
     private final BooleanProperty unlockedEdit = new SimpleBooleanProperty(false);
     private final BooleanProperty freeLvl = new SimpleBooleanProperty(false);
+    private final AtomicBoolean modLoaded = new AtomicBoolean(false);
 
     @FXML
     public GridPane pointsPane;
@@ -131,6 +137,8 @@ public class MainController implements Initializable {
     private Hyperlink versionCheck;
     @FXML
     private TabPane tabPane;
+    @FXML
+    private ComboBox<CustomMap> modCombo;
     @Inject
     private Db db;
     @Inject
@@ -177,6 +185,7 @@ public class MainController implements Initializable {
         saveButton.setGraphic(Icon.FA_SAVE.create());
         charactersButton.setGraphic(Icon.FA_USERS.create(1.4));
         charactersButton.setTooltip(uiUtils.simpleTooltip(ResourceHelper.getMessage("main.charactersButtonTooltip")));
+        characterCombo.setTooltip(uiUtils.simpleTooltip(ResourceHelper.getMessage("main.labelselectchar")));
 
         State.get().gameRunningProperty().addListener((value, oldV, newV) -> {
             if (BooleanUtils.isTrue(newV)) {
@@ -190,10 +199,18 @@ public class MainController implements Initializable {
 
                 Platform.runLater(() -> {
                     reset();
+                    unloadMods(true);
                     Toast.show((Stage) rootelement.getScene().getWindow(),
                             ResourceHelper.getMessage("alert.errorgamerunning_header"),
                             ResourceHelper.getMessage("alert.errorgamerunning_content"),
                             30000);
+                    logger.log(INFO, "Game found running");
+                });
+            } else if (BooleanUtils.isFalse(newV)) {
+                Platform.runLater(() -> {
+                    unloadMods(true);
+                    reset();
+                    logger.log(INFO, "Game is closed");
                 });
             }
         });
@@ -203,12 +220,29 @@ public class MainController implements Initializable {
         miscPaneController.unlockCheckboxSelectedProperty().bindBidirectional(unlockedEdit);
         miscPaneController.freeLvlCheckboxSelectedProperty().bindBidirectional(freeLvl);
         pointsPaneController.onMainInitialized();
+
+        modCombo.getSelectionModel().clearSelection();
+        List<CustomMap> maps = gameInfo.getCustomMaps().stream().map(c -> new CustomMap(c.getFileName().toString(), c)).toList();
+        if (!maps.isEmpty()) {
+            modCombo.getItems().setAll(maps);
+            modCombo.getItems().addFirst(new CustomMap("", null));
+        } else {
+            logger.log(INFO, "No custom maps found, disabling mods list");
+            modCombo.setDisable(true);
+        }
+        modCombo.setTooltip(uiUtils.simpleTooltip(ResourceHelper.getMessage("main.labelselectmod")));
+        modCombo.getSelectionModel().selectedItemProperty().addListener(this::modSelected);
     }
 
     public void addCharactersToCombo() {
         try {
             characterCombo.getSelectionModel().clearSelection();
-            characterCombo.getItems().setAll(gameInfo.getPlayerCharacterList(SaveLocation.MAIN, SaveLocation.EXTERNAL));
+            characterCombo.getItems().clear();
+            if (modLoaded.get()) {
+                characterCombo.getItems().setAll(gameInfo.getPlayerCharacterList(SaveLocation.USER));
+            } else {
+                characterCombo.getItems().setAll(gameInfo.getPlayerCharacterList(SaveLocation.MAIN, SaveLocation.EXTERNAL));
+            }
             characterCombo.setCellFactory(p -> new CharacterListCell());
             characterCombo.getItems().sort(Comparator.comparing(PlayerCharacterFile::getPlayerName));
         } catch (ClassCastException | UnsupportedOperationException | IllegalArgumentException e) {
@@ -261,6 +295,7 @@ public class MainController implements Initializable {
             return;
         }
 
+        unloadMods(false);
         reset();
         Parent root;
         if (fxmlLoaderCharacter.getRoot() == null) {
@@ -282,25 +317,34 @@ public class MainController implements Initializable {
     public void resetButtonClicked(ActionEvent event) {
         if (!State.get().isSaveInProgress()) {
             reset();
+            unloadMods(false);
         }
     }
 
     public void reset() {
+        Toast.cancel();
+        resetKeepToast();
+    }
+
+    public void resetKeepToast() {
         pointsPaneController.clearProperties();
         skillsPaneController.reset();
         miscPaneController.reset();
         player.reset();
-        characterCombo.setValue(null);
-        characterCombo.getItems().clear();
-        addCharactersToCombo();
+        resetCharacterCombo();
         setAllControlsDisable(true);
         characterCombo.setDisable(false);
-        Toast.cancel();
         restoreDefaultCursor();
         tabPane.getSelectionModel().select(attributesTab);
         unlockedEdit.set(false);
         freeLvl.set(false);
         playerProperties = null;
+    }
+
+    public void resetCharacterCombo() {
+        characterCombo.setValue(null);
+        characterCombo.getItems().clear();
+        addCharactersToCombo();
     }
 
     public void setCursorWaitOnTask(MyTask<Integer> task) {
@@ -386,13 +430,13 @@ public class MainController implements Initializable {
             player.setBoostedCharacterForX4(playerProps().getBoostedCharacterForX4());
             adjustTeleportsForDifficulty();
         }
-        if(sacksOld != playerProps().getNumberOfSacks()) {
+        if (sacksOld != playerProps().getNumberOfSacks()) {
             player.setNumberOfSacks(playerProps().getNumberOfSacks());
             player.addEmptyPlayerSacks();
-            if(sackFocOld != playerProps().getCurrentlyFocusedSackNumber()) {
+            if (sackFocOld != playerProps().getCurrentlyFocusedSackNumber()) {
                 player.setCurrentlyFocusedSackNumber(playerProps().getCurrentlyFocusedSackNumber());
             }
-            if(sackSelOld != playerProps().getCurrentlySelectedSackNumber()) {
+            if (sackSelOld != playerProps().getCurrentlySelectedSackNumber()) {
                 player.setCurrentlySelectedSackNumber(playerProps().getCurrentlySelectedSackNumber());
             }
         }
@@ -674,5 +718,106 @@ public class MainController implements Initializable {
 
     public BooleanProperty freeLvlProperty() {
         return freeLvl;
+    }
+
+    private void modSelected(ObservableValue<? extends CustomMap> obs, CustomMap oldValue, CustomMap newValue) {
+        if (State.get().isGameRunning() || newValue == null || (oldValue != null && oldValue.getPath() != null && oldValue.getPath().equals(newValue.getPath()))) {
+            return;
+        }
+        resetKeepToast();
+        if ((newValue.getPath() == null && modLoaded.get())) {
+            unloadMods(false);
+            return;
+        }
+
+        CustomMap selected = modCombo.getSelectionModel().getSelectedItem();
+        if (selected != null && selected.getPath() != null) {
+            Path database = gameInfo.getCustomMapDatabase(selected.getPath());
+            List<Path> textPath = gameInfo.getCustomMapText(selected.getPath());
+            if (database != null && Files.exists(database)) {
+                MyTask<Integer> loadModTask = new MyTask<>() {
+                    @Override
+                    protected Integer call() {
+                        try {
+                            Platform.runLater(() -> {
+                                Toast.show((Stage) rootelement.getScene().getWindow(),
+                                        ResourceHelper.getMessage("characters.loadingPlaceholder"),
+                                        null,
+                                        30000);
+                                characterCombo.setDisable(true);
+                                modCombo.setDisable(true);
+                            });
+                            db.unloadMods();
+                            txt.unloadMods();
+                            db.loadMod(database);
+                            if (textPath != null) {
+                                textPath.forEach(t -> {
+                                    txt.loadMod(t);
+                                });
+                            }
+                            logger.log(INFO, "Current playerLevels: " + db.player().getPlayerLevels());
+                            return 1;
+                        } catch (IOException e) {
+                            throw new UnhandledRuntimeException(e);
+                        }
+                    }
+                };
+                loadModTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED,
+                        (MyEventHandler<WorkerStateEvent>) workerStateEvent -> {
+                            modLoaded.set(true);
+                            Platform.runLater(() -> {
+                                resetCharacterCombo();
+                                reset();
+                                characterCombo.setDisable(false);
+                                modCombo.setDisable(false);
+                            });
+                        });
+                setCursorWaitOnTask(loadModTask);
+                new WorkerThread(loadModTask).start();
+            }
+        } else {
+            unloadMods(true);
+        }
+    }
+
+    private void unloadMods(boolean forceReset) {
+        if (!modLoaded.get() && !forceReset) {
+            return;
+        }
+        modLoaded.set(false);
+        MyTask<Integer> unloadModTask = new MyTask<>() {
+            @Override
+            protected Integer call() {
+                Platform.runLater(() -> {
+                    if (!forceReset) {
+                        Toast.show((Stage) rootelement.getScene().getWindow(),
+                                ResourceHelper.getMessage("characters.loadingPlaceholder"),
+                                null,
+                                30000);
+                    }
+                    characterCombo.setDisable(true);
+                    modCombo.setDisable(true);
+                    modCombo.getSelectionModel().clearSelection();
+                    modCombo.setValue(null);
+                });
+                db.unloadMods();
+                txt.unloadMods();
+                return 1;
+            }
+        };
+        unloadModTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED,
+                (MyEventHandler<WorkerStateEvent>) workerStateEvent -> {
+                    Platform.runLater(() -> {
+                        characterCombo.setDisable(false);
+                        modCombo.setDisable(false);
+                        resetCharacterCombo();
+                        if (!forceReset) {
+                            Toast.cancel();
+                        }
+                    });
+                    logger.log(INFO, "Current playerLevels: " + db.player().getPlayerLevels());
+                });
+        setCursorWaitOnTask(unloadModTask);
+        new WorkerThread(unloadModTask).start();
     }
 }

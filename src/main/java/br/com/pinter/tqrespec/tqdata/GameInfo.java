@@ -43,11 +43,13 @@ import java.io.IOException;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -797,6 +799,96 @@ public class GameInfo {
         }
         return null;
     }
+
+    public List<Path> getCustomMaps() {
+        Path userMaps = resolvePath(Path.of(getSavePath(), "CustomMaps")).toAbsolutePath();
+        List<Path> mods = new ArrayList<>();
+        if (steamLibraryPathFound != null && Files.exists(steamLibraryPathFound)) {
+            Path steamMapsParent = resolvePath(Path.of(steamLibraryPathFound.toString(), "workshop", "content", "475150"));
+            try (DirectoryStream<Path> workshop = Files.newDirectoryStream(steamMapsParent)) {
+                workshop.forEach(m -> {
+                    if (!Files.isDirectory(m)) {
+                        return;
+                    }
+                    List<Path> mdirs = new ArrayList<>();
+                    try (Stream<Path> stream = Files.list(m)) {
+                        stream.filter(f -> Files.isDirectory(f) && getCustomMapDatabase(f) != null).forEach(mdirs::add);
+                        mods.addAll(mdirs);
+                    } catch (IOException e) {
+                        logger.log(ERROR, "Error", e);
+                    }
+                });
+            } catch (IOException e) {
+                logger.log(ERROR, "Error", e);
+            }
+        }
+        if (Files.exists(userMaps)) {
+            File[] files = userMaps.toAbsolutePath().toFile().listFiles(File::isDirectory);
+            if (files != null) {
+                for (File m : files) {
+                    if (getCustomMapDatabase(m.toPath()) != null) {
+                        mods.add(m.toPath());
+                    }
+                }
+            }
+        }
+        return mods;
+    }
+
+    public Path getCustomMapDatabase(Path customMap) {
+        File[] databaseDirs = customMap.toAbsolutePath().toFile().listFiles(
+                f -> f.isDirectory() && f.getName().equalsIgnoreCase("database"));
+
+        if (databaseDirs != null && databaseDirs.length == 1) {
+            File[] arzFile = databaseDirs[0].listFiles(f ->
+                    f.getName().equalsIgnoreCase(customMap.getFileName().toString() + ".arz"));
+            if (arzFile != null && arzFile.length == 1) {
+                return arzFile[0].toPath();
+            }
+        }
+
+        return null;
+    }
+
+    public List<Path> getCustomMapText(Path customMap) {
+        List<Path> ret = new ArrayList<>();
+        File[] resources = customMap.toAbsolutePath().toFile().listFiles(
+                f -> f.isDirectory() && f.getName().equalsIgnoreCase("resources"));
+        File[] text = customMap.toAbsolutePath().toFile().listFiles(
+                f -> f.isDirectory() && f.getName().equalsIgnoreCase("text"));
+
+        if (resources != null && resources.length == 1) {
+            File[] files = resources[0].listFiles(f -> f.getName().matches("(?i)text.*\\.arc"));
+            if (files != null && Arrays.stream(files).anyMatch(File::exists)) {
+                ret.add(resources[0].toPath());
+            }
+        }
+
+        if (text != null && text.length == 1) {
+            File[] files = text[0].listFiles(f -> f.getName().matches("(?i)text.*\\.arc"));
+            if (files != null && Arrays.stream(files).anyMatch(File::exists)) {
+                ret.add(text[0].toPath());
+            }
+        }
+
+        return ret;
+    }
+
+    public List<Path> getCustomMapResources(Path customMap) {
+        File[] databaseDirs = customMap.toAbsolutePath().toFile().listFiles(
+                f -> f.isDirectory() && f.getName().equalsIgnoreCase("resources"));
+
+        if (databaseDirs != null && databaseDirs.length == 1) {
+            File[] resources = databaseDirs[0].listFiles(f ->
+                    !f.getName().toLowerCase(Locale.ROOT).equals("text.arc"));
+            if (resources != null && resources.length > 0) {
+                return Arrays.stream(resources).map(File::toPath).toList();
+            }
+        }
+
+        return Collections.emptyList();
+    }
+
 
     public String getSaveDataMainArchivedPath() {
         String archived = getSaveDataMainPath();
