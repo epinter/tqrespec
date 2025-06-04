@@ -76,6 +76,7 @@ public class GameInfo {
     private InstallType installType = InstallType.UNKNOWN;
     private Path tqBasePath = null;
     private Path steamLibraryPathFound = null;
+    private Path savePathFound = null;
     private HashMap<String, String> gameOptions;
     private GameVersion installedVersion = GameVersion.UNKNOWN;
     private boolean dlcRagnarok = false;
@@ -122,7 +123,8 @@ public class GameInfo {
         Path steamLibraryPath = getSteamLibraryPath();
         logger.log(DEBUG, "LibraryPathFound -- ''{0}''", steamLibraryPath);
         if (steamLibraryPath != null) {
-            Path steamGamePath = Paths.get(steamLibraryPath.toString(), Constants.GAME_DIRECTORY_STEAM).toAbsolutePath();
+            Path steamGamePath = resolvePath(Path.of(
+                    steamLibraryPath.toAbsolutePath().toString(), Constants.GAME_DIRECTORY_STEAM));
             if (isValidGamePath(steamGamePath)) {
                 return steamGamePath;
             }
@@ -150,7 +152,7 @@ public class GameInfo {
             }
             steamLibraryFolderVdf = Paths.get(steamPath, "SteamApps", "libraryfolders.vdf").toAbsolutePath();
         } else {
-            steamLibraryFolderVdf = Paths.get(System.getProperty("user.home"), ".steam", "steam", "config", "libraryfolders.vdf").toAbsolutePath();
+            steamLibraryFolderVdf = resolvePath(Path.of(System.getProperty("user.home"), ".steam", "steam", "config", "libraryfolders.vdf").toAbsolutePath());
         }
 
         try {
@@ -162,8 +164,8 @@ public class GameInfo {
             for (String directory : libraryPaths) {
                 logger.log(DEBUG, "Trying library -- ''{0}''", directory);
 
-                Path libraryPath = Paths.get(directory, "steamapps").toAbsolutePath();
-                Path libraryGamePath = Paths.get(libraryPath.toString(), Constants.GAME_DIRECTORY_STEAM).toAbsolutePath();
+                Path libraryPath = resolvePath(Path.of(directory, "steamapps").toAbsolutePath());
+                Path libraryGamePath = resolvePath(Path.of(libraryPath.toString(), Constants.GAME_DIRECTORY_STEAM));
                 if (isValidGamePath(libraryGamePath)) {
                     logger.log(DEBUG, "VALID PATH FOUND!! -- ''{0}''", libraryGamePath);
                     steamLibraryPathFound = libraryPath;
@@ -682,13 +684,21 @@ public class GameInfo {
     }
 
     private Path resolvePath(Path path) {
-        try (Stream<Path> stream = Files.list(path.getParent())) {
-            return stream.filter(f -> f.getFileName().toString().equalsIgnoreCase(path.getFileName().toString())).toList().getFirst();
-        } catch (NoSuchFileException ignored) {
-        } catch (IOException e) {
-            logger.log(ERROR, "Error", e);
+        if (Files.exists(path)) {
+            return path;
         }
-        return path;
+        if (path.getParent() != null) {
+            try (Stream<Path> stream = Files.list(resolvePath(path.getParent()))) {
+                List<Path> file = stream.filter(f -> f.getFileName().toString().equalsIgnoreCase(path.getFileName().toString())).toList();
+                if (!file.isEmpty()) {
+                    return file.getFirst().toAbsolutePath();
+                }
+            } catch (NoSuchFileException ignored) {
+            } catch (IOException e) {
+                logger.log(ERROR, "Error", e);
+            }
+        }
+        return path.toAbsolutePath();
     }
 
     private void addTextPath(Path path) {
@@ -746,6 +756,10 @@ public class GameInfo {
     }
 
     public String getSavePath() {
+        if (savePathFound != null && Files.exists(savePathFound)) {
+            return savePathFound.toAbsolutePath().toString();
+        }
+
         String userHome = System.getProperty("user.home");
         logger.log(DEBUG, "SavePath: user.home is ''{0}''", userHome);
 
@@ -757,26 +771,29 @@ public class GameInfo {
                 }
             }
             if (installType == InstallType.STEAM) {
-                return Path.of(
-                        steamLibraryPathFound.toString(),
+                savePathFound = resolvePath(Path.of(steamLibraryPathFound.toAbsolutePath().toString(),
                         "compatdata", "475150", "pfx", "drive_c", "users", "steamuser", "Documents",
-                        Constants.SAVEGAME_SUBDIR).toAbsolutePath().toString();
+                        Constants.SAVEGAME_SUBDIR)).toAbsolutePath();
+
+                return savePathFound.toString();
             }
             prepareDevGameSaveData();
-            return Constants.DEV_GAMEDATA;
+            savePathFound = resolvePath(Path.of(Constants.DEV_GAMEDATA).toAbsolutePath());
+            return savePathFound.toString();
         }
 
-        String saveDirectory;
+        String doc;
         try {
-            saveDirectory = Shell32Util.getFolderPath(ShlObj.CSIDL_MYDOCUMENTS);
+            doc = Shell32Util.getFolderPath(ShlObj.CSIDL_MYDOCUMENTS);
         } catch (Exception e) {
-            saveDirectory = userHome;
+            doc = userHome;
         }
 
-        Path savePath = Paths.get(saveDirectory, Constants.SAVEGAME_SUBDIR);
+        Path savePath = Path.of(doc, Constants.SAVEGAME_SUBDIR).toAbsolutePath();
         if (Files.exists(savePath)) {
             logger.log(DEBUG, "SavePath: found");
-            return savePath.toAbsolutePath().toString();
+            savePathFound = savePath;
+            return savePathFound.toString();
         }
         return null;
     }
