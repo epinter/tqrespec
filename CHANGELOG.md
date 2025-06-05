@@ -1,4 +1,16 @@
 # Changelog
+## [1.1.0] - 2025-06-05
+### Added
+- Mod support
+- Monitor game process on Linux
+
+### Fixed
+- Fixed texconverter-cli not starting on Windows
+
+### Changed
+- Switch to G1GC garbage collector
+- Use case-insensitive game and save path detection
+
 ## [1.0.3] - 2025-06-01
 ### Added
 - Added tag to characters list (for external saves).
