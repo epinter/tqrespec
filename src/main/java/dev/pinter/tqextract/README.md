@@ -17,13 +17,24 @@ of a total 25278 TEX files, so 24460 reversed.
 Convert a TEX to PNG on Windows
 
 ~~~
-./texconverter-cli.exe -i /tmp/TIGERMAN01.TEX -o /tmp/tigerman.png
+./texconverter-cli.exe -i x:/tmp/TIGERMAN01.TEX -o x:/tmp/tigerman.png
 ~~~
 
 Convert a TEX to DDS on Linux
 
 ~~~
 ./texconverter-cli.sh -i /tmp/TIGERMAN01.TEX -o /tmp/tigerman.dds
+~~~
+
+The example below converts all textures found in the directory specified, and a new directory "x:/tmp/output-texconvert/textures" will be
+created containing resulting textures. If no conversion type is specified with the command line options,
+***all .TEX will be converted to .DDS, and all .DDS will be converted to .TEX.***
+
+**If you drag-and-drop a directory to texconverter-cli.exe, the process will start in a console window, the log can be found in the default
+temporary directory, (%TEMP% on Windows, /tmp on Linux). The same can be done with a single file.**
+
+~~~
+./texconverter-cli.exe -d x:/tmp/textures
 ~~~
 
 ## Extract
