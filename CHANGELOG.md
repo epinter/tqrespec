@@ -1,4 +1,8 @@
 # Changelog
+## [1.1.1] - 2025-06-13
+### Added
+- Added option to bulk convert textures from a directory, supports drag-and-drop.
+
 ## [1.1.0] - 2025-06-05
 ### Added
 - Mod support
