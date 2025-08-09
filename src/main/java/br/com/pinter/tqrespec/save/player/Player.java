@@ -1015,6 +1015,9 @@ public class Player {
 
         List<VariableInfo> teleportUidsSizeVars = new ArrayList<>(Objects.requireNonNull(block).getVariables().get(Constants.Save.VAR_TELEPORTUIDSSIZE));
         teleportUidsSizeVars.sort(Comparator.comparing(VariableInfo::getKeyOffset));
+        if (difficulty < 0 || difficulty >= teleportUidsSizeVars.size()) {
+            return null;
+        }
         int offsetStart = teleportUidsSizeVars.get(difficulty).getKeyOffset();
         VariableInfo size = teleportUidsSizeVars.get(difficulty);
 
