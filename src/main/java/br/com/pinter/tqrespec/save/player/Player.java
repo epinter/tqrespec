@@ -906,13 +906,16 @@ public class Player {
         TeleportDifficulty teleportDifficulty = getTeleportUidFromDifficulty(difficulty);
 
         if (teleportDifficulty == null) {
-            throw new UnhandledRuntimeException("error creating teleport");
+            throw new UnhandledRuntimeException("error removing teleport");
         }
 
         VariableInfo uidsSize = getTeleportUIDsSizeVar(difficulty);
 
         List<VariableInfo> toRemove = new ArrayList<>();
         for (VariableInfo stagingVar : teleportDifficulty.getBlockInfo().getStagingVariables().values()) {
+            if(stagingVar == null) {
+                continue;
+            }
             if (stagingVar.getVariableType().equals(VariableType.UID) && stagingVar.getName().equals(Constants.Save.VAR_TELEPORTUID)) {
                 UID uidTp;
                 try {
@@ -1059,8 +1062,8 @@ public class Player {
 
         //search for teleports pending save
         for (VariableInfo v : block.getStagingVariables().get(Constants.Save.VAR_TELEPORTUID)
-                .stream().sorted(Comparator.comparing(VariableInfo::getKeyOffset)).toList()) {
-            if (v.getKeyOffset() >= startOffset && v.getKeyOffset() <= endOffset) {
+                .stream().sorted(Comparator.comparing(variableInfo -> variableInfo != null ? variableInfo.getKeyOffset() : 0)).toList()) {
+            if (v != null && v.getKeyOffset() >= startOffset && v.getKeyOffset() <= endOffset) {
                 teleports.add(v);
             }
         }
