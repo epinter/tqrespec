@@ -249,7 +249,7 @@ public class Cli {
     }
 
     @Command(name = "arz", mixinStandardHelpOptions = true,
-            description = "Extract arc files")
+            description = "Extract arz files")
     public static class OptionExtractArz implements Runnable {
         @ParentCommand
         private Cli parent;
