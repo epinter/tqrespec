@@ -1,4 +1,8 @@
 # Changelog
+## [1.1.2] - 2025-09-14
+### Fixed
+- Added check for teleports when loading, fixed mobile savegame bug ([#61](https://github.com/epinter/tqrespec/issues/61)) 
+
 ## [1.1.1] - 2025-06-13
 ### Added
 - Added option to bulk convert textures from a directory, supports drag-and-drop.
