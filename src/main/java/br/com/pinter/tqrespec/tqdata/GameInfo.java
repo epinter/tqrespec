@@ -801,8 +801,12 @@ public class GameInfo {
     }
 
     public List<Path> getCustomMaps() {
-        Path userMaps = resolvePath(Path.of(getSavePath(), "CustomMaps")).toAbsolutePath();
         List<Path> mods = new ArrayList<>();
+        String savePath = getSavePath();
+        if(StringUtils.isEmpty(savePath)) {
+            return mods;
+        }
+        Path userMaps = resolvePath(Path.of(savePath, "CustomMaps")).toAbsolutePath();
         if (steamLibraryPathFound != null && Files.exists(steamLibraryPathFound)) {
             Path steamMapsParent = resolvePath(Path.of(steamLibraryPathFound.toString(), "workshop", "content", "475150"));
             try (DirectoryStream<Path> workshop = Files.newDirectoryStream(steamMapsParent)) {
