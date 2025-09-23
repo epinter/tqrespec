@@ -1,4 +1,8 @@
 # Changelog
+## [1.1.3] - 2025-09-23
+### Fixed
+- Fix NPE loading savegames when game is not installed ([#63](https://github.com/epinter/tqrespec/issues/63))
+
 ## [1.1.2] - 2025-09-14
 ### Fixed
 - Added check for teleports when loading, fixed mobile savegame bug ([#61](https://github.com/epinter/tqrespec/issues/61)) 
