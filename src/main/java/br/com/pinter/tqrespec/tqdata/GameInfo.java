@@ -934,7 +934,7 @@ public class GameInfo {
         return null;
     }
 
-    public String getSaveSetingsPath() {
+    public String getSaveSettingsPath() {
         if (!SystemUtils.IS_OS_WINDOWS) {
             if (gamePath == null) {
                 try {
@@ -1056,12 +1056,12 @@ public class GameInfo {
     public void readGameOptions() throws IOException {
         gameOptions = new HashMap<>();
 
-        String saveSetingsPath = getSaveSetingsPath();
-        if (StringUtils.isBlank(saveSetingsPath)) {
+        String saveSettingsPath = getSaveSettingsPath();
+        if (StringUtils.isBlank(saveSettingsPath)) {
             throw new IOException("savegame path not found");
         }
 
-        Path optionsPath = Paths.get(saveSetingsPath, "options.txt");
+        Path optionsPath = Paths.get(saveSettingsPath, "options.txt");
         if (!Files.exists(optionsPath)) {
             throw new IOException("options.txt not found");
         }
