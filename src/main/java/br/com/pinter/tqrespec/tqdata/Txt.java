@@ -59,7 +59,6 @@ public class Txt {
             }
         } catch (FileNotFoundException e) {
             logger.log(ERROR, Constants.ERROR_MSG_EXCEPTION, e);
-            throw new UnhandledRuntimeException("Error loading text resource.");
         }
     }
 
