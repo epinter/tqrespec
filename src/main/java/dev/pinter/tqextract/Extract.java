@@ -331,7 +331,7 @@ public class Extract {
                             mapDecompiler.extractAll();
                             logger.log(INFO, "Map ''{0}'' extraction finished.", entry.getPath());
                             printInfo("Map '%s' extraction finished.", entry.getPath());
-                        } catch (IOException e) {
+                        } catch (Exception e) {
                             logger.log(ERROR, "MapDecompiler failed", e);
                             printInfo("ERROR: MapDecompiler failed: "
                                     + (e.getMessage() != null ? e.getMessage() : e.getClass()));
