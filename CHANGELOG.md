@@ -1,4 +1,9 @@
 # Changelog
+## [1.2.0] - 2026-02-27
+### Fixed
+- Fix manual path selection causing crash with languages without localization support (like German) ([#67](https://github.com/epinter/tqrespec/issues/67))
+- Fix tq-extract randomly writing content in wrong files when extracting ARZ (tqdatabase)
+
 ## [1.1.3] - 2025-09-23
 ### Fixed
 - Fix NPE loading savegames when game is not installed ([#63](https://github.com/epinter/tqrespec/issues/63))
