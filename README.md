@@ -13,11 +13,13 @@ TQRespec is a tool for [Titan Quest](https://titanquestgame.com) game that helps
 You can download TQRespec from the releases page, [here](https://github.com/epinter/tqrespec/releases/latest). There's no installation, just
 extract and run.
 
+**For a brief documentation about MAP, ARC, ARZ, textures and resources extraction, see [tq-extract](https://github.com/epinter/tqrespec/tree/master/src/main/java/dev/pinter/tqextract) command line tool included with TQRespec.**
+
 #### ***Requirements***
 
 This software runs on Windows or Linux, both must be 64bit. You don't need to have Java or any other software installed,
 but if you have problems like missing dlls, check
-if [Microsoft Visual C++ Redist 2015-2022](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist) is updated.
+if [Microsoft Visual C++ Redistributable](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist) is updated.
 
 ## **How to use**
 
