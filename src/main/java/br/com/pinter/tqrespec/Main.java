@@ -172,16 +172,6 @@ public class Main extends Application {
 
     private void load(Stage primaryStage) {
         logger.log(DEBUG, "preloading data");
-        try {
-            gameInfo.getDatabasePath();
-            gameInfo.getTextPath();
-            progressSet(0.1, 0.2);
-
-        } catch (FileNotFoundException e) {
-            uiUtils.showError(ResourceHelper.getMessage(Constants.Msg.MAIN_GAMENOTDETECTED), ResourceHelper.getMessage(Constants.Msg.MAIN_CHOOSEGAMEDIRECTORY));
-            logger.log(ERROR, "game path not detected, showing DirectoryChooser", e);
-            chooseDirectory(primaryStage);
-        }
 
         Task<Void> task = new Task<>() {
             @Override
@@ -300,7 +290,21 @@ public class Main extends Application {
         logger = Log.getLogger(Main.class.getName());
         logger.log(DEBUG, State.get().getDebugPrefix());
         progressSet(0.0, 0.1);
+
+        Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler::unhandled);
+
         try {
+            try {
+                gameInfo.getDatabasePath();
+                gameInfo.getTextPath();
+                progressSet(0.1, 0.2);
+
+            } catch (FileNotFoundException e) {
+                uiUtils.showError(ResourceHelper.getMessage(Constants.Msg.MAIN_GAMENOTDETECTED), ResourceHelper.getMessage(Constants.Msg.MAIN_CHOOSEGAMEDIRECTORY));
+                logger.log(ERROR, "game path not detected, showing DirectoryChooser", e);
+                chooseDirectory(primaryStage);
+            }
+
             prepareMainStage(primaryStage);
             load(primaryStage);
         } catch (RuntimeException e) {
@@ -311,8 +315,6 @@ public class Main extends Application {
     public void prepareMainStage(Stage primaryStage) {
         logger.log(DEBUG, "starting application");
         ResourceHelper.loadFonts();
-
-        Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler::unhandled);
 
         Parent root;
         try {
