@@ -32,6 +32,7 @@ import java.util.Set;
 
 import static java.lang.System.Logger.Level.ERROR;
 import static java.lang.System.Logger.Level.INFO;
+import static java.lang.System.Logger.Level.WARNING;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,9 +46,6 @@ public class PlayerTest {
 
     @Inject
     private Db db;
-
-    @Inject
-    private Db txt;
 
     @Inject
     @InjectMocks
@@ -64,6 +62,7 @@ public class PlayerTest {
 
     @BeforeEach
     void setUp() throws IOException {
+        //noinspection resource
         MockitoAnnotations.openMocks(this);
         try {
             injector = GuiceInjector.init(this);
@@ -96,7 +95,7 @@ public class PlayerTest {
         try {
             Files.copy(pathFrom, pathTo);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log(WARNING, "", e);
         }
 
         playerChr = pathTo.toAbsolutePath();

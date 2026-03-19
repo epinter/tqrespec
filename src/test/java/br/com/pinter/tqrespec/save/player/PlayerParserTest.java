@@ -72,6 +72,7 @@ class PlayerParserTest {
 
     @BeforeEach
     void setUp() throws IOException {
+        //noinspection resource
         MockitoAnnotations.openMocks(this);
         try {
             injector = GuiceInjector.init(this);
@@ -279,9 +280,12 @@ class PlayerParserTest {
         boolean hadesEpic = false;
         boolean hadesLegendary = false;
         for (TeleportDifficulty t : saveTeleports) {
-            assertTrue(t.getVariables().size() > 0);
+            assertFalse(t.getVariables().isEmpty());
             for (VariableInfo v : t.getVariables()) {
                 UID uid = new UID((byte[]) v.getValue());
+                if (uid.getUid() == null) {
+                    throw new IllegalArgumentException("Invalid uid");
+                }
                 switch (uid.getUid()) {
                     case helos -> {
                         helosNormal = t.getDifficulty() == 0 || helosNormal;

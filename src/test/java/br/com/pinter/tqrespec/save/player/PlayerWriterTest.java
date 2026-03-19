@@ -42,10 +42,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.logging.Level;
 
 import static java.lang.System.Logger.Level.ERROR;
 import static java.lang.System.Logger.Level.INFO;
+import static java.lang.System.Logger.Level.WARNING;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -61,7 +61,7 @@ class PlayerWriterTest {
     private PlayerParser playerParser;
 
     @Mock
-    GameInfo gameInfo;
+    private GameInfo gameInfo;
 
     @InjectMocks
     private PlayerWriter playerWriter;
@@ -92,6 +92,7 @@ class PlayerWriterTest {
             fail();
         }
 
+        //noinspection resource
         MockitoAnnotations.openMocks(this);
 
         try {
@@ -100,7 +101,7 @@ class PlayerWriterTest {
             Files.deleteIfExists(Paths.get("src/test/resources/_testcopy/Player.chr"));
             Files.deleteIfExists(Paths.get("src/test/resources/_testcopy"));
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log(WARNING, "", e);
         }
 
         Mockito.when(mockSaveData.getPlayerPath()).thenReturn(Path.of(String.format("%s/_%s","src/test/resources", savegame)));
@@ -161,6 +162,7 @@ class PlayerWriterTest {
             fail();
         }
 
+        //noinspection resource
         MockitoAnnotations.openMocks(this);
 
         try {
@@ -169,7 +171,7 @@ class PlayerWriterTest {
             Files.deleteIfExists(Paths.get("src/test/resources/_testcopy/Player.chr"));
             Files.deleteIfExists(Paths.get("src/test/resources/_testcopy"));
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log(WARNING, "", e);
         }
 
         Mockito.when(mockSaveData.getPlayerPath()).thenReturn(Path.of(String.format("%s/_%s","src/test/resources", savegame)));
@@ -345,11 +347,6 @@ class PlayerWriterTest {
 
         copyAndParseSavegame(Platform.WINDOWS);
 
-        try {
-            Files.copy(Path.of("src/test/resources/_testcopy"), Path.of("src/test/resources/a.chr"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         assertEquals("testcopy", saveData.getDataMap().getCharacterName());
         assertEquals(3, saveData.getDataMap().getInt(0,"headerVersion"));
         assertNull(saveData.getDataMap().getString("currentDifficulty"));
