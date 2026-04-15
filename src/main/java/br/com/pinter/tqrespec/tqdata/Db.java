@@ -70,19 +70,23 @@ public class Db {
         }
     }
 
+    protected Database getDatabase() {
+        return database;
+    }
+
     public Skills skills() {
         initialize();
-        return database.skills();
+        return getDatabase().skills();
     }
 
     public Player player() {
         initialize();
-        return database.player();
+        return getDatabase().player();
     }
 
     public Teleports teleports() {
         initialize();
-        return database.teleports();
+        return getDatabase().teleports();
     }
 
     public DbRecord getRecord(String recordPath) {
@@ -90,7 +94,7 @@ public class Db {
     }
 
     public void loadMod(Path dbPath) throws IOException {
-        database.loadMod(dbPath);
+        getDatabase().loadMod(dbPath);
     }
 
     public void unloadMods() {
@@ -99,11 +103,11 @@ public class Db {
 
     public void preloadAll() {
         initialize();
-        database.preloadAll();
+        getDatabase().preloadAll();
     }
 
     public boolean recordExists(String recordId) {
-        return database.recordExists(recordId);
+        return getDatabase().recordExists(recordId);
     }
 
     public enum Platform {
