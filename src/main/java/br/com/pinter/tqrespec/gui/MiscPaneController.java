@@ -20,6 +20,7 @@
 
 package br.com.pinter.tqrespec.gui;
 
+import br.com.pinter.tqdatabase.models.Teleport;
 import br.com.pinter.tqrespec.Settings;
 import br.com.pinter.tqrespec.core.MyEventHandler;
 import br.com.pinter.tqrespec.core.MyTask;
@@ -522,7 +523,11 @@ public class MiscPaneController implements Initializable {
     private List<MapTeleport> getAllTeleports() {
         List<MapTeleport> ret = new ArrayList<>();
         for (MapTeleport m : DefaultMapTeleport.getAll()) {
-            String name = db.teleports().getTeleport(m.getRecordId()).getDescription();
+            Teleport teleport = db.teleports().getTeleport(m.getRecordId());
+            if (teleport == null) {
+                continue;
+            }
+            String name = teleport.getDescription();
             if (txt.isTagStringValid(m.getTag())) {
                 name = txt.getString(m.getTag());
             } else if (txt.getString(name) != null) {

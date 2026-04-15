@@ -844,6 +844,9 @@ public class Player {
                     continue;
                 }
                 Teleport teleport = db.teleports().getTeleport(mapTeleport.getRecordId());
+                if (teleport == null) {
+                    continue;
+                }
                 mapTeleport.setName(teleport.getDescription());
                 ret.add(mapTeleport);
             }
