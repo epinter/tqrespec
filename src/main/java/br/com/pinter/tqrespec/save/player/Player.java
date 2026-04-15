@@ -466,8 +466,12 @@ public class Player {
         return getVariableValueInteger("money");
     }
 
+    public boolean supportsAltMoney() {
+        return getDataMap().hasVariable("altMoney");
+    }
+
     public int getAltMoney() {
-        if (getDataMap().hasVariable("altMoney")) {
+        if (supportsAltMoney()) {
             return getVariableValueInteger("altMoney");
         }
 
@@ -477,7 +481,7 @@ public class Player {
     }
 
     public void setAltMoney(int altMoney) {
-        if (!getDataMap().hasVariable("altMoney")) {
+        if (!supportsAltMoney()) {
             logger.log(INFO, "altMoney variable not found for character {0}, version {1}",
                     saveData.getPlayerName(), saveData.getHeaderInfo().getPlayerVersion());
             return;

@@ -223,8 +223,13 @@ public class AttributesPaneController implements Initializable {
         mc.unlockedEditProperty().addListener((o, ov, nv) -> {
             goldText.setEditable(nv);
             goldText.setStyle("border: 1px solid");
-            electrumText.setEditable(nv);
-            electrumText.setStyle("border: 1px solid");
+            if (player.supportsAltMoney()) {
+                electrumText.setEditable(nv);
+                electrumText.setStyle("border: 1px solid");
+            } else {
+                electrumText.setDisable(true);
+            }
+
             charLevelSpinner.setDisable(!nv);
             skillSpinner.setDisable(!nv);
         });
@@ -537,7 +542,12 @@ public class AttributesPaneController implements Initializable {
         difficulty.getSelectionModel().select(player.getDifficulty());
         difficulty.getItems().sort(Comparator.comparing(DifficultyItem::getId));
 
-        electrumText.setText(String.valueOf(playerProps().getElectrum()));
+        if (player.supportsAltMoney()) {
+            electrumText.setText(String.valueOf(playerProps().getElectrum()));
+        } else {
+            electrumText.setDisable(true);
+        }
+
         experienceText.setText(NumberFormat.getInstance(State.get().getLocale()).format(playerProps().getXp()));
         setCharLevelField(playerProps().getCharLevel());
         goldText.setText(String.valueOf(playerProps().getGold()));
