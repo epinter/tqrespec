@@ -22,7 +22,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="rootelement" alignment="TOP_CENTER" maxHeight="940.0" maxWidth="1320.0" minHeight="650.0" minWidth="900.0" prefHeight="650.0" prefWidth="900.0" stylesheets="@main.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.pinter.tqrespec.gui.MainController">
+<VBox fx:id="rootelement" alignment="TOP_CENTER" maxHeight="940.0" maxWidth="1320.0" minHeight="690.0" minWidth="900.0" prefHeight="650.0" prefWidth="900.0" stylesheets="@main.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.pinter.tqrespec.gui.MainController">
    <children>
       <HBox fx:id="tophbox" fillHeight="false" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" onMouseDragged="#moveWindow" onMousePressed="#startMoveWindow" onMouseReleased="#endMoveWindow" prefHeight="47.0" styleClass="tq-topdecoration" VBox.vgrow="ALWAYS">
          <children>
@@ -63,8 +63,8 @@
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="80.0" />
               </columnConstraints>
               <rowConstraints>
-                <RowConstraints maxHeight="68.0" minHeight="10.0" prefHeight="48.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="68.0" minHeight="10.0" prefHeight="48.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="68.0" minHeight="48.0" prefHeight="48.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="68.0" minHeight="48.0" prefHeight="48.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
                   <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#openAboutWindow" styleClass="tq-bigtitle" text="TQ Respec" GridPane.halignment="LEFT" GridPane.rowSpan="2" GridPane.valignment="TOP">
@@ -103,7 +103,7 @@
                   <Insets />
                </VBox.margin>
             </GridPane>
-            <TabPane fx:id="tabPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="270.0" styleClass="tq-tabpane" tabMaxHeight="100.0" tabMaxWidth="100.0" VBox.vgrow="ALWAYS">
+            <TabPane fx:id="tabPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="440.0" styleClass="tq-tabpane" tabMaxHeight="100.0" tabMaxWidth="100.0" VBox.vgrow="ALWAYS">
                <tabs>
                   <Tab fx:id="attributesTab" closable="false" styleClass="tq-tabbutton" text="%main.attributesTab">
                      <content>
@@ -133,7 +133,7 @@
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="27.0" />
               </columnConstraints>
               <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="42.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="42.0" prefHeight="42.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
                   <Button fx:id="saveButton" alignment="CENTER" disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#saveChar" styleClass="tq-button" text="%main.savechar" textAlignment="CENTER" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
