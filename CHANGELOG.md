@@ -1,4 +1,12 @@
 # Changelog
+## [1.2.1] - 2026-04-15
+### Fixed
+- Fix minor ui margin issue
+- Log all errors in mapdecompiler
+- Ignore teleports not found in the game database, fixes NPE when game is outdated ([#69](https://github.com/epinter/tqrespec/issues/69))
+- Fix electrum field being shown when savegame doesn't support (when game is outdated)
+
+# Changelog
 ## [1.2.0] - 2026-02-27
 ### Fixed
 - Fix manual path selection causing crash with languages without localization support (like German) ([#67](https://github.com/epinter/tqrespec/issues/67))
