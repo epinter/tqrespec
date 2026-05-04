@@ -330,7 +330,7 @@ public class PlayerWriter extends FileWriter {
                     Path dir = zipfs.getPath(toZipPath);
                     String excludeCopyRegex = null;
                     if (conversionTarget.equals(Platform.MOBILE)) {
-                        excludeCopyRegex = "(?i)(?:^backup.*|^winsys.dxg$|^winsys.dxb$|^settings.txt$)";
+                        excludeCopyRegex = "(?i)(?:^backup.*|^winsys\\.dxg$|^winsys\\.dxb$|^settings\\.txt$)";
                     }
                     copyDirectoryRecurse(playerSaveDirSource, dir, false, zipfs, excludeCopyRegex);
                     if (!backupOnly) {
@@ -341,7 +341,7 @@ public class PlayerWriter extends FileWriter {
             } else {
                 String excludeCopyRegex = "(?i)(?:^backup.*)";
                 if (!conversionTarget.equals(Platform.UNDEFINED) && oldPlatform.equals(Platform.MOBILE)) {
-                    excludeCopyRegex = "(?i)(?:^backup.*|^.winsys.dxg$|^.winsys.dxb$|^SavingChar.txt$)";
+                    excludeCopyRegex = "(?i)(?:^backup.*|^.winsys\\.dxg$|^.winsys\\.dxb$|^SavingChar\\.txt$)";
                 }
                 copyDirectoryRecurse(playerSaveDirSource, playerSaveDirTarget, false, excludeCopyRegex);
                 writeBuffer(playerSaveDirTarget.toString(), Constants.PLAYERCHR, fileDataMap);
