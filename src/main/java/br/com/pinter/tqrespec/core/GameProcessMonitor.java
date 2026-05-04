@@ -25,6 +25,7 @@ import org.apache.commons.lang3.SystemUtils;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Pattern;
 
 import static br.com.pinter.tqrespec.util.Constants.PROCESS_SCAN_INTERVAL_MS;
 
@@ -63,7 +64,7 @@ public class GameProcessMonitor implements Runnable {
                     ProcessHandle.allProcesses().forEach(p -> {
                         String command = p.info().commandLine().orElse(null);
                         Path gamePath = Paths.get(directory);
-                        if (command != null && command.matches("(?i).*" + gamePath.toAbsolutePath() + "\\b.*")
+                        if (command != null && command.matches("(?i).*" + Pattern.quote(gamePath.toAbsolutePath().toString()) + "\\b.*")
                                 && command.matches("(?i).*\\btq.exe\\b.*")) {
                             foundRunning.set(true);
                         }
