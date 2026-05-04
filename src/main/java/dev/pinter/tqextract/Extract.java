@@ -55,6 +55,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
@@ -187,6 +188,25 @@ public class Extract {
         if (!executorArc.isTerminated() || !executorMap.isTerminated()) {
             printInfo("Waiting workers to finish");
         }
+        try {
+            boolean waitArc = true;
+            boolean waitArz = true;
+            boolean waitMap = true;
+            while (waitArc || waitArz || waitMap) {
+                if (executorArc.awaitTermination(2, TimeUnit.SECONDS)) {
+                    waitArc = false;
+                }
+                if (executorArz.awaitTermination(2, TimeUnit.SECONDS)) {
+                    waitArz = false;
+                }
+                if (executorMap.awaitTermination(2, TimeUnit.SECONDS)) {
+                    waitMap = false;
+                }
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        }
     }
 
     private void processArc(Path file, Path dest, Executor executor) throws IOException {
@@ -265,7 +285,7 @@ public class Extract {
         List<CompletableFuture<Path>> arzFutures = Collections.synchronizedList(new ArrayList<>());
 
         database.processTree(arz, n -> {
-            if(n == null) {
+            if (n == null) {
                 return null;
             }
 
