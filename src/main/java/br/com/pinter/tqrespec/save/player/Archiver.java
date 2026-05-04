@@ -10,6 +10,7 @@ import br.com.pinter.tqrespec.tqdata.PlayerCharacter;
 import com.google.inject.Inject;
 
 import java.io.IOException;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -47,7 +48,11 @@ public class Archiver {
             throw new IOException("Error archiving character, invalid path");
         }
 
-        Files.move(src, dst, StandardCopyOption.ATOMIC_MOVE);
+        try {
+            Files.move(src, dst, StandardCopyOption.ATOMIC_MOVE);
+        } catch (AtomicMoveNotSupportedException e) {
+            Files.move(src, dst);
+        }
     }
 
     public void unarchive(PlayerCharacter playerCharacter) throws IOException {
@@ -66,6 +71,10 @@ public class Archiver {
             throw new IOException("Error unarchiving character, invalid path");
         }
 
-        Files.move(src, dst, StandardCopyOption.ATOMIC_MOVE);
+        try {
+            Files.move(src, dst, StandardCopyOption.ATOMIC_MOVE);
+        } catch (AtomicMoveNotSupportedException e) {
+            Files.move(src, dst);
+        }
     }
 }
