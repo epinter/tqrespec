@@ -485,7 +485,7 @@ public abstract class FileParser {
 
     byte[] readStream() {
         int len = getBuffer().getInt();
-        if (len <= 0) {
+        if (len <= 0 || len > getBuffer().remaining()) {
             return new byte[0];
         }
         byte[] buf = new byte[len];
@@ -500,7 +500,7 @@ public abstract class FileParser {
         int offset = getBuffer().position();
         try {
             len = getBuffer().getInt();
-            if (len <= 0) {
+            if (len <= 0 || len > getBuffer().remaining()) {
                 return null;
             }
             buf = new byte[len];
