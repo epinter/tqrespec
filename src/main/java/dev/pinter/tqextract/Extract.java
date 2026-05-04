@@ -137,7 +137,8 @@ public class Extract {
             logger.log(INFO, "Found ARC ''{0}''", relativePath);
             try {
                 processArc(file, Path.of(outputDir.toString(), relativePath.toString()), executorArc);
-            } catch (IOException ignored) {
+            } catch (IOException e) {
+                logger.log(ERROR, "Failed to process ARC '%s'", relativePath, e);
             }
         }
         latch.countDown();
@@ -264,6 +265,10 @@ public class Extract {
         List<CompletableFuture<Path>> arzFutures = Collections.synchronizedList(new ArrayList<>());
 
         database.processTree(arz, n -> {
+            if(n == null) {
+                return null;
+            }
+
             arzFutures.add(
                     CompletableFuture.runAsync(() -> {
                         try {
@@ -286,6 +291,9 @@ public class Extract {
                     }, executorArz).handle((v, e) -> {
                         count.incrementAndGet();
                         progressHandler.apply("ARZ", count.get(), database.getRecordCount());
+                        if (e != null) {
+                            logger.log(ERROR, "Error", e);
+                        }
                         return null;
                     })
             );
@@ -301,7 +309,7 @@ public class Extract {
         Path outfile;
         try {
             ResourceFile entry = rec.getFile(resourceName);
-            outfile = Path.of(destDir.toString(), entry.getPath().toString());
+            outfile = destDir.resolve(entry.getPath());
 
             if (outfile.toAbsolutePath().getParent() == null) {
                 throw new IllegalArgumentException("Invalid directory " + outfile);
