@@ -418,12 +418,12 @@ tasks.register('appimage') {
                         '--description', 'The respec tool for Titan Quest game',
                         '--copyright', 'Copyright (C) 2025 Emerson Pinter',
                         '--main-jar', jar.outputs.files.collect { it.getName() }.get(0),
-                        '--main-class', $ { application.mainClass.get() },
+                        '--main-class', application.mainClass.get(),
                         '--java-options',
                         '-XX:+UseG1GC ' +
                                 '-Dguice_bytecode_gen_option=DISABLED ' +
                                 '-XX:MinHeapFreeRatio=2 -XX:MaxHeapFreeRatio=15 -XX:SoftMaxHeapSize=512M ' +
-                                '-XX:G1PeriodicGCSystemLoadThreshold=0 -XX:G1PeriodicGCInterval=7000 -XX:-G1PeriodicGCInvokesConcurrent' +
+                                '-XX:G1PeriodicGCSystemLoadThreshold=0 -XX:G1PeriodicGCInterval=7000 -XX:-G1PeriodicGCInvokesConcurrent ' +
                                 '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED ' +
                                 '--add-opens java.base/java.lang=ALL-UNNAMED'
             }
