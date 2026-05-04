@@ -311,7 +311,7 @@ public class MiscPaneController implements Initializable {
     private void filterCopyCharInput() {
         String str = copyCharInput.getText();
         copyCharInput.setText(StringUtils.stripAccents(str)
-                .replaceAll("[\\\\/:*?\"<>|;]", "")
+                .replaceAll("[\\\\/:*?\".<>|;]", "")
                 .replaceAll("^(.{0,14}).*", "$1"));
     }
 
