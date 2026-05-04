@@ -156,6 +156,8 @@ jar {
 }
 
 tasks.register('copyMetaInf', Copy) {
+    mustRunAfter compileJava
+    mustRunAfter processResources
     group = 'tqrespec'
     from fileTree(new File(sourceSets.main.output.resourcesDir, '/META-INF'))
     into sourceSets.main.java.classesDirectory.get().dir('/META-INF')
