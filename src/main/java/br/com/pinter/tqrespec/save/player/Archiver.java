@@ -44,7 +44,7 @@ public class Archiver {
             throw new IOException("Invalid savegame location");
         }
 
-        if (!dst.startsWith(src.getParent()) || !dst.startsWith(gameInfo.getSavePath())) {
+        if (!dst.startsWith(src.getParent()) || !dst.startsWith(gameInfo.getSavePath()) || src.getFileName().toString().contains("..")) {
             throw new IOException("Error archiving character, invalid path");
         }
 
