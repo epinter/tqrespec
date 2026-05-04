@@ -544,7 +544,7 @@ public class FileDataMap implements DeepCloneable {
             int currentValue = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).put(currentData).rewind().getInt();
             value = currentValue - 1;
         } else {
-            value++;
+            value--;
         }
 
         setInt(variable, value);
